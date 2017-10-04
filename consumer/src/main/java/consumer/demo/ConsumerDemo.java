@@ -15,6 +15,8 @@ import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import config.ServiceConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -22,6 +24,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.scheduling.annotation.Async;
@@ -47,6 +50,8 @@ public class ConsumerDemo {
 
   @Autowired
   ExecutorService executorService;
+
+  private static String bootstrapServers;
 
   private final AtomicLong offset = new AtomicLong();
 
@@ -77,17 +82,25 @@ public class ConsumerDemo {
 
 
   public static void main(String[] args) {
+    Config config= ConfigFactory.load();
+    bootstrapServers=config.getString("akka.kafka.consumer.bootstrap-servers");
+
+    log.info("BootstrapServers----------------------------------------"+bootstrapServers);
+
     final ActorSystem system = ActorSystem.create("kafka-consumer-demo");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
+
 
     ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     ConsumerDemo consumerDemo=context.getBean(ConsumerDemo.class);
 
 
 
+
+
     final ConsumerSettings<String, String> consumerSettings =
       ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-        .withBootstrapServers("localhost:9092")
+        .withBootstrapServers(bootstrapServers)
         .withGroupId("group1")
         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
