@@ -1,4 +1,4 @@
-mainClassName = "consumer.demo.ConsumerDemo"
+mainClassName = "consumer.depsNotification.DepsNotificationConsumer"
 
 apply plugin: 'application'
 apply plugin: 'java'

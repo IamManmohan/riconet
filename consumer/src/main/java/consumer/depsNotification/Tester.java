@@ -1,7 +1,6 @@
-package consumer.demo;
+package consumer.depsNotification;
 
 import com.rivigo.zoom.common.enums.Topic;
-import dto.BarcodeScanDTO;
 import dto.TestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

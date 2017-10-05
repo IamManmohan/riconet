@@ -1,4 +1,4 @@
-package consumer.demo;
+package consumer.depsNotification;
 
 /**
  * Created by ashfakh on 26/9/17.

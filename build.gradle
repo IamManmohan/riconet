@@ -1,5 +1,5 @@
 allprojects {
-  group 'com.demo'
+  group 'com.depsNotification'
   version '1.0-SNAPSHOT'
 
   apply plugin: 'java'

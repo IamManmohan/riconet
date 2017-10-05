@@ -1,4 +1,4 @@
-group 'com.demo'
+group 'com.depsNotification'
 version '1.0-SNAPSHOT'
 
 mainClassName = "core"

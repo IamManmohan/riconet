@@ -1,4 +1,4 @@
-package consumer.demo;
+package consumer.depsNotification;
 
 import akka.Done;
 import akka.actor.ActorSystem;
@@ -18,13 +18,13 @@ import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import config.ServiceConfig;
+import enums.ProducerTopics;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.scheduling.annotation.Async;
@@ -32,9 +32,7 @@ import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Component
-public class ConsumerDemo {
+public class DepsNotificationConsumer {
 
 
   @Autowired
@@ -83,16 +81,16 @@ public class ConsumerDemo {
 
   public static void main(String[] args) {
     Config config= ConfigFactory.load();
-    bootstrapServers=config.getString("akka.kafka.consumer.bootstrap-servers");
+    bootstrapServers=config.getString("bootstrap-servers");
 
     log.info("BootstrapServers----------------------------------------"+bootstrapServers);
 
-    final ActorSystem system = ActorSystem.create("kafka-consumer-demo");
+    final ActorSystem system = ActorSystem.create("kafka-consumer-depsNotification");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
 
 
     ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
-    ConsumerDemo consumerDemo=context.getBean(ConsumerDemo.class);
+    DepsNotificationConsumer depsNotificationConsumer =context.getBean(DepsNotificationConsumer.class);
 
 
 
@@ -105,27 +103,27 @@ public class ConsumerDemo {
         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
 
-    Set<String> topicSets = new HashSet<>();
-    topicSets.add("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION");
+ //   Set<String> topicSets = new HashSet<>();
+   // topicSets.add(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString());
 
-//    demo
+//    depsNotification
 //      .loadOffset()
 //      .thenAccept(fromOffset -> Consumer
 //        .plainSource(
 //          consumerSettings,
 //          Subscriptions.topics(topicSets)
 //        )
-//        .mapAsync(1, demo::save)
+//        .mapAsync(1, depsNotification::save)
 //        .runWith(Sink.ignore(), materializer));
 
-    consumerDemo
+    depsNotificationConsumer
       .loadOffset()
       .thenAccept(fromOffset -> Consumer
         .plainSource(
           consumerSettings,
-          Subscriptions.assignmentWithOffset(new TopicPartition("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION", 0), fromOffset)
+          Subscriptions.assignmentWithOffset(new TopicPartition(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString(), 0), fromOffset)
         )
-        .mapAsync(1, consumerDemo::save)
+        .mapAsync(1, depsNotificationConsumer::save)
         .runWith(Sink.ignore(), materializer));
 
   }
