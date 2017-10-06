@@ -14,7 +14,9 @@ import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
+import com.rivigo.zoom.common.model.ConsumerMessages;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
+import com.rivigo.zoom.common.repository.mysql.ConsumerMessagesRepository;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import config.ServiceConfig;
@@ -24,6 +26,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -49,26 +52,47 @@ public class DepsNotificationConsumer {
   @Autowired
   ExecutorService executorService;
 
+  @Autowired
+  ConsumerMessagesRepository consumerMessagesRepository;
+
   private static String bootstrapServers;
 
   private final AtomicLong offset = new AtomicLong();
 
   @Async
   private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
+    Boolean processCheck=false;
     executorService.submit(()->{
-      ObjectMapper objectMapper=new ObjectMapper();
-      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-      DEPSNotificationContext context = null;
       try {
-        TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {};
-        List<DEPSNotificationDTO> depsRecordList = objectMapper.readValue(record.value().toString(), mapType);
-        context=depsRecordService.getNotificationContext(depsRecordList);
-      } catch (IOException e) {
-
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        DEPSNotificationContext context = null;
+        try {
+          TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {
+          };
+          List<DEPSNotificationDTO> depsRecordList = objectMapper.readValue(record.value().toString(), mapType);
+          context = depsRecordService.getNotificationContext(depsRecordList);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
+        depsRecordService.sendNotifications(depsNotificationList);
+      } catch (Exception e) {
+        log.error("--------------failed----------------");
+          ConsumerMessages consumerMessage;
+          consumerMessage=consumerMessagesRepository.findByMessage(record.value());
+          if(consumerMessage==null){
+            consumerMessage=new ConsumerMessages();
+            consumerMessage.setMessage(record.value());
+            consumerMessage.setRetry_count(1L);
+            consumerMessage.setRetry_time(DateTime.now().getMillis());
+            consumerMessage.setTopic(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString());
+          }else{
+            consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
+          }
+          consumerMessagesRepository.save(consumerMessage);
         e.printStackTrace();
       }
-      List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
-      depsRecordService.sendNotifications(depsNotificationList);
     });
     offset.set(record.offset());
     return CompletableFuture.completedFuture(Done.getInstance());
