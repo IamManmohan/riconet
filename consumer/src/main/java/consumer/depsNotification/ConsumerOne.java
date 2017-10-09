@@ -25,7 +25,6 @@ public class ConsumerOne extends ConsumerModel {
     }
 
     public ConsumerOne(){
-        super(new HashSet<>(Arrays.asList(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name())),
-                new HashSet<>(Arrays.asList(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name())));
+        super(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name());
     }
 }
