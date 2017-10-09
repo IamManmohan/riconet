@@ -16,6 +16,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timeout;
+import org.jboss.netty.util.Timer;
+import org.jboss.netty.util.TimerTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -41,6 +46,8 @@ public class ConsumerModel {
     @Autowired
     private DEPSRecordService depsRecordService;
 
+    private Timer timer=new HashedWheelTimer();
+
     //@Autowired
     //private KafkaTemplate kafkaTemplate;
 
@@ -51,6 +58,16 @@ public class ConsumerModel {
         System.out.println("DB.save: " + record.value());
         String st=processMeassage(record.value());
         //System.out.print(st);
+        try{}
+        catch(Exception e){
+            TimerTask task=new TimerTask() {
+                @Override
+                public void run(Timeout timeout) throws Exception {
+                    //do something
+                }
+            };
+            timer.newTimeout(task,5, TimeUnit.MINUTES);
+        }
         offset.set(record.offset());
         return CompletableFuture.completedFuture(Done.getInstance());
     }
