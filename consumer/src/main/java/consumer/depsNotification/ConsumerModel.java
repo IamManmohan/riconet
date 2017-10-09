@@ -57,9 +57,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 @Getter
 @Setter
+@Component
 public abstract class ConsumerModel {
 
-    private Topic topic;
+    private Set<Topic> topic;
 
     @Autowired
     private DEPSRecordService depsRecordService;
@@ -76,8 +77,9 @@ public abstract class ConsumerModel {
 
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
+
         executorService.submit(()->{
-            processMeassage(record.value());
+            processMessage(record.value());
         });
         offset.set(record.offset());
         return CompletableFuture.completedFuture(Done.getInstance());
@@ -85,37 +87,24 @@ public abstract class ConsumerModel {
 
     private CompletionStage<Long> loadOffset() {
         return CompletableFuture.completedFuture(offset.get());
-        }
+    }
 
-    public abstract String processMeassage(String str);
+    public abstract String processMessage(String str);
 
-    public abstract String getTopic();
-
-    public void load() {
-        final ActorSystem system = ActorSystem.create("kafka-consumer-depsNotification");
-        final ActorMaterializer materializer = ActorMaterializer.create(system);
-
-        ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
-        ConsumerModel consumerModel=context.getBean(ConsumerModel.class);
-
-
-
+    public void load(ActorSystem system, ActorMaterializer materializer, Set<Topic> topics) {
         final ConsumerSettings<String, String> consumerSettings =
                 ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
                         .withBootstrapServers("localhost:9092")
                         .withGroupId("group1")
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
-        String Topic=getTopic();
-
-        consumerModel
-                .loadOffset()
+        this.loadOffset()
                 .thenAccept(fromOffset -> Consumer
                         .plainSource(
                                 consumerSettings,
                                 Subscriptions.assignmentWithOffset(new TopicPartition("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION", 0), fromOffset)
                         )
-                        .mapAsync(1, consumerModel::save)
+                        .mapAsync(1, this::save)
                         .runWith(Sink.ignore(), materializer));
     }
 }
