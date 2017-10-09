@@ -126,20 +126,6 @@ public class DepsNotificationConsumer {
         .withGroupId("group1")
         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
-
- //   Set<String> topicSets = new HashSet<>();
-   // topicSets.add(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString());
-
-//    depsNotification
-//      .loadOffset()
-//      .thenAccept(fromOffset -> Consumer
-//        .plainSource(
-//          consumerSettings,
-//          Subscriptions.topics(topicSets)
-//        )
-//        .mapAsync(1, depsNotification::save)
-//        .runWith(Sink.ignore(), materializer));
-
     depsNotificationConsumer
       .loadOffset()
       .thenAccept(fromOffset -> Consumer

@@ -28,12 +28,11 @@ public class ConsumerTimer implements TimerTask {
     @Autowired
     KafkaTemplate kafkaTemplate;
 
-    private String msg;
+    private Long msgId;
 
     @Override
     public void run(Timeout timeout) throws Exception{
-        kafkaTemplate.send(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString(),msg);
-
+        kafkaTemplate.send("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR",msgId);
     }
 
 }
