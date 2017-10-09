@@ -7,10 +7,21 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import com.rivigo.zoom.common.dto.DEPSNotificationContext;
+import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
+import com.rivigo.zoom.common.enums.Topic;
+import com.rivigo.zoom.common.model.ConsumerMessages;
+import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import config.ServiceConfig;
 import dto.TestDTO;
+import enums.ProducerTopics;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,6 +31,7 @@ import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.Timer;
 import org.jboss.netty.util.TimerTask;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,10 +39,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
 
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -40,11 +55,17 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 @Slf4j
-@Component
-public class ConsumerModel {
+@Getter
+@Setter
+public abstract class ConsumerModel {
+
+    private Topic topic;
 
     @Autowired
     private DEPSRecordService depsRecordService;
+
+    @Autowired
+    ExecutorService executorService;
 
     private Timer timer=new HashedWheelTimer();
 
@@ -55,25 +76,10 @@ public class ConsumerModel {
 
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
-        System.out.println("DB.save: " + record.value());
-        String st=processMeassage(record.value());
-        //System.out.print(st);
-        try{}
-        catch(Exception e){
-            TimerTask task=new TimerTask() {
-                @Override
-                public void run(Timeout timeout) throws Exception {
-                    //do something
-                }
-            };
-            timer.newTimeout(task,5, TimeUnit.MINUTES);
-        }
+        executorService.submit(()->{
+            processMeassage(record.value());
+        });
         offset.set(record.offset());
-        return CompletableFuture.completedFuture(Done.getInstance());
-    }
-
-    public CompletionStage<Done> process(TestDTO data) {
-        System.out.println("Rocket launched to " + data);
         return CompletableFuture.completedFuture(Done.getInstance());
     }
 
@@ -81,15 +87,11 @@ public class ConsumerModel {
         return CompletableFuture.completedFuture(offset.get());
         }
 
-    private String processMeassage(String str){
-        if(str.equals("hai")){
-            return str;
-        }
-        return null;
-    }
+    public abstract String processMeassage(String str);
 
+    public abstract String getTopic();
 
-    public static void main(String[] args) {
+    public void load() {
         final ActorSystem system = ActorSystem.create("kafka-consumer-depsNotification");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
@@ -104,19 +106,7 @@ public class ConsumerModel {
                         .withGroupId("group1")
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
-
-        Set<String> topicSets = new HashSet<>();
-        topicSets.add("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION");
-
-//    depsNotification
-//      .loadOffset()
-//      .thenAccept(fromOffset -> Consumer
-//        .plainSource(
-//          consumerSettings,
-//          Subscriptions.topics(topicSets)
-//        )
-//        .mapAsync(1, depsNotification::save)
-//        .runWith(Sink.ignore(), materializer));
+        String Topic=getTopic();
 
         consumerModel
                 .loadOffset()
