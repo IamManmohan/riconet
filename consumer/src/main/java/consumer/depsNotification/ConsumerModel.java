@@ -17,6 +17,7 @@ import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.ConsumerMessages;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
+import com.rivigo.zoom.common.repository.mysql.ConsumerMessagesRepository;
 import config.ServiceConfig;
 import dto.TestDTO;
 import enums.ProducerTopics;
@@ -68,6 +69,9 @@ public abstract class ConsumerModel {
     @Autowired
     ExecutorService executorService;
 
+    @Autowired
+    ConsumerMessagesRepository consumerMessagesRepository;
+
     private Timer timer=new HashedWheelTimer();
 
     //@Autowired
@@ -79,7 +83,12 @@ public abstract class ConsumerModel {
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
 
         executorService.submit(()->{
-            processMessage(record.value());
+            try {
+                processMessage(record.value());
+            }catch (Exception e){
+                processError(record.value());
+                e.printStackTrace();
+            }
         });
         offset.set(record.offset());
         return CompletableFuture.completedFuture(Done.getInstance());
@@ -90,6 +99,29 @@ public abstract class ConsumerModel {
     }
 
     public abstract String processMessage(String str);
+
+    String processError(String str){
+        System.out.print("processing error");
+        ConsumerMessages consumerMessage=new ConsumerMessages();
+        consumerMessage = consumerMessagesRepository.findByMessage(str);
+
+        if(consumerMessage==null){
+            consumerMessage.setMessage(str);
+            consumerMessage.setRetry_count(1L);
+            consumerMessage.setRetry_time(DateTime.now().getMillis());
+            consumerMessage.setTopic(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString());
+        }else{
+            consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
+        }
+        consumerMessage=consumerMessagesRepository.save(consumerMessage);
+        if(consumerMessage.getRetry_count()<6L) {
+            ConsumerTimer task = new ConsumerTimer();
+            task.setMsg(str);
+            timer.newTimeout(task, 5, TimeUnit.MINUTES);
+        }
+        return str;
+    }
+
 
     public void load(ActorSystem system, ActorMaterializer materializer, Set<Topic> topics) {
         final ConsumerSettings<String, String> consumerSettings =

@@ -1,17 +1,14 @@
 package consumer.depsNotification;
 
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import com.rivigo.zoom.common.config.ZoomConfig;
-import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
-import com.rivigo.zoom.common.enums.Topic;
-import config.ServiceConfig;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.rivigo.zoom.common.model.Consignment;
+import com.rivigo.zoom.common.model.ConsumerMessages;
+import com.rivigo.zoom.common.repository.mysql.ConsumerMessagesRepository;
+import enums.ProducerTopics;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by ashfakh on 9/10/17.
@@ -20,6 +17,13 @@ import java.util.Set;
 public class ConsumerOne extends ConsumerModel {
 
     public String processMessage(String str){
+        if(str.equals("hai")){
+            System.out.println("--------------------Failure---------------");
+            Consignment cn=null;
+            str=cn.getCnote();
+            System.out.println("--------------------Failure-sssss--------------");
+        }
+        System.out.println("--------------------SUCCESS---------------"+str+"------");
         return str;
     }
 
