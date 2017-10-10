@@ -2,4 +2,5 @@ rootProject.name = 'riconet'
 
 include 'consumer'
 include 'core'
+include 'depsNotification'
 
