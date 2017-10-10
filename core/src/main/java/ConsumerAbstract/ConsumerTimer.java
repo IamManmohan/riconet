@@ -10,13 +10,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public class ConsumerTimer implements TimerTask {
 
-    private final Long msgId;
+    private final String msgId;
 
     private final String topic;
 
     private KafkaTemplate kafkaTemplate;
 
-    public ConsumerTimer(Long msgId,String topic,KafkaTemplate kafkaTemplate){
+    public ConsumerTimer(String msgId,String topic,KafkaTemplate kafkaTemplate){
         this.msgId=msgId;
         this.topic=topic;
         this.kafkaTemplate=kafkaTemplate;
@@ -25,7 +25,7 @@ public class ConsumerTimer implements TimerTask {
 
     @Override
     public void run(Timeout timeout) throws Exception{
-        kafkaTemplate.send(topic,msgId.toString());
+        kafkaTemplate.send(topic,msgId);
     }
 
 }

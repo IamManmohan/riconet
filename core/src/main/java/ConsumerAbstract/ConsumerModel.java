@@ -7,9 +7,8 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
-import com.rivigo.zoom.common.model.ConsumerMessages;
-import com.rivigo.zoom.common.repository.mysql.ConsumerMessagesRepository;
-import enums.ProducerTopics;
+import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
+import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
+import service.UserMasterService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -82,7 +82,7 @@ public abstract class ConsumerModel {
         }
         else if(record.topic().toString().equals(errorTopic)){
             executorService.submit(()->{
-                ConsumerMessages consumerMessages=consumerMessagesRepository.findById(Long.valueOf(record.value()));
+                ConsumerMessages consumerMessages=consumerMessagesRepository.findById(record.value());
                 try {
                     processMessage(consumerMessages.getMessage());
                 }catch (Exception e){
@@ -103,11 +103,12 @@ public abstract class ConsumerModel {
 
     String processError(ConsumerMessages consumerMessage){
         System.out.print("processing error");
-        if(consumerMessage.getRetry_count()<6L) {
+        if(consumerMessage.getRetry_count()<5L) {
+            consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
             consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
             consumerMessage=consumerMessagesRepository.save(consumerMessage);
             ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
-            timer.newTimeout(task, 5, TimeUnit.MINUTES);
+            timer.newTimeout(task, 30, TimeUnit.SECONDS);
         }
         return consumerMessage.getMessage();
     }
@@ -115,10 +116,13 @@ public abstract class ConsumerModel {
     String processFirstTimeError(String str){
         System.out.print("First time error");
         ConsumerMessages consumerMessage=new ConsumerMessages();
+        consumerMessage.setId(topic+DateTime.now().getMillis());
         consumerMessage.setMessage(str);
         consumerMessage.setRetry_count(1L);
         consumerMessage.setRetry_time(DateTime.now().getMillis());
         consumerMessage.setTopic(topic);
+        consumerMessage.setCreatedAt(DateTime.now().getMillis());
+        consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
 
         consumerMessage=consumerMessagesRepository.save(consumerMessage);
         ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
