@@ -1,4 +1,4 @@
-package consumer.depsNotification;
+package ConsumerAbstract;
 
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;
@@ -25,7 +25,7 @@ public class ConsumerTimer implements TimerTask {
 
     @Override
     public void run(Timeout timeout) throws Exception{
-        kafkaTemplate.send(topic,msgId);
+        kafkaTemplate.send(topic,msgId.toString());
     }
 
 }

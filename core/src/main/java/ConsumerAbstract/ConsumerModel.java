@@ -1,4 +1,4 @@
-package consumer.depsNotification;
+package ConsumerAbstract;
 
 import akka.Done;
 import akka.actor.ActorSystem;
@@ -7,21 +7,18 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
-import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.ConsumerMessages;
 import com.rivigo.zoom.common.repository.mysql.ConsumerMessagesRepository;
 import enums.ProducerTopics;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
@@ -72,28 +69,28 @@ public abstract class ConsumerModel {
 
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
-        if(record.topic().toString().equals(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString())){
+        if(record.topic().toString().equals(topic)){
             log.info("");
             executorService.submit(()->{
                 try {
                     processMessage(record.value());
                 }catch (Exception e){
-                    processError(record.value());
+                    processFirstTimeError(record.value());
                     e.printStackTrace();
                 }
             });
         }
-//        else if(record.topic().toString().equals("COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR")){
-//            executorService.submit(()->{
-//                ConsumerMessages consumerMessages=consumerMessagesRepository.findById(Long.valueOf(record.value()));
-//                try {
-//                    processMessage(consumerMessages.getMessage());
-//                }catch (Exception e){
-//                    processError(consumerMessages.getMessage());
-//                    e.printStackTrace();
-//                }
-//            });
-//        }
+        else if(record.topic().toString().equals(errorTopic)){
+            executorService.submit(()->{
+                ConsumerMessages consumerMessages=consumerMessagesRepository.findById(Long.valueOf(record.value()));
+                try {
+                    processMessage(consumerMessages.getMessage());
+                }catch (Exception e){
+                    processError(consumerMessages);
+                    e.printStackTrace();
+                }
+            });
+        }
         offset.set(record.offset());
         return CompletableFuture.completedFuture(Done.getInstance());
     }
@@ -104,25 +101,29 @@ public abstract class ConsumerModel {
 
     public abstract String processMessage(String str);
 
-    String processError(String str){
+    String processError(ConsumerMessages consumerMessage){
         System.out.print("processing error");
-        ConsumerMessages consumerMessage;
-        consumerMessage = consumerMessagesRepository.findByMessage(str);
-
-        if(consumerMessage==null){
-            consumerMessage=new ConsumerMessages();
-            consumerMessage.setMessage(str);
-            consumerMessage.setRetry_count(1L);
-            consumerMessage.setRetry_time(DateTime.now().getMillis());
-            consumerMessage.setTopic(ProducerTopics.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.toString());
-        }else{
-            consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
-        }
-        consumerMessage=consumerMessagesRepository.save(consumerMessage);
         if(consumerMessage.getRetry_count()<6L) {
-            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic);
-            timer.newTimeout(task, 30, TimeUnit.SECONDS);
+            consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
+            consumerMessage=consumerMessagesRepository.save(consumerMessage);
+            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
+            timer.newTimeout(task, 5, TimeUnit.MINUTES);
         }
+        return consumerMessage.getMessage();
+    }
+
+    String processFirstTimeError(String str){
+        System.out.print("First time error");
+        ConsumerMessages consumerMessage=new ConsumerMessages();
+        consumerMessage.setMessage(str);
+        consumerMessage.setRetry_count(1L);
+        consumerMessage.setRetry_time(DateTime.now().getMillis());
+        consumerMessage.setTopic(topic);
+
+        consumerMessage=consumerMessagesRepository.save(consumerMessage);
+        ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
+        timer.newTimeout(task, 30, TimeUnit.SECONDS);
+
         return str;
     }
 

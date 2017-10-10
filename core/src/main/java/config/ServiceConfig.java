@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@ComponentScan(basePackages ={"consumer.depsNotification"
+@ComponentScan(basePackages ={"consumerOne", "depsNotification"
 ,"service"})
 
 public class ServiceConfig {
