@@ -21,6 +21,7 @@ import org.jboss.netty.util.HashedWheelTimer;
 import org.jboss.netty.util.Timer;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
@@ -44,14 +45,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public abstract class ConsumerModel {
 
-    private final Set<String> topic;
+    private final String topic;
 
-    private final Set<String> errorTopic;
-
-    public ConsumerModel(Set<String> topic, Set<String> errorTopic){
-        this.topic=topic;
-        this.errorTopic=errorTopic;
-    }
+    private final String errorTopic;
 
     @Autowired
     private DEPSRecordService depsRecordService;
@@ -62,9 +58,17 @@ public abstract class ConsumerModel {
     @Autowired
     ConsumerMessagesRepository consumerMessagesRepository;
 
+    @Autowired
+    KafkaTemplate kafkaTemplate;
+
     private Timer timer=new HashedWheelTimer();
 
     private final AtomicLong offset = new AtomicLong();
+
+    public ConsumerModel(String topic, String errorTopic){
+        this.topic=topic;
+        this.errorTopic=errorTopic;
+    }
 
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
@@ -116,8 +120,7 @@ public abstract class ConsumerModel {
         }
         consumerMessage=consumerMessagesRepository.save(consumerMessage);
         if(consumerMessage.getRetry_count()<6L) {
-            ConsumerTimer task = new ConsumerTimer();
-            task.setMsgId(consumerMessage.getId());
+            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic);
             timer.newTimeout(task, 30, TimeUnit.SECONDS);
         }
         return str;
@@ -126,8 +129,8 @@ public abstract class ConsumerModel {
 
     public void load(ActorSystem system, ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings) {
         Set<String> topics=new HashSet<>();
-        topics.addAll(topic);
-        topics.addAll(errorTopic);
+        topics.add(topic);
+        topics.add(errorTopic);
 
 
         this.loadOffset()
