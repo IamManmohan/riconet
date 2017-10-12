@@ -175,3 +175,7 @@ Temporary Items
 *.log
 
 **/build/
+
+**/META-INF/
+/org/
+run

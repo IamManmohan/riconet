@@ -21,7 +21,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import service.DEPSRecordService;
-import service.UserMasterService;
 
 import java.util.HashSet;
 import java.util.Set;
