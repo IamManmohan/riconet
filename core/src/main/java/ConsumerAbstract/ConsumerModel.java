@@ -107,7 +107,7 @@ public abstract class ConsumerModel {
             consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
             consumerMessage=consumerMessagesRepository.save(consumerMessage);
             ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
-            timer.newTimeout(task, 30, TimeUnit.SECONDS);
+            timer.newTimeout(task, 5*(consumerMessage.getRetry_count()), TimeUnit.MINUTES);
         }
         return consumerMessage.getMessage();
     }
@@ -125,7 +125,7 @@ public abstract class ConsumerModel {
 
         consumerMessage=consumerMessagesRepository.save(consumerMessage);
         ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
-        timer.newTimeout(task, 30, TimeUnit.SECONDS);
+        timer.newTimeout(task, 5, TimeUnit.MINUTES);
 
         return str;
     }

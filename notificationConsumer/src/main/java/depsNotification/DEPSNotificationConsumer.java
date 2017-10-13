@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.enums.Topic;
+import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,8 @@ public class DEPSNotificationConsumer extends ConsumerModel {
     }catch (Exception e){
       e.printStackTrace();
     }
+    List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
+    depsRecordService.sendNotifications(depsNotificationList);
     return str;
   }
 

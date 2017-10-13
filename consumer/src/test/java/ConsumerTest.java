@@ -27,9 +27,9 @@ public class ConsumerTest {
         assertEquals("test",str);
     }
 
-//    @Test(expected = Exception.class)
-//    public void processMessageException(){
-//
-//    }
+    @Test(expected = Exception.class)
+    public void processMessageException(){
+        String str=consumerOne.processMessage("test");
+    }
 
 }
