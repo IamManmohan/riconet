@@ -45,6 +45,6 @@ public class ConsumerOne extends ConsumerModel{
     }
 
     public ConsumerOne(){
-        super(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
+        super(Topic.TEST.name(),Topic.TEST_ERROR.name());
     }
 }
