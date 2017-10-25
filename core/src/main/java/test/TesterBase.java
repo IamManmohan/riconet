@@ -5,9 +5,10 @@ import com.rivigo.common.config.AppConfig;
 import com.rivigo.zoom.common.config.CacheFactory;
 import com.rivigo.zoom.common.config.CacheInitializer;
 import com.rivigo.zoom.common.config.KafkaConsumerConfig;
-import com.rivigo.zoom.common.config.NotificationConfig;
+import com.rivigo.zoom.common.config.KafkaProducerConfig;
 import com.rivigo.zoom.common.config.PusherConfig;
 import com.rivigo.zoom.common.config.ZoomNeo4jConfig;
+import config.ServiceConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,7 +25,6 @@ import test.config.MySQLTestConfig;
 import test.config.RedisTestConfig;
 import test.config.RivigoMongoTestConfig;
 import test.config.RivigoMySQLTestConfig;
-import test.config.ServiceTestConfig;
 import test.config.TestConfig;
 
 
@@ -38,7 +38,9 @@ import test.config.TestConfig;
                 MySQLTestConfig.class, RivigoMySQLTestConfig.class,
                 MongoTestConfig.class, RivigoMongoTestConfig.class,
                 ZoomNeo4jConfig.class, RedisTestConfig.class,
-                TestConfig.class, ServiceTestConfig.class,
+                TestConfig.class,
+                KafkaProducerConfig.class,KafkaConsumerConfig.class,
+                ServiceConfig.class,
                 AWSConfig.class,
                 PusherConfig.class,
                 CacheInitializer.class,CacheFactory.class
