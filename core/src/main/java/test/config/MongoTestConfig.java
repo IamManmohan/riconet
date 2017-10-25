@@ -21,13 +21,17 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @ComponentScan({ "com.rivigo.zoom.common.repository", "com.rivigo.zoom.common.service" })
 public class MongoTestConfig extends AbstractMongoConfiguration {
 
-    private String embeddedMongoVersion="2.6.1";
+    @Value("${embedded.mongo.version}")
+    private String embeddedMongoVersion;
 
-    private String embeddedMongoHost="127.0.0.1";
+    @Value("${embedded.mongo.host}")
+    private String embeddedMongoHost;
 
-    private Integer embeddedMongoPort=11223;
+    @Value("${embedded.mongo.port}")
+    private Integer embeddedMongoPort;
 
-    private String embeddedMongoDbName="rivigo_zoom_test";
+    @Value("${embedded.mongo.db.name}")
+    private String embeddedMongoDbName;
 
     private MongoClient mongoClient = null;
 

@@ -29,7 +29,8 @@ import java.util.Properties;
 public class MySQLTestConfig {
 
 
-    private String embeddedMysqlDbName="rivigo_zoom_test";
+    @Value("${embedded.mysql.db.name}")
+    private String embeddedMysqlDbName;
 
     @Bean
     public DataSource dataSource() throws PropertyVetoException {

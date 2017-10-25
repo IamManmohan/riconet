@@ -18,14 +18,17 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @ComponentScan({"com.rivigo.common.service", "com.rivigo.analytics.common.service", "com.rivigo.driver.common.service"})
 public class RivigoMongoTestConfig extends AbstractMongoConfiguration {
 
-    private String embeddedMongoVersion="2.6.1";
+    @Value("${embedded.rivigo.mongo.version}")
+    private String embeddedMongoVersion;
 
-    private String embeddedMongoHost="127.0.0.1";
+    @Value("${embedded.rivigo.mongo.host}")
+    private String embeddedMongoHost;
 
-    private Integer embeddedMongoPort=33221;
+    @Value("${embedded.rivigo.mongo.port}")
+    private Integer embeddedMongoPort;
 
-
-    private String embeddedMongoDbName="rivigo";
+    @Value("${embedded.rivigo.mongo.db.name}")
+    private String embeddedMongoDbName;
 
     private MongoClient mongoClient = null;
 

@@ -41,7 +41,7 @@ import test.config.TestConfig;
                 TestConfig.class, ServiceTestConfig.class,
                 AWSConfig.class,
                 PusherConfig.class,
-                CacheInitializer.class
+                CacheInitializer.class,CacheFactory.class
         })
 @Transactional
 @TransactionConfiguration(defaultRollback = true)

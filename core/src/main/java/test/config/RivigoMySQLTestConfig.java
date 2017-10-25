@@ -29,7 +29,8 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class RivigoMySQLTestConfig {
 
-    private String embeddedRivigoMysqlDbName="rivigo_test";
+    @Value("${embedded.rivigo.mysql.db.name}")
+    private String embeddedRivigoMysqlDbName;
 
     @Bean
     @Qualifier("rivigoDataSource")

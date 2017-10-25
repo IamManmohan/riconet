@@ -20,9 +20,11 @@ import redis.clients.jedis.JedisPoolConfig;
 public class RedisTestConfig {
 
 
-    private String embeddedRedisHost="localhost";
+    @Value("${embedded.redis.host}")
+    private String embeddedRedisHost;
 
-    private Integer embeddedRedisPort=6379;
+    @Value("${embedded.redis.port}")
+    private Integer embeddedRedisPort;
 
     @Bean
     RedisConnectionFactory zoomRedisConnectionFactory() {
