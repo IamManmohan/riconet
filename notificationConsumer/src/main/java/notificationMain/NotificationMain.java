@@ -1,4 +1,4 @@
-package depsNotification;
+package notificationMain;
 
 import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
@@ -8,6 +8,7 @@ import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import config.ServiceConfig;
+import depsNotification.DEPSNotificationConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -22,9 +23,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class DEPSNotificationMain {
+public class NotificationMain {
 
-    @Value("bootstrap-servers")
+    @Value("bootstrap.servers")
     private static String bootstrapServers;
 
     @Autowired
@@ -34,7 +35,7 @@ public class DEPSNotificationMain {
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
         ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
-        DEPSNotificationMain consumer=context.getBean(DEPSNotificationMain.class);
+        NotificationMain consumer=context.getBean(NotificationMain.class);
         Config config= ConfigFactory.load();
         bootstrapServers=config.getString("bootstrap.servers");
         final ConsumerSettings<String, String> consumerSettings =
