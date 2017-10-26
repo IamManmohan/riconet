@@ -75,7 +75,7 @@ public abstract class ConsumerModel {
                     processMessage(record.value());
                 }catch (Exception e){
                     processFirstTimeError(record.value());
-                    e.printStackTrace();
+                    log.error("First time error", e);
                 }
             });
         }
@@ -86,7 +86,7 @@ public abstract class ConsumerModel {
                     processMessage(consumerMessages.getMessage());
                 }catch (Exception e){
                     processError(consumerMessages);
-                    e.printStackTrace();
+                    log.error("First time error", e);
                 }
             });
         }
@@ -101,7 +101,7 @@ public abstract class ConsumerModel {
     public abstract String processMessage(String str);
 
     String processError(ConsumerMessages consumerMessage){
-        System.out.print("processing error");
+        log.error("processing error");
         if(consumerMessage.getRetry_count()<5L) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
             consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
@@ -113,7 +113,7 @@ public abstract class ConsumerModel {
     }
 
     String processFirstTimeError(String str){
-        System.out.print("First time error");
+        log.error("First time error");
         ConsumerMessages consumerMessage=new ConsumerMessages();
         consumerMessage.setId(topic+DateTime.now().getMillis());
         consumerMessage.setMessage(str);

@@ -14,7 +14,6 @@ import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
-import com.rivigo.zoom.common.model.DEPSRecord;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PickupRunSheet;

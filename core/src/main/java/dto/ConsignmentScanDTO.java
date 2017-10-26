@@ -42,4 +42,25 @@ public class ConsignmentScanDTO implements Comparable<ConsignmentScanDTO>{
         }
         return this.cpbCategory.compareTo(c.cpbCategory);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj!=null) {
+            if (obj.getClass().equals(this.getClass())) {
+                if (this == obj) {
+                    return true;
+                }
+                return this.equals(obj);
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        return 1;
+    }
+
 }
