@@ -2,6 +2,9 @@ package test.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mysql.jdbc.Driver;
+import com.mysql.jdbc.ReplicationDriver;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,23 +31,48 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class MySQLTestConfig {
 
+    @Value("${zoom.mysql.url}")
+    private String mysqlURL;
 
-    @Value("${embedded.mysql.db.name}")
-    private String embeddedMysqlDbName;
+    @Value("${zoom.mysql.username}")
+    private String mysqlUsername;
+
+    @Value("${zoom.mysql.password}")
+    private String mysqlPassword;
+
+    @Value("${zoom.mysql.minidlethreads}")
+    private Integer mysqlMinIdleThreads;
+
+    @Value("${zoom.mysql.maxthreadpoolsize}")
+    private Integer mysqlMaxThreadPoolSize;
+
+    @Value("${zoom.mysql.connectiontimeoutmillis}")
+    private Integer connectionTimeoutMillis;
+
+    @Value("${zoom.mysql.idletimeoutmillis}")
+    private Integer idleTimeoutMillis;
+
+    @Value("${zoom.mysql.maxlifetimemillis}")
+    private Integer maxLifeTimeMillis;
 
     @Bean
     public DataSource dataSource() throws PropertyVetoException {
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-        builder.setType(EmbeddedDatabaseType.H2).setName(embeddedMysqlDbName).build();
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setDriverClass(Driver.class.getName());
-        dataSource.setJdbcUrl("jdbc:h2:mem:"+embeddedMysqlDbName+";mode=mysql;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false");
-        dataSource.setUser("sa");
-        dataSource.setPassword("");
-        dataSource.setMaxStatements(0);
-        dataSource.setTestConnectionOnCheckout(true);
-        dataSource.setMaxIdleTime(3500);
-        return dataSource;
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(mysqlURL);
+        config.setDriverClassName(Driver.class.getName());
+        config.setConnectionTestQuery("SELECT 1");
+        config.setUsername(mysqlUsername);
+        config.setPassword(mysqlPassword);
+        config.setMinimumIdle(mysqlMinIdleThreads);
+        config.setMaximumPoolSize(mysqlMaxThreadPoolSize);
+        config.setConnectionTimeout(connectionTimeoutMillis);
+        config.setIdleTimeout(idleTimeoutMillis);
+        config.setMaxLifetime(maxLifeTimeMillis);
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("useServerPrepStmts", "true");
+        return new HikariDataSource(config);
     }
 
     @Bean
