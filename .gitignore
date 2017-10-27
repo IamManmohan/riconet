@@ -88,7 +88,7 @@ hs_err_pid*
 .gradle
 /build/
 
-# Ignore Gradle GUI config
+# Ignore Gradle GUI com.rivigo.riconet.core.config
 gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
@@ -126,7 +126,7 @@ project/plugins/project/
 # *.sublime-project
 
 # SFTP configuration file
-sftp-config.json
+sftp-com.rivigo.riconet.core.config.json
 
 # Package control specific files
 Package Control.last-run

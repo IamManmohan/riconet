@@ -19,7 +19,7 @@ $:/> brew services start zookeeper
 $:/> brew services start kafka
 
 Creating a topic via command line:
-$:/> kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+$:/> kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic com.rivigo.riconet.core.test
 
 Running the producer:
 ---------------------
