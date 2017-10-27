@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @Configuration
 @EnableMongoRepositories(basePackages = {"com.rivigo.common.repository.mongo", "com.rivigo.analytics.common.repository.mongo"}, mongoTemplateRef = "rivigoMongoTemplate")
-@ComponentScan({"com.rivigo.common.com.rivigo.riconet.core.service", "com.rivigo.analytics.common.com.rivigo.riconet.core.service", "com.rivigo.driver.common.com.rivigo.riconet.core.service"})
+@ComponentScan({"com.rivigo.common.service", "com.rivigo.analytics.common.service", "com.rivigo.driver.common.service"})
 public class RivigoMongoTestConfig extends AbstractMongoConfiguration {
 
     @Value("${embedded.rivigo.mongo.version}")

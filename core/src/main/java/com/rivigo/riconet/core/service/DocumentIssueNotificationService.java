@@ -1,5 +1,8 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.EmailDlName;
@@ -16,8 +19,6 @@ import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.exceptions.ZoomException;
-import com.rivigo.riconet.core.constants.ConsignmentConstant;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
@@ -25,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 
 import java.util.ArrayList;
 import java.util.Collections;

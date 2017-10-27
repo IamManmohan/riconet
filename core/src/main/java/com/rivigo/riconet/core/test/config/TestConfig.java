@@ -15,13 +15,13 @@ import java.util.List;
 
 @Configuration
 @ComponentScan(basePackages = {
-	"com.rivigo.zoom.delivery",
-	"com.rivigo.zoom.com.rivigo.riconet.core.test.com.rivigo.riconet.core.config",
-	"com.rivigo.zoom.common.com.rivigo.riconet.core.service",
-	"com.rivigo.zoom.common.audit",
-	"com.rivigo.zoom.common.queue",
-	"com.rivigo.zoom.common.com.rivigo.riconet.core.utils",
-	"com.rivigo.zoom.component.query.com.rivigo.riconet.core.utils"
+		"com.rivigo.zoom.delivery",
+		"com.rivigo.zoom.test.config",
+		"com.rivigo.zoom.common.service",
+		"com.rivigo.zoom.common.audit",
+		"com.rivigo.zoom.common.queue",
+		"com.rivigo.zoom.common.utils",
+		"com.rivigo.zoom.component.query.utils"
 })
 public class TestConfig {
 
@@ -29,7 +29,7 @@ public class TestConfig {
 	public static PropertySourcesPlaceholderConfigurer configurer() throws IOException {
 		PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
 		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
-        String profile = "com/rivigo/riconet/core/test";
+        String profile = "test";
         Resource[] resources = patternResolver.getResources(String.format("classpath*:%s/*.properties", profile));
 		List<Resource> resourcesList = new ArrayList<>();
 		resourcesList.addAll(Arrays.asList(resources));
