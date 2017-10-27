@@ -43,11 +43,11 @@ public class NotificationMain {
                         .withBootstrapServers(bootstrapServers)
                         .withGroupId("group1")
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        consumer.load(system,materializer,consumerSettings);
+        consumer.load(materializer,consumerSettings);
     }
 
-    public void load(ActorSystem system, ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
-        depsNotificationConsumer.load(system,materializer,consumerSettings);
+    public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
+        depsNotificationConsumer.load(materializer,consumerSettings);
 
     }
 }

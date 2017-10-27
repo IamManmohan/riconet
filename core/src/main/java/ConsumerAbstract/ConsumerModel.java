@@ -131,7 +131,7 @@ public abstract class ConsumerModel {
     }
 
 
-    public void load(ActorSystem system, ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings) {
+    public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings) {
         Set<String> topics=new HashSet<>();
         topics.add(topic);
         topics.add(errorTopic);
