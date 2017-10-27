@@ -48,6 +48,5 @@ public class NotificationMain {
 
     public void load(ActorSystem system, ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
         depsNotificationConsumer.load(system,materializer,consumerSettings);
-
     }
 }

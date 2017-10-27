@@ -1,5 +1,6 @@
 package service;
 
+import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.repository.mysql.StockAccumulatorRepository;
@@ -19,5 +20,10 @@ public class StockAccumulatorService {
     public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(StockAccumulatorRole role, Long partnerId) {
 		return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerId(role.toString(), partnerId);
 	}
+
+    public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(StockAccumulatorRole role,
+                                                                                             Long partnerId, OperationalStatus status) {
+        return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(role.toString(), partnerId,status.name());
+    }
 
 }
