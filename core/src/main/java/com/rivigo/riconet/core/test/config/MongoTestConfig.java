@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "com.rivigo.zoom.common.repository.mongo")
-@ComponentScan({ "com.rivigo.zoom.common.repository", "com.rivigo.zoom.common.com.rivigo.riconet.core.service" })
+@ComponentScan({ "com.rivigo.zoom.common.repository", "com.rivigo.zoom.common.service" })
 public class MongoTestConfig extends AbstractMongoConfiguration {
 
     @Value("${embedded.mongo.version}")

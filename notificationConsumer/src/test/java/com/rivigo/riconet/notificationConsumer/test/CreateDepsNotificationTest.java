@@ -1,4 +1,4 @@
-package com.rivigo.riconet.notificationConsumer.test.service;
+package com.rivigo.riconet.notificationConsumer.test;
 
 import com.rivigo.zoom.common.repository.mysql.CityRepository;
 import com.rivigo.riconet.notificationConsumer.depsNotification.DEPSNotificationConsumer;

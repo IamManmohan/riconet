@@ -14,8 +14,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-@ComponentScan(basePackages ={"com.rivigo.riconet.notificationConsumer.depsNotification", "com.rivigo.riconet.notificationConsumer.notificationMain"
-, "com/rivigo/riconet/core/service"})
+@ComponentScan(basePackages ={"com.rivigo.riconet.notificationConsumer",
+ "com.rivigo.riconet.core.service"})
 
 public class ServiceConfig {
 	

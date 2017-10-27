@@ -6,6 +6,7 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
+import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
 import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
 import lombok.Getter;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import com.rivigo.riconet.core.service.DEPSRecordService;
 
 import java.util.HashSet;
 import java.util.Set;
