@@ -1,6 +1,6 @@
 package com.rivigo.riconet.notificationConsumer.depsNotification;
 
-import com.rivigo.riconet.core.ConsumerAbstract.ConsumerModel;
+import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

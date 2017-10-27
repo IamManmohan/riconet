@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.ConsumerAbstract;
+package com.rivigo.riconet.core.consumerabstract;
 
 import akka.Done;
 import akka.kafka.ConsumerSettings;
@@ -122,7 +122,7 @@ public abstract class ConsumerModel {
         consumerMessage.setCreatedAt(DateTime.now().getMillis());
         consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
 
-        consumerMessage=consumerMessagesRepository.save(consumerMessage);
+        consumerMessagesRepository.save(consumerMessage);
         ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
         timer.newTimeout(task, 5, TimeUnit.MINUTES);
 

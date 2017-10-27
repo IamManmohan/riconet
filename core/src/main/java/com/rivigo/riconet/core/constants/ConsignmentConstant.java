@@ -1,9 +1,11 @@
 package com.rivigo.riconet.core.constants;
 
-/**
- * Created by hitesh on 9/13/16.
- */
 public class ConsignmentConstant {
+
+    private ConsignmentConstant() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String SECONDARY_CNOTE_SEPARATOR = "-";
     public static final int MANDATORY_STOCK_CHECK_HOURS = 2;
     public static final int DO_STOCK_CHECK_DAYS = 90;

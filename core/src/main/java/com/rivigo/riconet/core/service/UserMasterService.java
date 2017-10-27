@@ -35,11 +35,11 @@ public class UserMasterService {
     }
 
     public <V> V adaptUserTo(User user, Class<V> classType) {
-        if (classType.getName().equals(ZoomUser.class.getName())) {
+        if (classType.equals(ZoomUser.class)) {
             return (V) getZoomUser(user);
-        } else if (classType.getName().equals(ClientUser.class.getName())) {
+        } else if (classType.equals(ClientUser.class)) {
             return (V) getClientUser(user);
-        } else if (classType.getName().equals(StockAccumulator.class.getName())) {
+        } else if (classType.equals(StockAccumulator.class)) {
             return (V) getBPUser(user);
         } else {
             throw new SessionUserException(CANT_ADAPT_USER_ERROR + classType.getName());
@@ -48,11 +48,11 @@ public class UserMasterService {
 
     public <V> boolean canAdaptTo(User user, Class<V> classType) {
         boolean returnValue = false;
-        if (classType.getName().equals(ZoomUser.class.getName())) {
+        if (classType.equals(ZoomUser.class)) {
             returnValue = null != zoomUserMasterService.getZoomUser(user.getEmail());
-        } else if (classType.getName().equals(ClientUser.class.getName())) {
+        } else if (classType.equals(ClientUser.class)) {
             returnValue = null != clientUserRepository.findByUserId(user.getId());
-        } else if (classType.getName().equals(StockAccumulator.class.getName())) {
+        } else if (classType.equals(StockAccumulator.class)) {
             returnValue = null != stockAccumulatorRepository.findByEmail(user.getEmail());
         }
         return returnValue;

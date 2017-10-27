@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.ConsumerAbstract;
+package com.rivigo.riconet.core.consumerabstract;
 
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;

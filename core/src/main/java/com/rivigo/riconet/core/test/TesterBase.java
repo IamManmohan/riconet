@@ -50,7 +50,7 @@ import com.rivigo.riconet.core.test.config.TestConfig;
 @SqlGroup({
         @Sql(value = "classpath:scripts/start/test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(value = "classpath:scripts/data/create-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
-       // @Sql(value = "classpath:scripts/end/remove-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @Sql(value = "classpath:scripts/end/remove-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
 @Slf4j
 public abstract class TesterBase {
