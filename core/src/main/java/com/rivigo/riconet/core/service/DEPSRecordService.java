@@ -471,35 +471,41 @@ public class DEPSRecordService {
         valuesMap.put("reporting_ou", depsNotification.getReporterLocation().getName());
         valuesMap.put("reporting_person", depsNotification.getReporter().getName());
 
+        String scenario="scenario";
+        String responsibleOu="responsible_ou";
+        String responsiblePerson="responsible_person";
+        String centPercent="100 %";
+        String secondCentPercent=" - 100 %";
+
         switch (depsNotification.getScenario()) {
             case PICKUP:
             case BFTRIP:
-                valuesMap.put("scenario","Short at the time of pickup");
-                valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporterLocation().getName());
-                valuesMap.put("responsible_person","100 % "+ depsNotification.getReportee().getName());
+                valuesMap.put(scenario,"Short at the time of pickup");
+                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporterLocation().getName());
+                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName());
                 valuesMap.put("dear",depsNotification.getReportee().getName());
                 break;
             case INBOUND:
-                valuesMap.put("scenario","Scan out -but not scan in");
-                valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporteeLocation().getName()+
-                        " - 100 % "+ depsNotification.getReporterLocation().getName());
-                valuesMap.put("responsible_person","100 % "+ depsNotification.getReportee().getName()+
-                        " - 100 % "+ depsNotification.getReporter().getName());
+                valuesMap.put(scenario,"Scan out -but not scan in");
+                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporteeLocation().getName()+
+                        secondCentPercent+ depsNotification.getReporterLocation().getName());
+                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName()+
+                        secondCentPercent+ depsNotification.getReporter().getName());
                 valuesMap.put("dear", depsNotification.getReportee().getName()+
                         " / "+ depsNotification.getReporter().getName());
                 break;
             case WITHINPC:
-                valuesMap.put("scenario","Within PC");
-                valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporterLocation().getName());
-                valuesMap.put("responsible_person","OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
+                valuesMap.put(scenario,"Within PC");
+                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporterLocation().getName());
+                valuesMap.put(responsiblePerson,"OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
                 valuesMap.put("dear", depsNotification.getReportee().getName()+
                         " / "+ depsNotification.getReporter().getName());
                 break;
             case RETURN_SCAN:
-                valuesMap.put("scenario","Short at time of delivery");
-                valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporteeLocation().getName()+
-                        " - 100 % "+ depsNotification.getReporterLocation().getName());
-                valuesMap.put("responsible_person","100 % "+ depsNotification.getReportee().getName());
+                valuesMap.put(scenario,"Short at time of delivery");
+                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporteeLocation().getName()+
+                        secondCentPercent+ depsNotification.getReporterLocation().getName());
+                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName());
                 valuesMap.put("dear", depsNotification.getReportee().getName());
                 break;
             default:

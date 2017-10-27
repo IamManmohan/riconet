@@ -85,7 +85,7 @@ public abstract class ConsumerModel {
                     processMessage(consumerMessages.getMessage());
                 }catch (Exception e){
                     processError(consumerMessages);
-                    log.error("First time error", e);
+                    log.error("error", e);
                 }
             });
         }
@@ -104,7 +104,7 @@ public abstract class ConsumerModel {
         if(consumerMessage.getRetry_count()<5L) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
             consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
-            consumerMessage=consumerMessagesRepository.save(consumerMessage);
+            consumerMessagesRepository.save(consumerMessage);
             ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
             timer.newTimeout(task, 5*(consumerMessage.getRetry_count()), TimeUnit.MINUTES);
         }
@@ -112,7 +112,7 @@ public abstract class ConsumerModel {
     }
 
     String processFirstTimeError(String str){
-        log.error("First time error");
+        log.error(" Processing first time error");
         ConsumerMessages consumerMessage=new ConsumerMessages();
         consumerMessage.setId(topic+DateTime.now().getMillis());
         consumerMessage.setMessage(str);

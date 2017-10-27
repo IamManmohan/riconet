@@ -51,6 +51,6 @@ import com.rivigo.riconet.core.test.config.TestConfig;
         @Sql(value = "classpath:scripts/data/create-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(value = "classpath:scripts/end/remove-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
-public interface TesterBase {
+public abstract class TesterBase {
 
 }
