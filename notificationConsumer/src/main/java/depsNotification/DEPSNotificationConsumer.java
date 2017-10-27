@@ -32,7 +32,7 @@ public class DEPSNotificationConsumer extends ConsumerModel {
       List<DEPSNotificationDTO> depsRecordList = objectMapper.readValue(str, mapType);
       context = depsRecordService.getNotificationContext(depsRecordList);
     }catch (Exception e){
-      e.printStackTrace();
+      log.error("DepsNotification mapping failed", e);
     }
     List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
     depsRecordService.sendNotifications(depsNotificationList);
@@ -40,6 +40,6 @@ public class DEPSNotificationConsumer extends ConsumerModel {
   }
 
   public DEPSNotificationConsumer(){
-    super(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name());
+    super(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
   }
 }

@@ -16,6 +16,18 @@ allprojects {
     }
   }
 
+  apply plugin: 'jacoco'
+  jacocoTestReport {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+    reports {
+      xml.enabled false
+      csv.enabled false
+      html.destination "${buildDir}/jacocoHtml"
+    }
+  }
+
   repositories { jcenter() }
   dependencies {
     testCompile "org.mockito:mockito-core:1.+"

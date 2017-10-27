@@ -32,7 +32,8 @@ public class ZoomPropertyService {
             }
             if (profile == null && zp.getSpringProfile() == null) {
                 return zp;
-            } else if (profile.equals(zp.getSpringProfile())) {
+            } else if(profile!=null) {
+                if (profile.equals(zp.getSpringProfile()))
                 return zp;
             }
         }

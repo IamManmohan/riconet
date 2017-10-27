@@ -1,7 +1,9 @@
 -- Adminer 4.3.1 MySQL dump
 
 SET NAMES utf8;
+SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address` (
@@ -18,7 +20,63 @@ CREATE TABLE `address` (
   PRIMARY KEY (`id`),
   KEY `FKqljept46mixryf9gklkr3ht0a` (`created_by_id`),
   KEY `FKfcpe5capw9jfeupgx9nbgh5iu` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `administrative_entity_deleted`;
+CREATE TABLE `administrative_entity_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `code` varchar(255) NOT NULL,
+  `location_type` enum('BRANCH','PROCESSING_CENTER','CLUSTER','REGION','HEADQUARTER','BP_TERMINAL') NOT NULL,
+  `owner` varchar(255) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `deleted_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code_UNIQUE` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `administrative_entity_location_deleted`;
+CREATE TABLE `administrative_entity_location_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `administrative_entity_id` bigint(20) NOT NULL,
+  `location_id` bigint(20) NOT NULL,
+  `location_type` enum('BRANCH','PROCESSING_CENTER','CLUSTER','REGION','HEADQUARTER','BP_TERMINAL') NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `deleted_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `administrative_entity_id` (`administrative_entity_id`),
+  KEY `is_active` (`is_active`),
+  KEY `location_id_and_location_type` (`location_type`,`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `alerts_deleted`;
+CREATE TABLE `alerts_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `alert_type` varchar(255) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `box_id` bigint(20) DEFAULT NULL,
+  `client_id` bigint(20) DEFAULT NULL,
+  `consignment_id` bigint(20) DEFAULT NULL,
+  `location_id` bigint(20) DEFAULT NULL,
+  `manifest_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index7` (`created_by_id`),
+  KEY `index8` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `alerts_last_seen_time`;
@@ -31,8 +89,56 @@ CREATE TABLE `alerts_last_seen_time` (
   `last_updated_at` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `alst_user_id` (`user_id`)
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `alert_escalation_matrix_deleted`;
+CREATE TABLE `alert_escalation_matrix_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `sequence` tinyint(4) DEFAULT NULL,
+  `current_level` varchar(255) DEFAULT NULL,
+  `escalation_interval` bigint(20) DEFAULT NULL,
+  `client_priority` varchar(10) DEFAULT NULL,
+  `alert_type` varchar(255) DEFAULT NULL,
+  `opc_to_call` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `alert_recipient_deleted`;
+CREATE TABLE `alert_recipient_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `alert_id` varchar(255) DEFAULT NULL,
+  `alert_type` varchar(255) DEFAULT NULL,
+  `is_active` bit(1) DEFAULT NULL,
+  `location_id` bigint(20) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `alert_template_deleted`;
+CREATE TABLE `alert_template_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `alert_medium` varchar(255) DEFAULT NULL,
+  `alert_type` varchar(255) DEFAULT NULL,
+  `template` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `app_login_restricted_location`;
@@ -47,8 +153,8 @@ CREATE TABLE `app_login_restricted_location` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `app_id_restricted_location_id` (`app_id`,`restricted_location_id`),
-  KEY `alrl_app_id` (`app_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `app_id` (`app_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `asset`;
@@ -63,8 +169,23 @@ CREATE TABLE `asset` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_asset_1_idx` (`trip_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_asset_1_idx` (`trip_id`),
+  CONSTRAINT `fk_asset_1` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `asset_history`;
+CREATE TABLE `asset_history` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `asset_id` bigint(20) DEFAULT NULL,
+  `location_id` bigint(20) DEFAULT NULL,
+  `trip_id` bigint(20) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `autoplan_history`;
@@ -85,7 +206,7 @@ CREATE TABLE `autoplan_history` (
   `event_type` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `autoplan_history_created_at_idx` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `bank_detail`;
@@ -100,7 +221,7 @@ CREATE TABLE `bank_detail` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `barcode_details`;
@@ -114,9 +235,9 @@ CREATE TABLE `barcode_details` (
   `location_code` varchar(45) DEFAULT NULL,
   `barcode_characters` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `bd_client_code` (`client_code`),
-  KEY `bd_location_code` (`location_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_code` (`client_code`),
+  KEY `location_code` (`location_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `billing_entity`;
@@ -131,8 +252,25 @@ CREATE TABLE `billing_entity` (
   `is_active` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FKqljept46mixryiouf9gklkr3ht0a` (`created_by_id`),
-  KEY `FKfcpe5capw9jfeupgkj9x9nbgh5iu` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKfcpe5capw9jfeupgkj9x9nbgh5iu` (`last_updated_by_id`),
+  CONSTRAINT `FKfcpe5capw9jfeupgx9jhnbgh5iu` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKqljept46mixryf9gklkkjlr3ht0a` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `blocked_route`;
+CREATE TABLE `blocked_route` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `from_location_id_list` json DEFAULT NULL,
+  `to_location_id_list` json DEFAULT NULL,
+  `exclusion_client_id_list` json DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `box`;
@@ -151,11 +289,11 @@ CREATE TABLE `box` (
   `is_active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `barcode_index` (`bar_code`),
-  KEY `box_index5` (`consignment_id`),
-  KEY `box_index4` (`created_by_id`),
-  KEY `box_last_updated_at` (`last_updated_at`),
-  KEY `box_bar_code` (`bar_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index5` (`consignment_id`),
+  KEY `index4` (`created_by_id`),
+  KEY `last_updated_at` (`last_updated_at`),
+  KEY `bar_code` (`bar_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `box_history`;
@@ -172,10 +310,17 @@ CREATE TABLE `box_history` (
   `location` varchar(255) DEFAULT NULL,
   `location_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `bh_bar_code_history` (`bar_code`),
-  KEY `bh_box_id` (`box_id`),
-  KEY `bh_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `bar_code` (`bar_code`),
+  KEY `box_id` (`box_id`),
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `box_history_to_delete`;
+CREATE TABLE `box_history_to_delete` (
+  `box_history_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`box_history_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `bp_trip`;
@@ -206,8 +351,12 @@ CREATE TABLE `bp_trip` (
   KEY `FK6fmeygsgf644u5l1me0mjlo2g` (`created_by_id`),
   KEY `FKsm74ofpt3ohbfiaemmt0ago90` (`last_updated_by_id`),
   KEY `FKhdo41nj48x15y8vfnpmdbubtm` (`business_partner_id`),
-  KEY `FKnolmo3o52iwo2xh8figlmt8v6` (`stock_accumulator_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKnolmo3o52iwo2xh8figlmt8v6` (`stock_accumulator_id`),
+  CONSTRAINT `FK6fmeygsgf644u5l1me0mjlo2g` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKhdo41nj48x15y8vfnpmdbubtm` FOREIGN KEY (`business_partner_id`) REFERENCES `business_partner` (`id`),
+  CONSTRAINT `FKnolmo3o52iwo2xh8figlmt8v6` FOREIGN KEY (`stock_accumulator_id`) REFERENCES `stockaccumulator` (`id`),
+  CONSTRAINT `FKsm74ofpt3ohbfiaemmt0ago90` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `bp_vehicle`;
@@ -223,7 +372,7 @@ CREATE TABLE `bp_vehicle` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `business_partner`;
@@ -241,8 +390,10 @@ CREATE TABLE `business_partner` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_orix79l831ufycj9o7kkw9neb` (`business_partner_code`),
   KEY `FKcfdinl6hmmdpg9o5x3bsaus4b` (`created_by_id`),
-  KEY `FKnmc68tqqw054m63q5oiqc24w1` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKnmc68tqqw054m63q5oiqc24w1` (`last_updated_by_id`),
+  CONSTRAINT `FKcfdinl6hmmdpg9o5x3bsaus4b` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKnmc68tqqw054m63q5oiqc24w1` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `business_partner_email`;
@@ -258,7 +409,7 @@ CREATE TABLE `business_partner_email` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cargonet_unavailability_reason`;
@@ -288,7 +439,7 @@ CREATE TABLE `cashbook_collection` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_collection_history`;
@@ -310,7 +461,7 @@ CREATE TABLE `cashbook_collection_history` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_collection_uploaded_files`;
@@ -325,7 +476,7 @@ CREATE TABLE `cashbook_collection_uploaded_files` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_deposit`;
@@ -348,7 +499,7 @@ CREATE TABLE `cashbook_deposit` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_deposit_history`;
@@ -366,7 +517,7 @@ CREATE TABLE `cashbook_deposit_history` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_deposit_uploaded_files`;
@@ -381,7 +532,7 @@ CREATE TABLE `cashbook_deposit_uploaded_files` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_dispute_reason`;
@@ -394,7 +545,7 @@ CREATE TABLE `cashbook_dispute_reason` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cashbook_remittance`;
@@ -412,14 +563,14 @@ CREATE TABLE `cashbook_remittance` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cc_attribution`;
 CREATE TABLE `cc_attribution` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `consignment_id` bigint(20) NOT NULL,
-  `timestamp` varchar(255) NOT NULL,
+  `timestamp` bigint(20) NOT NULL,
   `attribution_category` varchar(255) NOT NULL,
   `responsible_ou_id` bigint(20) DEFAULT NULL,
   `responsible_user_id` bigint(20) DEFAULT NULL,
@@ -427,20 +578,20 @@ CREATE TABLE `cc_attribution` (
   `prev_category` varchar(40) DEFAULT NULL,
   `new_category` varchar(40) DEFAULT NULL,
   `eta_addition` bigint(20) DEFAULT NULL,
-  `action_ids` text NOT NULL,
-  `meta_data` text NOT NULL,
+  `action_ids` json NOT NULL,
+  `meta_data` json NOT NULL,
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   `created_at` bigint(20) NOT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `cca_consignment_id` (`consignment_id`),
-  KEY `cca_attribution_category` (`attribution_category`),
-  KEY `cca_timestamp` (`timestamp`),
-  KEY `cca_responsible_ou_id` (`responsible_ou_id`),
-  KEY `cca_responsible_user_id` (`responsible_user_id`),
-  KEY `cca_responsible_entity` (`responsible_entity`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `attribution_category` (`attribution_category`),
+  KEY `timestamp` (`timestamp`),
+  KEY `responsible_ou_id` (`responsible_ou_id`),
+  KEY `responsible_user_id` (`responsible_user_id`),
+  KEY `responsible_entity` (`responsible_entity`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cc_meta_data`;
@@ -448,12 +599,12 @@ CREATE TABLE `cc_meta_data` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `consignment_id` bigint(20) NOT NULL,
   `cnote` varchar(255) NOT NULL,
-  `client` text NOT NULL,
-  `from_location_admin_cluster` text NOT NULL,
-  `to_location_admin_cluster` text NOT NULL,
-  `from_pincode_branch` text NOT NULL,
-  `to_pincode_branch` text NOT NULL,
-  `destination_zone` text NOT NULL,
+  `client` json NOT NULL,
+  `from_location_admin_cluster` json NOT NULL,
+  `to_location_admin_cluster` json NOT NULL,
+  `from_pincode_branch` json NOT NULL,
+  `to_pincode_branch` json NOT NULL,
+  `destination_zone` json NOT NULL,
   `weight` double NOT NULL,
   `charged_weight` double DEFAULT NULL,
   `volume` double DEFAULT NULL,
@@ -470,9 +621,32 @@ CREATE TABLE `cc_meta_data` (
   `created_at` bigint(20) NOT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ccmd_consignment_id` (`consignment_id`),
-  KEY `ccmd_cnote` (`cnote`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `cnote` (`cnote`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `cc_misrouting`;
+CREATE TABLE `cc_misrouting` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `consignment_id` bigint(20) NOT NULL,
+  `misrouting_type` enum('DISPATCHED_WITHOUT_SCANNING','SYSTEM_GENERATED','OU_SKIPPED','WRONG_DISPATCH_TO_UNEXPECTED_OU','WRONG_PHYSICAL_DISPATCH','WRONG_UNLOADING','SKIPPED_UNLOADING','UNEXPECTED_ARRIVAL') NOT NULL,
+  `timestamp` bigint(20) DEFAULT NULL,
+  `responsible_ou_id` bigint(20) NOT NULL,
+  `responsible_user_id` bigint(20) DEFAULT NULL,
+  `prev_category` enum('RED','ORANGE','GREEN') NOT NULL,
+  `new_category` enum('RED','ORANGE','GREEN') NOT NULL,
+  `eta_addition` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `consignment_id` (`consignment_id`),
+  KEY `timestamp` (`timestamp`),
+  KEY `responsible_ou_id` (`responsible_ou_id`),
+  KEY `responsible_user_id` (`responsible_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cc_ou_meta_data`;
@@ -506,8 +680,8 @@ CREATE TABLE `cc_ou_meta_data` (
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `consignment_id_cs_sequence` (`consignment_id`,`cs_sequence`),
-  KEY `ccomd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cc_processed_data`;
@@ -526,8 +700,8 @@ CREATE TABLE `cc_processed_data` (
   `created_at` bigint(20) NOT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ccpd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `cc_trip_detail`;
@@ -559,8 +733,9 @@ CREATE TABLE `cc_trip_detail` (
   `created_at` bigint(20) NOT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `cctd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `trip_id_consignment_id` (`trip_id`,`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `ce_escalation_alerts`;
@@ -575,7 +750,7 @@ CREATE TABLE `ce_escalation_alerts` (
   `alertType` varchar(45) DEFAULT NULL,
   `alertID` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `ce_issue_mapper`;
@@ -586,7 +761,7 @@ CREATE TABLE `ce_issue_mapper` (
   `alert_reason_against_sub_issue` varchar(45) NOT NULL,
   `is_active` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `champion_vehicle`;
@@ -601,7 +776,7 @@ CREATE TABLE `champion_vehicle` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `city`;
@@ -615,7 +790,7 @@ CREATE TABLE `city` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `clients`;
@@ -654,8 +829,9 @@ CREATE TABLE `clients` (
   KEY `FKibbfmfn566hafu79hnst7icq` (`created_by_id`),
   KEY `FKr0tgfkpbs9iqbvdtjsokv5ncg` (`last_updated_by_id`),
   KEY `FK7ebbh00t5amwa82g1jk070txw` (`industry_type_id`),
-  KEY `cl_organization_id` (`organization_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `organization_id` (`organization_id`),
+  CONSTRAINT `FK7ebbh00t5amwa82g1jk070txw` FOREIGN KEY (`industry_type_id`) REFERENCES `industry_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `client_address`;
@@ -679,12 +855,14 @@ CREATE TABLE `client_address` (
   KEY `FKggd313pbkctudfb2ipwwak0k1` (`last_updated_by_id`),
   KEY `FKdsuhnhv460af4xkakbbttea57` (`address_id`),
   KEY `FKndvyxiewc7oj1dlshobv2tiw0` (`client_id`),
-  KEY `ca_client_address_code` (`client_address_code`),
-  KEY `ca_organization_id` (`organization_id`),
-  KEY `ca_address_type` (`address_type`),
-  KEY `ca_status` (`status`),
-  KEY `ca_client_id_address_type_status` (`client_id`,`address_type`,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_address_code` (`client_address_code`),
+  KEY `organization_id` (`organization_id`),
+  KEY `address_type` (`address_type`),
+  KEY `status` (`status`),
+  KEY `client_id_address_type_status` (`client_id`,`address_type`,`status`),
+  CONSTRAINT `FKdsuhnhv460af4xkakbbttea57` FOREIGN KEY (`address_id`) REFERENCES `address` (`id`),
+  CONSTRAINT `FKndvyxiewc7oj1dlshobv2tiw0` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `client_insurance_details`;
@@ -709,7 +887,33 @@ CREATE TABLE `client_insurance_details` (
   `minimum_premium_fragile` double NOT NULL DEFAULT '10',
   `rov_percent_fragile` double NOT NULL DEFAULT '0.025',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `client_promised_tat_deleted`;
+CREATE TABLE `client_promised_tat_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `client_id` bigint(20) DEFAULT NULL,
+  `start_location_type` varchar(255) DEFAULT NULL,
+  `start_location_id` bigint(20) DEFAULT NULL,
+  `end_location_type` varchar(255) DEFAULT NULL,
+  `end_location_id` bigint(20) DEFAULT NULL,
+  `pickup_cutoff_time_millis` bigint(20) DEFAULT NULL,
+  `tat_days` int(11) DEFAULT NULL,
+  `delivery_cutoff_time_millis` bigint(20) DEFAULT NULL,
+  `is_active` int(11) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_client_promised_tat_last_updated_by` (`last_updated_by_id`),
+  KEY `FK_client_promised_tat_created_by` (`created_by_id`),
+  KEY `FK_client_promised_tat_client_id` (`client_id`),
+  CONSTRAINT `FK_client_promised_tat_client_id` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `FK_client_promised_tat_created_by` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FK_client_promised_tat_last_updated_by` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `client_user`;
@@ -725,8 +929,9 @@ CREATE TABLE `client_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `FK6p74omnrg7a2w4pnhyuy6jvs5` (`user_id`),
   KEY `FK82w1dbgagg29jmmtmoxb8b9p7` (`created_by_id`),
-  KEY `FKb73q74m7iekk1cuf4y9iq0of7` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKb73q74m7iekk1cuf4y9iq0of7` (`last_updated_by_id`),
+  CONSTRAINT `FK6p74omnrg7a2w4pnhyuy6jvs5` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `client_user_mapping`;
@@ -742,26 +947,32 @@ CREATE TABLE `client_user_mapping` (
   PRIMARY KEY (`id`),
   KEY `fk_client_user_mapping_1_idx` (`client_id`),
   KEY `fk_client_user_mapping_2_idx` (`user_id`),
-  KEY `fk_client_user_mapping_3_idx` (`client_address_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_client_user_mapping_3_idx` (`client_address_id`),
+  CONSTRAINT `fk_client_user_mapping_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_client_user_mapping_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_client_user_mapping_3` FOREIGN KEY (`client_address_id`) REFERENCES `client_address` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_client_user_mapping_4` FOREIGN KEY (`client_address_id`) REFERENCES `client_address` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `client_vas_detail`;
 CREATE TABLE `client_vas_detail` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `client_id` bigint(20) DEFAULT NULL,
-  `vas_metadata` text DEFAULT NULL,
+  `vas_metadata` json DEFAULT NULL,
   `client_vas_type` varchar(45) DEFAULT NULL,
   `is_active` varchar(45) DEFAULT NULL,
   `created_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) DEFAULT NULL,
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
-  `pricing_metadata` text DEFAULT NULL,
+  `pricing_metadata` json DEFAULT NULL,
   `finance_activated` tinyint(4) DEFAULT NULL,
+  `spot_consignment_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `cvd_client_id` (`client_id`,`client_vas_type`,`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_id` (`client_id`,`client_vas_type`,`is_active`),
+  KEY `spot_consignment_id` (`spot_consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `completion_details`;
@@ -776,9 +987,10 @@ CREATE TABLE `completion_details` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `com_det_consignment_id` (`consignment_id`),
-  KEY `com_det_consignment_id_index` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `consignment_id` (`consignment_id`),
+  KEY `consignment_id_index` (`consignment_id`),
+  KEY `last_updated_at` (`last_updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment`;
@@ -859,24 +1071,29 @@ CREATE TABLE `consignment` (
   `stockcheck_reason` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cnote` (`cnote`),
-  KEY `cn_FK5snm8d5qs34h63kmq54iwit5n` (`client_id`),
-  KEY `cn_fk_consignment_1_idx` (`consignee_client_address_id`),
-  KEY `cn_fk_consignment_2_idx` (`consignor_client_address_id`),
-  KEY `cn_fk_consignment_3_idx` (`drs_id`),
-  KEY `cn_fk_consignment_4_idx` (`pick_up_id`),
-  KEY `cn_fk_consignment_6_idx` (`bp_trip_id`),
-  KEY `cn_status_index` (`status`),
-  KEY `cn_created_at_index` (`created_at`),
-  KEY `cn_delivery_date_time_index` (`delivery_date_time`),
-  KEY `cn_consignee_email_index` (`consignee_email`),
-  KEY `cn_index18` (`created_by_id`),
-  KEY `cn_index19` (`last_updated_by_id`),
-  KEY `cn_fk_dho_consignment` (`dho_id`),
-  KEY `cn_prs_id_index` (`prs_id`),
-  KEY `cn_cnote_index` (`cnote`),
-  KEY `cn_is_active` (`is_active`),
-  KEY `cn_organization_id` (`organization_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK5snm8d5qs34h63kmq54iwit5n` (`client_id`),
+  KEY `fk_consignment_1_idx` (`consignee_client_address_id`),
+  KEY `fk_consignment_2_idx` (`consignor_client_address_id`),
+  KEY `fk_consignment_3_idx` (`drs_id`),
+  KEY `fk_consignment_4_idx` (`pick_up_id`),
+  KEY `fk_consignment_6_idx` (`bp_trip_id`),
+  KEY `status_index` (`status`),
+  KEY `created_at_index` (`created_at`),
+  KEY `delivery_date_time_index` (`delivery_date_time`),
+  KEY `consignee_email_index` (`consignee_email`),
+  KEY `index18` (`created_by_id`),
+  KEY `index19` (`last_updated_by_id`),
+  KEY `fk_dho_consignment` (`dho_id`),
+  KEY `prs_id_index` (`prs_id`),
+  KEY `cnote_index` (`cnote`),
+  KEY `is_active` (`is_active`),
+  KEY `organization_id` (`organization_id`),
+  KEY `prs_id` (`prs_id`),
+  CONSTRAINT `FK5snm8d5qs34h63kmq54iwit5n` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `fk_consignment_3` FOREIGN KEY (`drs_id`) REFERENCES `delivery_run_sheet` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_consignment_4` FOREIGN KEY (`pick_up_id`) REFERENCES `pickup` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dho_consignment` FOREIGN KEY (`dho_id`) REFERENCES `delivery_handover` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_appointment`;
@@ -892,9 +1109,9 @@ CREATE TABLE `consignment_appointment` (
   `is_active` tinyint(4) DEFAULT NULL,
   `appointment_id_required` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ca_consignment_id` (`consignment_id`),
-  KEY `ca_is_active` (`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `is_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_checklist`;
@@ -906,7 +1123,7 @@ CREATE TABLE `consignment_checklist` (
   `terminating_form` varchar(255) DEFAULT NULL,
   `transit` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_cod_dod`;
@@ -924,9 +1141,23 @@ CREATE TABLE `consignment_cod_dod` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `ccd_consignment_id` (`consignment_id`),
-  KEY `ccd_is_active` (`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `is_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `consignment_delivery_failure_reason_deleted`;
+CREATE TABLE `consignment_delivery_failure_reason_deleted` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reason` varchar(255) NOT NULL,
+  `user_type` varchar(255) NOT NULL,
+  `reschedule_allowed` tinyint(4) DEFAULT NULL,
+  `sub_reason` varchar(45) DEFAULT NULL,
+  `client_facing_reason` varchar(45) DEFAULT NULL,
+  `client_facing_sub_reason` varchar(45) DEFAULT NULL,
+  `contact_details_required` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_document`;
@@ -945,8 +1176,8 @@ CREATE TABLE `consignment_document` (
   `document_number` varchar(255) DEFAULT NULL,
   `document_validity` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `cd_consignment_id_is_active` (`consignment_id`,`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id_is_active` (`consignment_id`,`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_document_checklist`;
@@ -957,8 +1188,9 @@ CREATE TABLE `consignment_document_checklist` (
   `from_transit_to` varchar(255) NOT NULL,
   `document` varchar(255) NOT NULL,
   `document_type` varchar(255) DEFAULT NULL,
+  `min_invoice_value` double DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_history`;
@@ -986,12 +1218,15 @@ CREATE TABLE `consignment_history` (
   `payment_status` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_consignment_history_1_idx` (`client_id`),
-  KEY `ch_index4` (`consignment_id`),
-  KEY `ch_index5` (`created_by_id`),
-  KEY `ch_index6` (`last_updated_by_id`),
-  KEY `ch_index7` (`user_id`),
-  KEY `ch_last_updated_at` (`last_updated_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index4` (`consignment_id`),
+  KEY `index5` (`created_by_id`),
+  KEY `index6` (`last_updated_by_id`),
+  KEY `index7` (`user_id`),
+  KEY `last_updated_at` (`last_updated_at`),
+  KEY `task_id` (`task_id`),
+  KEY `cn_history_created_at_status` (`created_at`,`status`),
+  CONSTRAINT `fk_consignment_history_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_insurance_details`;
@@ -1011,8 +1246,8 @@ CREATE TABLE `consignment_insurance_details` (
   `consignor_phone` varchar(255) DEFAULT NULL,
   `error_msg` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `cid_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_life_cycle_order`;
@@ -1021,7 +1256,38 @@ CREATE TABLE `consignment_life_cycle_order` (
   `status` varchar(45) NOT NULL,
   `life_cycle_order` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `consignment_plan_deleted`;
+CREATE TABLE `consignment_plan_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `location_type` varchar(255) NOT NULL,
+  `location_id` bigint(20) NOT NULL,
+  `stop_sequence` tinyint(1) NOT NULL DEFAULT '-1',
+  `consignment_id` bigint(20) NOT NULL,
+  `plan_status` varchar(255) NOT NULL DEFAULT 'NOT_REACHED',
+  `cutoff_arrival_time` bigint(20) DEFAULT NULL,
+  `scheduled_arrival_time` bigint(20) DEFAULT NULL,
+  `actual_arrival_time` bigint(20) DEFAULT NULL,
+  `cutoff_departure_time` bigint(20) DEFAULT NULL,
+  `scheduled_departure_time` bigint(20) DEFAULT NULL,
+  `actual_departure_time` bigint(20) DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `trip_type` varchar(255) DEFAULT NULL,
+  `trip_id` bigint(20) DEFAULT NULL,
+  `trip_planner_type` varchar(255) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `manifest_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_consignment_plan_trip_id_trip_type` (`trip_id`,`trip_type`),
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  KEY `trip_id_index` (`trip_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_schedule`;
@@ -1063,16 +1329,16 @@ CREATE TABLE `consignment_schedule` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `version` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `cs_index2` (`location_type`,`location_id`),
-  KEY `cs_index3` (`consignment_id`),
-  KEY `cs_index4` (`departure_trip_type`,`departure_trip_id`),
-  KEY `cs_index5` (`departure_manifest_id`),
-  KEY `cs_departure_trip_id` (`departure_trip_id`),
-  KEY `cs_sequence` (`sequence`),
-  KEY `cs_is_active` (`is_active`),
-  KEY `cs_last_updated_at` (`last_updated_at`),
-  KEY `cs_consignment_id_location_type_is_active_plan_status` (`consignment_id`,`location_type`,`is_active`,`plan_status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`location_type`,`location_id`),
+  KEY `index3` (`consignment_id`),
+  KEY `index4` (`departure_trip_type`,`departure_trip_id`),
+  KEY `index5` (`departure_manifest_id`),
+  KEY `departure_trip_id` (`departure_trip_id`),
+  KEY `sequence` (`sequence`),
+  KEY `is_active` (`is_active`),
+  KEY `last_updated_at` (`last_updated_at`),
+  KEY `consignment_id_location_type_is_active_plan_status` (`consignment_id`,`location_type`,`is_active`,`plan_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_schedule_cache`;
@@ -1096,11 +1362,11 @@ CREATE TABLE `consignment_schedule_cache` (
   `last_updated_by_id` bigint(20) NOT NULL DEFAULT '57',
   `version` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `csc_consignment_id_location_type_location_id` (`consignment_id`,`location_type`,`location_id`),
-  KEY `csc_trip_id` (`trip_id`),
-  KEY `csc_manifest_id` (`manifest_id`),
-  KEY `csc_consignment_id_index` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `consignment_id_location_type_location_id` (`consignment_id`,`location_type`,`location_id`),
+  KEY `trip_id` (`trip_id`),
+  KEY `manifest_id` (`manifest_id`),
+  KEY `consignment_id_index` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_unclean_remarks_record`;
@@ -1109,7 +1375,7 @@ CREATE TABLE `consignment_unclean_remarks_record` (
   `reason` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_unclean_uploaded_files_record`;
@@ -1124,9 +1390,9 @@ CREATE TABLE `consignment_unclean_uploaded_files_record` (
   `remarks` varchar(1024) NOT NULL,
   `comments` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `cuufr_consignment_upload_file_id_index` (`consignment_upload_file_id`),
-  KEY `cuufr_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_upload_file_id_index` (`consignment_upload_file_id`),
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `consignment_uploaded_files`;
@@ -1143,10 +1409,11 @@ CREATE TABLE `consignment_uploaded_files` (
   `short_url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK1ai1o1hyt35cdgvx433f3s8hi` (`consignment_id`),
-  KEY `cuf_index3` (`created_by_id`),
-  KEY `cuf_index4` (`last_updated_by_id`),
-  KEY `cuf_consignment_id_file_types` (`consignment_id`,`file_types`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`),
+  KEY `consignment_id_file_types` (`consignment_id`,`file_types`),
+  CONSTRAINT `FK1ai1o1hyt35cdgvx433f3s8hi` FOREIGN KEY (`consignment_id`) REFERENCES `consignment` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `content_type`;
@@ -1158,7 +1425,7 @@ CREATE TABLE `content_type` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `continuum`;
@@ -1183,14 +1450,24 @@ CREATE TABLE `continuum` (
   `previous_eta` bigint(20) DEFAULT NULL,
   `new_eta` bigint(20) DEFAULT NULL,
   `is_frozen` tinyint(1) NOT NULL,
-  `meta_data` text DEFAULT NULL,
+  `meta_data` json DEFAULT NULL,
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   `created_at` bigint(20) NOT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `cc_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `continuum_last_updated` (`last_updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `critical_cn_plan_failure_reason_deleted`;
+CREATE TABLE `critical_cn_plan_failure_reason_deleted` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `reason` varchar(255) NOT NULL,
+  `sub_reason` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `damage_pilferage_record`;
@@ -1217,10 +1494,26 @@ CREATE TABLE `damage_pilferage_record` (
   `location_id` bigint(20) NOT NULL,
   `client_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dpr_client_id_fk` (`client_id`),
-  KEY `dpr_index4` (`created_by_id`),
-  KEY `dpr_index5` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_id_fk` (`client_id`),
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  CONSTRAINT `client_id_fk` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `delivery_franchise_deleted`;
+CREATE TABLE `delivery_franchise_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `code` varchar(45) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `status` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `delivery_handover`;
@@ -1242,9 +1535,10 @@ CREATE TABLE `delivery_handover` (
   `loading_end_time` bigint(20) DEFAULT NULL,
   `loading_start_time` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `dh_df_status_to_location` (`organization_id`,`to_location_id`,`status`),
-  KEY `dh_df_status` (`organization_id`,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `df_status_to_location` (`organization_id`,`to_location_id`,`status`),
+  KEY `df_status` (`organization_id`,`status`),
+  CONSTRAINT `fk_organization_delivery_handover` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `delivery_run_sheet`;
@@ -1264,11 +1558,11 @@ CREATE TABLE `delivery_run_sheet` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `drs_created_at_index` (`created_at`),
-  KEY `drs_status_index` (`status`),
-  KEY `drs_index6` (`created_by_id`),
-  KEY `drs_index7` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `created_at_index` (`created_at`),
+  KEY `status_index` (`status`),
+  KEY `index6` (`created_by_id`),
+  KEY `index7` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `delivery_run_sheet_history`;
@@ -1288,10 +1582,11 @@ CREATE TABLE `delivery_run_sheet_history` (
   `user_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKeks6mg9k3n1pnwl7tw5l25dt3` (`business_partner_id`),
-  KEY `drsh_index4` (`created_by_id`),
-  KEY `drsh_index5` (`last_updated_by_id`),
-  KEY `drsh_delivery_run_sheeet_id` (`delivery_run_sheeet_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  KEY `delivery_run_sheeet_id` (`delivery_run_sheeet_id`),
+  CONSTRAINT `FKeks6mg9k3n1pnwl7tw5l25dt3` FOREIGN KEY (`business_partner_id`) REFERENCES `business_partner` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `deps_document`;
@@ -1307,7 +1602,7 @@ CREATE TABLE `deps_document` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `dd_deps_id` (`deps_id`)
+  KEY `deps_id` (`deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1327,9 +1622,25 @@ CREATE TABLE `deps_line_item_detail` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `dlid_deps_id` (`deps_id`),
-  KEY `dlid_inbound_deps_record_id` (`inbound_deps_record_id`)
+  KEY `deps_id` (`deps_id`),
+  KEY `inbound_deps_record_id` (`inbound_deps_record_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `deps_queue`;
+CREATE TABLE `deps_queue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `submit_json` json DEFAULT NULL,
+  `deps_creation_status` varchar(45) DEFAULT NULL,
+  `task_id` int(11) DEFAULT NULL,
+  `cnote` varchar(45) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `number_of_deps` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `deps_record`;
@@ -1368,16 +1679,17 @@ CREATE TABLE `deps_record` (
   `parent_deps_id` bigint(20) DEFAULT NULL,
   `organization_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `dr_inbound_location_id` (`inbound_location_id`),
-  KEY `dr_client_id` (`client_id`),
-  KEY `dr_cnote` (`cnote`),
-  KEY `dr_barcode` (`barcode`),
-  KEY `dr_new_cnote` (`new_cnote`),
-  KEY `dr_created_at` (`created_at`),
-  KEY `dr_is_active` (`is_active`),
-  KEY `dr_deps_task_type` (`deps_task_type`),
-  KEY `dr_task_id` (`task_id`),
-  KEY `dr_box_id` (`box_id`)
+  KEY `inbound_location_id` (`inbound_location_id`),
+  KEY `client_id` (`client_id`),
+  KEY `cnote` (`cnote`),
+  KEY `barcode` (`barcode`),
+  KEY `new_cnote` (`new_cnote`),
+  KEY `created_at` (`created_at`),
+  KEY `is_active` (`is_active`),
+  KEY `deps_task_type` (`deps_task_type`),
+  KEY `task_id` (`task_id`),
+  KEY `box_id` (`box_id`),
+  KEY `deps_consignment_id` (`consignment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1394,8 +1706,8 @@ CREATE TABLE `deps_record_reason` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `drr_deps_id` (`deps_id`),
-  KEY `drr_outbound_deps_id` (`outbound_deps_id`)
+  KEY `deps_id` (`deps_id`),
+  KEY `outbound_deps_id` (`outbound_deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1411,7 +1723,7 @@ CREATE TABLE `deps_record_status_timeline` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `drst_deps_id` (`deps_id`)
+  KEY `deps_id` (`deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1428,8 +1740,27 @@ CREATE TABLE `deps_reopen_ticket_record` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `drtr_id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `df_user_deleted`;
+CREATE TABLE `df_user_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `email` varchar(40) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `df_id` bigint(20) NOT NULL,
+  `status` enum('ACTIVE','INACTIVE') NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `df_id` (`df_id`,`email`),
+  KEY `fk_user_mapping_1_idx` (`user_id`),
+  CONSTRAINT `fk_df_mapping_1_idx` FOREIGN KEY (`df_id`) REFERENCES `delivery_franchise_deleted` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_mapping_1_idx` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `dho_schedule`;
@@ -1449,8 +1780,24 @@ CREATE TABLE `dho_schedule` (
   `days_of_week` varchar(20) DEFAULT '1,1,1,1,1,1,1',
   PRIMARY KEY (`id`),
   KEY `is_active_df_from_location_to_location` (`is_active`,`organization_id`,`from_location_id`,`to_location_id`),
-  KEY `fk_organization_dho_schedule` (`organization_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_organization_dho_schedule` (`organization_id`),
+  CONSTRAINT `fk_organization_dho_schedule` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `documents_template`;
+CREATE TABLE `documents_template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `s3_url` varchar(2048) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) NOT NULL,
+  `is_active` tinyint(4) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `documents_template_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `document_fn_mapping`;
@@ -1465,9 +1812,24 @@ CREATE TABLE `document_fn_mapping` (
   `file_type` varchar(255) DEFAULT NULL,
   `is_active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `dfm_index2` (`fn_id`),
-  KEY `dfm_index3` (`document_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`fn_id`),
+  KEY `index3` (`document_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `document_fn_mapping_history`;
+CREATE TABLE `document_fn_mapping_history` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `document_id` bigint(20) DEFAULT NULL,
+  `document_status` varchar(255) DEFAULT NULL,
+  `fn_id` bigint(20) DEFAULT NULL,
+  `file_type` varchar(255) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `edd_calculation_data`;
@@ -1499,12 +1861,14 @@ CREATE TABLE `edd_calculation_data` (
   `location_dropoff_cut_off` bigint(20) NOT NULL,
   `from_pincode_service_type` varchar(40) NOT NULL,
   `to_pincode_service_type` varchar(40) NOT NULL,
+  `pickup_cutoff_cpd_increase_flag` tinyint(1) NOT NULL DEFAULT '0',
   `sunday_delivery_cpd_increase_flag` tinyint(1) NOT NULL DEFAULT '0',
+  `calculated_promised_delivery_date_time` bigint(20) DEFAULT NULL,
   `manual_change_remarks` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `consignment_id_unique` (`consignment_id`),
-  KEY `ecd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `email_dl`;
@@ -1519,7 +1883,7 @@ CREATE TABLE `email_dl` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `exclusion_locations`;
@@ -1535,7 +1899,94 @@ CREATE TABLE `exclusion_locations` (
   `created_by_id` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `feeder_schedule_deleted`;
+CREATE TABLE `feeder_schedule_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `deleted_at` bigint(20) DEFAULT NULL,
+  `deleted_by_id` bigint(20) DEFAULT NULL,
+  `vehicle_type` varchar(255) NOT NULL,
+  `start_location_type` varchar(255) NOT NULL,
+  `start_location_id` bigint(20) NOT NULL,
+  `end_location_type` varchar(255) NOT NULL,
+  `end_location_id` bigint(20) NOT NULL,
+  `placement_time` bigint(20) NOT NULL,
+  `dispatch_time` bigint(20) NOT NULL,
+  `frequency_type` varchar(255) NOT NULL DEFAULT 'DAILY',
+  `created_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `feeder_trip_deleted`;
+CREATE TABLE `feeder_trip_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `arrival_time` bigint(20) DEFAULT NULL,
+  `business_partner_id` bigint(20) DEFAULT NULL,
+  `destination_location_id` bigint(20) DEFAULT NULL,
+  `dispatch_time` bigint(20) DEFAULT NULL,
+  `driver_name` varchar(255) DEFAULT NULL,
+  `end_reading` double DEFAULT NULL,
+  `instructions` varchar(255) DEFAULT NULL,
+  `scheduled_dispatch_time` bigint(20) DEFAULT NULL,
+  `seal_number` varchar(255) DEFAULT NULL,
+  `source_location_id` bigint(20) DEFAULT NULL,
+  `start_reading` double DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `vehicle_number` varchar(255) DEFAULT NULL,
+  `vehicle_type` varchar(255) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `feeder_vendor_id` bigint(20) DEFAULT NULL,
+  `feeder_vendor_agent_id` bigint(20) DEFAULT NULL,
+  `source_location_type` varchar(255) NOT NULL,
+  `destination_location_type` varchar(255) NOT NULL,
+  `creation_type` varchar(255) NOT NULL DEFAULT 'ADHOC',
+  `creation_source_id` bigint(20) NOT NULL DEFAULT '1',
+  `scheduled_placement_time` bigint(20) NOT NULL DEFAULT '631152000000',
+  `placement_time` bigint(20) DEFAULT NULL,
+  `scheduled_arrival_time` bigint(20) NOT NULL DEFAULT '631152000000',
+  `percent_util` int(11) NOT NULL DEFAULT '0',
+  `user_id` bigint(20) DEFAULT NULL,
+  `trip_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKel079c11d5u9skmu31c3ctjah` (`destination_location_id`),
+  KEY `FK3j1l59mhusni70u0phs7nkqmf` (`source_location_id`),
+  KEY `created_at_index` (`created_at`),
+  KEY `status_index` (`status`),
+  KEY `index9` (`created_by_id`),
+  KEY `index10` (`last_updated_by_id`),
+  KEY `index11` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `feeder_trip_tracking_deleted`;
+CREATE TABLE `feeder_trip_tracking_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `delay_reason_arrival` varchar(1024) DEFAULT NULL,
+  `delay_reason_dispatch` varchar(1024) DEFAULT NULL,
+  `distance_from_source` bigint(20) DEFAULT NULL,
+  `in_time` bigint(20) DEFAULT NULL,
+  `scheduled_in_time` bigint(20) NOT NULL DEFAULT '631152000000',
+  `location_id` bigint(20) DEFAULT NULL,
+  `out_time` bigint(20) DEFAULT NULL,
+  `scheduled_out_time` bigint(20) NOT NULL DEFAULT '631152000000',
+  `feeder_trip_tracking_status` varchar(255) DEFAULT NULL,
+  `stop_sequence` int(11) DEFAULT NULL,
+  `wrong_entry_reason` varchar(255) DEFAULT NULL,
+  `feeder_trip_id` bigint(20) DEFAULT NULL,
+  `location_type` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKco6bpdm9ovwy091nfqlh2ljua` (`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `feeder_vendor`;
@@ -1555,8 +2006,10 @@ CREATE TABLE `feeder_vendor` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKglwm3f5u6ypnmtu1byllp7csv` (`created_by_id`),
-  KEY `FKmybhkg5yp9wooi1aqf4q1glfv` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKmybhkg5yp9wooi1aqf4q1glfv` (`last_updated_by_id`),
+  CONSTRAINT `FKglwm3f5u6ypnmtu1byllp7csv` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKmybhkg5yp9wooi1aqf4q1glfv` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `feeder_vendor_agent`;
@@ -1575,8 +2028,9 @@ CREATE TABLE `feeder_vendor_agent` (
   `vendor_code` varchar(255) DEFAULT NULL,
   `feeder_vendor_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK4wckyua9m3o35mu2kq2o6p3l1` (`feeder_vendor_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK4wckyua9m3o35mu2kq2o6p3l1` (`feeder_vendor_id`),
+  CONSTRAINT `FK4wckyua9m3o35mu2kq2o6p3l1` FOREIGN KEY (`feeder_vendor_id`) REFERENCES `feeder_vendor` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `feeder_vendor_agent_zone`;
@@ -1590,8 +2044,10 @@ CREATE TABLE `feeder_vendor_agent_zone` (
   `zone_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKno8rqvctknvvobn9siyrjywqw` (`feeder_vendor_agent_id`),
-  KEY `FK6u7neg4h1vwnusa2vc54b2sco` (`zone_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK6u7neg4h1vwnusa2vc54b2sco` (`zone_id`),
+  CONSTRAINT `FK6u7neg4h1vwnusa2vc54b2sco` FOREIGN KEY (`zone_id`) REFERENCES `zone` (`id`),
+  CONSTRAINT `FKno8rqvctknvvobn9siyrjywqw` FOREIGN KEY (`feeder_vendor_agent_id`) REFERENCES `feeder_vendor_agent` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `feeder_vendor_vehicle`;
@@ -1606,8 +2062,10 @@ CREATE TABLE `feeder_vendor_vehicle` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_feeder_vendor_vehicle_1_idx` (`created_by_id`),
-  KEY `fk_feeder_vendor_vehiclel_2_idx` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_feeder_vendor_vehiclel_2_idx` (`last_updated_by_id`),
+  CONSTRAINT `fk_feeder_vendor_vehicle_1` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_feeder_vendor_vehicle_2` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `fn_document`;
@@ -1623,11 +2081,12 @@ CREATE TABLE `fn_document` (
   `location_id` bigint(20) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `barcode` varchar(255) DEFAULT NULL,
+  `version` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `fd_index2` (`consignment_id`,`file_type`),
-  KEY `fd_index3` (`location_id`),
-  KEY `fd_index4` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`consignment_id`,`file_type`),
+  KEY `index3` (`location_id`),
+  KEY `index4` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `fn_document_history`;
@@ -1638,8 +2097,11 @@ CREATE TABLE `fn_document_history` (
   `status` varchar(45) DEFAULT NULL,
   `created_at` bigint(20) DEFAULT NULL,
   `created_by_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fn_document_history_fn_document_id_index` (`fn_document_id`,`status`,`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `forward_note`;
@@ -1660,12 +2122,13 @@ CREATE TABLE `forward_note` (
   `cost` bigint(20) DEFAULT NULL,
   `provider` varchar(255) DEFAULT NULL,
   `is_active` tinyint(4) NOT NULL DEFAULT '1',
+  `version` bigint(20) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `fn_index2` (`from_location_id`),
-  KEY `fn_index3` (`location_id`),
-  KEY `fn_index4` (`to_location_id`,`to_location_type`),
-  KEY `fn_index5` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`from_location_id`),
+  KEY `index3` (`location_id`),
+  KEY `index4` (`to_location_id`,`to_location_type`),
+  KEY `index5` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `forward_note_history`;
@@ -1676,8 +2139,11 @@ CREATE TABLE `forward_note_history` (
   `status` varchar(45) DEFAULT NULL,
   `created_at` bigint(20) DEFAULT NULL,
   `created_by_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `forward_note_history_forward_note_id_index` (`forward_note_id`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `function_execution`;
@@ -1689,7 +2155,7 @@ CREATE TABLE `function_execution` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`function_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `function_execution_history`;
@@ -1704,7 +2170,7 @@ CREATE TABLE `function_execution_history` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `goods_category`;
@@ -1716,7 +2182,7 @@ CREATE TABLE `goods_category` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `holiday`;
@@ -1730,7 +2196,7 @@ CREATE TABLE `holiday` (
   `holiday_name` varchar(45) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `inbound_deps_record`;
@@ -1754,7 +2220,7 @@ CREATE TABLE `inbound_deps_record` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idr_deps_id` (`deps_id`)
+  KEY `deps_id` (`deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -1770,8 +2236,10 @@ CREATE TABLE `industry_type` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKrehnjl578b6kgsxu9kck7xc4j` (`created_by_id`),
-  KEY `FKed08naustglp9gwhtprkbu8uu` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKed08naustglp9gwhtprkbu8uu` (`last_updated_by_id`),
+  CONSTRAINT `FKed08naustglp9gwhtprkbu8uu` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKrehnjl578b6kgsxu9kck7xc4j` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `inventory_tracking_detail`;
@@ -1792,8 +2260,10 @@ CREATE TABLE `inventory_tracking_detail` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK83wedmllaxtb2nbfperwvps9yox1252l` (`created_by_id`),
-  KEY `FKl89pvwqdnv3ap0f85qmwcsdc3m712312kqu` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKl89pvwqdnv3ap0f85qmwcsdc3m712312kqu` (`last_updated_by_id`),
+  CONSTRAINT `FK83wedmllaxtb2nbfperwvps9yox1252l` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKl89pvwqdnv3ap0f85qmwcsdc3m712312kqu` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `invoice`;
@@ -1811,9 +2281,10 @@ CREATE TABLE `invoice` (
   `invoice_date` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK4xtnn94t7qv45p5yxj9hvk7mr` (`consignment_id`),
-  KEY `i_index3` (`created_by_id`),
-  KEY `i_index4` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`),
+  CONSTRAINT `FK4xtnn94t7qv45p5yxj9hvk7mr` FOREIGN KEY (`consignment_id`) REFERENCES `consignment` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `linehaul_adhoc_request`;
@@ -1836,10 +2307,11 @@ CREATE TABLE `linehaul_adhoc_request` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_linehaul_adhoc_request_route_id` (`route_id`),
-  KEY `lar_index3` (`created_by_id`),
-  KEY `lar_index4` (`last_updated_by_id`),
-  KEY `lar_index5` (`deleted_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`),
+  KEY `index5` (`deleted_by_id`),
+  CONSTRAINT `fk_linehaul_adhoc_request_route_id` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `linehaul_schedule`;
@@ -1864,8 +2336,34 @@ CREATE TABLE `linehaul_schedule` (
   `days_of_week` varchar(255) NOT NULL DEFAULT '1,1,1,1,1,1,1',
   PRIMARY KEY (`id`),
   KEY `fk_linehaul_schedule_route_id` (`route_id`),
-  KEY `fk_ls_feeder_vendor_id` (`feeder_vendor_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_ls_feeder_vendor_id` (`feeder_vendor_id`),
+  CONSTRAINT `fk_linehaul_schedule_route_id` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`),
+  CONSTRAINT `fk_ls_feeder_vendor_id` FOREIGN KEY (`feeder_vendor_id`) REFERENCES `feeder_vendor` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `location_deleted`;
+CREATE TABLE `location_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `code` varchar(255) DEFAULT NULL,
+  `location_type` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `owner` varchar(255) DEFAULT NULL,
+  `location_status` varchar(255) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  `address_id` bigint(20) DEFAULT NULL,
+  `reporting_location_id` bigint(20) DEFAULT NULL,
+  `zone_id` bigint(20) DEFAULT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(10,8) DEFAULT NULL,
+  `radius_km` tinyint(4) NOT NULL DEFAULT '5',
+  `business_partner_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_hot3kqhtr723wmhfrehfrjiwl` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `mall_detail`;
@@ -1882,8 +2380,10 @@ CREATE TABLE `mall_detail` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKqljept46mixryiouf3212r3ht0a` (`created_by_id`),
-  KEY `FKfcpe5capw9jfeupgkj9345bgh5iu` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKfcpe5capw9jfeupgkj9345bgh5iu` (`last_updated_by_id`),
+  CONSTRAINT `FKfcpe5capw92345gx9jhnbgh5iu` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKqljept46midfe9gklkkjlr3ht0a` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `manifest`;
@@ -1906,9 +2406,9 @@ CREATE TABLE `manifest` (
   `cargonet_unavailable_reason_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKoik67u4uhkh158dlp229f0bndtrip` (`trip_id`),
-  KEY `m_index5` (`created_by_id`),
-  KEY `m_index6` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index5` (`created_by_id`),
+  KEY `index6` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `manifest_history`;
@@ -1924,9 +2424,70 @@ CREATE TABLE `manifest_history` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `mh_index2` (`created_by_id`),
-  KEY `mh_index3` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`created_by_id`),
+  KEY `index3` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `nearby_cluster_mapping_deleted`;
+CREATE TABLE `nearby_cluster_mapping_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` varchar(45) NOT NULL,
+  `last_updated_at` varchar(45) NOT NULL,
+  `created_by_id` varchar(45) DEFAULT NULL,
+  `last_updated_by_id` varchar(45) DEFAULT NULL,
+  `location_id` bigint(20) NOT NULL,
+  `nearby_location_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `neo4j_administrative_entity`;
+CREATE TABLE `neo4j_administrative_entity` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `code` varchar(255) NOT NULL,
+  `location_type` varchar(255) DEFAULT NULL,
+  `owner` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `reports_to_neo4j_administrative_entity_id` bigint(20) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `neo4j_location`;
+CREATE TABLE `neo4j_location` (
+  `id` bigint(20) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `code` varchar(255) NOT NULL,
+  `owner` varchar(255) DEFAULT NULL,
+  `latitude` double DEFAULT NULL,
+  `longitude` double DEFAULT NULL,
+  `business_partner_id` bigint(20) DEFAULT NULL,
+  `location_type` varchar(255) DEFAULT NULL,
+  `address_id` bigint(20) DEFAULT NULL,
+  `location_status` varchar(255) DEFAULT NULL,
+  `arrival_processing_time` bigint(20) DEFAULT NULL,
+  `dispatch_processing_time` bigint(20) DEFAULT NULL,
+  `dropoff_cutoff_time` bigint(20) DEFAULT NULL,
+  `delivery_cutoff_time` bigint(20) DEFAULT NULL,
+  `radius_km` double DEFAULT NULL,
+  `organization_id` bigint(20) DEFAULT NULL,
+  `adhoc_vehicle_availability` varchar(255) DEFAULT NULL,
+  `reports_to_neo4j_location_id` bigint(20) DEFAULT NULL,
+  `part_of_neo4j_cluster_id` bigint(20) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `oa_task_assignment`;
@@ -1950,19 +2511,19 @@ CREATE TABLE `oa_task_assignment` (
   `scheduled_end_time` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `trip_id_trip_type_location_id_task_type` (`trip_id`,`trip_type`,`location_id`,`task_type`),
-  KEY `ota_status_index` (`status`),
-  KEY `ota_assigned_at_index` (`assigned_at`),
-  KEY `ota_idx_oa_task_assignment_trip_id_trip_type` (`trip_id`,`trip_type`),
-  KEY `ota_idx_oa_task_assignment_location_id` (`location_id`),
-  KEY `ota_index6` (`created_by_id`),
-  KEY `ota_index7` (`last_updated_by_id`),
-  KEY `ota_index8` (`user_id`),
-  KEY `ota_index9` (`assigned_by_id`),
-  KEY `ota_trip_id_trip_type_location_id` (`trip_id`,`trip_type`,`location_id`),
-  KEY `ota_user_id` (`user_id`),
-  KEY `ota_task_type` (`task_type`),
-  KEY `ota_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `status_index` (`status`),
+  KEY `assigned_at_index` (`assigned_at`),
+  KEY `idx_oa_task_assignment_trip_id_trip_type` (`trip_id`,`trip_type`),
+  KEY `idx_oa_task_assignment_location_id` (`location_id`),
+  KEY `index6` (`created_by_id`),
+  KEY `index7` (`last_updated_by_id`),
+  KEY `index8` (`user_id`),
+  KEY `index9` (`assigned_by_id`),
+  KEY `trip_id_trip_type_location_id` (`trip_id`,`trip_type`,`location_id`),
+  KEY `user_id` (`user_id`),
+  KEY `task_type` (`task_type`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `organization`;
@@ -1980,9 +2541,11 @@ CREATE TABLE `organization` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `use_actual_weight` tinyint(4) NOT NULL DEFAULT '0',
   `insurance_applicable` tinyint(4) NOT NULL DEFAULT '0',
+  `email` varchar(255) DEFAULT NULL,
+  `mobile_number` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `organization_code` (`organization_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `outbound_deps_rca_record`;
@@ -2006,8 +2569,8 @@ CREATE TABLE `outbound_deps_rca_record` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `odrr_deps_id` (`deps_id`),
-  KEY `odrr_outbound_deps_id` (`outbound_deps_id`)
+  KEY `deps_id` (`deps_id`),
+  KEY `outbound_deps_id` (`outbound_deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2031,8 +2594,8 @@ CREATE TABLE `outbound_deps_record` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `odr_deps_id` (`deps_id`),
-  KEY `odr_outbound_location_id` (`outbound_location_id`)
+  KEY `deps_id` (`deps_id`),
+  KEY `outbound_location_id` (`outbound_location_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2049,8 +2612,8 @@ CREATE TABLE `outbound_deps_record_status_timeline` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `odrst_deps_id` (`deps_id`),
-  KEY `odrst_outbound_deps_id` (`outbound_deps_id`)
+  KEY `deps_id` (`deps_id`),
+  KEY `outbound_deps_id` (`outbound_deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2066,8 +2629,8 @@ CREATE TABLE `ou_drs_details` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `odd_location_id` (`location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `location_id` (`location_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `packing_type`;
@@ -2079,7 +2642,7 @@ CREATE TABLE `packing_type` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `payment_collection_task_assignment`;
@@ -2099,7 +2662,7 @@ CREATE TABLE `payment_collection_task_assignment` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `payment_details`;
@@ -2124,6 +2687,7 @@ CREATE TABLE `payment_details` (
   `oda_charges` double DEFAULT '0',
   `handling_charges` double DEFAULT '0',
   `vas_charges` double DEFAULT '0',
+  `cod_dod_base_price` double DEFAULT '0',
   `other_charges` double DEFAULT '0',
   `service_tax_percent` double DEFAULT '0',
   `uploaded_file_id` bigint(20) DEFAULT NULL,
@@ -2142,8 +2706,10 @@ CREATE TABLE `payment_details` (
   `cashbook_reason` varchar(255) DEFAULT NULL,
   `remittance_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `pd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`),
+  KEY `payment_details_cashbook_collection_id` (`cashbook_collection_id`),
+  KEY `payment_details_cashbook_deposit_id` (`cashbook_deposit_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `payment_details_history`;
@@ -2165,7 +2731,7 @@ CREATE TABLE `payment_details_history` (
   `cashbook_deposit_id` bigint(20) DEFAULT NULL,
   `cashbook_reason` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `payment_detail_master`;
@@ -2187,6 +2753,7 @@ CREATE TABLE `payment_detail_master` (
   `oda_charges` double DEFAULT '0',
   `handling_charges` double DEFAULT '0',
   `vas_charges` double DEFAULT '0',
+  `cod_dod_base_price` double DEFAULT '0',
   `other_charges` double DEFAULT '0',
   `service_tax_percent` double DEFAULT '0',
   `created_by_id` bigint(20) DEFAULT NULL,
@@ -2201,7 +2768,7 @@ CREATE TABLE `payment_detail_master` (
   `pickup_id` bigint(20) DEFAULT NULL,
   `payment_mode` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `paytm_payment_details`;
@@ -2217,7 +2784,7 @@ CREATE TABLE `paytm_payment_details` (
   `payment_status` varchar(45) DEFAULT NULL,
   `payTM_response` varchar(5000) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `paytm_qr_code`;
@@ -2230,7 +2797,7 @@ CREATE TABLE `paytm_qr_code` (
   `last_updated_at` bigint(20) NOT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pickup`;
@@ -2283,11 +2850,15 @@ CREATE TABLE `pickup` (
   KEY `FKqahxqvoglyisttd4te39t6bq5` (`business_partner_id`),
   KEY `FKhmpsp0ihiexhc7hxi8iq0137u` (`client_address_id`),
   KEY `fk_pickup_3_idx` (`failure_reason_id`),
-  KEY `p_user_id` (`user_id`),
-  KEY `p_index6` (`created_by_id`),
-  KEY `p_index7` (`last_updated_by_id`),
-  KEY `p_prs_id` (`prs_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `user_id` (`user_id`),
+  KEY `index6` (`created_by_id`),
+  KEY `index7` (`last_updated_by_id`),
+  KEY `prs_id` (`prs_id`),
+  KEY `client_code_index` (`client_code`),
+  CONSTRAINT `FKhmpsp0ihiexhc7hxi8iq0137u` FOREIGN KEY (`client_address_id`) REFERENCES `client_address` (`id`),
+  CONSTRAINT `FKqahxqvoglyisttd4te39t6bq5` FOREIGN KEY (`business_partner_id`) REFERENCES `business_partner` (`id`),
+  CONSTRAINT `fk_pickup_3` FOREIGN KEY (`failure_reason_id`) REFERENCES `pickup_failure_reason` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pickup_failure_reason`;
@@ -2301,8 +2872,9 @@ CREATE TABLE `pickup_failure_reason` (
   `pickup_failure_status` varchar(255) NOT NULL,
   `client_facing_reason` varchar(255) DEFAULT NULL,
   `client_facing_remark` varchar(255) DEFAULT NULL,
+  `client_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pickup_history`;
@@ -2325,11 +2897,12 @@ CREATE TABLE `pickup_history` (
   `failure_reason_id` bigint(20) DEFAULT NULL,
   `pickup_date` bigint(20) DEFAULT NULL,
   `pickup_time_slot` varchar(45) DEFAULT NULL,
+  `pickup_metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_pickup_history_pickup_id` (`pickup_id`),
-  KEY `ph_index3` (`created_by_id`),
-  KEY `ph_index4` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pickup_run_sheet`;
@@ -2353,11 +2926,43 @@ CREATE TABLE `pickup_run_sheet` (
   `vehicle_type` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKqahxqvoglyisttd4te39t6bq5123` (`bp_id`),
-  KEY `prs_index4` (`created_by_id`),
-  KEY `prs_index5` (`last_updated_by_id`),
-  KEY `prs_index6` (`user_id`),
-  KEY `prs_index7` (`oa_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  KEY `index6` (`user_id`),
+  KEY `index7` (`oa_user_id`),
+  KEY `status` (`status`),
+  CONSTRAINT `FKqahxqvoglyisttd1234te39t6bq5` FOREIGN KEY (`bp_id`) REFERENCES `business_partner` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `pickup_run_sheet_history`;
+CREATE TABLE `pickup_run_sheet_history` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `pickup_run_sheet_id` bigint(20) NOT NULL,
+  `bp_id` bigint(20) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  `location_id` bigint(20) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `oa_id` bigint(20) DEFAULT NULL,
+  `assignor_id` bigint(20) DEFAULT NULL,
+  `vehicle_number` varchar(45) DEFAULT NULL,
+  `vendor_name` varchar(255) DEFAULT NULL,
+  `cash_closure` bigint(20) DEFAULT NULL,
+  `oa_user_id` bigint(20) DEFAULT NULL,
+  `dock_number` varchar(45) DEFAULT NULL,
+  `vehicle_type` varchar(45) DEFAULT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `prsIndex` (`pickup_run_sheet_id`),
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  KEY `index6` (`user_id`),
+  KEY `index7` (`oa_user_id`),
+  KEY `status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pincode`;
@@ -2384,9 +2989,13 @@ CREATE TABLE `pincode` (
   KEY `FK83wedmllaxtb2nbfpvps9yoxl` (`created_by_id`),
   KEY `FKl89pvwqdnv3ap0f85qmwcmkqu` (`last_updated_by_id`),
   KEY `FKby9btadipvtxjksfb7xykxs0p` (`pickup_zone_id`),
-  KEY `p_delivery_zone_id` (`delivery_zone_id`),
-  KEY `p_code` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `delivery_zone_id` (`delivery_zone_id`),
+  KEY `code` (`code`),
+  CONSTRAINT `FK83wedmllaxtb2nbfpvps9yoxl` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKby9btadipvtxjksfb7xykxs0p` FOREIGN KEY (`pickup_zone_id`) REFERENCES `zone` (`id`),
+  CONSTRAINT `FKl89pvwqdnv3ap0f85qmwcmkqu` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `pincode_ibfk_1` FOREIGN KEY (`delivery_zone_id`) REFERENCES `zone` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pincodegeo`;
@@ -2408,7 +3017,7 @@ CREATE TABLE `pincodegeo` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `pincode_service_type`;
@@ -2423,7 +3032,30 @@ CREATE TABLE `pincode_service_type` (
   `last_updated_by_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `extra_charge_factor_extra_edd_in_days` (`extra_charge_factor`,`extra_edd_in_days`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `prime_trip`;
+CREATE TABLE `prime_trip` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `vehicle_planning_id` bigint(20) NOT NULL,
+  `vehicle_number` varchar(255) DEFAULT NULL,
+  `client_code` varchar(255) NOT NULL,
+  `vehicle_type` varchar(45) NOT NULL,
+  `status` varchar(255) NOT NULL,
+  `act_start_time` bigint(20) DEFAULT NULL,
+  `act_end_time` bigint(20) DEFAULT NULL,
+  `total_distance` double NOT NULL,
+  `pnl_processed` int(11) DEFAULT '0',
+  `created_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `vehicle_planning_id` (`vehicle_planning_id`),
+  KEY `pnl_processed` (`pnl_processed`),
+  KEY `client_code` (`client_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `prime_vehicle_rate_master`;
@@ -2434,7 +3066,7 @@ CREATE TABLE `prime_vehicle_rate_master` (
   `createdAt` bigint(20) NOT NULL,
   `lastUpdatedAt` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `qc_details`;
@@ -2449,10 +3081,10 @@ CREATE TABLE `qc_details` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `qd_index2` (`created_by_id`),
-  KEY `qd_index3` (`last_updated_by_id`),
-  KEY `qd_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`created_by_id`),
+  KEY `index3` (`last_updated_by_id`),
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `qc_invoice_details`;
@@ -2467,8 +3099,8 @@ CREATE TABLE `qc_invoice_details` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `qid_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `qc_volume_details`;
@@ -2487,9 +3119,9 @@ CREATE TABLE `qc_volume_details` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKmtwe7i2an0dv8gxasndjaesovb` (`consignment_id`),
-  KEY `qvd_index3` (`created_by_id`),
-  KEY `qvd_index4` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `reason`;
@@ -2521,7 +3153,7 @@ CREATE TABLE `reason` (
   `cod_dod` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `reason_sub_reason` (`reason`,`sub_reason`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `regional_hop_distance`;
@@ -2540,7 +3172,7 @@ CREATE TABLE `regional_hop_distance` (
   `vendor` text,
   `vehicle_type` text,
   `capacity_qntl` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `regional_linehaul_cost`;
@@ -2555,15 +3187,15 @@ CREATE TABLE `regional_linehaul_cost` (
   `google_km` int(11) DEFAULT NULL,
   `vehicle_type` int(11) DEFAULT NULL,
   `cost_with_toll` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `replaced_barcode_mapping`;
 CREATE TABLE `replaced_barcode_mapping` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `barcode` varchar(40) NOT NULL,
-  `cnote` varchar(20) NOT NULL,
-  `old_barcode` varchar(40) NOT NULL,
+  `barcode` varchar(255) NOT NULL,
+  `cnote` varchar(255) NOT NULL,
+  `old_barcode` varchar(255) NOT NULL,
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT '1',
@@ -2571,8 +3203,9 @@ CREATE TABLE `replaced_barcode_mapping` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `rbm_barcode` (`barcode`),
-  KEY `rbm_old_barcode` (`old_barcode`)
+  KEY `barcode` (`barcode`),
+  KEY `old_barcode` (`old_barcode`),
+  KEY `cnote` (`cnote`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2589,7 +3222,8 @@ CREATE TABLE `report` (
   `is_active` tinyint(1) DEFAULT '1',
   `next_execution_at` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK_3ktdukpv05gk1v1wwbk5rfuel` (`logic_id`)
+  KEY `FK_3ktdukpv05gk1v1wwbk5rfuel` (`logic_id`),
+  CONSTRAINT `report_ibfk_1` FOREIGN KEY (`logic_id`) REFERENCES `report_logic` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -2625,6 +3259,7 @@ CREATE TABLE `retail_payment_master` (
   `oda_charges` double DEFAULT '0',
   `handling_charges` double DEFAULT '0',
   `vas_charges` double DEFAULT '0',
+  `cod_dod_base_price` double DEFAULT '0',
   `other_charges` double DEFAULT '0',
   `service_tax_percent` double DEFAULT '0',
   `created_by_id` bigint(20) DEFAULT NULL,
@@ -2632,7 +3267,7 @@ CREATE TABLE `retail_payment_master` (
   `conversion_factor` double DEFAULT '0',
   `active` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `route`;
@@ -2654,7 +3289,7 @@ CREATE TABLE `route` (
   UNIQUE KEY `UK_9n4b1gwpv0dl4q7cdhgee9rp` (`code`),
   KEY `FKopqkrwk9rnr2yjdm1r9badcme` (`created_by_id`),
   KEY `FKdovxpcpbfuyjo690w1f9qqpr0` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `route_via_location`;
@@ -2671,8 +3306,9 @@ CREATE TABLE `route_via_location` (
   PRIMARY KEY (`id`),
   KEY `FKa8eteq9h2ubt8yyq6v3kw9axk` (`created_by_id`),
   KEY `FKf45xbqk7nf8sd3awmoh9nfwn9` (`last_updated_by_id`),
-  KEY `FKbip5c7pq5f78ahhh5g19688hy` (`route_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKbip5c7pq5f78ahhh5g19688hy` (`route_id`),
+  CONSTRAINT `FKbip5c7pq5f78ahhh5g19688hy` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `scheduled_consignment`;
@@ -2696,10 +3332,12 @@ CREATE TABLE `scheduled_consignment` (
   `is_pickup` tinyint(4) NOT NULL DEFAULT '0',
   `time_to_live_in_minutes` int(11) NOT NULL DEFAULT '180',
   PRIMARY KEY (`id`),
-  KEY `sc_client_id` (`client_id`),
-  KEY `sc_client_address_id` (`client_address_id`),
-  KEY `sc_created_by_id` (`created_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_id` (`client_id`),
+  KEY `client_address_id` (`client_address_id`),
+  KEY `created_by_id` (`created_by_id`),
+  CONSTRAINT `scheduled_consignment_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `scheduled_consignment_ibfk_3` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `schedule_task_config`;
@@ -2717,7 +3355,7 @@ CREATE TABLE `schedule_task_config` (
   `next_execution_at` bigint(20) DEFAULT NULL,
   `running_on_instance` varchar(1024) DEFAULT '',
   PRIMARY KEY (`task_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `schedule_task_history`;
@@ -2733,7 +3371,7 @@ CREATE TABLE `schedule_task_history` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `running_on_instance` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `shortage_excess_box_record`;
@@ -2755,8 +3393,8 @@ CREATE TABLE `shortage_excess_box_record` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `sebr_id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `shortage_excess_record`;
@@ -2773,11 +3411,14 @@ CREATE TABLE `shortage_excess_record` (
   `location_id` bigint(20) NOT NULL,
   `client_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `ser_id_UNIQUE` (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `fk_shortage_excess_record_1_idx` (`created_by_id`),
   KEY `fk_shortage_excess_record_2_idx` (`last_updated_by_id`),
-  KEY `client_id_shortage_fk_idx` (`client_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `client_id_shortage_fk_idx` (`client_id`),
+  CONSTRAINT `client_id_shortage_fk` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_shortage_excess_record_1` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_shortage_excess_record_2` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `shortage_excess_record_old`;
@@ -2801,8 +3442,10 @@ CREATE TABLE `shortage_excess_record_old` (
   `location_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FKottr7a0co2ea55dkn1msog4ck2` (`created_by_id`),
-  KEY `FKmiwr992pm4i9wbqigx7gowgid2` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKmiwr992pm4i9wbqigx7gowgid2` (`last_updated_by_id`),
+  CONSTRAINT `FKmiwr992pm4i9wbqigx7gowgid2` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKottr7a0co2ea55dkn1msog4ck2` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `stockaccumulator`;
@@ -2824,8 +3467,12 @@ CREATE TABLE `stockaccumulator` (
   UNIQUE KEY `index6` (`email`),
   KEY `FKa60h9qa8v0imjfjsp8oqj7i5d` (`created_by_id`),
   KEY `FKntgxqfmcihpwtniih6l03fhcl` (`last_updated_by_id`),
-  KEY `FK6w94nyh4j78wnbymh8r2xc6ax` (`accumulation_partner_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK6w94nyh4j78wnbymh8r2xc6ax` (`accumulation_partner_id`),
+  CONSTRAINT `FK6w94nyh4j78wnbymh8r2xc6ax` FOREIGN KEY (`accumulation_partner_id`) REFERENCES `business_partner` (`id`),
+  CONSTRAINT `FK9go7oh408aeghrth6lanut9ev` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKa60h9qa8v0imjfjsp8oqj7i5d` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKntgxqfmcihpwtniih6l03fhcl` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `stockaccumulator_zone`;
@@ -2843,8 +3490,12 @@ CREATE TABLE `stockaccumulator_zone` (
   UNIQUE KEY `FKers1ereldwcnuo6vclrl2g5ar` (`stockaccumulator_id`),
   KEY `FK3d7h9l8ifxj82qco652xm4q0f` (`created_by_id`),
   KEY `FK6lgcrnsmos8f287q5s6seiq46` (`last_updated_by_id`),
-  KEY `FK1nyp1qsk5xqvi8vpc7vydrneh` (`zone_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK1nyp1qsk5xqvi8vpc7vydrneh` (`zone_id`),
+  CONSTRAINT `FK1nyp1qsk5xqvi8vpc7vydrneh` FOREIGN KEY (`zone_id`) REFERENCES `zone` (`id`),
+  CONSTRAINT `FK3d7h9l8ifxj82qco652xm4q0f` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FK6lgcrnsmos8f287q5s6seiq46` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKers1ereldwcnuo6vclrl2g5ar` FOREIGN KEY (`stockaccumulator_id`) REFERENCES `stockaccumulator` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `stockaccumulator_zone_client`;
@@ -2860,8 +3511,10 @@ CREATE TABLE `stockaccumulator_zone_client` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `zone_client` (`zone_id`,`client_id`),
   KEY `fk_client_idx` (`client_id`),
-  KEY `fk_zone_idx` (`zone_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_zone_idx` (`zone_id`),
+  CONSTRAINT `fk_client` FOREIGN KEY (`client_id`) REFERENCES `clients` (`id`),
+  CONSTRAINT `fk_zone` FOREIGN KEY (`zone_id`) REFERENCES `zone` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `stock_check`;
@@ -2881,11 +3534,11 @@ CREATE TABLE `stock_check` (
   `check_type` varchar(45) DEFAULT NULL,
   `deps_reason_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `sc_task_id` (`task_id`),
-  KEY `sc_status` (`status`),
-  KEY `sc_check_type` (`check_type`),
-  KEY `sc_box_id` (`box_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `task_id` (`task_id`),
+  KEY `status` (`status`),
+  KEY `check_type` (`check_type`),
+  KEY `box_id` (`box_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `task_user`;
@@ -2901,7 +3554,22 @@ CREATE TABLE `task_user` (
   `is_active` tinyint(4) NOT NULL DEFAULT '1',
   `deleted_at` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `tat_deleted`;
+CREATE TABLE `tat_deleted` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_at` bigint(20) NOT NULL,
+  `last_updated_at` bigint(20) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `path` varchar(255) DEFAULT NULL,
+  `tat_minutes` int(11) NOT NULL DEFAULT '0',
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_3qmlspvi87v0sgup2rwnfg250` (`path`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `tracked_node`;
@@ -2918,7 +3586,7 @@ CREATE TABLE `tracked_node` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `tracked_vehicle`;
@@ -2934,8 +3602,9 @@ CREATE TABLE `tracked_vehicle` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_trip` (`trip_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_trip` (`trip_id`),
+  CONSTRAINT `fk_trip` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `transhipment_drop_suggestion`;
@@ -2951,7 +3620,7 @@ CREATE TABLE `transhipment_drop_suggestion` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `from_location_id_to_location_id` (`from_location_id`,`to_location_id`),
   KEY `fk_transhipment_drop_suggestion_1_idx` (`from_location_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `transhipment_drop_suggestion_adhoc`;
@@ -2968,7 +3637,7 @@ CREATE TABLE `transhipment_drop_suggestion_adhoc` (
   `deactivated_at` bigint(20) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `transportation_partner_mapping`;
@@ -2987,12 +3656,12 @@ CREATE TABLE `transportation_partner_mapping` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_transportation_partner_mapping_1` (`transportation_type`,`transportation_id`),
-  KEY `tpm_transportation_partner_mapping_4_idx` (`partner_type`,`partner_id`),
-  KEY `tpm_transportation_partner_mapping_3_idx` (`transportation_id`,`transportation_type`),
-  KEY `tpm_index5` (`created_by_id`),
-  KEY `tpm_index6` (`last_updated_by_id`),
-  KEY `tpm_index7` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `transportation_partner_mapping_4_idx` (`partner_type`,`partner_id`),
+  KEY `transportation_partner_mapping_3_idx` (`transportation_id`,`transportation_type`),
+  KEY `index5` (`created_by_id`),
+  KEY `index6` (`last_updated_by_id`),
+  KEY `index7` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip`;
@@ -3033,13 +3702,16 @@ CREATE TABLE `trip` (
   PRIMARY KEY (`id`),
   KEY `FKqoedvkaixg05cq2errn39sb49` (`business_partner_id`),
   KEY `FKcelj7w6yvj3x9txrqda5k3tai` (`route_id`),
-  KEY `t_created_at_index` (`created_at`),
-  KEY `t_status_index` (`status`),
-  KEY `t_index6` (`created_by_id`),
-  KEY `t_index7` (`last_updated_by_id`),
-  KEY `t_feeder_vendor_id` (`feeder_vendor_id`),
-  KEY `t_id_status` (`id`,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `created_at_index` (`created_at`),
+  KEY `status_index` (`status`),
+  KEY `index6` (`created_by_id`),
+  KEY `index7` (`last_updated_by_id`),
+  KEY `feeder_vendor_id` (`feeder_vendor_id`),
+  KEY `id_status` (`id`,`status`),
+  KEY `last_updated_at` (`last_updated_at`),
+  CONSTRAINT `FKcelj7w6yvj3x9txrqda5k3tai` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`),
+  CONSTRAINT `FKqoedvkaixg05cq2errn39sb49` FOREIGN KEY (`business_partner_id`) REFERENCES `business_partner` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip_asset`;
@@ -3052,6 +3724,7 @@ CREATE TABLE `trip_asset` (
   `trip_id` bigint(20) NOT NULL,
   `asset_id` bigint(20) DEFAULT NULL,
   `asset_type` varchar(255) NOT NULL,
+  `asset_position_type` varchar(255) DEFAULT 'FREE',
   `unavailable_reason_id` bigint(20) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `is_active` tinyint(4) NOT NULL DEFAULT '1',
@@ -3062,8 +3735,30 @@ CREATE TABLE `trip_asset` (
   KEY `fk_trip_asset_1_idx` (`task_id`),
   KEY `fk_trip_asset_2_idx` (`manifest_id`),
   KEY `fk_trip_asset_3_idx` (`trip_id`),
-  KEY `fk_trip_asset_4_idx` (`asset_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_trip_asset_4_idx` (`asset_id`),
+  CONSTRAINT `fk_trip_asset_1` FOREIGN KEY (`task_id`) REFERENCES `oa_task_assignment` (`id`),
+  CONSTRAINT `fk_trip_asset_2` FOREIGN KEY (`manifest_id`) REFERENCES `manifest` (`id`),
+  CONSTRAINT `fk_trip_asset_3` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`),
+  CONSTRAINT `fk_trip_asset_4` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `trip_asset_history`;
+CREATE TABLE `trip_asset_history` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `trip_asset_id` bigint(20) DEFAULT NULL,
+  `task_id` bigint(20) DEFAULT NULL,
+  `manifest_id` bigint(20) DEFAULT NULL,
+  `trip_id` bigint(20) DEFAULT NULL,
+  `asset_id` bigint(20) DEFAULT NULL,
+  `asset_position_type` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `created_at` bigint(20) DEFAULT NULL,
+  `created_by_id` bigint(20) DEFAULT NULL,
+  `last_updated_at` bigint(20) DEFAULT NULL,
+  `last_updated_by_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip_history`;
@@ -3084,10 +3779,10 @@ CREATE TABLE `trip_history` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `th_index2` (`trip_id`),
-  KEY `th_index3` (`created_by_id`),
-  KEY `th_index4` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index2` (`trip_id`),
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip_manifest`;
@@ -3095,8 +3790,10 @@ CREATE TABLE `trip_manifest` (
   `manifest_id` bigint(20) NOT NULL,
   `trip_id` bigint(20) NOT NULL,
   KEY `FKlp1pyga1n04cj88cw6lpps566` (`trip_id`),
-  KEY `FKi9exqnpjscl216cub65f3h380` (`manifest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKi9exqnpjscl216cub65f3h380` (`manifest_id`),
+  CONSTRAINT `FKi9exqnpjscl216cub65f3h380` FOREIGN KEY (`manifest_id`) REFERENCES `manifest` (`id`),
+  CONSTRAINT `FKlp1pyga1n04cj88cw6lpps566` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip_tracking`;
@@ -3128,13 +3825,15 @@ CREATE TABLE `trip_tracking` (
   `dispatched_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKmgqa1dfqpmxx1th3lhfnjtvf8` (`trip_id`,`location_id`),
-  KEY `tt_index4` (`created_by_id`),
-  KEY `tt_index5` (`last_updated_by_id`),
-  KEY `tt_trip_id` (`trip_id`),
-  KEY `tt_location_id` (`location_id`),
-  KEY `tt_trip_tracking_status` (`trip_tracking_status`),
-  KEY `tt_stop_sequence` (`stop_sequence`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index4` (`created_by_id`),
+  KEY `index5` (`last_updated_by_id`),
+  KEY `trip_id` (`trip_id`),
+  KEY `location_id` (`location_id`),
+  KEY `trip_tracking_status` (`trip_tracking_status`),
+  KEY `stop_sequence` (`stop_sequence`),
+  KEY `last_updated_at` (`last_updated_at`),
+  CONSTRAINT `FK6xlegq6o7sbyg31703fah86h2` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `trip_uploaded_files`;
@@ -3151,7 +3850,7 @@ CREATE TABLE `trip_uploaded_files` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `task_type` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `turn_around_time`;
@@ -3175,12 +3874,13 @@ CREATE TABLE `turn_around_time` (
   `delivery_cutoff_time_millis` bigint(20) NOT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `tat_index5` (`search_key`),
-  UNIQUE KEY `tat_unique_index` (`from_location_id`,`from_pincode`,`to_location_id`,`to_pincode`,`client_id`,`from_client_address_id`),
+  UNIQUE KEY `index5` (`search_key`),
+  UNIQUE KEY `unique_index` (`from_location_id`,`from_pincode`,`to_location_id`,`to_pincode`,`client_id`,`from_client_address_id`),
   KEY `fk_turn_around_time_1_idx` (`created_by_id`),
   KEY `fk_turn_around_time_2_idx` (`last_updated_by_id`),
-  KEY `tat_is_active_search_key` (`is_active`,`search_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `is_active_search_key` (`is_active`,`search_key`),
+  KEY `from_location_id_to_location_id_client_id` (`from_location_id`,`to_location_id`,`client_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `unconnected_box_detail`;
@@ -3206,7 +3906,7 @@ CREATE TABLE `unconnected_box_detail` (
   `deleted_at` bigint(20) DEFAULT NULL,
   `last_updated_at` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `ubd_deps_id` (`deps_id`)
+  KEY `deps_id` (`deps_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -3228,8 +3928,8 @@ CREATE TABLE `undelivered_consignments` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   `comments` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `uc_consignment_id _index` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id _index` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `user`;
@@ -3248,7 +3948,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `FKottr7a0co2ea55dkn1msog4ck` (`created_by_id`),
   KEY `FKmiwr992pm4i9wbqigx7gowgid` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `user_client_address_history`;
@@ -3265,12 +3965,12 @@ CREATE TABLE `user_client_address_history` (
   `last_updated_at` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id_created_at_entity_type_address_type` (`user_id`,`created_at`,`entity_type`,`address_type`),
-  KEY `ucah_user_id` (`user_id`),
-  KEY `ucah_created_at` (`created_at`),
-  KEY `ucah_entity_type` (`entity_type`),
-  KEY `ucah_address_type` (`address_type`),
+  KEY `user_id` (`user_id`),
+  KEY `created_at` (`created_at`),
+  KEY `entity_type` (`entity_type`),
+  KEY `address_type` (`address_type`),
   KEY `entity_id_entity_type_address_type` (`entity_id`,`entity_type`,`address_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `value_added_services`;
@@ -3291,8 +3991,8 @@ CREATE TABLE `value_added_services` (
   `pickup_id` bigint(20) DEFAULT NULL,
   `payment_detail_master_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `vas_consignment_id` (`consignment_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `consignment_id` (`consignment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `vehicle_detail`;
@@ -3307,8 +4007,10 @@ CREATE TABLE `vehicle_detail` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_vehicle_detail_1_idx` (`created_by_id`),
-  KEY `fk_vehicle_detail_2_idx` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_vehicle_detail_2_idx` (`last_updated_by_id`),
+  CONSTRAINT `fk_vehicle_detail_1` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_vehicle_detail_2` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `vehicle_pre_inspection`;
@@ -3325,8 +4027,8 @@ CREATE TABLE `vehicle_pre_inspection` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `vpi_trip_type_trip_id` (`trip_type`,`trip_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `trip_type_trip_id` (`trip_type`,`trip_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `volume_details`;
@@ -3345,9 +4047,10 @@ CREATE TABLE `volume_details` (
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKmtwe7i2an0dv8gxdcxtgesovb` (`consignment_id`),
-  KEY `vd_index3` (`created_by_id`),
-  KEY `vd_index4` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `index3` (`created_by_id`),
+  KEY `index4` (`last_updated_by_id`),
+  CONSTRAINT `FKmtwe7i2an0dv8gxdcxtgesovb` FOREIGN KEY (`consignment_id`) REFERENCES `consignment` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `zone`;
@@ -3364,8 +4067,21 @@ CREATE TABLE `zone` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_ogsepej3d4erg3m06qmyat27i` (`code`),
   KEY `FK7dbpp4hl0fva68sqg0cpdb15t` (`created_by_id`),
-  KEY `FKbo8ta8wet7ybiu1mlsjuwtt7v` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FKbo8ta8wet7ybiu1mlsjuwtt7v` (`last_updated_by_id`),
+  CONSTRAINT `FK7dbpp4hl0fva68sqg0cpdb15t` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKbo8ta8wet7ybiu1mlsjuwtt7v` FOREIGN KEY (`last_updated_by_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `zoombook_sync_config`;
+CREATE TABLE `zoombook_sync_config` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) NOT NULL,
+  `cutoff_timestamp` bigint(20) NOT NULL,
+  `passbook_v2_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `org_id` (`org_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `zoom_properties`;
@@ -3381,8 +4097,9 @@ CREATE TABLE `zoom_properties` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `zp_variable_name` (`variable_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `variable_name` (`variable_name`),
+  KEY `is_session_property_is_active` (`is_session_property`,`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `zoom_user`;
@@ -3402,10 +4119,11 @@ CREATE TABLE `zoom_user` (
   `drop_support` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `FK1wkfuiyyc6u5ljyqk3cn65yu6` (`user_id`),
-  UNIQUE KEY `zu_index6` (`email`),
+  UNIQUE KEY `index6` (`email`),
   KEY `FKmncmk9orvsth10kniubc4lp6e` (`created_by_id`),
-  KEY `FK1t7kuo7bjvbkxoi5b2gge0jqk` (`last_updated_by_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `FK1t7kuo7bjvbkxoi5b2gge0jqk` (`last_updated_by_id`),
+  CONSTRAINT `FK1wkfuiyyc6u5ljyqk3cn65yu6` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 DROP TABLE IF EXISTS `zoom_user_location_mapping`;
@@ -3421,9 +4139,9 @@ CREATE TABLE `zoom_user_location_mapping` (
   `created_by_id` bigint(20) DEFAULT NULL,
   `last_updated_by_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `zulm_zoom_user_id` (`zoom_user_id`),
-  KEY `zulm_is_active` (`is_active`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `zoom_user_id` (`zoom_user_id`),
+  KEY `is_active` (`is_active`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-
+-- 2017-10-25 11:50:16

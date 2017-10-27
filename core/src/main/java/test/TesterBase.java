@@ -49,6 +49,7 @@ import test.config.TestConfig;
 @TransactionConfiguration(defaultRollback = true)
 @SqlGroup({
         @Sql(value = "classpath:scripts/start/test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        @Sql(value = "classpath:scripts/data/create-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(value = "classpath:scripts/end/remove-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
 @Slf4j
