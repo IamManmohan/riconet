@@ -34,4 +34,10 @@ public class ConsignmentScheduleService {
         }
         return retMap;
     }
+
+    public List<ConsignmentSchedule> getActivePlan(Long consignmentId) {
+        List<ConsignmentSchedule> csList = consignmentScheduleRepository.findByConsignmentIdAndIsActive(consignmentId, 1);
+        Collections.sort(csList);
+        return csList;
+    }
 }

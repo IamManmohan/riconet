@@ -25,6 +25,7 @@ import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mongo.DEPSNotificationRepository;
+import enums.ZoomPropertyName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
@@ -450,8 +451,8 @@ public class DEPSRecordService {
     }
 
     public void sendNotifications(List<DEPSNotification> depsNotificationList) {
-        String templateString= zoomPropertyService.getString("SHORTAGE_NOTIFICATION_TEMPLATE");
-        Boolean isEmailEnabled = zoomPropertyService.getBoolean("DEPS_EMAIL_ENABLED", false);
+        String templateString= zoomPropertyService.getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_TEMPLATE);
+        Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.DEPS_EMAIL_ENABLED, false);
         if(templateString != null && isEmailEnabled){
             depsNotificationList.forEach(depsNotification -> {
                 String body = designEmailTemplate(depsNotification,templateString);

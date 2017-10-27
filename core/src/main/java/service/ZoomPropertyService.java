@@ -2,6 +2,7 @@ package service;
 
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
+import enums.ZoomPropertyName;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
@@ -40,16 +41,16 @@ public class ZoomPropertyService {
         return propertyForEveryProfile;
     }
 
-    public String getString(String propertyName) {
-        ZoomProperty property = getByPropertyName(propertyName);
+    public String getString(ZoomPropertyName propertyName) {
+        ZoomProperty property = getByPropertyName(propertyName.name());
         if (property == null)
             return null;
 
         return property.getVariableValue();
     }
 
-    public boolean getBoolean(String propertyName, boolean defaultVal) {
-        ZoomProperty property = getByPropertyName(propertyName);
+    public boolean getBoolean(ZoomPropertyName propertyName, boolean defaultVal) {
+        ZoomProperty property = getByPropertyName(propertyName.name());
         if (property == null)
             return defaultVal;
 
@@ -63,6 +64,21 @@ public class ZoomPropertyService {
 
         if (value.equals("0") || value.equalsIgnoreCase("false"))
             return false;
+
+        return defaultVal;
+    }
+
+    public int getInteger(ZoomPropertyName propertyName, int defaultVal) {
+        ZoomProperty property = getByPropertyName(propertyName.name());
+        if (property == null)
+            return defaultVal;
+
+        try {
+            int i = Integer.parseInt(property.getVariableValue());
+            return i;
+        } catch (Exception ex) {
+            log.error("Exception while getting integer value for " + propertyName.name(), ex);
+        }
 
         return defaultVal;
     }
