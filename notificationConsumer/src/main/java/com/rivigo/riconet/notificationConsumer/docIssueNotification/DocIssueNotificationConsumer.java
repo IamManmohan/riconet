@@ -1,6 +1,6 @@
 package com.rivigo.riconet.notificationConsumer.docIssueNotification;
 
-import com.rivigo.riconet.core.ConsumerAbstract.ConsumerModel;
+import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;

@@ -28,7 +28,7 @@ public class MongoTestConfig extends AbstractMongoConfiguration {
     private String embeddedMongoHost;
 
     @Value("${embedded.mongo.port}")
-    private Integer embeddedMongoPort;
+    private String embeddedMongoPort;
 
     @Value("${embedded.mongo.db.name}")
     private String embeddedMongoDbName;
@@ -46,7 +46,7 @@ public class MongoTestConfig extends AbstractMongoConfiguration {
             mongoClient = new EmbeddedMongoBuilder()
                     .version(embeddedMongoVersion)
                     .bindIp(embeddedMongoHost)
-                    .port(embeddedMongoPort)
+                    .port(100)
                     .build();
         }
         return mongoClient;
