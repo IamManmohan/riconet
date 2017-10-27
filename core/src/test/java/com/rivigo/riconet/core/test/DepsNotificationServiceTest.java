@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
-import com.rivigo.zoom.common.model.DEPSRecord;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

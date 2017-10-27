@@ -30,10 +30,8 @@ public class ZoomPropertyService {
             if (zp.getSpringProfile() == null) {
                 propertyForEveryProfile = zp;
             }
-            if (profile == null && zp.getSpringProfile() == null) {
-                return zp;
-            } else if(profile!=null) {
-                if (profile.equals(zp.getSpringProfile()))
+            if ((profile == null && zp.getSpringProfile() == null) ||
+                    (profile!=null && profile.equals(zp.getSpringProfile()))) {
                 return zp;
             }
         }
@@ -74,8 +72,7 @@ public class ZoomPropertyService {
             return defaultVal;
 
         try {
-            int i = Integer.parseInt(property.getVariableValue());
-            return i;
+            return Integer.parseInt(property.getVariableValue());
         } catch (Exception ex) {
             log.error("Exception while getting integer value for " + propertyName.name(), ex);
         }

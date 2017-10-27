@@ -1,4 +1,4 @@
-package com.rivigo.riconet.notificationConsumer.depsNotification;
+package com.rivigo.riconet.notification.consumer;
 
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.fasterxml.jackson.core.type.TypeReference;

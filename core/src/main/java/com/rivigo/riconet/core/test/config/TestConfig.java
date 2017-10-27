@@ -33,11 +33,6 @@ public class TestConfig {
         Resource[] resources = patternResolver.getResources(String.format("classpath*:%s/*.properties", profile));
 		List<Resource> resourcesList = new ArrayList<>();
 		resourcesList.addAll(Arrays.asList(resources));
-
-		// it is running inside com.rivigo.riconet.core.test context : look for the following
-		// files on the jenkins server
-		System.out.println("IN TEST CONTEXT ");
-		
 		configurer.setLocations(resourcesList.toArray(new Resource[resourcesList.size()]));
 		configurer.setOrder(0);
 		configurer.setIgnoreUnresolvablePlaceholders(true);

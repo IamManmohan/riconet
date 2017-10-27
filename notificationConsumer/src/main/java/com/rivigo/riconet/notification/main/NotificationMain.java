@@ -1,11 +1,11 @@
-package com.rivigo.riconet.notificationConsumer.notificationMain;
+package com.rivigo.riconet.notification.main;
 
 import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
-import com.rivigo.riconet.notificationConsumer.depsNotification.DEPSNotificationConsumer;
-import com.rivigo.riconet.notificationConsumer.docIssueNotification.DocIssueNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
@@ -35,7 +35,7 @@ public class NotificationMain {
     @Autowired
     private DocIssueNotificationConsumer docIssueNotificationConsumer;
 
-    public static void main(String args[]){
+    public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
         ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);

@@ -37,6 +37,6 @@ public class ConsignmentService {
         if (consignmentIds != null && !consignmentIds.isEmpty()) {
             return consignmentRepo.findByIdIn(consignmentIds);
         }
-        return new ArrayList<Consignment>();
+        return new ArrayList<>();
     }
 }

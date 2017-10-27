@@ -10,6 +10,7 @@ import com.rivigo.zoom.common.enums.EmailDlName;
 import com.rivigo.zoom.common.enums.PartnerType;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.enums.ZoomTripType;
+import com.rivigo.zoom.common.enums.ZoomUserType;
 import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
@@ -135,15 +136,15 @@ public class DEPSRecordService {
             dto.setTaskId(depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId());
             updateCnoteMetadata(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext);
             updateResponsiblePersonAndLocation(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext, tripIdToTripMap, prsIdToPRSMap, consignmentIdToLatestHistoryMap);
-            updateStakeHolders(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext,reportingCcList,bccList);
-            updateLastScanDetails(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext, consignmentIdToLatestHistoryMap);
+            updateStakeHolders(dto, reportingCcList,bccList);
+            updateLastScanDetails(dto, consignmentId, consignmentIdToLatestHistoryMap);
             dtoList.add(dto);
         });
         depsNotificationRepository.save(dtoList);
         return dtoList;
     }
 
-    private void updateLastScanDetails(DEPSNotification dto, Long consignmentId, Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap, DEPSNotificationContext depsNotificationContext, Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap) {
+    private void updateLastScanDetails(DEPSNotification dto, Long consignmentId, Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap) {
         ConsignmentHistory history = consignmentIdToLatestHistoryMap.get(consignmentId);
         if(history==null)
             return;
@@ -177,20 +178,20 @@ public class DEPSRecordService {
 
         Location pc=locationServiceV2.getPcOrReportingPc(loc);
         List<ZoomUser> rmList=zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(regionLocIds,
-                "ZOOM_RM","ZOOM_TECH_SUPPORT");
+                "ZOOM_RM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> clmList=zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds,
-                "ZOOM_CLM","ZOOM_TECH_SUPPORT");
+                "ZOOM_CLM",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> pceList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_PCE","ZOOM_TECH_SUPPORT");
+                "ZOOM_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> boPceList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(locationId,
-                "ZOOM_BO_PCE","ZOOM_TECH_SUPPORT");
+                "ZOOM_BO_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> pcmList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_BO_PCM","ZOOM_TECH_SUPPORT");
-        ccList.addAll(rmList.stream().map(e->e.getEmail()).collect(Collectors.toList()));
-        ccList.addAll(clmList.stream().map(e->e.getEmail()).collect(Collectors.toList()));
-        ccList.addAll(pceList.stream().map(e->e.getEmail()).collect(Collectors.toList()));
-        ccList.addAll(boPceList.stream().map(e->e.getEmail()).collect(Collectors.toList()));
-        ccList.addAll(pcmList.stream().map(e->e.getEmail()).collect(Collectors.toList()));
+                "ZOOM_BO_PCM",ZoomUserType.ZOOM_TECH_SUPPORT.name());
+        ccList.addAll(rmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+        ccList.addAll(clmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+        ccList.addAll(pceList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+        ccList.addAll(boPceList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+        ccList.addAll(pcmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         return ccList;
     }
 
@@ -200,23 +201,21 @@ public class DEPSRecordService {
             return;
         }
         List<String> dummyEmailList = new ArrayList<>();
-        dto.getEmailIdList().forEach(email->{
-            dummyEmailList.add(email.split("@")[0]+"@rivigodummy.com");
-        });
+        dto.getEmailIdList().forEach(email->
+            dummyEmailList.add(email.split("@")[0]+"@rivigodummy.com")
+        );
         dto.getEmailIdList().clear();
         dto.getEmailIdList().addAll(dummyEmailList);
 
         List<String> dummyCcList = new ArrayList<>();
-        dto.getCcList().forEach(email->{
-            dummyCcList.add(email.split("@")[0]+"@rivigodummy.com");
-        });
+        dto.getCcList().forEach(email->
+            dummyCcList.add(email.split("@")[0]+"@rivigodummy.com"));
         dto.getCcList().clear();
         dto.getCcList().addAll(dummyCcList);
 
     }
 
-    private void updateStakeHolders(DEPSNotification dto, Long consignmentId, Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap,
-                                    DEPSNotificationContext depsNotificationContext, Set<String> reportingCcList, Set<String> bccList) {
+    private void updateStakeHolders(DEPSNotification dto, Set<String> reportingCcList, Set<String> bccList) {
         dto.getCcList().addAll(reportingCcList);
         switch (dto.getScenario()) {
             case BFTRIP:
@@ -261,22 +260,19 @@ public class DEPSRecordService {
         ConsignmentHistory latestHistory;
         switch (depsRecord.getDepsTaskType()) {
             case UNLOADING:
-                switch (depsRecord.getTripType()) {
-                    case PRS:
-                        dto.setScenario(DEPSScenario.PICKUP);
-                        getDEPSReporteePRSDTO(dto, prsIdToPRSMap.get(depsRecord.getTripId()));
-                        break;
-                    case TRIP:
-                        if(tripIdToTripMap.containsKey(depsRecord.getTripId()) && tripIdToTripMap.get(depsRecord.getTripId()).getType()==BF)
-                            dto.setScenario(DEPSScenario.BFTRIP);
-                        else {
-                            dto.setScenario(DEPSScenario.INBOUND);
-                        }
-                        if(previousSchedule!=null && previousSchedule.getLoadedById()!=null) {
-                            addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()), DEPSLocationType.OUTBOUND);
-                            addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()), DEPSLocationType.OUTBOUND);
-                        }
-                        break;
+                if(depsRecord.getTripType().equals(ZoomTripType.PRS)){
+                    dto.setScenario(DEPSScenario.PICKUP);
+                    getDEPSReporteePRSDTO(dto, prsIdToPRSMap.get(depsRecord.getTripId()));
+                }else if (depsRecord.getTripType().equals(ZoomTripType.TRIP)) {
+                    if(tripIdToTripMap.containsKey(depsRecord.getTripId()) && tripIdToTripMap.get(depsRecord.getTripId()).getType()==BF)
+                        dto.setScenario(DEPSScenario.BFTRIP);
+                    else {
+                        dto.setScenario(DEPSScenario.INBOUND);
+                    }
+                    if(previousSchedule!=null && previousSchedule.getLoadedById()!=null) {
+                        addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()), DEPSLocationType.OUTBOUND);
+                        addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()), DEPSLocationType.OUTBOUND);
+                    }
                 }
                 break;
             case STOCK_CHECK:
@@ -294,7 +290,7 @@ public class DEPSRecordService {
                 TransportationPartnerMapping transportationPartnerMapping = transportationPartnerMappingService.getByDRSId(depsRecord.getTripId());
                 latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
                 if(transportationPartnerMapping!=null) {
-                    getDEPSReporteeDRSUserDTO(dto, transportationPartnerMapping, DEPSLocationType.OUTBOUND);
+                    getDEPSReporteeDRSUserDTO(dto, transportationPartnerMapping);
                     addDEPSLocationDTO(dto, locationServiceV2.getLocationById(latestHistory.getLocationId()), DEPSLocationType.OUTBOUND);
                 }
                 break;
@@ -303,7 +299,7 @@ public class DEPSRecordService {
         }
     }
 
-    private void getDEPSReporteeDRSUserDTO(DEPSNotification dto, TransportationPartnerMapping transportationPartnerMapping, DEPSLocationType outbound) {
+    private void getDEPSReporteeDRSUserDTO(DEPSNotification dto, TransportationPartnerMapping transportationPartnerMapping) {
         User user = null;
         FeederVendor feederVendor = null;
         DEPSNotification.DEPSUserDTO userDTO = new DEPSNotification.DEPSUserDTO();
@@ -328,6 +324,8 @@ public class DEPSRecordService {
                 user = userMasterService.getById(transportationPartnerMapping.getUserId());
                 feederVendor = feederVendorService.getFeederVendorById(transportationPartnerMapping.getPartnerId());
                 userDTO.setType(PartnerType.VENDOR.name());
+                break;
+            default:
                 break;
         }
         if(feederVendor!=null) {
@@ -390,7 +388,7 @@ public class DEPSRecordService {
             ZoomUser zoomUser = zoomUserMasterService.getZoomUser(user.getEmail());
             userDTO.setType(zoomUser.getZoomUserType());
         }catch(Exception e){
-
+            log.info("not a zoomUser");
         }
         if(locationType==DEPSLocationType.LAST_SCAN) {
             dto.setLastScannedByUser(userDTO);
@@ -463,7 +461,7 @@ public class DEPSRecordService {
     }
 
     private String designEmailTemplate(DEPSNotification depsNotification, String templateString) {
-        Map<String, String> valuesMap = new HashMap<String, String>();
+        Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("cnote", depsNotification.getCnote());
         valuesMap.put("client_name", depsNotification.getClientName());
         valuesMap.put("shortage_count",Integer.toString( depsNotification.getDepsBoxesCount()));
@@ -474,6 +472,7 @@ public class DEPSRecordService {
         valuesMap.put("reporting_person", depsNotification.getReporter().getName());
 
         switch (depsNotification.getScenario()) {
+            case PICKUP:
             case BFTRIP:
                 valuesMap.put("scenario","Short at the time of pickup");
                 valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporterLocation().getName());
@@ -500,12 +499,6 @@ public class DEPSRecordService {
                 valuesMap.put("scenario","Short at time of delivery");
                 valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporteeLocation().getName()+
                         " - 100 % "+ depsNotification.getReporterLocation().getName());
-                valuesMap.put("responsible_person","100 % "+ depsNotification.getReportee().getName());
-                valuesMap.put("dear", depsNotification.getReportee().getName());
-                break;
-            case PICKUP:
-                valuesMap.put("scenario","Short at the time of pickup");
-                valuesMap.put("responsible_ou","100 % "+ depsNotification.getReporterLocation().getName());
                 valuesMap.put("responsible_person","100 % "+ depsNotification.getReportee().getName());
                 valuesMap.put("dear", depsNotification.getReportee().getName());
                 break;

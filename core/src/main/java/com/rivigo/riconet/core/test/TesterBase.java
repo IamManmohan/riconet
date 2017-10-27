@@ -9,7 +9,6 @@ import com.rivigo.zoom.common.config.KafkaProducerConfig;
 import com.rivigo.zoom.common.config.PusherConfig;
 import com.rivigo.zoom.common.config.ZoomNeo4jConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -52,7 +51,6 @@ import com.rivigo.riconet.core.test.config.TestConfig;
         @Sql(value = "classpath:scripts/data/create-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
         @Sql(value = "classpath:scripts/end/remove-tables.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
-@Slf4j
-public abstract class TesterBase {
+public interface TesterBase {
 
 }

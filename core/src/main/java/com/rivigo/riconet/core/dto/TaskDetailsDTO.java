@@ -27,15 +27,11 @@ public class TaskDetailsDTO {
     List<ManifestScanDTO> manifests = new ArrayList<>(0);
     private Map<String, String> locationmap;
     private List<DEPSRecordTaskDetailDTO> depsRecords;
-    //	private Map<IncompletenessType, List<String>> incompleteQCMap = new HashMap<>();
     private CargonetDTO cargonet;
     private List<ReplacedBarcodeMappingScanDTO> replacedBarcodes;
     private DateTime lastUpdatedAt;
     private List<TaskUserDTO> taskUsers;
 
-    //	public enum IncompletenessType {
-//		QC_NOT_DONE, INCOMPLETE
-//	}
     @Getter
     @Setter
     @AllArgsConstructor

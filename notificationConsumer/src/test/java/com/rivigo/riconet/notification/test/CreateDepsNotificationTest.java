@@ -1,7 +1,7 @@
-package com.rivigo.riconet.notificationConsumer.test;
+package com.rivigo.riconet.notification.test;
 
 import com.rivigo.riconet.core.test.TesterBase;
-import com.rivigo.riconet.notificationConsumer.depsNotification.DEPSNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

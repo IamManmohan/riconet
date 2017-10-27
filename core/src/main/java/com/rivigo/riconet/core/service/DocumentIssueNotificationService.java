@@ -9,6 +9,7 @@ import com.rivigo.zoom.common.enums.EmailDlName;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
+import com.rivigo.zoom.common.enums.ZoomUserType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
@@ -98,36 +99,37 @@ public class DocumentIssueNotificationService {
     }
 
     private DocumentIssueNotification.NotificationUserDTO getUserDTO(User user) {
+        User responsibleUser=user;
         DocumentIssueNotification.NotificationUserDTO userDTO = new DocumentIssueNotification.NotificationUserDTO();
         boolean isBpUser = false;
         Organization organization=null;
-        if(!user.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)){
-            organization=organizationService.getById(user.getOrganizationId());
-        }else if(userMasterService.canAdaptTo(user, StockAccumulator.class)) {
-            StockAccumulator stockAccumulator = userMasterService.adaptUserTo(user,StockAccumulator.class);
+        if(!responsibleUser.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)){
+            organization=organizationService.getById(responsibleUser.getOrganizationId());
+        }else if(userMasterService.canAdaptTo(responsibleUser, StockAccumulator.class)) {
+            StockAccumulator stockAccumulator = userMasterService.adaptUserTo(responsibleUser,StockAccumulator.class);
             List<StockAccumulator> accumulatorList = stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
                     StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, stockAccumulator.getAccumulationPartnerId().getId(), OperationalStatus.ACTIVE);
             if(!CollectionUtils.isEmpty(accumulatorList)) {
                 StockAccumulator accumulator = accumulatorList.get(0);
-                user = accumulator.getUser();
+                responsibleUser = accumulator.getUser();
                 isBpUser = true;
             }
         }
         if(organization == null){
-            userDTO.setEmail(user.getEmail());
+            userDTO.setEmail(responsibleUser.getEmail());
         }else{
             userDTO.setEmail(organization.getEmail());
         }
-        userDTO.setId(user.getId());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setName(user.getName());
-        userDTO.setOrgId(user.getOrganizationId());
-        if(user.getOrganizationId()!=1) {
-            userDTO.setType(organizationService.getById(user.getOrganizationId()).getType().name());
+        userDTO.setId(responsibleUser.getId());
+        userDTO.setEmail(responsibleUser.getEmail());
+        userDTO.setName(responsibleUser.getName());
+        userDTO.setOrgId(responsibleUser.getOrganizationId());
+        if(responsibleUser.getOrganizationId()!=1) {
+            userDTO.setType(organizationService.getById(responsibleUser.getOrganizationId()).getType().name());
         }else if(isBpUser) {
             userDTO.setType(StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN.name());
         } else {
-            ZoomUser zoomUser = zoomUserMasterService.getZoomUser(user.getEmail());
+            ZoomUser zoomUser = zoomUserMasterService.getZoomUser(responsibleUser.getEmail());
             if (zoomUser != null) {
                 userDTO.setType(zoomUser.getZoomUserType());
             }
@@ -152,17 +154,14 @@ public class DocumentIssueNotificationService {
 
         Location pc=locationServiceV2.getPcOrReportingPc(loc);
 
-
-
-
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds,
-                "ZOOM_CLM","ZOOM_TECH_SUPPORT").stream().map(e->e.getEmail()).collect(Collectors.toList()));
+                "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_PCE","ZOOM_TECH_SUPPORT").stream().map(e->e.getEmail()).collect(Collectors.toList()));
+                "ZOOM_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(locationId,
-                "ZOOM_BO_PCE","ZOOM_TECH_SUPPORT").stream().map(e->e.getEmail()).collect(Collectors.toList()));
+                "ZOOM_BO_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_PCM","ZOOM_TECH_SUPPORT").stream().map(e->e.getEmail()).collect(Collectors.toList()));
+                "ZOOM_PCM",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         return ccList;
     }
 
@@ -172,16 +171,14 @@ public class DocumentIssueNotificationService {
             return;
         }
         List<String> dummyEmailList = new ArrayList<>();
-        dto.getEmailIdList().forEach(email->{
-            dummyEmailList.add(email.split("@")[0]+"@rivigodummy.com");
-        });
+        dto.getEmailIdList().forEach(email->
+            dummyEmailList.add(email.split("@")[0]+"@rivigodummy.com"));
         dto.getEmailIdList().clear();
         dto.getEmailIdList().addAll(dummyEmailList);
 
         List<String> dummyCcList = new ArrayList<>();
-        dto.getCcList().forEach(email->{
-            dummyCcList.add(email.split("@")[0]+"@rivigodummy.com");
-        });
+        dto.getCcList().forEach(email->
+            dummyCcList.add(email.split("@")[0]+"@rivigodummy.com"));
         dto.getCcList().clear();
         dto.getCcList().addAll(dummyCcList);
 
@@ -207,7 +204,7 @@ public class DocumentIssueNotificationService {
     private void updateResponsiblePersonAndLocation(DocumentIssueNotification notification, User user, Long locationId,
                                                     ConsignmentReadOnly consignment, ConsignmentStatus status) {
         //fill scenario
-        Integer buffer_minutes= zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES,120);
+        Integer bufferMinutes= zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES,120);
         User reporter=null;
         User reportee=null;
         Long reporterLocationId=null;
@@ -223,7 +220,7 @@ public class DocumentIssueNotificationService {
             if(schedule==null){
                 throw new ZoomException("This consignment with id "+consignment.getId()+" is not present at any location");
             }
-            if(DateTime.now().getMillis() > schedule.getArrivalTime()+buffer_minutes* TimeUtilsZoom.MILLIS_IN_MINUTE){
+            if(DateTime.now().getMillis() > schedule.getArrivalTime()+bufferMinutes* TimeUtilsZoom.MILLIS_IN_MINUTE){
                 notification.setScenario("Within PC");
                 reporter=user;
                 reporterLocationId=locationId;
@@ -300,7 +297,7 @@ public class DocumentIssueNotificationService {
     }
 
     private String designEmailTemplate(DocumentIssueNotification notification, String templateString) {
-        Map<String, String> valuesMap = new HashMap<String, String>();
+        Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("cnote", notification.getCnote());
         valuesMap.put("client_name", notification.getClientName());
         valuesMap.put("last_loading_ou", notification.getReporteeLocation()==null ?"-":notification.getReporteeLocation().getCode());

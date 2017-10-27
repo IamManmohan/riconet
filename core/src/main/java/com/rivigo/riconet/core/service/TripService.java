@@ -35,8 +35,7 @@ public class TripService {
         return idToTripMap;
     }
 
-    public ArrayList<Trip> getTripsByIdIn(Collection<Long> linehaulTripIds) {
-        ArrayList<Trip> toReturn = new ArrayList<Trip>((List)(tripRepository.findAll(linehaulTripIds)));
-        return toReturn;
+    public List<Trip> getTripsByIdIn(Collection<Long> linehaulTripIds) {
+        return new ArrayList<>((List)(tripRepository.findAll(linehaulTripIds)));
     }
 }

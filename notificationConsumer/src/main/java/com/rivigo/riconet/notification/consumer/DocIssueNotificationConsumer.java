@@ -1,4 +1,4 @@
-package com.rivigo.riconet.notificationConsumer.docIssueNotification;
+package com.rivigo.riconet.notification.consumer;
 
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
