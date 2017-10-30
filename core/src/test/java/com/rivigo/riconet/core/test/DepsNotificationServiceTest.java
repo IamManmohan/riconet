@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
+import com.rivigo.zoom.common.enums.PartnerType;
 import com.rivigo.zoom.common.enums.ZoomTripType;
+import com.rivigo.zoom.common.enums.ZoomUserType;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
@@ -70,7 +72,9 @@ public class DepsNotificationServiceTest extends TesterBase {
     public void returnScanNotification()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
-        //edit tpm
+        tpm.setPartnerType(PartnerType.MARKET);
+        tpm.setPartnerId(null);
+        tpm.setUserId(1118l);
         transportationPartnerMappingRepository.save(tpm);
         String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
 
@@ -81,7 +85,9 @@ public class DepsNotificationServiceTest extends TesterBase {
     public void returnScanNotification2()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
-        //edit tpm
+        tpm.setPartnerType(PartnerType.RIVIGO_CAPTAIN);
+        tpm.setPartnerId(null);
+        tpm.setUserId(2172l);
         transportationPartnerMappingRepository.save(tpm);
 
         String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
@@ -92,7 +98,9 @@ public class DepsNotificationServiceTest extends TesterBase {
     public void returnScanNotification3()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
-        //edit tpm
+        tpm.setPartnerType(PartnerType.BUSINESS_PARTNER);
+        tpm.setPartnerId(1l);
+        tpm.setUserId(58l);
         transportationPartnerMappingRepository.save(tpm);
         String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
         processNotification(str);
@@ -102,7 +110,9 @@ public class DepsNotificationServiceTest extends TesterBase {
     public void returnScanNotification4()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
-        //edit tpm
+        tpm.setPartnerType(PartnerType.VENDOR);
+        tpm.setPartnerId(1l);
+        tpm.setUserId(1118l);
         transportationPartnerMappingRepository.save(tpm);
         String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
         processNotification(str);

@@ -48,34 +48,33 @@ public abstract class ConsumerModel {
     @Autowired
     KafkaTemplate kafkaTemplate;
 
-    private Timer timer=new HashedWheelTimer();
+    private Timer timer = new HashedWheelTimer();
 
     private final AtomicLong offset = new AtomicLong();
 
-    public ConsumerModel(String topic, String errorTopic){
-        this.topic=topic;
-        this.errorTopic=errorTopic;
+    public ConsumerModel(String topic, String errorTopic) {
+        this.topic = topic;
+        this.errorTopic = errorTopic;
     }
 
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
-        if(record.topic().toString().equals(topic)){
+        if (record.topic().toString().equals(topic)) {
             log.info("lolololololol");
-            executorService.submit(()->{
+            executorService.submit(() -> {
                 try {
                     processMessage(record.value());
-                }catch (Exception e){
+                } catch (Exception e) {
                     processFirstTimeError(record.value());
                     log.error("First time error", e);
                 }
             });
-        }
-        else if(record.topic().toString().equals(errorTopic)){
-            executorService.submit(()->{
-                ConsumerMessages consumerMessages=consumerMessagesRepository.findById(record.value());
+        } else if (record.topic().toString().equals(errorTopic)) {
+            executorService.submit(() -> {
+                ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
                 try {
                     processMessage(consumerMessages.getMessage());
-                }catch (Exception e){
+                } catch (Exception e) {
                     processError(consumerMessages);
                     log.error("error", e);
                 }
@@ -91,22 +90,22 @@ public abstract class ConsumerModel {
 
     public abstract String processMessage(String str);
 
-    String processError(ConsumerMessages consumerMessage){
+    String processError(ConsumerMessages consumerMessage) {
         log.error("processing error");
-        if(consumerMessage.getRetry_count()<5L) {
+        if (consumerMessage.getRetry_count() < 5L) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
-            consumerMessage.setRetry_count(consumerMessage.getRetry_count()+1L);
+            consumerMessage.setRetry_count(consumerMessage.getRetry_count() + 1L);
             consumerMessagesRepository.save(consumerMessage);
-            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
-            timer.newTimeout(task, 5*(consumerMessage.getRetry_count()), TimeUnit.MINUTES);
+            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
+            timer.newTimeout(task, 5 * (consumerMessage.getRetry_count()), TimeUnit.MINUTES);
         }
         return consumerMessage.getMessage();
     }
 
-    String processFirstTimeError(String str){
+    String processFirstTimeError(String str) {
         log.error(" Processing first time error");
-        ConsumerMessages consumerMessage=new ConsumerMessages();
-        consumerMessage.setId(topic+DateTime.now().getMillis());
+        ConsumerMessages consumerMessage = new ConsumerMessages();
+        consumerMessage.setId(topic + DateTime.now().getMillis());
         consumerMessage.setMessage(str);
         consumerMessage.setRetry_count(1L);
         consumerMessage.setRetry_time(DateTime.now().getMillis());
@@ -115,15 +114,15 @@ public abstract class ConsumerModel {
         consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
 
         consumerMessagesRepository.save(consumerMessage);
-        ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(),errorTopic,kafkaTemplate);
+        ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
         timer.newTimeout(task, 5, TimeUnit.MINUTES);
 
         return str;
     }
 
 
-    public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings) {
-        Set<String> topics=new HashSet<>();
+    public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+        Set<String> topics = new HashSet<>();
         topics.add(topic);
         topics.add(errorTopic);
 
@@ -138,5 +137,3 @@ public abstract class ConsumerModel {
                         .runWith(Sink.ignore(), materializer));
     }
 }
-
-

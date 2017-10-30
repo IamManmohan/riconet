@@ -21,7 +21,7 @@ public class DocIssueNotificationTest extends TesterBase{
     @Test
     public void processNotification()
     {
-        docIssueNotificationConsumer.processMessage("5|1505|Invoice missing|RECEIVED_AT_OU");
+        docIssueNotificationConsumer.processMessage("8|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
     @Test(expected = ZoomException.class)

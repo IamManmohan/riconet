@@ -1,4 +1,4 @@
-mainClassName = "notificationMain.NotificationMain"
+mainClassName = "com.rivigo.riconet.notificationConsumer.notificationMain.NotificationMain"
 
 apply plugin: 'application'
 apply plugin: 'java'
