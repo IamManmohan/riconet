@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
+import com.rivigo.zoom.common.enums.ZoomTripType;
+import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
+import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +25,12 @@ import java.util.List;
  */
 
 @Slf4j
-public class DepsNotificationServiceTest extends TesterBase {    @Autowired
-DEPSRecordService depsRecordService;
+public class DepsNotificationServiceTest extends TesterBase {
+    @Autowired
+    DEPSRecordService depsRecordService;
+
+    @Autowired
+    TransportationPartnerMappingRepository transportationPartnerMappingRepository;
 
     private void processNotification(String str){
         Collection<String> toRecipients;
@@ -62,6 +69,41 @@ DEPSRecordService depsRecordService;
     @Test
     public void returnScanNotification()
     {
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
+        //edit tpm
+        transportationPartnerMappingRepository.save(tpm);
+        String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
+
+        processNotification(str);
+    }
+
+    @Test
+    public void returnScanNotification2()
+    {
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
+        //edit tpm
+        transportationPartnerMappingRepository.save(tpm);
+
+        String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
+        processNotification(str);
+    }
+
+    @Test
+    public void returnScanNotification3()
+    {
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
+        //edit tpm
+        transportationPartnerMappingRepository.save(tpm);
+        String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
+        processNotification(str);
+    }
+
+    @Test
+    public void returnScanNotification4()
+    {
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
+        //edit tpm
+        transportationPartnerMappingRepository.save(tpm);
         String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
         processNotification(str);
     }
