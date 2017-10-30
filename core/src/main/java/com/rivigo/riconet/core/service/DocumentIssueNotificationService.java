@@ -255,7 +255,7 @@ public class DocumentIssueNotificationService {
 
     }
 
-    private ConsignmentSchedule getPreviousSchedule( List<ConsignmentSchedule> consignmentSchedules) {
+    public ConsignmentSchedule getPreviousSchedule( List<ConsignmentSchedule> consignmentSchedules) {
         Collections.sort(consignmentSchedules);
         final ConsignmentSchedule[] lastSchedule = new ConsignmentSchedule[1];
         consignmentSchedules.forEach(consignmentSchedule -> {
@@ -266,7 +266,7 @@ public class DocumentIssueNotificationService {
         return lastSchedule[0];
     }
 
-    private ConsignmentSchedule getCurrentSchedule( List<ConsignmentSchedule> consignmentSchedules) {
+    public ConsignmentSchedule getCurrentSchedule( List<ConsignmentSchedule> consignmentSchedules) {
         Collections.sort(consignmentSchedules);
         final ConsignmentSchedule[] lastSchedule = new ConsignmentSchedule[1];
         consignmentSchedules.forEach(consignmentSchedule -> {

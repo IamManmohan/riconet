@@ -2,7 +2,7 @@ package com.rivigo.riconet.core.constants;
 
 public class ConsignmentConstant {
 
-    private ConsignmentConstant() {
+    public ConsignmentConstant() {
         throw new IllegalStateException("Utility class");
     }
 

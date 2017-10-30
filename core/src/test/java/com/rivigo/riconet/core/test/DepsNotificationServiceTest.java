@@ -13,24 +13,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by ashfakh on 27/10/17.
  */
 
 @Slf4j
-public class DepsNotificationServiceTest extends TesterBase {
+public class DepsNotificationServiceTest extends TesterBase {    @Autowired
+DEPSRecordService depsRecordService;
 
-    @Autowired
-    DEPSRecordService depsRecordService;
-
-    @Test
-    public void processNotification()
-    {
-        String str ="[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]";
+    private void processNotification(String str){
+        Collection<String> toRecipients;
+        Collection<String> ccRecipients;
+        Collection<String> bccRecipients;
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         DEPSNotificationContext context = null;
@@ -44,6 +42,44 @@ public class DepsNotificationServiceTest extends TesterBase {
         context = depsRecordService.getNotificationContext(depsRecordList);
         List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
         depsRecordService.sendNotifications(depsNotificationList);
-        assertEquals(str,"[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]");
+
     }
+
+    @Test
+    public void prsUnloadingNotification()
+    {
+        String str ="[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]";
+        processNotification(str);
+    }
+
+    @Test
+    public void tripUnloadingNotification()
+    {
+        String str ="[{\"id\":2,\"consignmentId\":2,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"TRIP\",\"taskId\":3,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"UNLOADING\"}]";
+        processNotification(str);
+    }
+
+    @Test
+    public void returnScanNotification()
+    {
+        String str ="[{\"id\":3,\"consignmentId\":4,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"DRS\",\"taskId\":5,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"RETURN_SCAN\"}]";
+        processNotification(str);
+    }
+
+    @Test
+    public void instockNotification()
+    {
+        String str ="[{\"id\":4,\"consignmentId\":3,\"depsType\":\"SHORTAGE\",\"taskId\":25,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"STOCK_CHECK\"}]";
+        processNotification(str);
+
+    }
+
+    @Test
+    public void emptyNotification(){
+        String str ="[]";
+        processNotification(str);
+
+    }
+
+
 }

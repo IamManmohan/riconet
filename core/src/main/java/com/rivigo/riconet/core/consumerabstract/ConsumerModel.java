@@ -6,11 +6,8 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
-import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
 import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -35,17 +32,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 
 @Slf4j
-@Getter
-@Setter
 @Component
 public abstract class ConsumerModel {
 
     private final String topic;
 
     private final String errorTopic;
-
-    @Autowired
-    private DEPSRecordService depsRecordService;
 
     @Autowired
     ExecutorService executorService;
@@ -68,7 +60,7 @@ public abstract class ConsumerModel {
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
         if(record.topic().toString().equals(topic)){
-            log.info("");
+            log.info("lolololololol");
             executorService.submit(()->{
                 try {
                     processMessage(record.value());

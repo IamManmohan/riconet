@@ -122,10 +122,6 @@ public class DEPSRecordService {
         Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap = consignmentService.getLastScanByCnIdIn(new ArrayList<>(shortageConsignmentIds), Arrays.asList(RECEIVED_AT_OU.name(),
                 STOCK_CHECK_DONE.name(), LOADED.name(), DELIVERY_LOADED.name(), EXCESS.name()));
 
-        if(CollectionUtils.isEmpty(depsNotificationContext.getNewDEPSRecordList())){
-            return dtoList;
-        }
-
         Set<String> reportingCcList = getCcList(depsNotificationContext.getNewDEPSRecordList().get(0).getInboundLocationId());
 
         Set<String> bccList = emailService.getEmails(EmailDlName.DEPS_NOTIFICATION);
@@ -260,23 +256,9 @@ public class DEPSRecordService {
         ConsignmentHistory latestHistory;
         switch (depsRecord.getDepsTaskType()) {
             case UNLOADING:
-                if(depsRecord.getTripType().equals(ZoomTripType.PRS)){
-                    dto.setScenario(DEPSScenario.PICKUP);
-                    getDEPSReporteePRSDTO(dto, prsIdToPRSMap.get(depsRecord.getTripId()));
-                }else if (depsRecord.getTripType().equals(ZoomTripType.TRIP)) {
-                    if(tripIdToTripMap.containsKey(depsRecord.getTripId()) && tripIdToTripMap.get(depsRecord.getTripId()).getType()==BF)
-                        dto.setScenario(DEPSScenario.BFTRIP);
-                    else {
-                        dto.setScenario(DEPSScenario.INBOUND);
-                    }
-                    if(previousSchedule!=null && previousSchedule.getLoadedById()!=null) {
-                        addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()), DEPSLocationType.OUTBOUND);
-                        addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()), DEPSLocationType.OUTBOUND);
-                    }
-                }
+                handleUnloading(depsRecord,previousSchedule,dto,tripIdToTripMap,prsIdToPRSMap);
                 break;
             case STOCK_CHECK:
-            case LOADING:
             case HANDOVER:
                 dto.setScenario(DEPSScenario.WITHINPC);
                 latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
@@ -296,6 +278,25 @@ public class DEPSRecordService {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void handleUnloading(DEPSNotificationDTO depsRecord,ConsignmentSchedule previousSchedule,
+                                 DEPSNotification dto, Map<Long, Trip> tripIdToTripMap,
+                                 Map<Long, PickupRunSheet> prsIdToPRSMap){
+        if(depsRecord.getTripType().equals(ZoomTripType.PRS)){
+            dto.setScenario(DEPSScenario.PICKUP);
+            getDEPSReporteePRSDTO(dto, prsIdToPRSMap.get(depsRecord.getTripId()));
+        }else if (depsRecord.getTripType().equals(ZoomTripType.TRIP)) {
+            if(tripIdToTripMap.containsKey(depsRecord.getTripId()) && tripIdToTripMap.get(depsRecord.getTripId()).getType()==BF)
+                dto.setScenario(DEPSScenario.BFTRIP);
+            else {
+                dto.setScenario(DEPSScenario.INBOUND);
+            }
+            if(previousSchedule!=null && previousSchedule.getLoadedById()!=null) {
+                addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()), DEPSLocationType.OUTBOUND);
+                addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()), DEPSLocationType.OUTBOUND);
+            }
         }
     }
 

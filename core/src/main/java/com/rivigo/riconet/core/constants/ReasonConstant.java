@@ -5,7 +5,7 @@ package com.rivigo.riconet.core.constants;
  */
 public class ReasonConstant {
 
-    private ReasonConstant() {
+    public ReasonConstant() {
         throw new IllegalStateException("Utility class");
     }
 

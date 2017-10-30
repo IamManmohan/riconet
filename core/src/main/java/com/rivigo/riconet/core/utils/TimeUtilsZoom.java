@@ -3,7 +3,7 @@ package com.rivigo.riconet.core.utils;
 
 public class TimeUtilsZoom {
 
-	private TimeUtilsZoom() {}
+	public TimeUtilsZoom() {throw new IllegalStateException("Utility class");}
 
 	public static final long MILLIS_IN_DAY = 24 * 3600 * 1000l;
 	public static final long MILLIS_IN_HOUR = 3600 * 1000l;

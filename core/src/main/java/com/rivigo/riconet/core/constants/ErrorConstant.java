@@ -5,7 +5,7 @@ package com.rivigo.riconet.core.constants;
  */
 public class ErrorConstant {
 
-    private ErrorConstant() {
+    public ErrorConstant() {
         throw new IllegalStateException("Utility class");
     }
 
