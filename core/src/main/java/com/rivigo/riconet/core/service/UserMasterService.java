@@ -60,9 +60,6 @@ public class UserMasterService {
 
     private ZoomUser getZoomUser(User user) {
         ZoomUser zoomUser = zoomUserMasterService.getZoomUser(user.getEmail());
-        if (null == zoomUser) {
-            throw new SessionUserException(CANT_ADAPT_USER_ERROR + ZoomUser.class.getName());
-        }
         return zoomUser;
     }
 
