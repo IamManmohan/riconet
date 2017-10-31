@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class ZoomPropertyService {
     public ZoomProperty getByPropertyName(String str) {
         List<ZoomProperty> zpList =
                 zoomPropertiesRepository.findByVariableNameAndIsActive(str, 1);
-        if (zpList == null || zpList.isEmpty())
+        if (CollectionUtils.isEmpty(zpList))
             return null;
 
         String profile = System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME);

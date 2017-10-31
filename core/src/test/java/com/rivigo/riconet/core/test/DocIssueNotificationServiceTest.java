@@ -1,20 +1,28 @@
 package com.rivigo.riconet.core.test;
 
+import com.rivigo.common.util.MailUtils;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import com.rivigo.zoom.common.enums.PartnerType;
+import com.rivigo.zoom.common.enums.ZoomTripType;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleRepository;
+import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.util.List;
+
 
 
 /**
@@ -35,6 +43,9 @@ public class DocIssueNotificationServiceTest extends TesterBase {
 
     @Autowired
     ConsignmentScheduleRepository consignmentScheduleRepository;
+
+    @Autowired
+    TransportationPartnerMappingRepository transportationPartnerMappingRepository;
 
     public String processMessage(String str){
         String[] split=str.split("\\|");
@@ -70,28 +81,49 @@ public class DocIssueNotificationServiceTest extends TesterBase {
     @Test
     public void vehicleUnloadingWithinTwoHoursNotification()
     {
-        List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(8l);
+        List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
         ConsignmentSchedule schedule=documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
         schedule.setArrivalTime(DateTime.now().getMillis());
         consignmentScheduleRepository.save(schedule);
-        processMessage("9|1505|lol|RECEIVED_AT_OU");
+        processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
     @Test
     public void vehicleUnloadingAfterTwoHoursNotification()
     {
-        List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(8l);
+        List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
         ConsignmentSchedule schedule=documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
         Integer bufferMinutes= zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES,120);
         schedule.setArrivalTime(DateTime.now().minusMinutes(bufferMinutes+1).getMillis());
         consignmentScheduleRepository.save(schedule);
-        processMessage("9|1505|lol|RECEIVED_AT_OU");
+        processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
     @Test
-    public void undeliveredNotification()
+    public void undeliveredNotification1()
     {
-        processMessage("10|1505|lol|UNDELIVERED");
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,2l);
+        tpm.setPartnerType(PartnerType.MARKET);
+        tpm.setPartnerId(null);
+        tpm.setUserId(1118l);
+        transportationPartnerMappingRepository.save(tpm);
+        processMessage("10|1505|Invoice missing|UNDELIVERED");
+    }
+
+    @Test
+    public void undeliveredNotification2()
+    {
+        TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,2l);
+        tpm.setPartnerType(PartnerType.BUSINESS_PARTNER);
+        tpm.setPartnerId(1l);
+        tpm.setUserId(58l);
+        transportationPartnerMappingRepository.save(tpm);
+        processMessage("10|1505|Invoice missing|UNDELIVERED");
+    }
+
+    @Test(expected = ZoomException.class)
+    public void noUser(){
+        processMessage("10|150500|lol|UNDELIVERED");
     }
 
 

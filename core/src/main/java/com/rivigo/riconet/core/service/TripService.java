@@ -27,10 +27,7 @@ public class TripService {
             if(TripStatus.DELETED.equals(t.getStatus())){
                 continue;
             }
-            Trip o = idToTripMap.get(t.getId());
-            if (o == null) {
-                idToTripMap.put(t.getId(), t);
-            }
+            idToTripMap.put(t.getId(), t);
         }
         return idToTripMap;
     }

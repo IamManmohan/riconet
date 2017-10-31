@@ -5,6 +5,7 @@ import com.rivigo.zoom.common.model.ClientUser;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.repository.mysql.ClientUserRepository;
 import com.rivigo.zoom.exceptions.SessionUserException;
 import lombok.extern.slf4j.Slf4j;
@@ -25,34 +26,96 @@ public class UserServiceTest extends TesterBase {
     UserMasterService userMasterService;
 
     @Test
-    public void userTest()
+    public void zoomUserTest()
     {
-        User user=new User();
-        user.setId(51695l);
-        userMasterService.canAdaptTo(user,ClientUser.class);
-        user.setEmail("jasjacobjex@gmail.com");
+        User user=userMasterService.getById(1505l);
+        userMasterService.canAdaptTo(user,ZoomUser.class);
+        userMasterService.adaptUserTo(user,ZoomUser.class);
+        try{
+            userMasterService.canAdaptTo(user,ClientUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.canAdaptTo(user,StockAccumulator.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,ClientUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,StockAccumulator.class);
+        }catch (Exception e){
+
+        }
+    }
+
+    @Test
+    public void stockAccumulatorTest()
+    {
+        User user=userMasterService.getById(58l);
         userMasterService.canAdaptTo(user,StockAccumulator.class);
-        userMasterService.adaptUserTo(user,ClientUser.class);
         userMasterService.adaptUserTo(user,StockAccumulator.class);
-    }
-    @Test(expected= SessionUserException.class)
-    public void userExceptionAdaptToTest()
-    {
-        User user=new User();
-        userMasterService.adaptUserTo(user,Consignment.class);
+        try{
+            userMasterService.canAdaptTo(user,ClientUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.canAdaptTo(user,ZoomUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,ClientUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,ZoomUser.class);
+        }catch (Exception e){
+
+        }
     }
 
-    @Test(expected= SessionUserException.class)
-    public void userExceptionClientUserTest()
+    @Test
+    public void clientUserTest()
     {
-        User user=new User();
+        User user=userMasterService.getById(65l);
+        userMasterService.canAdaptTo(user,ClientUser.class);
         userMasterService.adaptUserTo(user,ClientUser.class);
+        try{
+            userMasterService.canAdaptTo(user,StockAccumulator.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.canAdaptTo(user,ZoomUser.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,StockAccumulator.class);
+        }catch (Exception e){
+
+        }
+        try{
+            userMasterService.adaptUserTo(user,ZoomUser.class);
+        }catch (Exception e){
+
+        }
     }
 
-    @Test(expected= SessionUserException.class)
-    public void userExceptionStockAccumulatorTest()
-    {
-        User user=new User();
-        userMasterService.adaptUserTo(user,StockAccumulator.class);
+    @Test(expected=Exception.class)
+    public void errorTest1(){
+        userMasterService.adaptUserTo(null,Consignment.class);
+    }
+
+    @Test
+    public void errorTest2(){
+        userMasterService.canAdaptTo(null,Consignment.class);
     }
 }

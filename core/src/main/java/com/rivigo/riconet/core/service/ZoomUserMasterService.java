@@ -18,11 +18,7 @@ public class ZoomUserMasterService {
     ZoomUserRepository zoomUserRepository;
 
     public ZoomUser getZoomUser(String userName) {
-        ZoomUser savedZoomUser = zoomUserRepository.findByEmail(userName);
-        if (savedZoomUser == null) {
-            throw new ZoomException("Zoom user does not exists.");
-        }
-        return savedZoomUser;
+        return zoomUserRepository.findByEmail(userName);
     }
 
     public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId, String zoomUserType, String excludedZoomUserType) {

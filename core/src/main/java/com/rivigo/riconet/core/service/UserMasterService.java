@@ -59,8 +59,7 @@ public class UserMasterService {
     }
 
     private ZoomUser getZoomUser(User user) {
-        ZoomUser zoomUser = zoomUserMasterService.getZoomUser(user.getEmail());
-        return zoomUser;
+        return zoomUserMasterService.getZoomUser(user.getEmail());
     }
 
     private ClientUser getClientUser(User user) {
