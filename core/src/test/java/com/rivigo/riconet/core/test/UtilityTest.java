@@ -1,23 +1,14 @@
 package com.rivigo.riconet.core.test;
 
-import akka.actor.ActorSystem;
-import akka.kafka.ConsumerSettings;
-import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.ErrorConstant;
 import com.rivigo.riconet.core.constants.ReasonConstant;
-import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
-import com.rivigo.zoom.common.enums.Topic;
-import com.rivigo.zoom.exceptions.ZoomException;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -27,24 +18,36 @@ import org.springframework.kafka.core.KafkaTemplate;
 @Slf4j
 public class UtilityTest{
 
-    @Test(expected = IllegalStateException.class)
-    public void consignmentConstant(){
-        ConsignmentConstant  consignmentConstant=new ConsignmentConstant();
+    @Test(expected = Exception.class)
+    public void consignmentConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        ConsignmentConstant  consignmentConstant;
+        Constructor<ConsignmentConstant> constructor = (Constructor<ConsignmentConstant>) ConsignmentConstant.class.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        consignmentConstant=constructor.newInstance();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void timeUtils(){
-        TimeUtilsZoom timeUtilsZoom=new TimeUtilsZoom();
+    @Test(expected = Exception.class)
+    public void timeUtils() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        TimeUtilsZoom  timeUtilsZoom;
+        Constructor<TimeUtilsZoom> constructor = (Constructor<TimeUtilsZoom>) TimeUtilsZoom.class.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        timeUtilsZoom=constructor.newInstance();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void reasonConstant(){
-        ReasonConstant reasonConstant=new ReasonConstant();
+    @Test(expected = Exception.class)
+    public void reasonConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        ReasonConstant  reasonConstant;
+        Constructor<ReasonConstant> constructor = (Constructor<ReasonConstant>) ReasonConstant.class.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        reasonConstant=constructor.newInstance();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void errorConstant(){
-        ErrorConstant errorConstant=new ErrorConstant();
+    @Test(expected = Exception.class)
+    public void errorConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+        ErrorConstant  errorConstant;
+        Constructor<ErrorConstant> constructor = (Constructor<ErrorConstant>) ErrorConstant.class.getDeclaredConstructors()[0];
+        constructor.setAccessible(true);
+        errorConstant=constructor.newInstance();
     }
 
 }

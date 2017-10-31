@@ -64,7 +64,7 @@ public class consumerModelTest extends TesterBase {
         try {
             Method method= ConsumerModel.class.getDeclaredMethod("save", ConsumerRecord.class);
             method.setAccessible(true);
-            ConsumerRecord<String, String>abc=new ConsumerRecord<String, String>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),
+            ConsumerRecord<String, String>abc=new ConsumerRecord<>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),
                     0,0l,null,"1");
             method.invoke(testConsumer,abc);
         } catch (NoSuchMethodException e) {
