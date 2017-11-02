@@ -126,13 +126,17 @@ public class DEPSRecordService {
 
         Set<String> bccList = emailService.getEmails(EmailDlName.DEPS_NOTIFICATION);
 
+        Set<String> defaultCcList = emailService.getEmails(EmailDlName.DEPS_NOTIFICATION_CC);
+
+        boolean isTesting = zoomPropertyService.getBoolean(ZoomPropertyName.DEPS_EMAIL_TESTING, true);
+
         shortageConsignmentIds.forEach(consignmentId -> {
             DEPSNotification dto = new DEPSNotification();
             dto.setId(consignmentId+"_"+depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId()+"_"+ DateTime.now().getMillis());
             dto.setTaskId(depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId());
             updateCnoteMetadata(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext);
             updateResponsiblePersonAndLocation(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext, tripIdToTripMap, prsIdToPRSMap, consignmentIdToLatestHistoryMap);
-            updateStakeHolders(dto, reportingCcList,bccList);
+            updateStakeHolders(dto, reportingCcList,bccList,defaultCcList,isTesting);
             updateLastScanDetails(dto, consignmentId, consignmentIdToLatestHistoryMap);
             dtoList.add(dto);
         });
@@ -179,21 +183,18 @@ public class DEPSRecordService {
                 "ZOOM_CLM",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> pceList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
                 "ZOOM_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name());
-        List<ZoomUser> boPceList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(locationId,
-                "ZOOM_BO_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         List<ZoomUser> pcmList=zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
                 "ZOOM_BO_PCM",ZoomUserType.ZOOM_TECH_SUPPORT.name());
         ccList.addAll(rmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(clmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(pceList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
-        ccList.addAll(boPceList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(pcmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         return ccList;
     }
 
-    private void  filterEmails(DEPSNotification dto,Set<String> bccList){
+    private void  filterEmails(DEPSNotification dto,Set<String> bccList, boolean isTesting){
         dto.getBccList().addAll(bccList);
-        if("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+        if(!isTesting && "production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
             return;
         }
         List<String> dummyEmailList = new ArrayList<>();
@@ -211,8 +212,10 @@ public class DEPSRecordService {
 
     }
 
-    private void updateStakeHolders(DEPSNotification dto, Set<String> reportingCcList, Set<String> bccList) {
+    private void updateStakeHolders(DEPSNotification dto, Set<String> reportingCcList, Set<String> bccList,
+                                    Set<String> defaultCcList, boolean isTesting) {
         dto.getCcList().addAll(reportingCcList);
+        dto.getCcList().addAll(defaultCcList);
         switch (dto.getScenario()) {
             case BFTRIP:
                 dto.getEmailIdList().add(dto.getReportee().getEmail());
@@ -238,7 +241,7 @@ public class DEPSRecordService {
             default:
                 break;
         }
-        filterEmails(dto,bccList);
+        filterEmails(dto,bccList, isTesting);
     }
 
     private void updateResponsiblePersonAndLocation(DEPSNotification dto, Long consignmentId,
@@ -452,11 +455,12 @@ public class DEPSRecordService {
     public void sendNotifications(List<DEPSNotification> depsNotificationList) {
         String templateString= zoomPropertyService.getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_TEMPLATE);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.DEPS_EMAIL_ENABLED, false);
+        String subjectTemplate = zoomPropertyService.getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_SUBJECT);//get from zoom property
         if(templateString != null && isEmailEnabled){
             depsNotificationList.forEach(depsNotification -> {
                 String body = designEmailTemplate(depsNotification,templateString);
-                String subject = "";//get from zoom property
-                emailService.sendEmail(depsNotification.getEmailIdList(), depsNotification.getCcList(), depsNotification.getBccList(), subject, body, null);
+                String subject = designEmailTemplate(depsNotification,subjectTemplate);
+                emailService.sendShortageEmail(depsNotification.getEmailIdList(), depsNotification.getCcList(), depsNotification.getBccList(), subject, body, null);
             });
         }
     }
@@ -465,48 +469,49 @@ public class DEPSRecordService {
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("cnote", depsNotification.getCnote());
         valuesMap.put("client_name", depsNotification.getClientName());
-        valuesMap.put("shortage_count",Integer.toString( depsNotification.getDepsBoxesCount()));
-        valuesMap.put("estimated_loss", depsNotification.getExpectedLoss().toString());
-        valuesMap.put("last_scan_ou", depsNotification.getLastScannedAtLocation()==null ?"-":depsNotification.getLastScannedAtLocation().getName());
-        valuesMap.put("last_scan_person", depsNotification.getLastScannedByUser() == null? "-":depsNotification.getLastScannedByUser().getName());
-        valuesMap.put("reporting_ou", depsNotification.getReporterLocation().getName());
+        valuesMap.put("shortage_count", Integer.toString(depsNotification.getDepsBoxesCount()));
+        valuesMap.put("estimated_loss", depsNotification.getExpectedLoss() == null ? "NA" : Long.toString(Math.round(depsNotification.getExpectedLoss())));
+        valuesMap.put("last_scan_ou", depsNotification.getLastScannedAtLocation() == null ? "-" : depsNotification.getLastScannedAtLocation().getCode());
+        valuesMap.put("last_scan_person", depsNotification.getLastScannedByUser() == null ? "-" : depsNotification.getLastScannedByUser().getName());
+        valuesMap.put("reporting_ou", depsNotification.getReporterLocation().getCode());
         valuesMap.put("reporting_person", depsNotification.getReporter().getName());
 
-        String scenario="scenario";
-        String responsibleOu="responsible_ou";
-        String responsiblePerson="responsible_person";
-        String centPercent="100 %";
-        String secondCentPercent=" - 100 %";
-
         switch (depsNotification.getScenario()) {
-            case PICKUP:
             case BFTRIP:
-                valuesMap.put(scenario,"Short at the time of pickup");
-                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporterLocation().getName());
-                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName());
-                valuesMap.put("dear",depsNotification.getReportee().getName());
+                valuesMap.put("scenario", "Short at the time of pickup");
+                valuesMap.put("responsible_ou", depsNotification.getReporterLocation().getCode());
+                valuesMap.put("responsible_person", "100 % " + depsNotification.getReportee().getName());
+                valuesMap.put("dear", depsNotification.getReportee().getName());
                 break;
             case INBOUND:
-                valuesMap.put(scenario,"Scan out -but not scan in");
-                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporteeLocation().getName()+
-                        secondCentPercent+ depsNotification.getReporterLocation().getName());
-                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName()+
-                        secondCentPercent+ depsNotification.getReporter().getName());
-                valuesMap.put("dear", depsNotification.getReportee().getName()+
-                        " / "+ depsNotification.getReporter().getName());
+                valuesMap.put("scenario", "Scan out -but not scan in");
+                valuesMap.put("responsible_ou", depsNotification.getReporteeLocation().getCode() +
+                        " - " + depsNotification.getReporterLocation().getCode());
+                valuesMap.put("responsible_person", "100 % " + depsNotification.getReportee().getName() +
+                        " - 100 % " + depsNotification.getReporter().getName());
+                valuesMap.put("dear", depsNotification.getReportee().getName() +
+                        (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId()) ?
+                                "" : (" / " + depsNotification.getReporter().getName())));
                 break;
             case WITHINPC:
-                valuesMap.put(scenario,"Within PC");
-                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporterLocation().getName());
-                valuesMap.put(responsiblePerson,"OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
-                valuesMap.put("dear", depsNotification.getReportee().getName()+
-                        " / "+ depsNotification.getReporter().getName());
+                valuesMap.put("scenario", "Within PC");
+                valuesMap.put("responsible_ou", depsNotification.getReporterLocation().getCode());
+                valuesMap.put("responsible_person", "OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
+                valuesMap.put("dear", depsNotification.getReportee().getName() +
+                        (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId()) ?
+                                "" : (" / " + depsNotification.getReporter().getName())));
                 break;
             case RETURN_SCAN:
-                valuesMap.put(scenario,"Short at time of delivery");
-                valuesMap.put(responsibleOu,centPercent+ depsNotification.getReporteeLocation().getName()+
-                        secondCentPercent+ depsNotification.getReporterLocation().getName());
-                valuesMap.put(responsiblePerson,centPercent+ depsNotification.getReportee().getName());
+                valuesMap.put("scenario", "Short at time of delivery");
+                valuesMap.put("responsible_ou", depsNotification.getReporteeLocation().getCode() +
+                        " - " + depsNotification.getReporterLocation().getCode());
+                valuesMap.put("responsible_person", "100 % " + depsNotification.getReportee().getName());
+                valuesMap.put("dear", depsNotification.getReportee().getName());
+                break;
+            case PICKUP:
+                valuesMap.put("scenario", "Short at the time of pickup");
+                valuesMap.put("responsible_ou", depsNotification.getReporterLocation().getCode());
+                valuesMap.put("responsible_person", "100 % " + depsNotification.getReportee().getName());
                 valuesMap.put("dear", depsNotification.getReportee().getName());
                 break;
             default:

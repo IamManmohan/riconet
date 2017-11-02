@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EmailService {
 
-    public static final String EMAIL_ID = "no-reply-zoom@rivigo.com";
-    public static final String EMAIL_PASS = "2oom1g0R0ck$";
+    public static final String SHORTAGE_EMAIL_ID = "shortage.desk@rivigo.com";
+    public static final String SHORTAGE_EMAIL_PASS = "deps@1122";
 
     public static final String DOCUMENT_EMAIL_ID = "document.desk@rivigo.com";
     public static final String DOCUMENT_EMAIL_PASS = "deps@1122";
@@ -30,8 +30,8 @@ public class EmailService {
     private EmailDLRepository emailDLRepository;
 
 
-    public void sendEmail(Collection<String> toRecipients, Collection<String> ccRecipients, Collection<String> bccRecipients, String subject, String body, File file) {
-        MailUtils.sendEmail(EMAIL_ID, EMAIL_PASS, new ArrayList<>(toRecipients), new ArrayList<>(ccRecipients), new ArrayList<>(bccRecipients), subject, body, file);
+    public void sendShortageEmail(Collection<String> toRecipients, Collection<String> ccRecipients, Collection<String> bccRecipients, String subject, String body, File file) {
+        MailUtils.sendEmail(SHORTAGE_EMAIL_ID, SHORTAGE_EMAIL_PASS, new ArrayList<>(toRecipients), new ArrayList<>(ccRecipients), new ArrayList<>(bccRecipients), subject, body, file);
     }
 
     public Set<String> getEmails(EmailDlName dl){

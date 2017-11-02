@@ -19,6 +19,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
+import com.rivigo.zoom.common.repository.mongo.DocumentIssueNotificationRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -77,6 +78,9 @@ public class DocumentIssueNotificationService {
     @Autowired
     private ClientMasterService clientMasterService;
 
+    @Autowired
+    private DocumentIssueNotificationRepository documentIssueNotificationRepository;
+
 
     public DocumentIssueNotification createNotificationData(Long consignmentId, Long userId, String subReason, ConsignmentStatus status) {
         ConsignmentReadOnly cn=consignmentReadOnlyService.findByConsignmentById(consignmentId);
@@ -95,6 +99,7 @@ public class DocumentIssueNotificationService {
         updateCnoteMetadata(notification,cn,subReason);
         updateResponsiblePersonAndLocation(notification,user,zoomUser==null?cn.getLocationId():zoomUser.getLocationId(),cn,status);
         updateStakeHolders(notification);
+        documentIssueNotificationRepository.save(notification);
         return notification;
     }
 
@@ -156,8 +161,6 @@ public class DocumentIssueNotificationService {
 
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds,
                 "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
-        ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(locationId,
                 "ZOOM_BO_PCE",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),

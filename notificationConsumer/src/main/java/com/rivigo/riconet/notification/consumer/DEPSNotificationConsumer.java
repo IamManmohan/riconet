@@ -23,9 +23,9 @@ public class DEPSNotificationConsumer extends ConsumerModel {
   @Autowired
   private DEPSRecordService depsRecordService;
 
+  ObjectMapper objectMapper ;
+
   public String processMessage(String str){
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     DEPSNotificationContext context = null;
     try {
       TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {};
@@ -41,5 +41,7 @@ public class DEPSNotificationConsumer extends ConsumerModel {
 
   public DEPSNotificationConsumer(){
     super(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
+    objectMapper=new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 }

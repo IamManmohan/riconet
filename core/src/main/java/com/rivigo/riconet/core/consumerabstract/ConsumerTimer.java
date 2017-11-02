@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.consumerabstract;
 
+import lombok.AllArgsConstructor;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -7,7 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 /**
  * Created by ashfakh on 9/10/17.
  */
-
+@AllArgsConstructor
 public class ConsumerTimer implements TimerTask {
 
     private final String msgId;
@@ -16,11 +17,7 @@ public class ConsumerTimer implements TimerTask {
 
     private KafkaTemplate kafkaTemplate;
 
-    public ConsumerTimer(String msgId,String topic,KafkaTemplate kafkaTemplate){
-        this.msgId=msgId;
-        this.topic=topic;
-        this.kafkaTemplate=kafkaTemplate;
-    }
+
 
 
     @Override
