@@ -3,6 +3,7 @@ mainClassName = "com.rivigo.riconet.notification.main.NotificationMain"
 apply plugin: 'application'
 apply plugin: 'java'
 
+
 repositories {
     mavenCentral()
 }

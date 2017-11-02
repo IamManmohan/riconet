@@ -60,7 +60,6 @@ public abstract class ConsumerModel {
     @Async
     private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
         if (record.topic().toString().equals(topic)) {
-            log.info("lolololololol");
             executorService.submit(() -> {
                 try {
                     processMessage(record.value());
