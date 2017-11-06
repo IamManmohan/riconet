@@ -33,6 +33,6 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
   }
 
   public DocIssueNotificationConsumer(){
-    super(Topic.COM_RIVIGO_ZOOM_DOCUMENT_ISSUE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_DOCUMENT_ISSUE_NOTIFICATION_ERROR.name());
+    super(Topic.COM_RIVIGO_ZOOM_DOCUMENT_ISSUE_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_DOCUMENT_ISSUE_NOTIFICATION_ERROR.name(),5L);
   }
 }
