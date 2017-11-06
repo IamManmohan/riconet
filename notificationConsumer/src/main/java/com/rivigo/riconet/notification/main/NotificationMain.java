@@ -29,6 +29,9 @@ public class NotificationMain {
     @Value("bootstrap.servers")
     private static String bootstrapServers;
 
+    @Value("group.id")
+    private static String groupId;
+
     @Autowired
     private DEPSNotificationConsumer depsNotificationConsumer;
 
@@ -42,10 +45,11 @@ public class NotificationMain {
         NotificationMain consumer=context.getBean(NotificationMain.class);
         Config config= ConfigFactory.load();
         bootstrapServers=config.getString("bootstrap.servers");
+        groupId=config.getString("group.id");
         final ConsumerSettings<String, String> consumerSettings =
                 ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
                         .withBootstrapServers(bootstrapServers)
-                        .withGroupId("group1")
+                        .withGroupId(groupId)
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         consumer.load(materializer,consumerSettings);
     }
