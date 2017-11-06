@@ -39,6 +39,8 @@ public abstract class ConsumerModel {
 
     private final String errorTopic;
 
+    private final Long NUM_RETRIES;
+
     @Autowired
     ExecutorService executorService;
 
@@ -52,9 +54,10 @@ public abstract class ConsumerModel {
 
     private final AtomicLong offset = new AtomicLong();
 
-    public ConsumerModel(String topic, String errorTopic) {
+    public ConsumerModel(String topic, String errorTopic,Long numRetries) {
         this.topic = topic;
         this.errorTopic = errorTopic;
+        this.NUM_RETRIES=numRetries;
     }
 
     @Async
@@ -91,10 +94,10 @@ public abstract class ConsumerModel {
 
     String processError(ConsumerMessages consumerMessage,String errorMsg) {
         log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount()+1L) + errorMsg );
-        if (consumerMessage.getRetryCount() < 5L) {
+        if (consumerMessage.getRetryCount() < NUM_RETRIES) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
             consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
-            consumerMessage.setErrorMsg(", Retry number "+consumerMessage.getRetryCount().toString()+" "+errorMsg);
+            consumerMessage.setErrorMsg(consumerMessage.getErrorMsg()+", Retry number "+consumerMessage.getRetryCount().toString()+" "+errorMsg);
             consumerMessagesRepository.save(consumerMessage);
             ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
             timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
