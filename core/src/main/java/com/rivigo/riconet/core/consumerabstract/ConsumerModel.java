@@ -64,7 +64,7 @@ public abstract class ConsumerModel {
                 try {
                     processMessage(record.value());
                 } catch (Exception e) {
-                    processFirstTimeError(record.value());
+                    processFirstTimeError(record.value(),e.getMessage());
                     log.error("First time error", e);
                 }
             });
@@ -74,7 +74,7 @@ public abstract class ConsumerModel {
                 try {
                     processMessage(consumerMessages.getMessage());
                 } catch (Exception e) {
-                    processError(consumerMessages);
+                    processError(consumerMessages,e.getMessage());
                     log.error("error", e);
                 }
             });
@@ -89,28 +89,29 @@ public abstract class ConsumerModel {
 
     public abstract String processMessage(String str);
 
-    String processError(ConsumerMessages consumerMessage) {
+    String processError(ConsumerMessages consumerMessage,String errorMsg) {
         log.error("processing error");
-        if (consumerMessage.getRetry_count() < 5L) {
+        if (consumerMessage.getRetryCount() < 5L) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
-            consumerMessage.setRetry_count(consumerMessage.getRetry_count() + 1L);
+            consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
+            consumerMessage.setErrorMsg(", Retry number "+consumerMessage.getRetryCount().toString()+" "+errorMsg);
             consumerMessagesRepository.save(consumerMessage);
             ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
-            timer.newTimeout(task, 5 * (consumerMessage.getRetry_count()), TimeUnit.MINUTES);
+            timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
         }
         return consumerMessage.getMessage();
     }
 
-    String processFirstTimeError(String str) {
+    String processFirstTimeError(String str,String errorMsg) {
         log.error(" Processing first time error");
         ConsumerMessages consumerMessage = new ConsumerMessages();
         consumerMessage.setId(topic + DateTime.now().getMillis());
         consumerMessage.setMessage(str);
-        consumerMessage.setRetry_count(1L);
-        consumerMessage.setRetry_time(DateTime.now().getMillis());
+        consumerMessage.setRetryCount(1L);
         consumerMessage.setTopic(topic);
         consumerMessage.setCreatedAt(DateTime.now().getMillis());
         consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
+        consumerMessage.setErrorMsg("1"+errorMsg);
 
         consumerMessagesRepository.save(consumerMessage);
         ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
