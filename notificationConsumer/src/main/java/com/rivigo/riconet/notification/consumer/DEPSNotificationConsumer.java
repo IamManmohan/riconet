@@ -9,6 +9,7 @@ import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.enums.DEPSType;
 import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
+import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,7 @@ public class DEPSNotificationConsumer extends ConsumerModel {
       }
     }catch (Exception e){
       log.error("DepsNotification mapping failed", e);
+        throw  new ZoomException("Error in message format");
     }
     return str;
   }
