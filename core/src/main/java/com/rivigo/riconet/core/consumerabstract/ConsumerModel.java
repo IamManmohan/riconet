@@ -18,6 +18,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -67,7 +69,8 @@ public abstract class ConsumerModel {
                 try {
                     processMessage(record.value());
                 } catch (Exception e) {
-                    processFirstTimeError(record.value(),e.getStackTrace().toString());
+                    String errorMsg=getStackTrace(e);
+                    processFirstTimeError(record.value(),errorMsg);
                     log.error("First time error", e);
                 }
             });
@@ -77,7 +80,8 @@ public abstract class ConsumerModel {
                 try {
                     processMessage(consumerMessages.getMessage());
                 } catch (Exception e) {
-                    processError(consumerMessages,e.getStackTrace().toString());
+                    String errorMsg=getStackTrace(e);
+                    processError(consumerMessages,errorMsg);
                     log.error("error", e);
                 }
             });
@@ -121,6 +125,12 @@ public abstract class ConsumerModel {
         timer.newTimeout(task, 5, TimeUnit.MINUTES);
 
         return str;
+    }
+
+    public static String getStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
     }
 
 
