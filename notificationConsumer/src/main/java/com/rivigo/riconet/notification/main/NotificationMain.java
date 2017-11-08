@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
@@ -38,6 +39,9 @@ public class NotificationMain {
     @Autowired
     private DocIssueNotificationConsumer docIssueNotificationConsumer;
 
+    @Autowired
+    private PickupNotificationConsumer pickupNotificationConsumer;
+
     public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -57,6 +61,6 @@ public class NotificationMain {
     public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
         depsNotificationConsumer.load(materializer,consumerSettings);
         docIssueNotificationConsumer.load(materializer,consumerSettings);
-
+        pickupNotificationConsumer.load(materializer,consumerSettings);
     }
 }
