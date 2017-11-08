@@ -206,7 +206,7 @@ public class DocumentIssueNotificationService {
 
     private void updateResponsiblePersonAndLocation(DocumentIssueNotification notification, User user, Long locationId,
                                                     ConsignmentReadOnly consignment, ConsignmentStatus status) {
-        //fill scenario
+        //fill SCENARIO
         Integer bufferMinutes= zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES,120);
         User reporter=null;
         User reportee=null;

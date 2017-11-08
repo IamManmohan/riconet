@@ -17,30 +17,18 @@ import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
-import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.Timer;
 import org.jboss.netty.util.TimerTask;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.kafka.core.KafkaTemplate;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 /**
@@ -83,7 +71,7 @@ public class consumerModelTest extends TesterBase {
             method.setAccessible(true);
             ConsumerMessages consumerMessages=new ConsumerMessages();
             consumerMessages.setId("test1");
-            consumerMessages.setRetry_count(1l);
+            consumerMessages.setRetryCount(1l);
             consumerMessages.setMessage("1");
             consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
             consumerMessagesRepository.save(consumerMessages);
@@ -123,7 +111,7 @@ public class consumerModelTest extends TesterBase {
             method.setAccessible(true);
             ConsumerMessages consumerMessages=new ConsumerMessages();
             consumerMessages.setId("test2");
-            consumerMessages.setRetry_count(1l);
+            consumerMessages.setRetryCount(1l);
             consumerMessages.setMessage("");
             consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
             consumerMessagesRepository.save(consumerMessages);
@@ -146,7 +134,7 @@ public class consumerModelTest extends TesterBase {
             method.setAccessible(true);
             ConsumerMessages consumerMessages=new ConsumerMessages();
             consumerMessages.setId("test3");
-            consumerMessages.setRetry_count(6l);
+            consumerMessages.setRetryCount(6l);
             consumerMessages.setMessage("");
             consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
             consumerMessagesRepository.save(consumerMessages);
