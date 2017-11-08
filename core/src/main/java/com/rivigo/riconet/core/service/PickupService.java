@@ -226,11 +226,12 @@ public class PickupService {
     }
 
     private void sendSms(PickupNotification pickupNotification,String smsTemplate){
-
         if(smsTemplate==null){
+            log.info("Please add the sms templates");
             return;
         }
         String smsString=designSms(pickupNotification,smsTemplate);
+        log.info(smsTemplate);
         pickupNotification.setSmsString(smsString);
         pickupNotification.getRecipients().forEach(recipient ->
              recipient.setSmsResponse(smsService.sendSms(recipient.getMobile(),smsString))
