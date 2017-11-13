@@ -19,6 +19,9 @@ import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -126,6 +129,9 @@ public class PickupService {
         pickupNotification.setPincode(pickup.getPincode());
         pickupNotification.setVehicleNumber(pickup.getVehicleNumber());
         pickupNotification.setWeight(pickup.getWeightRange());
+        pickupNotification.setConsignorMobile(pickup.getClientAddress().getPhoneNumber());
+        pickupNotification.setReachedAtClientWareHouseTime(PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getReportStatus())
+                ?pickup.getLastUpdatedAt().getMillis():null);
         Client client= clientMasterService.getClientByCode(pickup.getClientCode());
         if(client== null){
             throw  new ZoomException("No client with this Id exists");
@@ -240,11 +246,19 @@ public class PickupService {
 
     private String designSms(PickupNotification pickupNotification, String template) {
         Map<String, String> valuesMap = new HashMap<>();
+        DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
+        String dateStr1 = formatter1.print(pickupNotification.getPickupDate());
+
+        DateTimeFormatter formatter2 = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").withZone(DateTimeZone.forID("Asia/Kolkata"));
+        String dateStr2 =pickupNotification.getReachedAtClientWareHouseTime()!=null?
+                formatter2.print(pickupNotification.getReachedAtClientWareHouseTime()):'-';
+
         valuesMap.put("pickupId", pickupNotification.getPickupId().toString());
         valuesMap.put("bpName", pickupNotification.getBpName());
         valuesMap.put("userName", pickupNotification.getUserName());
         valuesMap.put("userMobile", pickupNotification.getUserMobile());
-        valuesMap.put("pickupDate", pickupNotification.getPickupDate().toString());
+        valuesMap.put("pickupDate", dateStr1);
+        valuesMap.put("reachedAtClientWareHouseTime", dateStr2);
         valuesMap.put("pickupTimeSlot", pickupNotification.getPickupTimeSlot());
         valuesMap.put("clientCode", pickupNotification.getClientCode());
         valuesMap.put("clientName", pickupNotification.getClientName());
@@ -253,6 +267,7 @@ public class PickupService {
         valuesMap.put("pincode", pickupNotification.getPincode());
         valuesMap.put("vehicleNumber", pickupNotification.getVehicleNumber());
         valuesMap.put("weight", pickupNotification.getWeight());
+        valuesMap.put("consignorMobile",pickupNotification.getConsignorMobile());
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
         return sub.replace(template);
     }
