@@ -251,7 +251,7 @@ public class PickupService {
 
         DateTimeFormatter formatter2 = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").withZone(DateTimeZone.forID("Asia/Kolkata"));
         String dateStr2 =pickupNotification.getReachedAtClientWareHouseTime()!=null?
-                formatter2.print(pickupNotification.getReachedAtClientWareHouseTime()):'-';
+                formatter2.print(pickupNotification.getReachedAtClientWareHouseTime()):"-";
 
         valuesMap.put("pickupId", pickupNotification.getPickupId().toString());
         valuesMap.put("bpName", pickupNotification.getBpName());
