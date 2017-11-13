@@ -155,6 +155,9 @@ public class PickupService {
     }
 
     private void fillBpAdminRecipients(PickupNotification pickupNotification){
+        if(pickupNotification.getBusinessPartnerId() == null){
+            return ;
+        }
         List<StockAccumulator> saList=stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus
                 (StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN,pickupNotification.getBusinessPartnerId(),
                         OperationalStatus.ACTIVE);
@@ -178,7 +181,10 @@ public class PickupService {
     private void fillRecipients(PickupNotification pickupNotification){
         switch (pickupNotification.getNotificationType()){
             case PICKUP_REACHED:
+                fillBpAdminRecipients(pickupNotification);
+                return;
             case PICKUP_DELAYED:
+                fillBpAdminRecipients(pickupNotification);
                 pickupNotification.getRecipients()
                         .add(new PickupNotification.
                                 Recipient(pickupNotification.getUserId(),pickupNotification.getUserMobile(),null));
