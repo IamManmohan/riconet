@@ -90,7 +90,9 @@ public class PickupService {
         Long prevCutOffTime=lastExecutedAt+zoomPropertyService.getInteger(ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS,15*60)*1000l;
         Long cutOffTime=DateTime.now().getMillis()+zoomPropertyService.getInteger(ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS,15*60)*1000l;
         List<Pickup> delayedPickupList=pickupList.stream()
-                .filter(pickup -> (prevCutOffTime<pickup.getPickupEndTime() && pickup.getPickupEndTime()< cutOffTime))
+                .filter(pickup -> (
+                        (prevCutOffTime<pickup.getPickupEndTime()|| lastExecutedAt<pickup.getLastUpdatedAt().getMillis())
+                                && pickup.getPickupEndTime()< cutOffTime))
                 .collect(Collectors.toList());
         String smsTemplate=zoomPropertyService.getString(ZoomPropertyName.PICKUP_DELAYED_SMS_STRING);
         delayedPickupList.forEach(pickup -> {
