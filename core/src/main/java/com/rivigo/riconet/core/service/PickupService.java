@@ -129,6 +129,7 @@ public class PickupService {
         pickupNotification.setPincode(pickup.getPincode());
         pickupNotification.setVehicleNumber(pickup.getVehicleNumber());
         pickupNotification.setWeight(pickup.getWeightRange());
+        pickupNotification.setContactPerson(pickup.getContactPerson());
         pickupNotification.setConsignorMobile(pickup.getContactNumber());
         pickupNotification.setReachedAtClientWareHouseTime(PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getReportStatus())
                 ?pickup.getLastUpdatedAt().getMillis():null);
@@ -274,6 +275,7 @@ public class PickupService {
         valuesMap.put("vehicleNumber", pickupNotification.getVehicleNumber());
         valuesMap.put("weight", pickupNotification.getWeight());
         valuesMap.put("consignorMobile",pickupNotification.getConsignorMobile());
+        valuesMap.put("contactPerson",pickupNotification.getContactPerson());
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
         return sub.replace(template);
     }
