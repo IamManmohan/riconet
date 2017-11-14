@@ -131,7 +131,7 @@ public class PickupService {
         pickupNotification.setWeight(pickup.getWeightRange());
         pickupNotification.setContactPerson(pickup.getContactPerson());
         pickupNotification.setConsignorMobile(pickup.getContactNumber());
-        pickupNotification.setReachedAtClientWareHouseTime(PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getReportStatus())
+        pickupNotification.setReachedAtClientWareHouseTime(PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getPickupStatus())
                 ?pickup.getLastUpdatedAt().getMillis():null);
         Client client= clientMasterService.getClientByCode(pickup.getClientCode());
         if(client== null){
