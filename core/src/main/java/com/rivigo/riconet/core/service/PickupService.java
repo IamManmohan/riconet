@@ -76,12 +76,18 @@ public class PickupService {
         }
         Map<Long,Pickup> pickupMap=getPickupMapByIdIn(pickupNotificationDTOList.stream()
                 .map(PickupNotificationDTO::getId).collect(Collectors.toList()));
+        String locationCodes=zoomPropertyService.getString(ZoomPropertyName.PICKUP_NOTIFICATION_ALLOWED_LOCATIONS);
         pickupNotificationDTOList.forEach(pickupNotificationDTO -> {
             PickupNotification pickupNotification=getPickupNotification(pickupMap.get(pickupNotificationDTO.getId()),
                     pickupNotificationDTO.getLastUpdatedAt(),pickupNotificationDTO.getNotificationType());
-            if(pickupNotification!= null){
+            if(pickupNotification == null){
+                return;
+            }
+
+            if(locationCodes==null || locationCodes.contains(pickupNotification.getLocationCode())){
                 sendSms(pickupNotification,getSmsTemplate(pickupNotification));
             }
+            pickupNotificationRepository.save(pickupNotification);
         });
     }
 
@@ -144,7 +150,6 @@ public class PickupService {
         pickupNotification.setLocationCode(loc.getCode());
         pickupNotification.setClientName(client.getName());
         fillRecipients(pickupNotification);
-        pickupNotificationRepository.save(pickupNotification);
         return pickupNotification;
     }
 
