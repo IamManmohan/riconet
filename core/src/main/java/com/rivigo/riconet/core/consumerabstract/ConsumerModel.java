@@ -18,6 +18,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashSet;
@@ -41,7 +42,7 @@ public abstract class ConsumerModel {
 
     private final String errorTopic;
 
-    private final Long NUM_RETRIES;
+    private final Long numRetries;
 
     @Autowired
     ExecutorService executorService;
@@ -59,7 +60,7 @@ public abstract class ConsumerModel {
     public ConsumerModel(String topic, String errorTopic,Long numRetries) {
         this.topic = topic;
         this.errorTopic = errorTopic;
-        this.NUM_RETRIES=numRetries;
+        this.numRetries =numRetries;
     }
 
     @Async
@@ -94,11 +95,11 @@ public abstract class ConsumerModel {
         return CompletableFuture.completedFuture(offset.get());
     }
 
-    public abstract String processMessage(String str);
+    public abstract String processMessage(String str) throws IOException;
 
     String processError(ConsumerMessages consumerMessage,String errorMsg) {
         log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount()+1L) + errorMsg );
-        if (consumerMessage.getRetryCount() < NUM_RETRIES) {
+        if (consumerMessage.getRetryCount() < numRetries) {
             consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
             consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
             consumerMessage.setErrorMsg(consumerMessage.getErrorMsg()+", Retry number "+consumerMessage.getRetryCount().toString()+" "+errorMsg);

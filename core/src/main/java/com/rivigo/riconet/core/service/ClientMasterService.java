@@ -16,4 +16,8 @@ public class ClientMasterService {
     public Client getClientById(Long id) {
         return clientRepository.findOne(id);
     }
+
+    public Client getClientByCode(String code) {
+        return clientRepository.findByClientCode(code);
+    }
 }

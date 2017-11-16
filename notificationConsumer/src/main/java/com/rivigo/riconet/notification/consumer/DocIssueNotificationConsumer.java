@@ -28,7 +28,9 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
     String subReason=split[2];
     ConsignmentStatus status=ConsignmentStatus.valueOf(split[3]);
     DocumentIssueNotification notification=documentIssueNotificationService.createNotificationData(consignmentId,userId,subReason,status);
-    documentIssueNotificationService.sendNotifications(notification);
+    if(notification != null){
+      documentIssueNotificationService.sendNotifications(notification);
+    }
     return str;
   }
 
