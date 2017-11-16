@@ -53,7 +53,7 @@ public class ZoomPropertyServiceTest extends TesterBase {
         zoomPropertyService.getInteger(ZoomPropertyName.TESTING,1);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testBooleanProperty(){
         ZoomProperty zoomProperty=zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(),1).get(0);
         zoomProperty.setVariableValue("true");
@@ -76,7 +76,7 @@ public class ZoomPropertyServiceTest extends TesterBase {
         zoomPropertyService.getBoolean(ZoomPropertyName.BOOLEAN_TESTING,true);
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void testIntegerProperty(){
         ZoomProperty zoomProperty=zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.INTEGER_TESTING.name(),1).get(0);
         zoomProperty.setVariableValue("1");

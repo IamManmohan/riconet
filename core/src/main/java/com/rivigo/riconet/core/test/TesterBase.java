@@ -6,6 +6,7 @@ import com.rivigo.zoom.common.config.CacheFactory;
 import com.rivigo.zoom.common.config.CacheInitializer;
 import com.rivigo.zoom.common.config.KafkaConsumerConfig;
 import com.rivigo.zoom.common.config.KafkaProducerConfig;
+import com.rivigo.zoom.common.config.NotificationConfig;
 import com.rivigo.zoom.common.config.PusherConfig;
 import com.rivigo.zoom.common.config.ZoomNeo4jConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
@@ -41,7 +42,7 @@ import com.rivigo.riconet.core.test.config.TestConfig;
                 KafkaProducerConfig.class,KafkaConsumerConfig.class,
                 ServiceConfig.class,
                 AWSConfig.class,
-                PusherConfig.class,
+                PusherConfig.class, NotificationConfig.class,
                 CacheInitializer.class,CacheFactory.class
         })
 @Transactional

@@ -99,8 +99,12 @@ public class DocumentIssueNotificationService {
         updateCnoteMetadata(notification,cn,subReason);
         updateResponsiblePersonAndLocation(notification,user,zoomUser==null?cn.getLocationId():zoomUser.getLocationId(),cn,status);
         updateStakeHolders(notification);
-        documentIssueNotificationRepository.save(notification);
-        return notification;
+        notification.setId(notification.getCnote()+"|"+notification.getScenario()+"|"+notification.getReporter().getEmail());
+        if(documentIssueNotificationRepository.findOne(notification.getId()) != null){
+            documentIssueNotificationRepository.save(notification);
+            return notification;
+        }
+        return null;
     }
 
     private DocumentIssueNotification.NotificationUserDTO getUserDTO(User user) {
@@ -206,7 +210,7 @@ public class DocumentIssueNotificationService {
 
     private void updateResponsiblePersonAndLocation(DocumentIssueNotification notification, User user, Long locationId,
                                                     ConsignmentReadOnly consignment, ConsignmentStatus status) {
-        //fill scenario
+        //fill SCENARIO
         Integer bufferMinutes= zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES,120);
         User reporter=null;
         User reportee=null;
