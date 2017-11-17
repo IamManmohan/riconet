@@ -100,7 +100,7 @@ public class DocumentIssueNotificationService {
         updateResponsiblePersonAndLocation(notification,user,zoomUser==null?cn.getLocationId():zoomUser.getLocationId(),cn,status);
         updateStakeHolders(notification);
         notification.setId(notification.getCnote()+"|"+notification.getScenario()+"|"+notification.getReporter().getEmail());
-        if(documentIssueNotificationRepository.findOne(notification.getId()) != null){
+        if(documentIssueNotificationRepository.findOne(notification.getId()) == null){
             documentIssueNotificationRepository.save(notification);
             return notification;
         }
