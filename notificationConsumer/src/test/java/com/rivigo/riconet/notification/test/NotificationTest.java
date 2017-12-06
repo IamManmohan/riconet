@@ -1,10 +1,12 @@
 package com.rivigo.riconet.notification.test;
 
 import com.rivigo.riconet.core.test.TesterBase;
+import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.main.NotificationMain;
+import com.rivigo.zoom.common.model.mongo.AppointmentNotification;
 import com.rivigo.zoom.exceptions.ZoomException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class NotificationTest extends TesterBase{
 
     @Autowired
     PickupNotificationConsumer pickupNotificationConsumer;
+
+    @Autowired
+    AppointmentNotificationConsumer appointmentNotificationConsumer;
 
     @Test
     public void processDepsNotification() throws IOException {
@@ -66,5 +71,12 @@ public class NotificationTest extends TesterBase{
     public void processPickupNotificationConsumer() throws IOException {
         String str ="[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
         pickupNotificationConsumer.processMessage(str);
+    }
+
+    @Test
+    public void processAppointmentNotification() throws IOException {
+        String str="{\"notificationType\":\"APPOINTMENT_MISSED_SUMMARY\"}";
+        appointmentNotificationConsumer.processMessage(str);
+
     }
 }
