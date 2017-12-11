@@ -92,7 +92,8 @@ public class ConsignmentAppointmentService {
                         sendNotifications(notification,ZoomPropertyName.APPOINTMENT_MISSED_EMAIL,ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT)
                 );
                 return;
-            case APPOINTMENT_DISAPPROVED:
+            case APPOINTMENT_WRONG_UNDELIVERED_MARKED:
+                processFakeUndeliveryReason(dto);
                 return;
             case APPOINTMENT_MISSED_SUMMARY:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
@@ -183,6 +184,22 @@ public class ConsignmentAppointmentService {
             sendNotifications(appointmentNotification,ZoomPropertyName.APPOINTMENT_DELIVERED_LATE_DIFFERENT_DAY_EMAIL,
                     ZoomPropertyName.APPOINTMENT_DELIVERED_LATE_DIFFERENT_DAY_SUBJECT);
         }
+    }
+
+    private void processFakeUndeliveryReason(AppointmentNotificationDTO dto){
+        ConsignmentHistory cnHistory=consignmentService.getLastScanByCnId(dto.getConsignmentId(),
+                Arrays.asList(ConsignmentStatus.UNDELIVERED.toString()));
+        AppointmentNotification appointmentNotification=new AppointmentNotification();
+        appointmentNotification.setConsignmentId(cnHistory.getConsignmentId());
+        Location loc=locationService.getLocationById(cnHistory.getLocationId());
+        appointmentNotification.setResponsibleLocation(getLocationDto(loc));
+        appointmentNotification.setCnote(consignmentService.getCnoteByIdAndIsActive(cnHistory.getConsignmentId()));
+        User user=userMasterService.getById(cnHistory.getCreatedById());
+        appointmentNotification.setResponsiblePerson(getUserDto(user));
+        appointmentNotification.getEmailIdList().add(user.getEmail());
+        updateStakeHolders(appointmentNotification);
+        sendNotifications(appointmentNotification,ZoomPropertyName.APPOINTMENT_WRONG_UNDELIVERED_MARKED_EMAIL,
+                    ZoomPropertyName.APPOINTMENT_WRONG_UNDELIVERED_MARKED_SUBJECT);
     }
 
     private void sendNotifications(AppointmentNotification notification, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName) {
