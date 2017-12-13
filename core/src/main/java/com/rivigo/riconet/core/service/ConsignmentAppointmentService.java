@@ -227,7 +227,7 @@ public class ConsignmentAppointmentService {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    private class ConsignmentDetails{
+    public class ConsignmentDetails{
         String cnote;
     }
 
