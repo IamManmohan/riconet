@@ -35,6 +35,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.util.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -229,11 +230,16 @@ public class ConsignmentAppointmentService {
 
 
     private void sendNotificationList(List<AppointmentNotification> notificationList, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName){
-        String body= zoomPropertyService.getString(emailPropertyName);
+        String templateString= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
-        String subject = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
-        log.info(body);
-        if(body != null && isEmailEnabled){
+        String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
+        if(CollectionUtils.isEmpty(notificationList)){
+            return;
+        }
+        log.info(templateString);
+        if(templateString != null && isEmailEnabled){
+            String body = designEmailTemplate(notificationList.get(0),templateString);
+            String subject = designEmailTemplate(notificationList.get(0),subjectTemplate);
             SXSSFWorkbook wb = new SXSSFWorkbook(100);
             Sheet sheet=wb.createSheet("Consignments");
             Row headerRow = sheet.createRow(0);
