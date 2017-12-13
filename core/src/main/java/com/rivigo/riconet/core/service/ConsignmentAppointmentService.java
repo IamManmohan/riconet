@@ -88,6 +88,7 @@ public class ConsignmentAppointmentService {
                 return;
             case APPOINTMENT_MISSED:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
+                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationList.forEach(notification ->
                         sendNotifications(notification,ZoomPropertyName.APPOINTMENT_MISSED_EMAIL,ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT)
                 );
@@ -97,6 +98,7 @@ public class ConsignmentAppointmentService {
                 return;
             case APPOINTMENT_MISSED_SUMMARY:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
+                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationMap=notificationList.stream()
                         .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
                 notificationMap.keySet().forEach(list->
@@ -108,6 +110,7 @@ public class ConsignmentAppointmentService {
                 statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
                 notificationList= processAppointmentMissed(now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0),
                         statusList);
+                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationMap=notificationList.stream()
                         .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
                 notificationMap.keySet().forEach(list->
@@ -132,6 +135,7 @@ public class ConsignmentAppointmentService {
                 .collect(Collectors.toList());
         List<Consignment> consignments = consignmentService.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList,
                 statusList);
+        log.info(consignments.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
 
         Map<Long,List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
 
@@ -148,6 +152,7 @@ public class ConsignmentAppointmentService {
         Location loc=locationService.getLocationById(getCurrentSchedule(consignmentScheduleList).getLocationId());
         appointmentNotification.setResponsibleLocation(getLocationDto(loc));
         appointmentNotification.setCnote(consignment.getCnote());
+        log.info("888888888888888");
         updateStakeHolders(appointmentNotification);
         return appointmentNotification;
 
@@ -208,6 +213,7 @@ public class ConsignmentAppointmentService {
         String templateString= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
         String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
+        log.info(templateString);
         if(templateString != null && isEmailEnabled){
             String body = designEmailTemplate(notification,templateString);
             String subject = designEmailTemplate(notification,subjectTemplate);
@@ -219,6 +225,7 @@ public class ConsignmentAppointmentService {
         String body= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
         String subject = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
+        log.info(body);
         if(body != null && isEmailEnabled){
             SXSSFWorkbook wb = new SXSSFWorkbook(100);
             GenericReportGeneratorImpl.write(wb.createSheet("Pending Deliveries - 7 days rolling"), String.class,
