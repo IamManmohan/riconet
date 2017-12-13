@@ -26,6 +26,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -130,7 +133,7 @@ public class ConsignmentAppointmentService {
     private List<AppointmentNotification> processAppointmentMissed(DateTime start, DateTime end, List<ConsignmentStatus> statusList){
         List<ConsignmentAppointmentRecord> consignmentAppointmentRecordList=consignmentAppointmentRepository.
                 findByIsActiveAndAppointmentTimeBetween(Boolean.TRUE, start, end);
-        log.info("------");
+        log.info(start.getMillis()+"------"+end.getMillis());
         log.info(consignmentAppointmentRecordList.stream().map(p->p.getConsignmentId().toString()).collect(Collectors.joining(", ")));
         List<Long> consignmentIdList=consignmentAppointmentRecordList.stream()
                 .map(ConsignmentAppointmentRecord::getConsignmentId)
@@ -223,13 +226,7 @@ public class ConsignmentAppointmentService {
         }
     }
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class ConsignmentDetails{
-        String cnote;
-    }
+
 
     private void sendNotificationList(List<AppointmentNotification> notificationList, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName){
         String body= zoomPropertyService.getString(emailPropertyName);
@@ -238,8 +235,16 @@ public class ConsignmentAppointmentService {
         log.info(body);
         if(body != null && isEmailEnabled){
             SXSSFWorkbook wb = new SXSSFWorkbook(100);
-            GenericReportGeneratorImpl.write(wb.createSheet("Pending Deliveries - 7 days rolling"), ConsignmentDetails.class,
-                    notificationList.stream().map(p -> new ConsignmentDetails(p.getCnote())).collect(Collectors.toList()));
+            Sheet sheet=wb.createSheet("Consignments");
+            Row headerRow = sheet.createRow(0);
+            Cell headerCell = headerRow.createCell(0);
+            headerCell.setCellValue("Cnote");
+            int  counter[]={1};
+            notificationList.forEach(p ->{
+                Row row = sheet.createRow(counter[0]++);
+                Cell cell = row.createCell(0);
+                cell.setCellValue(p.getCnote());
+            });
             File file = new File("Missed_Appointment_Delivery.xlsx");
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             try{
