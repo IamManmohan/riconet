@@ -123,6 +123,8 @@ public class ConsignmentAppointmentService {
     private List<AppointmentNotification> processAppointmentMissed(DateTime start, DateTime end, List<ConsignmentStatus> statusList){
         List<ConsignmentAppointmentRecord> consignmentAppointmentRecordList=consignmentAppointmentRepository.
                 findByIsActiveAndAppointmentTimeBetween(Boolean.TRUE, start, end);
+        log.info("------");
+        log.info(consignmentAppointmentRecordList.stream().map(p->p.getConsignmentId().toString()).collect(Collectors.joining(", ")));
         List<Long> consignmentIdList=consignmentAppointmentRecordList.stream()
                 .filter(appointment ->
                         appointment.getAppointmentTime().getMillis()<DateTime.now().getMillis()

@@ -46,6 +46,9 @@ public class NotificationMain {
     @Autowired
     private AppointmentNotificationConsumer appointmentNotificationConsumer;
 
+    @Value("${zoom.mysql.url}")
+    private String mysqlURL;
+
     public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -63,6 +66,7 @@ public class NotificationMain {
     }
 
     public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
+        log.info(mysqlURL);
         depsNotificationConsumer.load(materializer,consumerSettings);
         docIssueNotificationConsumer.load(materializer,consumerSettings);
         pickupNotificationConsumer.load(materializer,consumerSettings);
