@@ -200,14 +200,12 @@ public class ConsignmentAppointmentService {
     }
 
     private void processFakeUndeliveryReason(AppointmentNotificationDTO dto){
-        ConsignmentHistory cnHistory=consignmentService.getLastScanByCnId(dto.getConsignmentId(),
-                Arrays.asList(ConsignmentStatus.UNDELIVERED.toString()));
         AppointmentNotification appointmentNotification=new AppointmentNotification();
-        appointmentNotification.setConsignmentId(cnHistory.getConsignmentId());
-        Location loc=locationService.getLocationById(cnHistory.getLocationId());
+        appointmentNotification.setConsignmentId(dto.getConsignmentId());
+        Location loc=locationService.getLocationById(dto.getResponsibleLocationId());
         appointmentNotification.setResponsibleLocation(getLocationDto(loc));
-        appointmentNotification.setCnote(consignmentService.getCnoteByIdAndIsActive(cnHistory.getConsignmentId()));
-        User user=userMasterService.getById(cnHistory.getCreatedById());
+        appointmentNotification.setCnote(consignmentService.getCnoteByIdAndIsActive(dto.getConsignmentId()));
+        User user=userMasterService.getById(dto.getResponsibleUserId());
         appointmentNotification.setResponsiblePerson(getUserDto(user));
         appointmentNotification.getEmailIdList().add(user.getEmail());
         updateStakeHolders(appointmentNotification);
