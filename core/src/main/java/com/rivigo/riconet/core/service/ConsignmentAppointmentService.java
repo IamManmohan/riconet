@@ -111,8 +111,8 @@ public class ConsignmentAppointmentService {
                 notificationMap=notificationList.stream()
                         .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
                 notificationMap.keySet().forEach(list->
-                    sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_EMAIL,
-                            ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_SUBJECT)
+                    sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL,
+                            ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT)
                 );
                 return;
             default:
@@ -264,7 +264,8 @@ public class ConsignmentAppointmentService {
     private String designEmailTemplate(AppointmentNotification appointmentNotification, String template) {
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("cnote",appointmentNotification.getCnote());
-        valuesMap.put("user",appointmentNotification.getResponsiblePerson().getName());
+        valuesMap.put("user",appointmentNotification.getResponsiblePerson()==null?"-":appointmentNotification.getResponsiblePerson().getName());
+        valuesMap.put("locationCode",appointmentNotification.getResponsibleLocation()==null?"-":appointmentNotification.getResponsibleLocation().getCode());
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
         return sub.replace(template);
     }
