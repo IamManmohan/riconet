@@ -19,6 +19,10 @@ import com.rivigo.zoom.common.model.mongo.AppointmentNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentAppointmentRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -129,9 +133,7 @@ public class ConsignmentAppointmentService {
         log.info("------");
         log.info(consignmentAppointmentRecordList.stream().map(p->p.getConsignmentId().toString()).collect(Collectors.joining(", ")));
         List<Long> consignmentIdList=consignmentAppointmentRecordList.stream()
-                .filter(appointment ->
-                        appointment.getAppointmentTime().getMillis()<DateTime.now().getMillis()
-                ).map(ConsignmentAppointmentRecord::getConsignmentId)
+                .map(ConsignmentAppointmentRecord::getConsignmentId)
                 .collect(Collectors.toList());
         List<Consignment> consignments = consignmentService.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList,
                 statusList);
@@ -221,6 +223,14 @@ public class ConsignmentAppointmentService {
         }
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private class ConsignmentDetails{
+        String cnote;
+    }
+
     private void sendNotificationList(List<AppointmentNotification> notificationList, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName){
         String body= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
@@ -228,8 +238,8 @@ public class ConsignmentAppointmentService {
         log.info(body);
         if(body != null && isEmailEnabled){
             SXSSFWorkbook wb = new SXSSFWorkbook(100);
-            GenericReportGeneratorImpl.write(wb.createSheet("Pending Deliveries - 7 days rolling"), String.class,
-                    notificationList.stream().map(AppointmentNotification::getCnote).collect(Collectors.toList()));
+            GenericReportGeneratorImpl.write(wb.createSheet("Pending Deliveries - 7 days rolling"), ConsignmentDetails.class,
+                    notificationList.stream().map(p -> new ConsignmentDetails(p.getCnote())).collect(Collectors.toList()));
             File file = new File("Missed_Appointment_Delivery.xlsx");
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             try{
