@@ -108,21 +108,27 @@ public class ConsignmentAppointmentService {
                             ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_SUBJECT)
                 );
                 break;
-            case APPOINTMENT_NOT_OFD:
-                statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
-                notificationList= processAppointmentMissed(now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0),
-                        statusList);
-                notificationMap=notificationList.stream()
-                        .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
-                notificationMap.keySet().forEach(list->
-                    sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL,
-                            ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT)
-                );
+            case APPOINTMENT_NOT_OFD_FIRST_HALF:
+                processAppointmentNotOfd(statusList,now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).withMillisOfDay(0).plusHours(12));
+                break;
+            case APPOINTMENT_NOT_OFD_SECOND_HALF:
+                processAppointmentNotOfd(statusList,now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0));
                 break;
             default:
                 log.info("This notificationType is not handled in this consumer");
                 break;
         }
+    }
+
+    private void processAppointmentNotOfd(List<ConsignmentStatus> statusList, DateTime start, DateTime end){
+        statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
+        List<AppointmentNotification> notificationList= processAppointmentMissed(start,end,statusList);
+        Map<Long,List<AppointmentNotification>> notificationMap=notificationList.stream()
+                .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
+        notificationMap.keySet().forEach(list->
+                sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL,
+                        ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT)
+        );
     }
 
     private List<AppointmentNotification> processAppointmentMissed(final DateTime start, final DateTime end, List<ConsignmentStatus> statusList){
