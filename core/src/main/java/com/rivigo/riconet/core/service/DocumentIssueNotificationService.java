@@ -184,7 +184,7 @@ public class DocumentIssueNotificationService {
             notification.getEmailIdList().add(notification.getReportee().getEmail());
             notification.getCcList().addAll(getCcList(notification.getReporteeLocation().getId()));
         }
-        emailService.filterEmails(notification,bccList, isTesting);
+        emailService.filterEmails(notification,bccList);
     }
 
     private void updateResponsiblePersonAndLocation(DocumentIssueNotification notification, User user, Long locationId,

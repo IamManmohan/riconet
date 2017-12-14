@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,5 +56,11 @@ public class LocationService {
         List<Organization> organization = organizationService.getByOrganizationTypeAndOperationalStatus(OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
         List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
         return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(fromLocation.getId(), orgIds,LocationType.REGION.name());
+    }
+
+    public Map<Long,Location> getLocationMap(){
+        return locationRepository.findByStatus(OperationalStatus.ACTIVE.name())
+                .stream()
+                .collect(Collectors.toMap(Location::getId, Function.identity()));
     }
 }

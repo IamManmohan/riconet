@@ -24,7 +24,6 @@ public class AppointmentNotificationConsumer extends ConsumerModel {
 
   public String processMessage(String str) throws IOException {
     TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {};
-    log.info(str);
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
     return str;

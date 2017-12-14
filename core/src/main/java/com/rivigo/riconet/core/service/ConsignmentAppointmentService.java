@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +82,9 @@ public class ConsignmentAppointmentService {
         }
         List<AppointmentNotification> notificationList;
         Map<Long,List<AppointmentNotification>> notificationMap;
-        List<ConsignmentStatus> statusList=new ArrayList(Arrays.asList(ConsignmentStatus.DELIVERED,ConsignmentStatus.DELIVERED_POD_PENDING));
+        List<ConsignmentStatus> statusList=new ArrayList();
+        statusList.add(ConsignmentStatus.DELIVERED_POD_PENDING);
+        statusList.add(ConsignmentStatus.DELIVERED);
         DateTime now=DateTime.now();
         switch (dto.getNotificationType()){
             case APPOINTMENT_DELIVERED_LATE:
@@ -134,20 +135,28 @@ public class ConsignmentAppointmentService {
                 statusList);
         Map<Long,List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
 
+
+        Map<Long,Location> locationMap=locationService.getLocationMap();
+
+        Set<String> bccList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION);
+        Set<String> defaultCcList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION_CC);
+
         return consignments.stream()
         .map(consignment->
-            processAppointmentMissedConsignment(consignment,cnToScheduleMap.get(consignment.getId()))
+            processAppointmentMissedConsignment(consignment,cnToScheduleMap.get(consignment.getId()),locationMap,defaultCcList,bccList)
         ).collect(Collectors.toList());
 
     }
 
-    private AppointmentNotification processAppointmentMissedConsignment(Consignment consignment, List<ConsignmentSchedule> consignmentScheduleList){
+    private AppointmentNotification processAppointmentMissedConsignment(Consignment consignment
+            , List<ConsignmentSchedule> consignmentScheduleList,Map<Long,Location> locationMap
+            ,Set<String> defaultCcList, Set<String> bccList){
         AppointmentNotification appointmentNotification=new AppointmentNotification();
         appointmentNotification.setConsignmentId(consignment.getId());
-        Location loc=locationService.getLocationById(getCurrentSchedule(consignmentScheduleList).getLocationId());
+        Location loc=locationMap.get(getCurrentSchedule(consignmentScheduleList).getLocationId());
         appointmentNotification.setResponsibleLocation(getLocationDto(loc));
         appointmentNotification.setCnote(consignment.getCnote());
-        updateStakeHolders(appointmentNotification);
+        updateStakeHolders(appointmentNotification,loc,defaultCcList,bccList);
         return appointmentNotification;
 
     }
@@ -174,7 +183,9 @@ public class ConsignmentAppointmentService {
         User user=userMasterService.getById(cnHistory.getCreatedById());
         appointmentNotification.setResponsiblePerson(getUserDto(user));
         appointmentNotification.getEmailIdList().add(user.getEmail());
-        updateStakeHolders(appointmentNotification);
+        Set<String> bccList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION);
+        Set<String> defaultCcList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION_CC);
+        updateStakeHolders(appointmentNotification,loc,defaultCcList,bccList);
         DateTime deliveryTime= (new DateTime(dto.getDeliveryTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
         DateTime appointmentTime= (new DateTime(dto.getAppoitnmentTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
         if(Days.daysBetween(deliveryTime.toLocalDate(), appointmentTime.toLocalDate()).getDays()==0){
@@ -195,7 +206,9 @@ public class ConsignmentAppointmentService {
         User user=userMasterService.getById(dto.getResponsibleUserId());
         appointmentNotification.setResponsiblePerson(getUserDto(user));
         appointmentNotification.getEmailIdList().add(user.getEmail());
-        updateStakeHolders(appointmentNotification);
+        Set<String> bccList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION);
+        Set<String> defaultCcList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION_CC);
+        updateStakeHolders(appointmentNotification,loc,defaultCcList,bccList);
         sendNotifications(appointmentNotification,ZoomPropertyName.APPOINTMENT_WRONG_UNDELIVERED_MARKED_EMAIL,
                     ZoomPropertyName.APPOINTMENT_WRONG_UNDELIVERED_MARKED_SUBJECT);
     }
@@ -251,18 +264,16 @@ public class ConsignmentAppointmentService {
         }
     }
 
-    private void updateStakeHolders(AppointmentNotification appointmentNotification){
-        Set<String> bccList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION);
-        Set<String> defaultCcList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION_CC);
-        boolean isTesting = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_TESTING, true);
+    private void updateStakeHolders(AppointmentNotification appointmentNotification,Location loc,
+                                    Set<String> defaultCcList, Set<String> bccList){
         if(appointmentNotification.getEmailIdList().isEmpty()){
-            appointmentNotification.getEmailIdList().addAll(getCcList(appointmentNotification.getResponsibleLocation().getId()));
+            appointmentNotification.getEmailIdList().addAll(getCcList(loc));
             appointmentNotification.getEmailIdList().addAll(defaultCcList);
         }else{
-            appointmentNotification.getCcList().addAll(getCcList(appointmentNotification.getResponsibleLocation().getId()));
+            appointmentNotification.getCcList().addAll(getCcList(loc));
             appointmentNotification.getCcList().addAll(defaultCcList);
         }
-        emailService.filterEmails(appointmentNotification,bccList,isTesting);
+        emailService.filterEmails(appointmentNotification,bccList);
     }
 
     private UserBasicDTO getUserDto(User user){
@@ -283,20 +294,19 @@ public class ConsignmentAppointmentService {
         return sub.replace(template);
     }
 
-    private Set<String> getCcList(Long locationId){
+    private Set<String> getCcList(Location loc){
         Set<String> ccList=new HashSet<>();
-        Location loc=locationService.getLocationById(locationId);
         List<Long> locIds=locationService.getAllClusterSiblingsOfLocation(loc.getCode())
                 .stream().map(Location::getId).collect(Collectors.toList());
 
         Location pc=locationService.getPcOrReportingPc(loc);
 
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds,
-                "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+                ZoomUserType.ZOOM_CLM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds,
-                "ZOOM_RM", ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+                ZoomUserType.ZOOM_RM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         ccList.addAll(zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-                "ZOOM_PCM",ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
+                ZoomUserType.ZOOM_PCM.name(),ZoomUserType.ZOOM_TECH_SUPPORT.name()).stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
         return ccList;
     }
 }

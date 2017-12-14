@@ -45,9 +45,9 @@ public class EmailService {
         MailUtils.sendEmail(DOCUMENT_EMAIL_ID, DOCUMENT_EMAIL_PASS, new ArrayList<>(toRecipients), new ArrayList<>(ccRecipients), new ArrayList<>(bccRecipients), subject, body, file);
     }
 
-    public void  filterEmails(AbstractMailNotificationEntity dto, Set<String> bccList, boolean isTesting){
+    public void  filterEmails(AbstractMailNotificationEntity dto, Set<String> bccList){
         dto.getBccList().addAll(bccList);
-        if(!isTesting && "production".equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
+        if( "production".equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
             return;
         }
         List<String> dummyEmailList = new ArrayList<>();
