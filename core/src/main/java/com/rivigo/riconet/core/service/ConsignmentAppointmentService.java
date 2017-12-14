@@ -88,16 +88,16 @@ public class ConsignmentAppointmentService {
         switch (dto.getNotificationType()){
             case APPOINTMENT_DELIVERED_LATE:
                 processLateDelivery(dto);
-                return;
+                break;
             case APPOINTMENT_MISSED:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
                 notificationList.forEach(notification ->
                         sendNotifications(notification,ZoomPropertyName.APPOINTMENT_MISSED_EMAIL,ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT)
                 );
-                return;
+                break;
             case APPOINTMENT_WRONG_UNDELIVERED_MARKED:
                 processFakeUndeliveryReason(dto);
-                return;
+                break;
             case APPOINTMENT_MISSED_SUMMARY:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
                 notificationMap=notificationList.stream()
@@ -106,7 +106,7 @@ public class ConsignmentAppointmentService {
                     sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_EMAIL,
                             ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_SUBJECT)
                 );
-                return;
+                break;
             case APPOINTMENT_NOT_OFD:
                 statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
                 notificationList= processAppointmentMissed(now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0),
@@ -117,13 +117,14 @@ public class ConsignmentAppointmentService {
                     sendNotificationList(notificationMap.get(list),ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL,
                             ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT)
                 );
-                return;
+                break;
             default:
+                log.info("This notificationType is not handled in this consumer");
                 break;
         }
     }
 
-    private List<AppointmentNotification> processAppointmentMissed(DateTime start, DateTime end, List<ConsignmentStatus> statusList){
+    private List<AppointmentNotification> processAppointmentMissed(final DateTime start, final DateTime end, List<ConsignmentStatus> statusList){
         List<ConsignmentAppointmentRecord> consignmentAppointmentRecordList=consignmentAppointmentRepository.
                 findByIsActiveAndAppointmentTimeBetween(Boolean.TRUE, start, end);
         List<Long> consignmentIdList=consignmentAppointmentRecordList.stream()
@@ -152,7 +153,6 @@ public class ConsignmentAppointmentService {
     }
 
     private ConsignmentSchedule getCurrentSchedule(List<ConsignmentSchedule> consignmentScheduleList) {
-        Collections.sort(consignmentScheduleList);
         Optional<ConsignmentSchedule> present=consignmentScheduleList.stream().filter(consignmentSchedule ->
             consignmentSchedule.getPlanStatus() != ConsignmentLocationStatus.LEFT
         ).findFirst();
@@ -160,12 +160,12 @@ public class ConsignmentAppointmentService {
         if(present.isPresent()){
             return present.get();
         }
-        throw  new ZoomException("Error in consignment schedule ");
+        throw  new ZoomException("Error in consignment schedule: consignment is not left from any location ");
     }
 
     private void processLateDelivery(AppointmentNotificationDTO dto){
         ConsignmentHistory cnHistory=consignmentService.getLastScanByCnId(dto.getConsignmentId(),
-                Arrays.asList(ConsignmentStatus.OUT_FOR_DELIVERY.toString()));
+                Arrays.asList(ConsignmentStatus.OUT_FOR_DELIVERY.name()));
         AppointmentNotification appointmentNotification=new AppointmentNotification();
         appointmentNotification.setConsignmentId(cnHistory.getConsignmentId());
         Location loc=locationService.getLocationById(cnHistory.getLocationId());
@@ -204,7 +204,7 @@ public class ConsignmentAppointmentService {
         String templateString= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
         String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
-        if(templateString != null && isEmailEnabled){
+        if(templateString != null && isEmailEnabled && subjectTemplate != null){
             String body = designEmailTemplate(notification,templateString);
             String subject = designEmailTemplate(notification,subjectTemplate);
             emailService.sendDocumentIssueEmail(notification.getEmailIdList(), notification.getCcList(), notification.getBccList(), subject, body, null);
@@ -214,12 +214,12 @@ public class ConsignmentAppointmentService {
 
 
     private void sendNotificationList(List<AppointmentNotification> notificationList, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName){
-        String templateString= zoomPropertyService.getString(emailPropertyName);
-        Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
-        String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
         if(CollectionUtils.isEmpty(notificationList)){
             return;
         }
+        String templateString= zoomPropertyService.getString(emailPropertyName);
+        Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
+        String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
         if(templateString != null && isEmailEnabled){
             String body = designEmailTemplate(notificationList.get(0),templateString);
             String subject = designEmailTemplate(notificationList.get(0),subjectTemplate);
