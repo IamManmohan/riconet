@@ -9,7 +9,6 @@ import com.rivigo.zoom.common.dto.AppointmentNotificationDTO;
 import com.rivigo.zoom.common.enums.Topic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,13 +22,9 @@ public class AppointmentNotificationConsumer extends ConsumerModel {
 
   ObjectMapper objectMapper ;
 
-  @Value("${zoom.mysql.url}")
-  private String mysqlURL;
-
   public String processMessage(String str) throws IOException {
     TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {};
     log.info(str);
-    log.info(mysqlURL);
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
     return str;

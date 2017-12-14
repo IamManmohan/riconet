@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.common.report.impl.GenericReportGeneratorImpl;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.dto.AppointmentNotificationDTO;
 import com.rivigo.zoom.common.dto.LocationBasicDTO;
@@ -19,10 +18,6 @@ import com.rivigo.zoom.common.model.mongo.AppointmentNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentAppointmentRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -96,7 +91,6 @@ public class ConsignmentAppointmentService {
                 return;
             case APPOINTMENT_MISSED:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
-                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationList.forEach(notification ->
                         sendNotifications(notification,ZoomPropertyName.APPOINTMENT_MISSED_EMAIL,ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT)
                 );
@@ -106,7 +100,6 @@ public class ConsignmentAppointmentService {
                 return;
             case APPOINTMENT_MISSED_SUMMARY:
                 notificationList= processAppointmentMissed(new DateTime(dto.getLastExecutionTime()),now,statusList);
-                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationMap=notificationList.stream()
                         .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
                 notificationMap.keySet().forEach(list->
@@ -118,7 +111,6 @@ public class ConsignmentAppointmentService {
                 statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
                 notificationList= processAppointmentMissed(now,now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0),
                         statusList);
-                log.info(notificationList.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
                 notificationMap=notificationList.stream()
                         .collect(Collectors.groupingBy(notification-> notification.getResponsibleLocation().getId()));
                 notificationMap.keySet().forEach(list->
@@ -134,15 +126,11 @@ public class ConsignmentAppointmentService {
     private List<AppointmentNotification> processAppointmentMissed(DateTime start, DateTime end, List<ConsignmentStatus> statusList){
         List<ConsignmentAppointmentRecord> consignmentAppointmentRecordList=consignmentAppointmentRepository.
                 findByIsActiveAndAppointmentTimeBetween(Boolean.TRUE, start, end);
-        log.info(start.getMillis()+"------"+end.getMillis());
-        log.info(consignmentAppointmentRecordList.stream().map(p->p.getConsignmentId().toString()).collect(Collectors.joining(", ")));
         List<Long> consignmentIdList=consignmentAppointmentRecordList.stream()
                 .map(ConsignmentAppointmentRecord::getConsignmentId)
                 .collect(Collectors.toList());
         List<Consignment> consignments = consignmentService.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList,
                 statusList);
-        log.info(consignments.stream().map(p->p.getCnote()).collect(Collectors.joining(", ")));
-
         Map<Long,List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
 
         return consignments.stream()
@@ -158,7 +146,6 @@ public class ConsignmentAppointmentService {
         Location loc=locationService.getLocationById(getCurrentSchedule(consignmentScheduleList).getLocationId());
         appointmentNotification.setResponsibleLocation(getLocationDto(loc));
         appointmentNotification.setCnote(consignment.getCnote());
-        log.info("888888888888888");
         updateStakeHolders(appointmentNotification);
         return appointmentNotification;
 
@@ -217,7 +204,6 @@ public class ConsignmentAppointmentService {
         String templateString= zoomPropertyService.getString(emailPropertyName);
         Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
         String subjectTemplate = zoomPropertyService.getString(subjectPropertyName);//get from zoom property
-        log.info(templateString);
         if(templateString != null && isEmailEnabled){
             String body = designEmailTemplate(notification,templateString);
             String subject = designEmailTemplate(notification,subjectTemplate);
@@ -234,7 +220,6 @@ public class ConsignmentAppointmentService {
         if(CollectionUtils.isEmpty(notificationList)){
             return;
         }
-        log.info(templateString);
         if(templateString != null && isEmailEnabled){
             String body = designEmailTemplate(notificationList.get(0),templateString);
             String subject = designEmailTemplate(notificationList.get(0),subjectTemplate);
@@ -243,7 +228,7 @@ public class ConsignmentAppointmentService {
             Row headerRow = sheet.createRow(0);
             Cell headerCell = headerRow.createCell(0);
             headerCell.setCellValue("Cnote");
-            int  counter[]={1};
+            int[]  counter={1};
             notificationList.forEach(p ->{
                 Row row = sheet.createRow(counter[0]++);
                 Cell cell = row.createCell(0);
