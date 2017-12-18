@@ -4,6 +4,7 @@ import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
@@ -42,6 +43,9 @@ public class NotificationMain {
     @Autowired
     private PickupNotificationConsumer pickupNotificationConsumer;
 
+    @Autowired
+    private AppointmentNotificationConsumer appointmentNotificationConsumer;
+
     public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -62,5 +66,6 @@ public class NotificationMain {
         depsNotificationConsumer.load(materializer,consumerSettings);
         docIssueNotificationConsumer.load(materializer,consumerSettings);
         pickupNotificationConsumer.load(materializer,consumerSettings);
+        appointmentNotificationConsumer.load(materializer,consumerSettings);
     }
 }

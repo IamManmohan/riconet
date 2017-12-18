@@ -25,11 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -172,25 +170,6 @@ public class DocumentIssueNotificationService {
         return ccList;
     }
 
-    private void  filterEmails(DocumentIssueNotification dto,Set<String> bccList, boolean isTesting){
-        dto.getBccList().addAll(bccList);
-        if(!isTesting && "production".equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
-            return;
-        }
-        List<String> dummyEmailList = new ArrayList<>();
-        dto.getEmailIdList().forEach(email->
-            dummyEmailList.add(email.split("@")[0]+"@rivigodummy.com"));
-        dto.getEmailIdList().clear();
-        dto.getEmailIdList().addAll(dummyEmailList);
-
-        List<String> dummyCcList = new ArrayList<>();
-        dto.getCcList().forEach(email->
-            dummyCcList.add(email.split("@")[0]+"@rivigodummy.com"));
-        dto.getCcList().clear();
-        dto.getCcList().addAll(dummyCcList);
-
-    }
-
     private void updateStakeHolders(DocumentIssueNotification notification) {
         Set<String> bccList = emailService.getEmails(EmailDlName.DOCUMENT_ISSUE_NOTIFICATION);
 
@@ -205,7 +184,7 @@ public class DocumentIssueNotificationService {
             notification.getEmailIdList().add(notification.getReportee().getEmail());
             notification.getCcList().addAll(getCcList(notification.getReporteeLocation().getId()));
         }
-        filterEmails(notification,bccList, isTesting);
+        emailService.filterEmails(notification,bccList);
     }
 
     private void updateResponsiblePersonAndLocation(DocumentIssueNotification notification, User user, Long locationId,
