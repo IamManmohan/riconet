@@ -29,6 +29,9 @@ public class EmailService {
     public static final String DOCUMENT_EMAIL_ID = "document.desk@rivigo.com";
     public static final String DOCUMENT_EMAIL_PASS = "deps@1122";
 
+    public static final String APPOINTMENT_EMAIL_ID = "appointment@rivigo.com";
+    public static final String APPOINTMENT_EMAIL_PASS = "rivigo@123";
+
     @Autowired
     private EmailDLRepository emailDLRepository;
 
@@ -43,6 +46,10 @@ public class EmailService {
 
     public void sendDocumentIssueEmail(Collection<String> toRecipients, Collection<String> ccRecipients, Collection<String> bccRecipients, String subject, String body, File file) {
         MailUtils.sendEmail(DOCUMENT_EMAIL_ID, DOCUMENT_EMAIL_PASS, new ArrayList<>(toRecipients), new ArrayList<>(ccRecipients), new ArrayList<>(bccRecipients), subject, body, file);
+    }
+
+    public void sendAppointmentEmail(Collection<String> toRecipients, Collection<String> ccRecipients, Collection<String> bccRecipients, String subject, String body, File file) {
+        MailUtils.sendEmail(APPOINTMENT_EMAIL_ID, APPOINTMENT_EMAIL_PASS, new ArrayList<>(toRecipients), new ArrayList<>(ccRecipients), new ArrayList<>(bccRecipients), subject, body, file);
     }
 
     public void  filterEmails(AbstractMailNotificationEntity dto, Set<String> bccList){

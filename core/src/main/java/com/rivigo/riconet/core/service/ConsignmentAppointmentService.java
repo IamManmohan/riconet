@@ -226,7 +226,7 @@ public class ConsignmentAppointmentService {
         if(templateString != null && isEmailEnabled && subjectTemplate != null){
             String body = designEmailTemplate(notification,templateString);
             String subject = designEmailTemplate(notification,subjectTemplate);
-            emailService.sendDocumentIssueEmail(notification.getEmailIdList(), notification.getCcList(), notification.getBccList(), subject, body, null);
+            emailService.sendAppointmentEmail(notification.getEmailIdList(), notification.getCcList(), notification.getBccList(), subject, body, null);
         }
     }
 
@@ -262,7 +262,7 @@ public class ConsignmentAppointmentService {
                 wb.close();
                 byte[] contents = output.toByteArray();
                 FileUtils.writeByteArrayToFile(file, contents);
-                emailService.sendDocumentIssueEmail(notificationList.get(0).getEmailIdList(),
+                emailService.sendAppointmentEmail(notificationList.get(0).getEmailIdList(),
                         notificationList.get(0).getCcList(), notificationList.get(0).getBccList(), subject, body, file);
             }catch (IOException e){
                 throw new ZoomException("IOException while writing to file");
