@@ -27,7 +27,7 @@ public class EmailService {
     public static final String SHORTAGE_EMAIL_PASS = "deps@1122";
 
     public static final String DOCUMENT_EMAIL_ID = "document.desk@rivigo.com";
-    public static final String DOCUMENT_EMAIL_PASS = "deps@1122";
+    public static final String DOCUMENT_EMAIL_PASS = "Rivigo@666";
 
     public static final String APPOINTMENT_EMAIL_ID = "appointment@rivigo.com";
     public static final String APPOINTMENT_EMAIL_PASS = "rivigo@123";
