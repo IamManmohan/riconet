@@ -37,4 +37,8 @@ public class ZoomUserMasterService {
                 (locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
    }
 
+    public ZoomUser getByUserId(Long userId){
+        return zoomUserRepository.findByUserId(userId);
+    }
+
 }

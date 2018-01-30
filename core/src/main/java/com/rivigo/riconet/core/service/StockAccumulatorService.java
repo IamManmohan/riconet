@@ -15,7 +15,7 @@ import java.util.List;
 public class StockAccumulatorService {
 
     @Autowired
-    StockAccumulatorRepository stockAccumulatorRepo;
+    private StockAccumulatorRepository stockAccumulatorRepo;
 
     public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(StockAccumulatorRole role, Long partnerId) {
 		return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerId(role.toString(), partnerId);
@@ -24,6 +24,10 @@ public class StockAccumulatorService {
     public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(StockAccumulatorRole role,
                                                                                              Long partnerId, OperationalStatus status) {
         return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(role.toString(), partnerId,status.name());
+    }
+
+    public StockAccumulator getByUserId(Long userId){
+        return stockAccumulatorRepo.findByUserId(userId);
     }
 
 }
