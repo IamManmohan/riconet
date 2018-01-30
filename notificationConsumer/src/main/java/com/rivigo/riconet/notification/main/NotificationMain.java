@@ -8,6 +8,7 @@ import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
@@ -46,6 +47,9 @@ public class NotificationMain {
     @Autowired
     private AppointmentNotificationConsumer appointmentNotificationConsumer;
 
+    @Autowired
+    private RetailNotificationConsumer retailNotificationConsumer;
+
     public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -67,5 +71,6 @@ public class NotificationMain {
         docIssueNotificationConsumer.load(materializer,consumerSettings);
         pickupNotificationConsumer.load(materializer,consumerSettings);
         appointmentNotificationConsumer.load(materializer,consumerSettings);
+        retailNotificationConsumer.load(materializer,consumerSettings);
     }
 }
