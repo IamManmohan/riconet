@@ -118,6 +118,7 @@ public class RetailService {
         consigneeSmsDTO.setMobileNumber(notification.getConsigneePhone());
         consigneeSmsDTO.setSmsString(designSms(notification,consigneeSmsTemplate));
         notification.setSmsList(Arrays.asList(consigneeSmsDTO,consignorSmsDTO));
+        log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consigneeSmsDTO.getMobileNumber(),consignorSmsDTO.getMobileNumber());
         smsService.sendSms(consigneeSmsDTO.getMobileNumber(),consigneeSmsDTO.getSmsString());
         smsService.sendSms(consignorSmsDTO.getMobileNumber(),consignorSmsDTO.getSmsString());
     }
@@ -165,11 +166,13 @@ public class RetailService {
                 if(notification.getPaymentMode().equals(PaymentMode.COD)){
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_CREATION_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_CREATION_CONSIGNEE_SMS_STRING);
+                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }else {
 
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_CREATION_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_CREATION_CONSIGNEE_SMS_STRING);
+                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }
                 break;
@@ -177,10 +180,12 @@ public class RetailService {
                 if(notification.getPaymentMode().equals(PaymentMode.COD)){
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_UPDATE_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_UPDATE_CONSIGNEE_SMS_STRING);
-                    processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
+                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
+                   processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }else {
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_UPDATE_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_UPDATE_CONSIGNEE_SMS_STRING);
+                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }
                 break;

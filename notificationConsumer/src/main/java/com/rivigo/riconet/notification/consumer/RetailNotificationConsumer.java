@@ -27,6 +27,7 @@ public class RetailNotificationConsumer extends ConsumerModel {
     List<RetailNotificationDTO> retailNotificationDTOList=null;
     TypeReference<List<RetailNotificationDTO>> mapType = new TypeReference<List<RetailNotificationDTO>>() {};
     retailNotificationDTOList= objectMapper.readValue(str, mapType);
+    log.info("retail notification recieved {}",str);
     retailService.processRetailNotificationDTOList(retailNotificationDTOList);
     return str;
   }
