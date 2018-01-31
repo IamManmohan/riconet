@@ -19,14 +19,15 @@ import java.util.List;
 public class RetailNotificationConsumer extends ConsumerModel {
 
   @Autowired
-  RetailService retailService;
+  private RetailService retailService;
 
-  ObjectMapper objectMapper ;
+  private ObjectMapper objectMapper ;
 
   public String processMessage(String str) throws IOException {
     List<RetailNotificationDTO> retailNotificationDTOList=null;
     TypeReference<List<RetailNotificationDTO>> mapType = new TypeReference<List<RetailNotificationDTO>>() {};
     retailNotificationDTOList= objectMapper.readValue(str, mapType);
+    retailService.processRetailNotificationDTOList(retailNotificationDTOList);
     return str;
   }
 
