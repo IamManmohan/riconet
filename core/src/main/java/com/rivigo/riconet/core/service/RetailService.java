@@ -1,33 +1,32 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
-import com.rivigo.zoom.common.dto.PickupNotificationDTO;
 import com.rivigo.zoom.common.dto.RetailNotificationDTO;
 import com.rivigo.zoom.common.dto.SmsDTO;
-import com.rivigo.zoom.common.enums.OperationalStatus;
+import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
 import com.rivigo.zoom.common.enums.PaymentMode;
-import com.rivigo.zoom.common.enums.PickupNotificationType;
-import com.rivigo.zoom.common.enums.PickupStatus;
+import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.enums.RetailNotificationType;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
-import com.rivigo.zoom.common.enums.ZoomUserType;
-import com.rivigo.zoom.common.model.Client;
-import com.rivigo.zoom.common.model.PaymentDetailV2History;
-import com.rivigo.zoom.common.model.Pickup;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionSubHeader;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionType;
+import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.model.mongo.PickupNotification;
 import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mongo.PickupNotificationRepository;
-import com.rivigo.zoom.common.repository.mysql.PickupRepository;
+import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
+import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.dozer.Mapper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -35,10 +34,12 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -71,6 +72,15 @@ public class RetailService {
 
     @Autowired
     private UserMasterService userMasterService;
+
+    @Autowired
+    private AdministrativeEntityRepository administrativeEntityRepository;
+
+    @Autowired
+    private PaymentDetailV2Repository paymentDetailV2Repository;
+
+    @Autowired
+    private ZoomBookAPIClientService zoomBookAPIClientService;
 
     public void processRetailNotificationDTOList(List<RetailNotificationDTO> retailNotificationDTOList){
         if(CollectionUtils.isEmpty(retailNotificationDTOList)){
@@ -111,6 +121,11 @@ public class RetailService {
     }
 
     private void processCnCreateUpdateNotification(RetailNotification notification, String consigneeSmsTemplate, String consignorSmsTemplate){
+        DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
+        String dateStr = formatter1.print(notification.getEdd());
+        notification.setEddString(dateStr);
+        notification.setFromOuCluster(administrativeEntityRepository.findParentCluster(notification.getFromOuId()).getName());
+        notification.setToOuCluster(administrativeEntityRepository.findParentCluster(notification.getToOuId()).getName());
         SmsDTO consignorSmsDTO=new SmsDTO();
         consignorSmsDTO.setMobileNumber(notification.getConsignorPhone());
         consignorSmsDTO.setSmsString(designSms(notification,consignorSmsTemplate));
@@ -127,8 +142,19 @@ public class RetailService {
         User user=userMasterService.getById(notification.getUserId());
         notification.setUserMobile(user.getMobileNo());
         notification.setUserName(user.getName());
+        Location location=locationService.getLocationById(notification.getOuId());
+        notification.setOuCode(location.getCode());
+        if(notification.getNotificationType().equals(RetailNotificationType.HANDOVER)){
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+            notification.setHandoveredDateString(formatter.print(DateTime.now()));
+        }
         ZoomUser zoomUser=zoomUserMasterService.getByUserId(notification.getUserId());
+        DateTime fromDate= DateTime.now().withZone(DateTimeZone.forID("Asia/Kolkata")).withMillisOfDay(0);
         if(zoomUser!=null){
+            getPendingHandoverConsignments(notification,
+                    zoomBookAPIClientService.getEntityCollectionsSummary(notification.getUserId(),
+                            ZoomBookFunctionType.USER_CASHBOOK.name(),
+                            ZoomBookTenantType.RETAIL.name(), fromDate.getMillis(), fromDate.plusDays(1).getMillis(), true));
             String smsTemplate;
             if(notification.getNotificationType().equals(RetailNotificationType.CN_COLLECTION)){
                 smsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COLLECTION_CREATION_USER_SMS_STRING);
@@ -145,6 +171,10 @@ public class RetailService {
         if(captain==null){
             return;
         }
+        getPendingHandoverConsignments(notification,
+                zoomBookAPIClientService.getEntityCollectionsSummary(captain.getAccumulationPartnerId().getId(),
+                        ZoomBookFunctionType.BP_CASHBOOK.name(),
+                        ZoomBookTenantType.RETAIL.name(), fromDate.getMillis(), fromDate.plusDays(1).getMillis(), true));
         StockAccumulator bpAdmin=stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN,
                 captain.getAccumulationPartnerId().getId()).get(0);
         String smsTemplate;
@@ -215,5 +245,86 @@ public class RetailService {
         Map<String, String> valuesMap = objectMapper.convertValue(retailNotification,Map.class);
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
         return sub.replace(template);
+    }
+
+    public List<TransactionModelDTO> getEntityCollectionsSummary(Long orgId, String functionType, String tenantType,
+                                                                 Long fromDateTime, Long toDateTime, Boolean getAllByReference){
+        String requestURL = "zoombook/transaction/compile";
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.set("orgId", String.valueOf(orgId));
+        queryParams.set("tenantType", tenantType);
+        queryParams.set("functionType", functionType);
+        queryParams.set("getAllByReference", getAllByReference.toString());
+        if (null != fromDateTime && null != toDateTime) {
+            queryParams.set("fromDate", String.valueOf(fromDateTime));
+            queryParams.set("toDate", String.valueOf(toDateTime));
+        }
+        TypeReference responseType=new TypeReference<List<TransactionModelDTO>>(){};
+        Object response=zoomBookAPIClientService.getDataFromZoomBook(requestURL,queryParams,responseType);
+        if(response==null){
+            return new ArrayList<>();
+        }
+        return (List<TransactionModelDTO>)response;
+    }
+
+    public void getPendingHandoverConsignments(RetailNotification notification, List<TransactionModelDTO> transactionModelDTOList){
+        Map<String, List<TransactionModelDTO>> cnoteTransactionMap = transactionModelDTOList
+                .stream()
+                .collect(Collectors.groupingBy(TransactionModelDTO::getReference));
+        Double pendingCash=0.0;
+        Double pendingCheque=0.0;
+        List<Long> consignmentIdList=new ArrayList<>();
+        for (Map.Entry<String, List<TransactionModelDTO>> entry : cnoteTransactionMap.entrySet()) {
+            try {
+                JsonNode jsonNode=objectMapper.readTree(entry.getValue().get(0).getRemarks());
+                consignmentIdList.add(jsonNode.findValue("consignmentId").asLong());
+            } catch (IOException e) {
+                log.error("Error while reading remarks {} from zoombook {}", entry.getValue().get(0).getRemarks(), e);
+                throw new ZoomException("Error while reading remarks from zoombook");
+            }
+        }
+        Map<Long,PaymentDetailV2> paymentDetailV2Map=getPaymentdetailsByConsignmentIdIn(consignmentIdList);
+        for (Map.Entry<String, List<TransactionModelDTO>> entry : cnoteTransactionMap.entrySet()) {
+            PaymentDetailV2 paymentDetailV2=null;
+            try {
+                JsonNode jsonNode=objectMapper.readTree(entry.getValue().get(0).getRemarks());
+                paymentDetailV2=paymentDetailV2Map.get(jsonNode.findValue("consignmentId").asLong());
+            } catch (IOException e) {
+                log.error("Error while reading remarks {} from zoombook {}", entry.getValue().get(0).getRemarks(), e);
+                throw new ZoomException("Error while reading remarks from zoombook");
+            }
+            if(paymentDetailV2==null){
+                continue;
+            }
+            Double cnAmount = 0.0;
+            Double handoveredAmount = 0.0;
+            for (TransactionModelDTO transactionModelDTO : entry.getValue()) {
+                if (ZoomBookTransactionSubHeader.HANDOVER.equals(transactionModelDTO.getTransactionSubHeader())) {
+                    handoveredAmount += transactionModelDTO.getAmount();
+                } else {
+                    if (ZoomBookTransactionType.CREDIT.equals(transactionModelDTO.getTransactionType())) {
+                        cnAmount += transactionModelDTO.getAmount();
+                    } else {
+                        cnAmount -= transactionModelDTO.getAmount();
+                    }
+                }
+            }
+            if(((int)(cnAmount-handoveredAmount))>0){
+                if(paymentDetailV2.getPaymentType().equals(PaymentType.CHEQUE)){
+                    pendingCheque+=cnAmount-handoveredAmount;
+                }else if(paymentDetailV2.getPaymentType().equals(PaymentType.CASH)){
+                    pendingCash+=cnAmount-handoveredAmount;
+                }
+            }
+        }
+        notification.setCashPendingAmount(pendingCash);
+        notification.setChequePendingAmount(pendingCheque);
+    }
+
+    public Map<Long,PaymentDetailV2> getPaymentdetailsByConsignmentIdIn(List<Long> consignmentIds) {
+        return paymentDetailV2Repository.findByConsignmentIdInAndIsActive(consignmentIds, true)
+                .stream()
+                .collect(Collectors.toMap(PaymentDetailV2::getConsignmentId, Function.identity()));
     }
 }
