@@ -180,6 +180,11 @@ public class RetailService {
         String smsTemplate;
         if(notification.getNotificationType().equals(RetailNotificationType.CN_COLLECTION)){
             smsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COLLECTION_CREATION_BP_SMS_STRING);
+            if(captain.getStockAccumulatorRole().equals(StockAccumulatorRole.STOCK_ACCUMULATOR_USER)){
+                String template=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COLLECTION_CREATION_BP_CAPTAIN_SMS_STRING);
+                String sms=designSms(notification,template);
+                smsService.sendSms(bpAdmin.getUser().getMobileNo(),sms);
+            }
         }else {
             smsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_HANDOVER_BP_SMS_STRING);
         }
