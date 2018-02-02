@@ -96,7 +96,7 @@ public class RetailService {
     private void processDRSdispatch(List<RetailNotificationDTO> retailNotificationDTOList){
         StringBuilder sb=new StringBuilder();
         TransportationPartnerMapping tpm=transportationPartnerMappingService.getByDRSId(retailNotificationDTOList.get(0).getDrsId());
-        User user=userMasterService.getById(tpm.getId());
+        User user=userMasterService.getById(tpm.getUserId());
         sb.append("DRS ")
                 .append(retailNotificationDTOList.get(0).getDrsId())
                 .append(" with ")
