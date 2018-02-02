@@ -231,6 +231,7 @@ public class RetailService {
                     String smsString=designSms(notification,consigneeSmsTemplate);
                     smsService.sendSms(notification.getConsigneePhone(),smsString);
                 }
+                break;
             case CN_COLLECTION:
             case HANDOVER:
                 processCollectionAndHandoverNotifications(notification);
