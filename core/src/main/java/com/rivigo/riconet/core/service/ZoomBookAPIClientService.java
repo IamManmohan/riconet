@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
 import com.rivigo.zoom.common.repository.mysql.ZoomBookTransactionRecordRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -57,11 +58,16 @@ public class ZoomBookAPIClientService {
     @Value("${zoombookClientKey}")
     private String zoombookClientKey;
 
+    @Value("${zoombookClientSecret}")
+    private String zoombookClientSecret;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private ZoomBookTransactionRecordRepository zoomBookTransactionRecordRepository;
+
+    private RestTemplate restTemplate = new RestTemplate();
 
 
     public List<TransactionModelDTO> getEntityCollectionsSummary(Long orgId, String functionType, String tenantType,
@@ -78,16 +84,18 @@ public class ZoomBookAPIClientService {
             queryParams.set("toDate", String.valueOf(toDateTime));
         }
         TypeReference responseType=new TypeReference<List<TransactionModelDTO>>(){};
-        Object response=getDataFromZoomBook(requestURL,queryParams,responseType);
+        Object response=getDataFromZoomBook(requestURL,queryParams,responseType,
+                FinanceUtils.createToken(String.valueOf(orgId),functionType,tenantType,zoombookClientSecret));
         if(response==null){
             return new ArrayList<>();
         }
         return (List<TransactionModelDTO>)response;
     }
 
-    public Object getDataFromZoomBook(String requestUrl, MultiValueMap<String, String> queryParams,TypeReference responseType){
+    public Object getDataFromZoomBook(String requestUrl, MultiValueMap<String, String> queryParams,TypeReference responseType,
+                                      String zoombookClientToken){
 
-        Map<String, String> zoomBookReponse = getDataFromZoomBook(requestUrl, queryParams);
+        Map<String, String> zoomBookReponse = getDataFromZoomBook(requestUrl, queryParams, zoombookClientToken);
 
         return getTransactionModelDetails(zoomBookReponse,responseType);
     }
@@ -110,11 +118,10 @@ public class ZoomBookAPIClientService {
         return responseDto;
     }
 
-    private Map<String, String> getDataFromZoomBook(String requestUrl, MultiValueMap<String, String> queryParams)  {
+    private Map<String, String> getDataFromZoomBook(String requestUrl, MultiValueMap<String, String> queryParams, String zoombookClientToken)  {
         Map<String, String> responseMap = new HashMap<>();
         try {
             log.info(" params {} ",queryParams);
-            RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -126,7 +133,7 @@ public class ZoomBookAPIClientService {
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(zoomBookUrl + "/" + requestUrl)
                     .queryParams(queryParams);
 
-            log.info("Calling API for to GET data from Zoom-book");
+            log.debug("Calling API for to GET data from Zoom-book");
             ResponseEntity<JsonNode> oauthResponse = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod
                     .GET, entity, JsonNode.class);
             JsonNode responseJson = oauthResponse.getBody();

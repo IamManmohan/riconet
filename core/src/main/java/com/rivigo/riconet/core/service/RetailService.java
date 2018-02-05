@@ -254,27 +254,6 @@ public class RetailService {
         return sub.replace(template);
     }
 
-    public List<TransactionModelDTO> getEntityCollectionsSummary(Long orgId, String functionType, String tenantType,
-                                                                 Long fromDateTime, Long toDateTime, Boolean getAllByReference){
-        String requestURL = "zoombook/transaction/compile";
-
-        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        queryParams.set("orgId", String.valueOf(orgId));
-        queryParams.set("tenantType", tenantType);
-        queryParams.set("functionType", functionType);
-        queryParams.set("getAllByReference", getAllByReference.toString());
-        if (null != fromDateTime && null != toDateTime) {
-            queryParams.set("fromDate", String.valueOf(fromDateTime));
-            queryParams.set("toDate", String.valueOf(toDateTime));
-        }
-        TypeReference responseType=new TypeReference<List<TransactionModelDTO>>(){};
-        Object response=zoomBookAPIClientService.getDataFromZoomBook(requestURL,queryParams,responseType);
-        if(response==null){
-            return new ArrayList<>();
-        }
-        return (List<TransactionModelDTO>)response;
-    }
-
     public void getPendingHandoverConsignments(RetailNotification notification, List<TransactionModelDTO> transactionModelDTOList){
         Map<String, List<TransactionModelDTO>> cnoteTransactionMap = transactionModelDTOList
                 .stream()
