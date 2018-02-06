@@ -26,6 +26,7 @@ import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -80,6 +81,8 @@ public class RetailService {
     @Autowired
     private ZoomBookAPIClientService zoomBookAPIClientService;
 
+    private static final DateTimeZone IST=DateTimeZone.forID("Asia/Kolkata");
+
     public void processRetailNotificationDTOList(List<RetailNotificationDTO> retailNotificationDTOList){
         if(CollectionUtils.isEmpty(retailNotificationDTOList)){
             return;
@@ -88,7 +91,9 @@ public class RetailService {
             processDRSdispatch(retailNotificationDTOList);
             return;
         }
-        retailNotificationDTOList.forEach(retailNotificationDTO -> processSingleNotification(retailNotificationDTO));
+        for(RetailNotificationDTO dto:retailNotificationDTOList){
+            processSingleNotification(dto);
+        }
     }
 
     private void processDRSdispatch(List<RetailNotificationDTO> retailNotificationDTOList){
@@ -120,7 +125,7 @@ public class RetailService {
     }
 
     private void processCnCreateUpdateNotification(RetailNotification notification, String consigneeSmsTemplate, String consignorSmsTemplate){
-        DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
+        DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(IST);
         String dateStr = formatter1.print(notification.getEdd());
         notification.setEddString(dateStr);
         notification.setFromOuCluster(administrativeEntityRepository.findParentCluster(notification.getFromOuId()).getName());
@@ -132,7 +137,6 @@ public class RetailService {
         consigneeSmsDTO.setMobileNumber(notification.getConsigneePhone());
         consigneeSmsDTO.setSmsString(designSms(notification,consigneeSmsTemplate));
         notification.setSmsList(Arrays.asList(consigneeSmsDTO,consignorSmsDTO));
-        log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consigneeSmsDTO.getMobileNumber(),consignorSmsDTO.getMobileNumber());
         smsService.sendSms(consigneeSmsDTO.getMobileNumber(),consigneeSmsDTO.getSmsString());
         smsService.sendSms(consignorSmsDTO.getMobileNumber(),consignorSmsDTO.getSmsString());
     }
@@ -144,11 +148,11 @@ public class RetailService {
         Location location=locationService.getLocationById(notification.getOuId());
         notification.setOuCode(location.getCode());
         if(notification.getNotificationType().equals(RetailNotificationType.HANDOVER)){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
             notification.setHandoveredDateString(formatter.print(DateTime.now()));
         }
         ZoomUser zoomUser=zoomUserMasterService.getByUserId(notification.getUserId());
-        DateTime fromDate= DateTime.now().withZone(DateTimeZone.forID("Asia/Kolkata")).withMillisOfDay(0);
+        DateTime fromDate= DateTime.now().withZone(IST).withMillisOfDay(0);
         if(zoomUser!=null){
             getPendingHandoverConsignments(notification,
                     zoomBookAPIClientService.getEntityCollectionsSummary(notification.getUserId(),
@@ -201,13 +205,11 @@ public class RetailService {
                 if(notification.getPaymentMode().equals(PaymentMode.COD)){
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_CREATION_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_CREATION_CONSIGNEE_SMS_STRING);
-                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }else {
 
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_CREATION_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_CREATION_CONSIGNEE_SMS_STRING);
-                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }
                 break;
@@ -215,12 +217,10 @@ public class RetailService {
                 if(notification.getPaymentMode().equals(PaymentMode.COD)){
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_UPDATE_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_CN_UPDATE_CONSIGNEE_SMS_STRING);
-                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                    processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }else {
                     String consignorSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_UPDATE_CONSIGNOR_SMS_STRING);
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_PREPAID_CN_UPDATE_CONSIGNEE_SMS_STRING);
-                    log.info("consignorSmsTemplate {} consigneeSmsTemplate {} ",consignorSmsTemplate,consigneeSmsTemplate);
                     processCnCreateUpdateNotification(notification,consigneeSmsTemplate,consignorSmsTemplate);
                 }
                 break;
@@ -244,7 +244,7 @@ public class RetailService {
         if(objectMapper==null){
             objectMapper=new ObjectMapper();
         }
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
         String dateStr =retailNotification.getEdd()!=null?
                 formatter.print(retailNotification.getEdd()):"-";
         retailNotification.setEddString(dateStr);
@@ -285,19 +285,10 @@ public class RetailService {
             if(paymentDetailV2==null){
                 continue;
             }
-            BigDecimal cnAmount = BigDecimal.ZERO;
-            BigDecimal handoveredAmount = BigDecimal.ZERO;
-            for (TransactionModelDTO transactionModelDTO : entry.getValue()) {
-                if (ZoomBookTransactionSubHeader.HANDOVER.equals(transactionModelDTO.getTransactionSubHeader())) {
-                    handoveredAmount = handoveredAmount.add(transactionModelDTO.getAmount());
-                } else {
-                    if (ZoomBookTransactionType.CREDIT.equals(transactionModelDTO.getTransactionType())) {
-                        cnAmount = cnAmount.add(transactionModelDTO.getAmount());
-                    } else {
-                        cnAmount = cnAmount.subtract(transactionModelDTO.getAmount());
-                    }
-                }
-            }
+
+            ImmutablePair<BigDecimal, BigDecimal> pair = getTotalAndHandoveredAmountsFromUserBookTransactions(entry.getValue());
+            BigDecimal cnAmount = pair.getLeft();
+            BigDecimal handoveredAmount = pair.getRight();
             if(cnAmount.subtract(handoveredAmount).compareTo(BigDecimal.ZERO)>0){
                 if(paymentDetailV2.getPaymentType().equals(PaymentType.CHEQUE)){
                     pendingCheque=pendingCheque.add(cnAmount.subtract(handoveredAmount));
@@ -308,6 +299,23 @@ public class RetailService {
         }
         notification.setCashPendingAmount(pendingCash);
         notification.setChequePendingAmount(pendingCheque);
+    }
+
+    private ImmutablePair<BigDecimal, BigDecimal> getTotalAndHandoveredAmountsFromUserBookTransactions(List<TransactionModelDTO> consignmentTransactions) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        BigDecimal handoveredAmount = BigDecimal.ZERO;
+        for (TransactionModelDTO transactionModelDTO : consignmentTransactions) {
+            if (ZoomBookTransactionSubHeader.HANDOVER.equals(transactionModelDTO.getTransactionSubHeader())) {
+                handoveredAmount = handoveredAmount.add(transactionModelDTO.getAmount());
+            } else {
+                if (ZoomBookTransactionType.CREDIT.equals(transactionModelDTO.getTransactionType())) {
+                    totalAmount = totalAmount.add(transactionModelDTO.getAmount());
+                } else {
+                    totalAmount = totalAmount.subtract(transactionModelDTO.getAmount());
+                }
+            }
+        }
+        return new ImmutablePair<>(totalAmount, handoveredAmount);
     }
 
     public Map<Long,PaymentDetailV2> getPaymentdetailsByConsignmentIdIn(List<Long> consignmentIds) {

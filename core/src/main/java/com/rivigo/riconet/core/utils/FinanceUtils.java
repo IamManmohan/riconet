@@ -14,12 +14,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FinanceUtils {
 
+	private FinanceUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static String createToken(String firstString, String secondString, String thirdString, String fourthString) {
 		try {
 			return buildChecksum(Arrays.asList(firstString,secondString,thirdString,fourthString));
-		} catch (NoSuchAlgorithmException e) {
-			log.error(ExceptionUtils.getStackTrace(e));
-		} catch (UnsupportedEncodingException e) {
+		} catch (NoSuchAlgorithmException|UnsupportedEncodingException e) {
 			log.error(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
@@ -30,14 +32,14 @@ public class FinanceUtils {
 		String listString = entities.stream().map(Object::toString).collect(Collectors.joining(""));
 		MessageDigest md;
 		md = MessageDigest.getInstance("SHA-1");
-		byte[] sha1Hash = new byte[40];
+		byte[] sha1Hash ;
 		md.update(listString.getBytes("iso-8859-1"), 0, listString.length());
 		sha1Hash = md.digest();
 		return convertToHex(sha1Hash);
 	}
 
 	private static String convertToHex(byte[] data) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		for (int i = 0; i < data.length; i++) {
 			int halfByte = (data[i] >>> 4) & 0x0F;
 			int twoHalves = 0;
