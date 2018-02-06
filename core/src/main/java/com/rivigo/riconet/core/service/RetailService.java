@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
@@ -34,8 +33,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -103,7 +100,8 @@ public class RetailService {
                 .append(" with ")
                 .append(retailNotificationDTOList.get(0).getTotalCnCount())
                 .append(" CNs is assigned to you. You need to collect Rs. ")
-                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)).get().setScale(BigDecimal.ROUND_HALF_EVEN))
+                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount)
+                        .reduce((x,y)-> x.add(y)).get().setScale(1, BigDecimal.ROUND_HALF_EVEN))
                 .append(" for ")
                 .append(retailNotificationDTOList.size())
                 .append(" To-Pay CNs: ");
@@ -114,7 +112,7 @@ public class RetailService {
             processSingleNotification(retailNotificationDTO);
             sb.append(retailNotificationDTO.getCnote())
                     .append(" - Rs. ")
-                    .append(retailNotificationDTO.getTotalAmount())
+                    .append(retailNotificationDTO.getTotalAmount().setScale(1, BigDecimal.ROUND_HALF_EVEN))
                     .append(" ");
         });
         sb.append("Please do not deliver the shipment without To-Pay amount collection.");
@@ -317,4 +315,5 @@ public class RetailService {
                 .stream()
                 .collect(Collectors.toMap(PaymentDetailV2::getConsignmentId, Function.identity()));
     }
+
 }
