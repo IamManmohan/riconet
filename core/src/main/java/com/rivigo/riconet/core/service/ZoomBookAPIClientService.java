@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,8 +7,6 @@ import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
 import com.rivigo.zoom.common.repository.mysql.ZoomBookTransactionRecordRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 
@@ -43,7 +38,6 @@ public class ZoomBookAPIClientService {
     private static final String FAILURE="FAILURE";
     private static final String STATUS="status";
     private static final String SUCCESS="SUCCESS";
-    private static final String TIMEOUT="TIMEOUT";
     private static final String CLIENT_TOKEN="clientToken";
     private static final String CLIENT_KEY="clientKey";
     private static final String RESPONSE="response";
