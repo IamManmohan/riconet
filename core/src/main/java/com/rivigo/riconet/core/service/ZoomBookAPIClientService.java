@@ -81,7 +81,7 @@ public class ZoomBookAPIClientService {
         Object response=getDataFromZoomBook(requestURL,queryParams,responseType,
                 FinanceUtils.createToken(String.valueOf(orgId),functionType,tenantType,zoombookClientSecret));
         if(response==null){
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         return (List<TransactionModelDTO>)response;
     }
@@ -106,7 +106,7 @@ public class ZoomBookAPIClientService {
             }
             responseDto = mapper.readValue(zoomBookReponse.get(RESPONSE), responseType);
         }catch (IOException e){
-            log.error("Error while reading data from finance {} ",e);
+            log.error("Error while reading data from finance",e);
             throw new ZoomException("Error while reading data from finance ");
         }
         return responseDto;

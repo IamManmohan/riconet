@@ -18,9 +18,9 @@ public class FinanceUtils {
 		throw new IllegalStateException("Utility class");
 	}
 
-	public static String createToken(String firstString, String secondString, String thirdString, String fourthString) {
+	public static String createToken(String orgId, String functionType, String tenantType, String zoombookClientSecret) {
 		try {
-			return buildChecksum(Arrays.asList(firstString,secondString,thirdString,fourthString));
+			return buildChecksum(Arrays.asList(orgId, functionType, tenantType, zoombookClientSecret));
 		} catch (NoSuchAlgorithmException|UnsupportedEncodingException e) {
 			log.error(ExceptionUtils.getStackTrace(e));
 		}

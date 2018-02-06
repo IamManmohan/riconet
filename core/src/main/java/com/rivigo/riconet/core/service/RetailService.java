@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import com.rivigo.zoom.common.dto.RetailNotificationDTO;
 import com.rivigo.zoom.common.dto.SmsDTO;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
@@ -29,8 +30,6 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -125,8 +124,7 @@ public class RetailService {
     }
 
     private void processCnCreateUpdateNotification(RetailNotification notification, String consigneeSmsTemplate, String consignorSmsTemplate){
-        DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(IST);
-        String dateStr = formatter1.print(notification.getEdd());
+        String dateStr = TimeUtilsZoom.IST_DATE_TIME_FORMATTER.print(notification.getEdd());
         notification.setEddString(dateStr);
         notification.setFromOuCluster(administrativeEntityRepository.findParentCluster(notification.getFromOuId()).getName());
         notification.setToOuCluster(administrativeEntityRepository.findParentCluster(notification.getToOuId()).getName());
@@ -148,8 +146,7 @@ public class RetailService {
         Location location=locationService.getLocationById(notification.getOuId());
         notification.setOuCode(location.getCode());
         if(notification.getNotificationType().equals(RetailNotificationType.HANDOVER)){
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
-            notification.setHandoveredDateString(formatter.print(DateTime.now()));
+            notification.setHandoveredDateString(TimeUtilsZoom.IST_DATE_TIME_FORMATTER.print(DateTime.now()));
         }
         ZoomUser zoomUser=zoomUserMasterService.getByUserId(notification.getUserId());
         DateTime fromDate= DateTime.now().withZone(IST).withMillisOfDay(0);
@@ -244,9 +241,8 @@ public class RetailService {
         if(objectMapper==null){
             objectMapper=new ObjectMapper();
         }
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
         String dateStr =retailNotification.getEdd()!=null?
-                formatter.print(retailNotification.getEdd()):"-";
+                TimeUtilsZoom.IST_DATE_TIME_FORMATTER.print(retailNotification.getEdd()):"-";
         retailNotification.setEddString(dateStr);
         Map<String, String> valuesMap = objectMapper.convertValue(retailNotification,Map.class);
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
@@ -268,7 +264,7 @@ public class RetailService {
                 JsonNode jsonNode=objectMapper.readTree(entry.getValue().get(0).getRemarks());
                 consignmentIdList.add(jsonNode.findValue("consignmentId").asLong());
             } catch (IOException e) {
-                log.error("Error while reading remarks {} from zoombook {}", entry.getValue().get(0).getRemarks(), e);
+                log.error("Error while reading remarks {} from zoombook", entry.getValue().get(0).getRemarks(), e);
                 throw new ZoomException("Error while reading remarks from zoombook");
             }
         }
@@ -279,7 +275,7 @@ public class RetailService {
                 JsonNode jsonNode=objectMapper.readTree(entry.getValue().get(0).getRemarks());
                 paymentDetailV2=paymentDetailV2Map.get(jsonNode.findValue("consignmentId").asLong());
             } catch (IOException e) {
-                log.error("Error while reading remarks {} from zoombook {}", entry.getValue().get(0).getRemarks(), e);
+                log.error("Error while reading remarks {} from zoombook", entry.getValue().get(0).getRemarks(), e);
                 throw new ZoomException("Error while reading remarks from zoombook");
             }
             if(paymentDetailV2==null){
