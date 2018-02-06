@@ -38,6 +38,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -102,7 +103,7 @@ public class RetailService {
                 .append(" with ")
                 .append(retailNotificationDTOList.get(0).getTotalCnCount())
                 .append(" CNs is assigned to you. You need to collect Rs. ")
-                .append(retailNotificationDTOList.stream().mapToDouble(RetailNotificationDTO::getTotalAmount).sum())
+                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)))
                 .append(" for ")
                 .append(retailNotificationDTOList.size())
                 .append(" To-Pay CNs: ");
@@ -258,8 +259,8 @@ public class RetailService {
         Map<String, List<TransactionModelDTO>> cnoteTransactionMap = transactionModelDTOList
                 .stream()
                 .collect(Collectors.groupingBy(TransactionModelDTO::getReference));
-        Double pendingCash=0.0;
-        Double pendingCheque=0.0;
+        BigDecimal pendingCash=BigDecimal.ZERO;
+        BigDecimal pendingCheque=BigDecimal.ZERO;
         List<Long> consignmentIdList=new ArrayList<>();
         for (Map.Entry<String, List<TransactionModelDTO>> entry : cnoteTransactionMap.entrySet()) {
             try {
@@ -283,24 +284,24 @@ public class RetailService {
             if(paymentDetailV2==null){
                 continue;
             }
-            Double cnAmount = 0.0;
-            Double handoveredAmount = 0.0;
+            BigDecimal cnAmount = BigDecimal.ZERO;
+            BigDecimal handoveredAmount = BigDecimal.ZERO;
             for (TransactionModelDTO transactionModelDTO : entry.getValue()) {
                 if (ZoomBookTransactionSubHeader.HANDOVER.equals(transactionModelDTO.getTransactionSubHeader())) {
-                    handoveredAmount += transactionModelDTO.getAmount();
+                    handoveredAmount = handoveredAmount.add(transactionModelDTO.getAmount());
                 } else {
                     if (ZoomBookTransactionType.CREDIT.equals(transactionModelDTO.getTransactionType())) {
-                        cnAmount += transactionModelDTO.getAmount();
+                        cnAmount = cnAmount.add(transactionModelDTO.getAmount());
                     } else {
-                        cnAmount -= transactionModelDTO.getAmount();
+                        cnAmount = cnAmount.subtract(transactionModelDTO.getAmount());
                     }
                 }
             }
-            if(((int)(cnAmount-handoveredAmount))>0){
+            if(cnAmount.subtract(handoveredAmount).compareTo(BigDecimal.ZERO)>0){
                 if(paymentDetailV2.getPaymentType().equals(PaymentType.CHEQUE)){
-                    pendingCheque+=cnAmount-handoveredAmount;
+                    pendingCheque=pendingCheque.add(cnAmount.subtract(handoveredAmount));
                 }else if(paymentDetailV2.getPaymentType().equals(PaymentType.CASH)){
-                    pendingCash+=cnAmount-handoveredAmount;
+                    pendingCash=pendingCash.add(cnAmount.subtract(handoveredAmount));
                 }
             }
         }
