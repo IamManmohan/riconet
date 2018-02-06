@@ -105,7 +105,7 @@ public class RetailService {
                 .append(" with ")
                 .append(retailNotificationDTOList.get(0).getTotalCnCount())
                 .append(" CNs is assigned to you. You need to collect Rs. ")
-                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)).get())
+                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)).get().setScale(BigDecimal.ROUND_HALF_EVEN))
                 .append(" for ")
                 .append(retailNotificationDTOList.size())
                 .append(" To-Pay CNs: ");
