@@ -103,7 +103,7 @@ public class RetailService {
                 .append(" with ")
                 .append(retailNotificationDTOList.get(0).getTotalCnCount())
                 .append(" CNs is assigned to you. You need to collect Rs. ")
-                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)))
+                .append(retailNotificationDTOList.stream().map(RetailNotificationDTO::getTotalAmount).reduce((x,y)-> x.add(y)).get())
                 .append(" for ")
                 .append(retailNotificationDTOList.size())
                 .append(" To-Pay CNs: ");
@@ -197,7 +197,7 @@ public class RetailService {
 
     private void processSingleNotification(RetailNotificationDTO retailNotificationDTO){
         RetailNotification notification = objectMapper.convertValue(retailNotificationDTO, RetailNotification.class);
-        notification.setPaymentModeString(notification.getPaymentMode().displayName());
+        notification.setPaymentModeString(notification.getPaymentMode()==null?"-":notification.getPaymentMode().displayName());
         switch (notification.getNotificationType()){
             case CN_CREATION:
                 if(notification.getPaymentMode().equals(PaymentMode.COD)){
@@ -252,7 +252,10 @@ public class RetailService {
         retailNotification.setEddString(dateStr);
         Map<String, String> valuesMap = objectMapper.convertValue(retailNotification,Map.class);
         StrSubstitutor sub=new StrSubstitutor(valuesMap);
-        return sub.replace(template);
+        String sms= sub.replace(template);
+        valuesMap.put("paymentType","-");
+        StrSubstitutor sub2=new StrSubstitutor(valuesMap);
+        return sub2.replace(sms);
     }
 
     public void getPendingHandoverConsignments(RetailNotification notification, List<TransactionModelDTO> transactionModelDTOList){
