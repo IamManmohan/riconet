@@ -208,6 +208,7 @@ public class RetailService {
 
     private RetailNotification processSingleNotification(RetailNotificationDTO retailNotificationDTO){
         RetailNotification notification = objectMapper.convertValue(retailNotificationDTO, RetailNotification.class);
+        notification.setSmsList(new ArrayList<>());
         notification.setPaymentModeString(notification.getPaymentMode()==null?"-":notification.getPaymentMode().displayName());
         switch (notification.getNotificationType()){
             case CN_CREATION:
