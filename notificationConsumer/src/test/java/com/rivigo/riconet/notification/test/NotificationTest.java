@@ -72,11 +72,4 @@ public class NotificationTest extends TesterBase{
         String str ="[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
         pickupNotificationConsumer.processMessage(str);
     }
-
-    @Test
-    public void processAppointmentNotification() throws IOException {
-        String str="{\"notificationType\":\"APPOINTMENT_MISSED_SUMMARY\"}";
-        appointmentNotificationConsumer.processMessage(str);
-
-    }
 }

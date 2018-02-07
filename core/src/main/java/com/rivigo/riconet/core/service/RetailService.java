@@ -22,6 +22,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
+import com.rivigo.zoom.common.repository.mongo.RetailNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
 import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -80,6 +81,9 @@ public class RetailService {
     @Autowired
     private ZoomBookAPIClientService zoomBookAPIClientService;
 
+    @Autowired
+    private RetailNotificationRepository retailNotificationRepository;
+
     private static final DateTimeZone IST=DateTimeZone.forID("Asia/Kolkata");
 
     public void processRetailNotificationDTOList(List<RetailNotificationDTO> retailNotificationDTOList){
@@ -90,9 +94,11 @@ public class RetailService {
             processDRSdispatch(retailNotificationDTOList);
             return;
         }
-        for(RetailNotificationDTO dto:retailNotificationDTOList){
-            processSingleNotification(dto);
-        }
+        List<RetailNotification> retailNotifications=retailNotificationDTOList
+                .stream()
+                .map(dto -> processSingleNotification(dto))
+                .collect(Collectors.toList());
+        retailNotificationRepository.save(retailNotifications);
     }
 
     private void processDRSdispatch(List<RetailNotificationDTO> retailNotificationDTOList){
@@ -109,11 +115,12 @@ public class RetailService {
                 .append(" for ")
                 .append(retailNotificationDTOList.size())
                 .append(" To-Pay CNs: ");
+        List<RetailNotification> retailNotifications=new ArrayList<>();
         retailNotificationDTOList.forEach(retailNotificationDTO -> {
             retailNotificationDTO.setDrsUserId(user.getId());
             retailNotificationDTO.setDrsUserName(user.getName());
             retailNotificationDTO.setDrsUserMobile(user.getMobileNo());
-            processSingleNotification(retailNotificationDTO);
+            retailNotifications.add(processSingleNotification(retailNotificationDTO));
             sb.append(retailNotificationDTO.getCnote())
                     .append(" - Rs. ")
                     .append(retailNotificationDTO.getTotalAmount().setScale(1, BigDecimal.ROUND_HALF_EVEN))
@@ -121,6 +128,8 @@ public class RetailService {
         });
         sb.append("Please do not deliver the shipment without To-Pay amount collection.");
         smsService.sendSms(retailNotificationDTOList.get(0).getDrsUserMobile(),sb.toString());
+        retailNotifications.get(0).getSmsList().add(new SmsDTO(retailNotificationDTOList.get(0).getDrsUserMobile(),sb.toString()));
+        retailNotificationRepository.save(retailNotifications);
     }
 
     private void processCnCreateUpdateNotification(RetailNotification notification, String consigneeSmsTemplate, String consignorSmsTemplate){
@@ -163,6 +172,7 @@ public class RetailService {
             }
             String smsString=designSms(notification,smsTemplate);
             smsService.sendSms(notification.getUserMobile(),smsString);
+            notification.getSmsList().add(new SmsDTO(notification.getUserMobile(),smsString));
             notification.setOuId(zoomUser.getLocationId());
             notification.setOuCode(locationService.getLocationById(zoomUser.getLocationId()).getCode());
             return;
@@ -184,17 +194,19 @@ public class RetailService {
                 String template=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COLLECTION_CREATION_BP_CAPTAIN_SMS_STRING);
                 String sms=designSms(notification,template);
                 smsService.sendSms(bpAdmin.getUser().getMobileNo(),sms);
+                notification.getSmsList().add(new SmsDTO(bpAdmin.getUser().getMobileNo(),sms));
             }
         }else {
             smsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_HANDOVER_BP_SMS_STRING);
         }
         String smsString=designSms(notification,smsTemplate);
         smsService.sendSms(bpAdmin.getUser().getMobileNo(),smsString);
+        notification.getSmsList().add(new SmsDTO(bpAdmin.getUser().getMobileNo(),smsString));
         notification.setOuId(captain.getZones().get(0).getZone().getLocationId());
         notification.setOuCode(locationService.getLocationById(captain.getZones().get(0).getZone().getLocationId()).getCode());
     }
 
-    private void processSingleNotification(RetailNotificationDTO retailNotificationDTO){
+    private RetailNotification processSingleNotification(RetailNotificationDTO retailNotificationDTO){
         RetailNotification notification = objectMapper.convertValue(retailNotificationDTO, RetailNotification.class);
         notification.setPaymentModeString(notification.getPaymentMode()==null?"-":notification.getPaymentMode().displayName());
         switch (notification.getNotificationType()){
@@ -226,6 +238,7 @@ public class RetailService {
                     String consigneeSmsTemplate=zoomPropertyService.getString(ZoomPropertyName.RETAIL_COD_DRS_DISPATCH_CONSIGNEE_SMS_STRING);
                     String smsString=designSms(notification,consigneeSmsTemplate);
                     smsService.sendSms(notification.getConsigneePhone(),smsString);
+                    notification.getSmsList().add(new SmsDTO(notification.getConsigneePhone(),smsString));
                 }
                 break;
             case CN_COLLECTION:
@@ -235,6 +248,7 @@ public class RetailService {
             default:
                 break;
         }
+        return notification;
     }
 
     private String designSms(RetailNotification retailNotification, String template) {

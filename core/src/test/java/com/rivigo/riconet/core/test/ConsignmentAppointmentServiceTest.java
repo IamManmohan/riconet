@@ -56,7 +56,7 @@ public class ConsignmentAppointmentServiceTest extends TesterBase {
 
     @Test
     public void appointmentNotOfdNotification() throws IOException {
-        String str ="{\"notificationType\":\"APPOINTMENT_NOT_OFD\"}";
+        String str ="{\"notificationType\":\"APPOINTMENT_NOT_OFD_FIRST_HALF\"}";
         processMessage(str);
     }
 
