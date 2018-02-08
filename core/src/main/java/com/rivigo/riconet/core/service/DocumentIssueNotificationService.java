@@ -175,8 +175,6 @@ public class DocumentIssueNotificationService {
 
         Set<String> defaultCcList = emailService.getEmails(EmailDlName.DOCUMENT_ISSUE_NOTIFICATION_CC);
 
-        boolean isTesting = zoomPropertyService.getBoolean(ZoomPropertyName.DOCUMENT_ISSUE_EMAIL_TESTING, true);
-
         notification.getCcList().addAll(getCcList(notification.getReporterLocation().getId()));
         notification.getCcList().addAll(defaultCcList);
         notification.getEmailIdList().add(notification.getReporter().getEmail());
