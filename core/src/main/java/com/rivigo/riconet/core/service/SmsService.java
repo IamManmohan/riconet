@@ -34,10 +34,20 @@ public class SmsService {
 
     private static  final  String SMS_SERVER_URL_ABSENT="sms server url is absent";
 
+    private static  final  String SMS_STRING_ABSENT ="sms string is absent";
+
+    private static  final  String INVALID_RECIPIENTS ="invalid recipients";
+
     public String sendSms(String mobileNo, String message) {
 
         if(!smsEnable){
             return SMS_DISABLED;
+        }
+        if(message==null ){
+            return SMS_STRING_ABSENT;
+        }
+        if(mobileNo==null){
+            return INVALID_RECIPIENTS;
         }
         List<String> phoneNumbers = new ArrayList<>();
         String smsString=message;
