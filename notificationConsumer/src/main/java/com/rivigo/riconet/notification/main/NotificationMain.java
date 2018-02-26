@@ -9,6 +9,7 @@ import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
+import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
@@ -50,6 +51,9 @@ public class NotificationMain {
     @Autowired
     private RetailNotificationConsumer retailNotificationConsumer;
 
+    @Autowired
+    private ZoomCommunicationsConsumer zoomCommunicationsConsumer;
+
     public static void main(String[] args){
         final ActorSystem system = ActorSystem.create("notifications");
         final ActorMaterializer materializer = ActorMaterializer.create(system);
@@ -57,6 +61,9 @@ public class NotificationMain {
         NotificationMain consumer=context.getBean(NotificationMain.class);
         Config config= ConfigFactory.load();
         bootstrapServers=config.getString("bootstrap.servers");
+        log.info("Bootstrap servers are:");
+        log.info(bootstrapServers);
+        bootstrapServers = "ts-qa-kafka-1.rivigo.com:9092";
         groupId=config.getString("group.id");
         final ConsumerSettings<String, String> consumerSettings =
                 ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
@@ -67,10 +74,11 @@ public class NotificationMain {
     }
 
     public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
-        depsNotificationConsumer.load(materializer,consumerSettings);
-        docIssueNotificationConsumer.load(materializer,consumerSettings);
-        pickupNotificationConsumer.load(materializer,consumerSettings);
-        appointmentNotificationConsumer.load(materializer,consumerSettings);
-        retailNotificationConsumer.load(materializer,consumerSettings);
+//        depsNotificationConsumer.load(materializer,consumerSettings);
+//        docIssueNotificationConsumer.load(materializer,consumerSettings);
+//        pickupNotificationConsumer.load(materializer,consumerSettings);
+//        appointmentNotificationConsumer.load(materializer,consumerSettings);
+//        retailNotificationConsumer.load(materializer,consumerSettings);
+          zoomCommunicationsConsumer.load(materializer,consumerSettings);
     }
 }

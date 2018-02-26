@@ -58,7 +58,8 @@ public abstract class ConsumerModel {
     private final AtomicLong offset = new AtomicLong();
 
     public ConsumerModel(String topic, String errorTopic,Long numRetries) {
-        this.topic = topic;
+//        this.topic = topic;
+        this.topic = "sms_sink";
         this.errorTopic = errorTopic;
         this.numRetries =numRetries;
     }
