@@ -33,7 +33,8 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
   }
 
   public ZoomCommunicationsConsumer() {
-    super(Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION.name(),Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION_ERROR.name(),5l);
+//    super(Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION.name(),Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION_ERROR.name(),5l);
+    super("sms_sink",Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION_ERROR.name(),5l);
     objectMapper=new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }

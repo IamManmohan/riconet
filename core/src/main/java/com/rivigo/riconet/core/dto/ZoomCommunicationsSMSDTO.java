@@ -25,4 +25,3 @@ public class ZoomCommunicationsSMSDTO {   // TODO: Use one from zoom commons onc
   private List<String> phoneNumbers;
 
 }
-
