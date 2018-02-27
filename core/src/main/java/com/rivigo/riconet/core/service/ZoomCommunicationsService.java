@@ -37,7 +37,7 @@ public class ZoomCommunicationsService {
             log.info(zoomCommunicationsSMSDTO.getMessage());
             log.info(zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
             log.info(zoomCommunicationsSMSDTO.getConfidential().toString());
-            String return_value = smsService.sendSms("7503810874", zoomCommunicationsSMSDTO.getMessage());
+            String return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
             log.info(return_value);
         }
         log.info("Done");

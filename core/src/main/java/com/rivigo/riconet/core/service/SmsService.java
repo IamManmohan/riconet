@@ -58,7 +58,7 @@ public class SmsService {
         }else{
             String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER);
             log.info("Default phone no is : " + defaultPhone);
-            defaultPhone = "7503810874";
+            defaultPhone = "7795569771";
             phoneNumbers.add(defaultPhone);
             smsString=mobileNo+" - "+smsString;
         }

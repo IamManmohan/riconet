@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @ComponentScan(basePackages ={"com.rivigo.riconet.notification",
+		"com.rivigo.riconet.zoomCommunication",
  "com.rivigo.riconet.core.service", "com.rivigo.riconet.core.test.consumer"})
 
 public class ServiceConfig {

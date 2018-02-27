@@ -74,11 +74,10 @@ public class NotificationMain {
     }
 
     public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
-//        depsNotificationConsumer.load(materializer,consumerSettings);
-//        docIssueNotificationConsumer.load(materializer,consumerSettings);
-//        pickupNotificationConsumer.load(materializer,consumerSettings);
-//        appointmentNotificationConsumer.load(materializer,consumerSettings);
-//        retailNotificationConsumer.load(materializer,consumerSettings);
-          zoomCommunicationsConsumer.load(materializer,consumerSettings);
+        depsNotificationConsumer.load(materializer,consumerSettings);
+        docIssueNotificationConsumer.load(materializer,consumerSettings);
+        pickupNotificationConsumer.load(materializer,consumerSettings);
+        appointmentNotificationConsumer.load(materializer,consumerSettings);
+        retailNotificationConsumer.load(materializer,consumerSettings);
     }
 }
