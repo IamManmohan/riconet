@@ -1,8 +1,9 @@
-package com.rivigo.riconet.zoomCommunication.consumer;
+package com.rivigo.riconet.notification.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
+import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.service.ZoomCommunicationsService;
 import com.rivigo.zoom.common.enums.Topic;
 import lombok.extern.slf4j.Slf4j;
@@ -25,16 +26,20 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   @Override
   public String processMessage(String str) throws IOException {
-//    List<PickupNotificationDTO> pickupNotificationDTOList=null;
-//    TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {};
-//    pickupNotificationDTOList= objectMapper.readValue(str, mapType);
-    zoomCommunicationsService.processNotificationMessage(str);
+    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO;
+    try {
+      zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
+    } catch (Exception e ) {
+      log.error("failed", e);
+      return str;
+    }
+
+    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
     return str;
   }
 
   public ZoomCommunicationsConsumer() {
-//    super(Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION.name(),Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION_ERROR.name(),5l);
-    super("sms_sink",Topic.COM_RIVIGO_ZOOM_COMMUNICATIONS_CN_CREATION_ERROR.name(),5l);
+    super("sms_sink",Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION_ERROR.name(),5l);
     objectMapper=new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }

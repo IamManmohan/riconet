@@ -21,26 +21,22 @@ public class ZoomCommunicationsService {
     @Autowired
     private ObjectMapper objectMapper ;
 
-    public void processNotificationMessage(String str) throws IOException {
+    public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
 
         log.info("ZoomCommunicationsService is in action");
-        log.info(str);
-        ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO;
-        try {
-            zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
-        } catch (Exception e ) {
-            log.error("failed", e);
+//        log.info(str);
+        if (null == zoomCommunicationsSMSDTO) {
             return;
         }
-
-        if (null != zoomCommunicationsSMSDTO) {
-            log.info(zoomCommunicationsSMSDTO.getMessage());
-            log.info(zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
-            log.info(zoomCommunicationsSMSDTO.getConfidential().toString());
-            String return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
-            log.info(return_value);
-        }
-        log.info("Done");
+        log.info("Sending  msg");
+        log.info(zoomCommunicationsSMSDTO.getMessage());
+        log.info("");
+        log.info(zoomCommunicationsSMSDTO.getMessage());
+        log.info(zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
+        log.info(zoomCommunicationsSMSDTO.getConfidential().toString());
+        String return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
+        log.info(return_value);
+        log.info("Sent Message");
     }
 
 }
