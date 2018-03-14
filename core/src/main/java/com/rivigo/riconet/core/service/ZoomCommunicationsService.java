@@ -34,7 +34,17 @@ public class ZoomCommunicationsService {
         log.info(zoomCommunicationsSMSDTO.getMessage());
         log.info(zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
         log.info(zoomCommunicationsSMSDTO.getConfidential().toString());
-        String return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
+        if (null == zoomCommunicationsSMSDTO.getPhoneNumbers() || zoomCommunicationsSMSDTO.getPhoneNumbers().isEmpty()) {
+            return;
+        }
+        String return_value;
+        //TODO: Change
+//        zoomCommunicationsSMSDTO.getPhoneNumbers().forEach(
+//            number -> {
+//                smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
+//            }
+//        );
+        return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
         log.info(return_value);
         log.info("Sent Message");
     }
