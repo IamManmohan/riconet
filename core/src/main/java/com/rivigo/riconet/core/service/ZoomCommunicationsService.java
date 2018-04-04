@@ -20,7 +20,7 @@ import java.io.IOException;
 public class ZoomCommunicationsService {
 
   //This is usually in evening
-  public Integer dndStartTime = 20;
+  public Integer dndStartTime = 18;
 
   //This is usually in morning
   public Integer dndEndTime = 8;
