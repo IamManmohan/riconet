@@ -41,14 +41,14 @@ public class ZoomCommunicationsService {
       return;
     }
 
-    if (StringUtils.isEmpty(zoomCommunicationsSMSDTO.getPhoneNumbers())) {
+    if (StringUtils.isEmpty(zoomCommunicationsSMSDTO.getPhoneNumber())) {
       log.debug("zoomCommunicationsSmsDTO with empty or null phonenumbers");
       return;
     }
 
     log.info("Sending sms, message {}, on Phone number {}",
         zoomCommunicationsSMSDTO.getMessage(),
-        zoomCommunicationsSMSDTO.getPhoneNumbers());
+        zoomCommunicationsSMSDTO.getPhoneNumber());
 
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);

@@ -32,6 +32,7 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   @Override
   public String processMessage(String str) throws IOException {
+    log.info("Processing message in ZoomCommunicationConsumer {}", str);
     ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;
     try {
       zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);

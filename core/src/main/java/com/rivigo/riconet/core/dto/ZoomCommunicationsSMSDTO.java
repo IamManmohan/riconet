@@ -23,9 +23,9 @@ public class ZoomCommunicationsSMSDTO {
   private final Boolean confidential = Boolean.TRUE;
 
   private String message;
-  private String phoneNumbers;
+  private String phoneNumber;
   private String userType;
-  private String eventUId;
+  private String eventUID;
   private String notificationDTO;
   private String communicationId;
   private Boolean clientResponded;
