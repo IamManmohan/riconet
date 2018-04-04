@@ -19,29 +19,28 @@ import java.io.IOException;
 @Component
 public class ZoomCommunicationsConsumer extends ConsumerModel {
 
-  private ObjectMapper objectMapper ;
+  private ObjectMapper objectMapper;
 
   @Autowired
   private ZoomCommunicationsService zoomCommunicationsService;
 
-  @Override
-  public String processMessage(String str) throws IOException {
-    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO;
-    try {
-      zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
-    } catch (Exception e ) {
-      log.error("failed", e);
-      return str;
-    }
-
-    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
-    return str;
+  public ZoomCommunicationsConsumer() {
+    super("sms_sink", Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION_ERROR.name(), 5l);
+    objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public ZoomCommunicationsConsumer() {
-    super("sms_sink",Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION_ERROR.name(),5l);
-    objectMapper=new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  @Override
+  public String processMessage(String str) throws IOException {
+    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;
+    try {
+      zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
+      log.debug("ZoomCommunicationsSMSDTO {}", zoomCommunicationsSMSDTO);
+    } catch (Exception e) {
+      log.error("failed", e);
+    }
+    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
+    return str;
   }
 
 }

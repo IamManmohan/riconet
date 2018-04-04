@@ -3,8 +3,12 @@ package com.rivigo.riconet.core.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
@@ -15,38 +19,46 @@ import java.io.IOException;
 @Service
 public class ZoomCommunicationsService {
 
-    @Autowired
-    SmsService smsService;
+  //This is usually in evening
+  @Value("${dnd.start.time}")
+  public Integer dndStartTime;
 
-    @Autowired
-    private ObjectMapper objectMapper ;
+  //This is usually in morning
+  @Value("${dnd.end.time}")
+  public Integer dndEndTime;
 
-    public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
+  @Autowired
+  SmsService smsService;
 
-        log.info("ZoomCommunicationsService is in action");
-//        log.info(str);
-        if (null == zoomCommunicationsSMSDTO) {
-            return;
-        }
-        log.info("Sending  msg");
-        log.info(zoomCommunicationsSMSDTO.getMessage());
-        log.info("");
-        log.info(zoomCommunicationsSMSDTO.getMessage());
-        log.info(zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
-        log.info(zoomCommunicationsSMSDTO.getConfidential().toString());
-        if (null == zoomCommunicationsSMSDTO.getPhoneNumbers() || zoomCommunicationsSMSDTO.getPhoneNumbers().isEmpty()) {
-            return;
-        }
-        String return_value;
-        //TODO: Change
-//        zoomCommunicationsSMSDTO.getPhoneNumbers().forEach(
-//            number -> {
-//                smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
-//            }
-//        );
-        return_value = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
-        log.info(return_value);
-        log.info("Sent Message");
+  @Autowired
+  private ObjectMapper objectMapper;
+
+  public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
+
+    log.info("Processing zoomCommunicationsSMSDTO");
+    if (null == zoomCommunicationsSMSDTO) {
+      log.debug("zoomCommunicationsSMSDTO is null");
+      return;
     }
+
+    if (StringUtils.isEmpty(zoomCommunicationsSMSDTO.getPhoneNumbers())) {
+      log.debug("zoomCommunicationsSmsDTO with empty or null phonenumbers");
+      return;
+    }
+
+    log.info("Sending sms, message {}, on Phone number {}",
+        zoomCommunicationsSMSDTO.getMessage(),
+        zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
+
+
+    log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
+    int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
+    if (hourOfDay >= dndEndTime && hourOfDay < dndStartTime) {
+      String returnValue = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
+      log.info("Return value from notificationService {}", returnValue);
+    } else {
+      log.info("Can not send sms as the current time is dnd time");
+    }
+  }
 
 }

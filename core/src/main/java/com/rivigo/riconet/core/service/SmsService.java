@@ -61,6 +61,12 @@ public class SmsService {
             //TODO: Remove
             defaultPhone = "7795569771";
             phoneNumbers.add(defaultPhone);
+            String imranContactNumber = "7503810874";
+            phoneNumbers.add(imranContactNumber);
+            String rashmiContactNumber = "8208981885";
+            phoneNumbers.add(rashmiContactNumber);
+            String chandraContactNumber = "9742048001";
+            phoneNumbers.add(chandraContactNumber);
             smsString=mobileNo+" - "+smsString;
         }
 
