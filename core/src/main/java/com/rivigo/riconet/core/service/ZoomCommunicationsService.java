@@ -48,7 +48,7 @@ public class ZoomCommunicationsService {
 
     log.info("Sending sms, message {}, on Phone number {}",
         zoomCommunicationsSMSDTO.getMessage(),
-        zoomCommunicationsSMSDTO.getPhoneNumbers().get(0));
+        zoomCommunicationsSMSDTO.getPhoneNumbers());
 
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);

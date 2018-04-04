@@ -19,9 +19,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ZoomCommunicationsSMSDTO {   // TODO: Use one from zoom commons once it is shifted there
+public class ZoomCommunicationsSMSDTO {
   private final Boolean confidential = Boolean.TRUE;
+
   private String message;
-  private List<String> phoneNumbers;
+  private String phoneNumbers;
+  private String userType;
+  private String eventUId;
+  private String notificationDTO;
+  private String communicationId;
+  private Boolean clientResponded;
+  private String urlDTO;
 
 }
