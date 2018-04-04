@@ -21,11 +21,11 @@ public class ZoomCommunicationsService {
 
   //This is usually in evening
   @Value("${dnd.start.time}")
-  public Integer dndStartTime;
+  public String dndStartTime;
 
   //This is usually in morning
   @Value("${dnd.end.time}")
-  public Integer dndEndTime;
+  public String dndEndTime;
 
   @Autowired
   SmsService smsService;
@@ -53,7 +53,9 @@ public class ZoomCommunicationsService {
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
     int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
-    if (hourOfDay >= dndEndTime && hourOfDay < dndStartTime) {
+    int dndEndTimeInt = Integer.parseInt(dndEndTime);
+    int dndStartTimeInt = Integer.parseInt(dndStartTime);
+    if (hourOfDay >= dndEndTimeInt && hourOfDay < dndStartTimeInt) {
       String returnValue = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
       log.info("Return value from notificationService {}", returnValue);
     } else {
