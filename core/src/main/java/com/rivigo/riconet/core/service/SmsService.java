@@ -59,12 +59,10 @@ public class SmsService {
             String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER);
             log.info("Default phone no is : " + defaultPhone);
             //TODO: Remove
-            defaultPhone = "7795569771";
+            defaultPhone = "8553959140";
             phoneNumbers.add(defaultPhone);
             String imranContactNumber = "7503810874";
             phoneNumbers.add(imranContactNumber);
-            String rashmiContactNumber = "8208981885";
-            phoneNumbers.add(rashmiContactNumber);
             String chandraContactNumber = "9742048001";
             phoneNumbers.add(chandraContactNumber);
             smsString=mobileNo+" - "+smsString;

@@ -52,7 +52,7 @@ public class ZoomCommunicationsService {
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
     int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
     if (hourOfDay >= dndEndTime && hourOfDay < dndStartTime) {
-      String returnValue = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
+      String returnValue = smsService.sendSms("8553959140", zoomCommunicationsSMSDTO.getMessage());
       log.info("Return value from notificationService {}", returnValue);
     } else {
       log.info("Can not send sms as the current time is dnd time");
