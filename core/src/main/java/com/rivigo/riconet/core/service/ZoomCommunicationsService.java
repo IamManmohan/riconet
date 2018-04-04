@@ -20,12 +20,10 @@ import java.io.IOException;
 public class ZoomCommunicationsService {
 
   //This is usually in evening
-  @Value("${dnd.start.time}")
-  public String dndStartTime;
+  public Integer dndStartTime = 20;
 
   //This is usually in morning
-  @Value("${dnd.end.time}")
-  public String dndEndTime;
+  public Integer dndEndTime = 8;
 
   @Autowired
   SmsService smsService;
@@ -53,9 +51,7 @@ public class ZoomCommunicationsService {
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
     int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
-    int dndEndTimeInt = Integer.parseInt(dndEndTime);
-    int dndStartTimeInt = Integer.parseInt(dndStartTime);
-    if (hourOfDay >= dndEndTimeInt && hourOfDay < dndStartTimeInt) {
+    if (hourOfDay >= dndEndTime && hourOfDay < dndStartTime) {
       String returnValue = smsService.sendSms("7795569771", zoomCommunicationsSMSDTO.getMessage());
       log.info("Return value from notificationService {}", returnValue);
     } else {
