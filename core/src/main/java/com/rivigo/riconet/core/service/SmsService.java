@@ -67,6 +67,12 @@ public class SmsService {
             phoneNumbers.add(chandraContactNumber);
             String mayankNumber = "9582361731";
             phoneNumbers.add(mayankNumber);
+            String shashankNumber = "9818429365";
+            phoneNumbers.add(shashankNumber);
+            String ishanNumber = "9910176497";
+            phoneNumbers.add(ishanNumber);
+            String riteshNumber = "8884024446";
+            phoneNumbers.add(riteshNumber);
             smsString=mobileNo+" - "+smsString;
         }
 
