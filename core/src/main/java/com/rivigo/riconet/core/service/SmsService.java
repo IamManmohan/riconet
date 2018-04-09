@@ -73,6 +73,8 @@ public class SmsService {
             phoneNumbers.add(ishanNumber);
             String riteshNumber = "8884024446";
             phoneNumbers.add(riteshNumber);
+            String sakshamNumber = "7829321459";
+            phoneNumbers.add(sakshamNumber);
             smsString=mobileNo+" - "+smsString;
         }
 
