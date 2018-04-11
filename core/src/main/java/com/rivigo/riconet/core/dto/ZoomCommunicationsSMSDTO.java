@@ -28,7 +28,7 @@ public class ZoomCommunicationsSMSDTO {
   private String eventUID;
   private String notificationDTO;
   private String communicationId;
-  private Boolean clientResponded;
+  private Integer clientResponded;
   private String urlDTO;
 
 }
