@@ -1,16 +1,13 @@
 package com.rivigo.riconet.core.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
 
 /**
  * Created by aditya on 22/2/18.
@@ -19,19 +16,18 @@ import java.io.IOException;
 @Service
 public class ZoomCommunicationsService {
 
-  //This is usually in evening
-  public Integer dndStartTime = 22;
-
-  //This is usually in morning
-  public Integer dndEndTime = 8;
+  @Autowired
+  private SmsService smsService;
 
   @Autowired
-  SmsService smsService;
-
-  @Autowired
-  private ObjectMapper objectMapper;
+  private ZoomPropertyService zoomPropertyService;
 
   public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
+
+    //This is usually in evening
+    Integer dndStartTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_START_TIME, 20);
+    //This is usually in morning
+    Integer dndEndTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_END_TIME, 8);
 
     log.info("Processing zoomCommunicationsSMSDTO");
     if (null == zoomCommunicationsSMSDTO) {
@@ -47,7 +43,6 @@ public class ZoomCommunicationsService {
     log.info("Sending sms, message {}, on Phone number {}",
         zoomCommunicationsSMSDTO.getMessage(),
         zoomCommunicationsSMSDTO.getPhoneNumber());
-
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
     int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
