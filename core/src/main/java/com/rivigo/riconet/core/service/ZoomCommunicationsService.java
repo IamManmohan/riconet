@@ -25,9 +25,9 @@ public class ZoomCommunicationsService {
   public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
 
     //This is usually in evening
-    Integer dndStartTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_START_TIME, 20);
+    Integer dndStartTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_START_TIME, 1000*20*60*60);
     //This is usually in morning
-    Integer dndEndTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_END_TIME, 8);
+    Integer dndEndTime = zoomPropertyService.getInteger(ZoomPropertyName.ZOOM_COMMUNICATION_DND_END_TIME, 1000*8*60*60);
 
     log.info("Processing zoomCommunicationsSMSDTO");
     if (null == zoomCommunicationsSMSDTO) {
@@ -45,8 +45,8 @@ public class ZoomCommunicationsService {
         zoomCommunicationsSMSDTO.getPhoneNumber());
 
     log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
-    int hourOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getHourOfDay();
-    if (hourOfDay >= dndEndTime && hourOfDay < dndStartTime) {
+    int millisOfDay = DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
+    if (millisOfDay >= dndEndTime && millisOfDay < dndStartTime) {
       String returnValue = smsService.sendSms(zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
       log.info("Return value from notificationService {}", returnValue);
     } else {
