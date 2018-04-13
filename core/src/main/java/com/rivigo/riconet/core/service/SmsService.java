@@ -40,7 +40,7 @@ public class SmsService {
   @Autowired
   public ZoomPropertyService zoomPropertyService;
 
-  public String sendSms(String mobileNo, String message) throws JSONException {
+  public String sendSms(String mobileNo, String message) {
 
     log.info("Call to send sms");
     if (!smsEnable) {
@@ -68,7 +68,7 @@ public class SmsService {
 
     log.info(mobileNo + "-------" + smsString);
 
-    if(!StringUtils.isNullOrEmpty(rootUrl)) {
+    if (!StringUtils.isNullOrEmpty(rootUrl)) {
       RestTemplate restTemplate = new RestTemplate();
       HttpHeaders headers = new HttpHeaders();
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -76,9 +76,13 @@ public class SmsService {
       headers.set(X_USER_AGENT_HEADER, notificationClientCode);
       JSONObject jsonObject = new JSONObject();
 
-      jsonObject.put("phoneNumbers", phoneNumbers);
-      jsonObject.put("message", smsString);
-      jsonObject.put("confidential", true);
+      try {
+        jsonObject.put("phoneNumbers", phoneNumbers);
+        jsonObject.put("message", smsString);
+        jsonObject.put("confidential", true);
+      } catch (JSONException e) {
+        log.error("Exception occurred while preparing payload ", e);
+      }
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
       String url = rootUrl.concat(smsApi);
       ResponseEntity responseEng = restTemplate.exchange(url,
