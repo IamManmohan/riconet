@@ -25,32 +25,41 @@ import java.util.List;
 public class SmsService {
 
   public final static String X_USER_AGENT_HEADER = "X-User-Agent";
+
   private static final String SMS_DISABLED = "sending sms is disabled";
+
   private static final String SMS_SERVER_URL_ABSENT = "sms server url is absent";
+
   private static final String SMS_STRING_ABSENT = "sms string is absent";
+
   private static final String INVALID_RECIPIENTS = "invalid recipients";
+
   @Value("${notification.root.url}")
-  public String rootUrl;
+  private String rootUrl;
+
   @Value("${notification.sms.api}")
-  public String smsApi;
+  private String smsApi;
+
   @Value("${notification.sms.enable}")
-  public Boolean smsEnable;
+  private Boolean smsEnable;
+
   @Value("${notification.client.code}")
-  public String notificationClientCode;
+  private String notificationClientCode;
+
   @Autowired
   public ZoomPropertyService zoomPropertyService;
 
   public String sendSms(String mobileNo, String message) {
 
-    log.info("Call to send sms");
+    log.info("Call to send sms with smsEnable {}", smsEnable);
     if (!smsEnable) {
       log.info("SMS is disabled");
       return SMS_DISABLED;
     }
-    if (message == null) {
+    if (StringUtils.isNullOrEmpty(message)) {
       return SMS_STRING_ABSENT;
     }
-    if (mobileNo == null) {
+    if (StringUtils.isNullOrEmpty(mobileNo)) {
       return INVALID_RECIPIENTS;
     }
     List<String> phoneNumbers = new ArrayList<>();
@@ -68,22 +77,27 @@ public class SmsService {
 
     log.info(mobileNo + "-------" + smsString);
 
+    log.info("root url from properties {}", rootUrl);
     if (!StringUtils.isNullOrEmpty(rootUrl)) {
       RestTemplate restTemplate = new RestTemplate();
+
       HttpHeaders headers = new HttpHeaders();
       headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
       headers.setContentType(MediaType.APPLICATION_JSON);
+
+      log.info("notificationClientCode from properties {}", notificationClientCode);
       headers.set(X_USER_AGENT_HEADER, notificationClientCode);
       JSONObject jsonObject = new JSONObject();
 
       try {
         jsonObject.put("phoneNumbers", phoneNumbers);
         jsonObject.put("message", smsString);
-        jsonObject.put("confidential", true);
+        jsonObject.put("confidential", false);
       } catch (JSONException e) {
         log.error("Exception occurred while preparing payload ", e);
       }
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
+      log.info("sms api from properties {}", smsApi);
       String url = rootUrl.concat(smsApi);
       ResponseEntity responseEng = restTemplate.exchange(url,
           HttpMethod.POST, entity, Object.class);
