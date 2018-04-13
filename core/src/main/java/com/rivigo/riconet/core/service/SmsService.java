@@ -60,6 +60,7 @@ public class SmsService {
             log.info("Default phone no is : " + defaultPhone);
 //            TODO: Remove
             defaultPhone = "8553959140";
+            phoneNumbers.add(defaultPhone);
             smsString=mobileNo+" - "+smsString;
         }
 
