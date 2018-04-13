@@ -40,7 +40,9 @@ public class SmsService {
 
     public String sendSms(String mobileNo, String message) {
 
+        log.info("Call to send sms");
         if(!smsEnable){
+            log.info("SMS is disabled");
             return SMS_DISABLED;
         }
         if(message==null ){
@@ -55,6 +57,9 @@ public class SmsService {
             phoneNumbers.add(mobileNo);
         }else{
             String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER);
+            log.info("Default phone no is : " + defaultPhone);
+//            TODO: Remove
+            defaultPhone = "8553959140";
             phoneNumbers.add(defaultPhone);
             smsString=mobileNo+" - "+smsString;
         }
