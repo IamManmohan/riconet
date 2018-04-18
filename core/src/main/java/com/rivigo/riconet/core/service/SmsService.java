@@ -1,94 +1,115 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.riconet.core.dto.SmsMessageDTO;
+import com.amazonaws.util.StringUtils;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Service
 public class SmsService {
 
-    @Value("${notification.root.url}")
-    public String rootUrl;
+  public final static String X_USER_AGENT_HEADER = "X-User-Agent";
 
-    @Value("${notification.sms.api}")
-    public String smsApi;
+  private static final String SMS_DISABLED = "sending sms is disabled";
 
-    @Value("${notification.sms.enable}")
-    public Boolean smsEnable;
+  private static final String SMS_SERVER_URL_ABSENT = "sms server url is absent";
 
-    @Autowired
-    public ZoomPropertyService zoomPropertyService;
+  private static final String SMS_STRING_ABSENT = "sms string is absent";
 
-    private static  final  String SMS_DISABLED="sending sms is disabled";
+  private static final String INVALID_RECIPIENTS = "invalid recipients";
 
-    private static  final  String SMS_SERVER_URL_ABSENT="sms server url is absent";
+  @Value("${notification.root.url}")
+  private String rootUrl;
 
-    private static  final  String SMS_STRING_ABSENT ="sms string is absent";
+  @Value("${notification.sms.api}")
+  private String smsApi;
 
-    private static  final  String INVALID_RECIPIENTS ="invalid recipients";
+  @Value("${notification.sms.enable}")
+  private Boolean smsEnable;
 
-    public String sendSms(String mobileNo, String message) {
+  @Value("${notification.client.code}")
+  private String notificationClientCode;
 
-        log.info("Call to send sms");
-        if(!smsEnable){
-            log.info("SMS is disabled");
-            return SMS_DISABLED;
-        }
-        if(message==null ){
-            return SMS_STRING_ABSENT;
-        }
-        if(mobileNo==null){
-            return INVALID_RECIPIENTS;
-        }
-        List<String> phoneNumbers = new ArrayList<>();
-        String smsString=message;
-        if( "production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
-            phoneNumbers.add(mobileNo);
-        }else{
-            String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER);
-            log.info("Default phone no is : " + defaultPhone);
-//            TODO: Remove
-            defaultPhone = "8553959140";
-            phoneNumbers.add(defaultPhone);
-            smsString=mobileNo+" - "+smsString;
-        }
+  @Autowired
+  public ZoomPropertyService zoomPropertyService;
 
+  public String sendSms(String mobileNo, String message) {
 
-        log.info(mobileNo+"-------"+smsString);
-
-        URI uri = getURI(smsApi);
-        if (uri != null) {
-            RestTemplate restTemplate = new RestTemplate();
-            SmsMessageDTO smsRequest = new SmsMessageDTO(phoneNumbers, smsString);
-            String responseEng = restTemplate.postForObject(uri, smsRequest, String.class);
-            if (responseEng == null) {
-                throw new ZoomException("SMS is not sent properly");
-            }
-            return  responseEng;
-
-        }
-        return SMS_SERVER_URL_ABSENT;
+    log.info("Call to send sms with smsEnable {}", smsEnable);
+    if (!smsEnable) {
+      log.info("SMS is disabled");
+      return SMS_DISABLED;
+    }
+    if (StringUtils.isNullOrEmpty(message)) {
+      return SMS_STRING_ABSENT;
+    }
+    if (StringUtils.isNullOrEmpty(mobileNo)) {
+      return INVALID_RECIPIENTS;
+    }
+    List<String> phoneNumbers = new ArrayList<>();
+    String smsString = message;
+    if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+      phoneNumbers.add(mobileNo);
+    } else {
+      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
+      String[] defaultPhones = defaultPhone.split(",");
+      Arrays.stream(defaultPhones).forEach(phoneNumber -> {
+        log.info("Default phone no is : " + defaultPhone);
+        phoneNumbers.add(phoneNumber);
+      });
+      smsString = mobileNo + " - " + smsString;
     }
 
-    private URI getURI(String str) {
-        String url = rootUrl.concat(str);
-        URI uri = null;
-        try {
-            uri = new URI(url);
-        } catch (URISyntaxException e) {
-            log.error("Error creating URI ", e);
-        }
-        return uri;
+
+    log.info(mobileNo + "-------" + smsString);
+
+    log.info("root url from properties {}", rootUrl);
+    if (!StringUtils.isNullOrEmpty(rootUrl)) {
+      RestTemplate restTemplate = new RestTemplate();
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+      headers.setContentType(MediaType.APPLICATION_JSON);
+
+      log.info("notificationClientCode from properties {}", notificationClientCode);
+      headers.set(X_USER_AGENT_HEADER, notificationClientCode);
+      JSONObject jsonObject = new JSONObject();
+
+      try {
+        jsonObject.put("phoneNumbers", phoneNumbers);
+        jsonObject.put("message", smsString);
+        jsonObject.put("confidential", false);
+      } catch (JSONException e) {
+        log.error("Exception occurred while preparing payload ", e);
+      }
+      HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
+      log.info("sms api from properties {}", smsApi);
+      String url = rootUrl.concat(smsApi);
+      ResponseEntity responseEng = restTemplate.exchange(url,
+          HttpMethod.POST, entity, Object.class);
+
+      if (responseEng == null) {
+        throw new ZoomException("SMS is not sent properly");
+      }
+      return responseEng.toString();
     }
+    return SMS_SERVER_URL_ABSENT;
+  }
 }

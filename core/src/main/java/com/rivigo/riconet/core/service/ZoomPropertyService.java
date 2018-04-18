@@ -48,6 +48,18 @@ public class ZoomPropertyService {
         return property.getVariableValue();
     }
 
+    public String getString(ZoomPropertyName propertyName, String defaultValue) {
+        ZoomProperty property = getByPropertyName(propertyName.name());
+        if (property == null)
+            return defaultValue;
+
+        if (property.getVariableValue() == null) {
+            return defaultValue;
+        }
+
+        return property.getVariableValue();
+    }
+
     public boolean getBoolean(ZoomPropertyName propertyName, boolean defaultVal) {
         ZoomProperty property = getByPropertyName(propertyName.name());
         if (property == null)
