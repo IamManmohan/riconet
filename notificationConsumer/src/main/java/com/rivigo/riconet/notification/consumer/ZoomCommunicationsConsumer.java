@@ -25,7 +25,8 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
   private ZoomCommunicationsService zoomCommunicationsService;
 
   public ZoomCommunicationsConsumer() {
-    super(Topic.zoom_communication_sms_prod_sink.name(), Topic.zoom_communication_sms_prod_sink_error.name(), 5l);
+    super("sms_sink", Topic.zoom_communication_sms_prod_sink_error.name(), 5l);
+//    super(Topic.zoom_communication_sms_prod_sink.name(), Topic.zoom_communication_sms_prod_sink_error.name(), 5l);
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
