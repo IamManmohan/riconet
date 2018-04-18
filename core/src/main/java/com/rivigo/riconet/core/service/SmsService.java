@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,9 +68,12 @@ public class SmsService {
     if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
       phoneNumbers.add(mobileNo);
     } else {
-      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER);
-      log.info("Default phone no is : " + defaultPhone);
-      phoneNumbers.add(defaultPhone);
+      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
+      String[] defaultPhones = defaultPhone.split(",");
+      Arrays.stream(defaultPhones).forEach(phoneNumber -> {
+        log.info("Default phone no is : " + defaultPhone);
+        phoneNumbers.add(phoneNumber);
+      });
       smsString = mobileNo + " - " + smsString;
     }
 
