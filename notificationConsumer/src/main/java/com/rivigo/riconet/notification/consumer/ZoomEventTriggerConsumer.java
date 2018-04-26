@@ -4,57 +4,55 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
-import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
-import com.rivigo.riconet.core.service.ZoomCommunicationsService;
-import com.rivigo.zoom.common.enums.Topic;
+import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.service.EventTriggerService;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 /**
- * Created by aditya on 22/2/18.
+ * Created by ashfakh on 19/4/18.
  */
+
 @Slf4j
 @Component
-public class ZoomCommunicationsConsumer extends ConsumerModel {
+public class ZoomEventTriggerConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
   @Autowired
-  private ZoomCommunicationsService zoomCommunicationsService;
+  private EventTriggerService eventTriggerService;
 
   @Autowired
   private TopicNameConfig topicNameConfig;
 
-  public ZoomCommunicationsConsumer() {
+  public ZoomEventTriggerConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   @Override
   public String getTopic() {
-    return topicNameConfig.SMS_SINK();
+    return topicNameConfig.ENRICHED_EVENT_SINK_TOPIC();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.SMS_SINK_ERROR();
+    return topicNameConfig.ENRICHED_EVENT_SINK_ERROR_TOPIC();
   }
 
   @Override
   public String processMessage(String str) throws IOException {
-    log.info("Processing message in ZoomCommunicationConsumer {}", str);
-    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;
+    log.info("Processing message in ZoomEventTrigger {}", str);
+    NotificationDTO notificationDTO = null;
     try {
-      zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
-      log.debug("ZoomCommunicationsSMSDTO {}", zoomCommunicationsSMSDTO);
+      notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
+      log.debug("NotificationDTO {}", notificationDTO);
+      eventTriggerService.processNotification(notificationDTO);
     } catch (Exception e) {
       log.error("failed", e);
     }
-    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
     return str;
   }
-
 }

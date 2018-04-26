@@ -19,21 +19,31 @@ import java.util.List;
 public class PickupNotificationConsumer extends ConsumerModel {
 
   @Autowired
-  PickupService pickupService;
+  private PickupService pickupService;
 
-  ObjectMapper objectMapper ;
+  private ObjectMapper objectMapper;
 
-  public String processMessage(String str) throws IOException {
-    List<PickupNotificationDTO> pickupNotificationDTOList=null;
-    TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {};
-    pickupNotificationDTOList= objectMapper.readValue(str, mapType);
-    pickupService.processPickupNotificationDTOList(pickupNotificationDTOList);
-    return str;
+  public PickupNotificationConsumer() {
+    objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public PickupNotificationConsumer(){
-    super(Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION_ERROR.name(),5l);
-    objectMapper=new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  @Override
+  public String getTopic() {
+    return Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION.name();
+  }
+
+  @Override
+  public String getErrorTopic() {
+    return Topic.COM_RIVIGO_ZOOM_PICKUP_NOTIFICATION_ERROR.name();
+  }
+
+  public String processMessage(String str) throws IOException {
+    List<PickupNotificationDTO> pickupNotificationDTOList = null;
+    TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {
+    };
+    pickupNotificationDTOList = objectMapper.readValue(str, mapType);
+    pickupService.processPickupNotificationDTOList(pickupNotificationDTOList);
+    return str;
   }
 }

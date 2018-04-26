@@ -18,20 +18,30 @@ import java.io.IOException;
 public class AppointmentNotificationConsumer extends ConsumerModel {
 
   @Autowired
-  ConsignmentAppointmentService consignmentAppointmentService;
+  private ConsignmentAppointmentService consignmentAppointmentService;
 
-  ObjectMapper objectMapper ;
+  private ObjectMapper objectMapper;
+
+  public AppointmentNotificationConsumer() {
+    objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  }
+
+  @Override
+  public String getTopic() {
+    return Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION.name();
+  }
+
+  @Override
+  public String getErrorTopic() {
+    return Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION_ERROR.name();
+  }
 
   public String processMessage(String str) throws IOException {
-    TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {};
+    TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {
+    };
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
     return str;
-  }
-
-  public AppointmentNotificationConsumer(){
-    super(Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION_ERROR.name(),5L);
-    objectMapper=new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 }

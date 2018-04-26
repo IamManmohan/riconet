@@ -1,10 +1,15 @@
 package com.rivigo.riconet.core.service;
 
 import com.amazonaws.util.StringUtils;
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -90,15 +90,11 @@ public class SmsService {
 
       log.info("notificationClientCode from properties {}", notificationClientCode);
       headers.set(X_USER_AGENT_HEADER, notificationClientCode);
-      JSONObject jsonObject = new JSONObject();
-
-      try {
-        jsonObject.put("phoneNumbers", phoneNumbers);
-        jsonObject.put("message", smsString);
-        jsonObject.put("confidential", false);
-      } catch (JSONException e) {
-        log.error("Exception occurred while preparing payload ", e);
-      }
+      ObjectMapper mapper = new ObjectMapper();
+      ObjectNode jsonObject=mapper.createObjectNode();
+      jsonObject.putPOJO("phoneNumbers", phoneNumbers);
+      jsonObject.put("message", smsString);
+      jsonObject.put("confidential", false);
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
       log.info("sms api from properties {}", smsApi);
       String url = rootUrl.concat(smsApi);

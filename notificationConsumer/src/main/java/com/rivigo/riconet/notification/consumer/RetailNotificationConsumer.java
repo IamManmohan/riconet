@@ -21,20 +21,30 @@ public class RetailNotificationConsumer extends ConsumerModel {
   @Autowired
   private RetailService retailService;
 
-  private ObjectMapper objectMapper ;
+  private ObjectMapper objectMapper;
 
-  public String processMessage(String str) throws IOException {
-    List<RetailNotificationDTO> retailNotificationDTOList=null;
-    TypeReference<List<RetailNotificationDTO>> mapType = new TypeReference<List<RetailNotificationDTO>>() {};
-    retailNotificationDTOList= objectMapper.readValue(str, mapType);
-    log.info("retail notification recieved {}",str);
-    retailService.processRetailNotificationDTOList(retailNotificationDTOList);
-    return str;
+  public RetailNotificationConsumer() {
+    objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public RetailNotificationConsumer(){
-    super(Topic.COM_RIVIGO_ZOOM_RETAIL_NOTIFICATION.name(),Topic.COM_RIVIGO_ZOOM_RETAIL_NOTIFICATION_ERROR.name(),5l);
-    objectMapper=new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  @Override
+  public String getTopic() {
+    return Topic.COM_RIVIGO_ZOOM_RETAIL_NOTIFICATION.name();
+  }
+
+  @Override
+  public String getErrorTopic() {
+    return Topic.COM_RIVIGO_ZOOM_RETAIL_NOTIFICATION_ERROR.name();
+  }
+
+  public String processMessage(String str) throws IOException {
+    List<RetailNotificationDTO> retailNotificationDTOList = null;
+    TypeReference<List<RetailNotificationDTO>> mapType = new TypeReference<List<RetailNotificationDTO>>() {
+    };
+    retailNotificationDTOList = objectMapper.readValue(str, mapType);
+    log.info("retail notification recieved {}", str);
+    retailService.processRetailNotificationDTOList(retailNotificationDTOList);
+    return str;
   }
 }

@@ -10,6 +10,7 @@ import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
+import com.rivigo.riconet.notification.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import com.typesafe.config.Config;
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
@@ -30,54 +30,51 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NotificationMain {
 
-    @Value("bootstrap.servers")
-    private static String bootstrapServers;
+  @Autowired
+  private DEPSNotificationConsumer depsNotificationConsumer;
 
-    @Value("group.id")
-    private static String groupId;
+  @Autowired
+  private DocIssueNotificationConsumer docIssueNotificationConsumer;
 
-    @Autowired
-    private DEPSNotificationConsumer depsNotificationConsumer;
+  @Autowired
+  private PickupNotificationConsumer pickupNotificationConsumer;
 
-    @Autowired
-    private DocIssueNotificationConsumer docIssueNotificationConsumer;
+  @Autowired
+  private AppointmentNotificationConsumer appointmentNotificationConsumer;
 
-    @Autowired
-    private PickupNotificationConsumer pickupNotificationConsumer;
+  @Autowired
+  private RetailNotificationConsumer retailNotificationConsumer;
 
-    @Autowired
-    private AppointmentNotificationConsumer appointmentNotificationConsumer;
+  @Autowired
+  private ZoomCommunicationsConsumer zoomCommunicationsConsumer;
 
-    @Autowired
-    private RetailNotificationConsumer retailNotificationConsumer;
+  @Autowired
+  private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
 
-    @Autowired
-    private ZoomCommunicationsConsumer zoomCommunicationsConsumer;
+  public static void main(String[] args) {
+    final ActorSystem system = ActorSystem.create("notifications");
+    final ActorMaterializer materializer = ActorMaterializer.create(system);
+    ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    NotificationMain consumer = context.getBean(NotificationMain.class);
+    Config config = ConfigFactory.load();
+    String bootstrapServers = config.getString("bootstrap.servers");
+    log.info("Bootstrap servers are: {}", bootstrapServers);
+    String groupId = config.getString("group.id");
+    final ConsumerSettings<String, String> consumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(groupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+    consumer.load(materializer, consumerSettings);
+  }
 
-    public static void main(String[] args){
-        final ActorSystem system = ActorSystem.create("notifications");
-        final ActorMaterializer materializer = ActorMaterializer.create(system);
-        ApplicationContext context= new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
-        NotificationMain consumer=context.getBean(NotificationMain.class);
-        Config config= ConfigFactory.load();
-        bootstrapServers=config.getString("bootstrap.servers");
-        log.info("Bootstrap servers are: ");
-        log.info(bootstrapServers);
-        groupId=config.getString("group.id");
-        final ConsumerSettings<String, String> consumerSettings =
-                ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-                        .withBootstrapServers(bootstrapServers)
-                        .withGroupId(groupId)
-                        .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        consumer.load(materializer,consumerSettings);
-    }
-
-    public void load(ActorMaterializer materializer,ConsumerSettings<String, String> consumerSettings){
-        depsNotificationConsumer.load(materializer,consumerSettings);
-        docIssueNotificationConsumer.load(materializer,consumerSettings);
-        pickupNotificationConsumer.load(materializer,consumerSettings);
-        appointmentNotificationConsumer.load(materializer,consumerSettings);
-        retailNotificationConsumer.load(materializer,consumerSettings);
-        zoomCommunicationsConsumer.load(materializer,consumerSettings);
-    }
+  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+    depsNotificationConsumer.load(materializer, consumerSettings);
+    docIssueNotificationConsumer.load(materializer, consumerSettings);
+    pickupNotificationConsumer.load(materializer, consumerSettings);
+    appointmentNotificationConsumer.load(materializer, consumerSettings);
+    retailNotificationConsumer.load(materializer, consumerSettings);
+    zoomCommunicationsConsumer.load(materializer, consumerSettings);
+    zoomEventTriggerConsumer.load(materializer, consumerSettings);
+  }
 }

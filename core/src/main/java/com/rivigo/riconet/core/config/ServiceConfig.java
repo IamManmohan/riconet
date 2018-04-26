@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 @ComponentScan(basePackages = {
     "com.rivigo.riconet.notification",
     "com.rivigo.riconet.core.service",
+    "com.rivigo.riconet.core.config",
     "com.rivigo.riconet.core.test.consumer"
 })
 

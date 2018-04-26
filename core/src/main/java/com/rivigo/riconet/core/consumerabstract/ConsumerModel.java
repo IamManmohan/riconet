@@ -38,116 +38,117 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public abstract class ConsumerModel {
 
-    private final String topic;
+  public abstract String getTopic();
 
-    private final String errorTopic;
+  public abstract String getErrorTopic();
 
-    private final Long numRetries;
+  /**
+   * For all the consumers default
+   * retries are 5. One can change this number
+   * by overriding this in the respective consumer
+   * @return
+   */
+  public Long getNumRetries() {
+    return 5L;
+  }
 
-    @Autowired
-    ExecutorService executorService;
+  private final AtomicLong offset = new AtomicLong();
 
-    @Autowired
-    ConsumerMessagesRepository consumerMessagesRepository;
+  @Autowired
+  private ExecutorService executorService;
 
-    @Autowired
-    KafkaTemplate kafkaTemplate;
+  @Autowired
+  private ConsumerMessagesRepository consumerMessagesRepository;
 
-    private Timer timer = new HashedWheelTimer();
+  @Autowired
+  private KafkaTemplate kafkaTemplate;
 
-    private final AtomicLong offset = new AtomicLong();
+  private Timer timer = new HashedWheelTimer();
 
-    public ConsumerModel(String topic, String errorTopic,Long numRetries) {
-        this.topic = topic;
-        this.errorTopic = errorTopic;
-        this.numRetries =numRetries;
-    }
+  public static String getStackTrace(Throwable t) {
+    StringWriter sw = new StringWriter();
+    t.printStackTrace(new PrintWriter(sw));
+    return sw.toString();
+  }
 
-    @Async
-    private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
-        if (record.topic().toString().equals(topic)) {
-            executorService.submit(() -> {
-                try {
-                    processMessage(record.value());
-                } catch (Exception e) {
-                    String errorMsg=getStackTrace(e);
-                    processFirstTimeError(record.value(),errorMsg);
-                    log.error("First time error", e);
-                }
-            });
-        } else if (record.topic().toString().equals(errorTopic)) {
-            executorService.submit(() -> {
-                ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
-                try {
-                    processMessage(consumerMessages.getMessage());
-                } catch (Exception e) {
-                    String errorMsg=getStackTrace(e);
-                    processError(consumerMessages,errorMsg);
-                    log.error("error", e);
-                }
-            });
+  @Async
+  private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
+    if (record.topic().equals(getTopic())) {
+      executorService.submit(() -> {
+        try {
+          processMessage(record.value());
+        } catch (Exception e) {
+          String errorMsg = getStackTrace(e);
+          processFirstTimeError(record.value(), errorMsg);
+          log.error("First time error", e);
         }
-        offset.set(record.offset());
-        return CompletableFuture.completedFuture(Done.getInstance());
-    }
-
-    private CompletionStage<Long> loadOffset() {
-        return CompletableFuture.completedFuture(offset.get());
-    }
-
-    public abstract String processMessage(String str) throws IOException;
-
-    String processError(ConsumerMessages consumerMessage,String errorMsg) {
-        log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount()+1L) + errorMsg );
-        if (consumerMessage.getRetryCount() < numRetries) {
-            consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
-            consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
-            consumerMessage.setErrorMsg(consumerMessage.getErrorMsg()+", Retry number "+consumerMessage.getRetryCount().toString()+" "+errorMsg);
-            consumerMessagesRepository.save(consumerMessage);
-            ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
-            timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
+      });
+    } else if (record.topic().equals(getErrorTopic())) {
+      executorService.submit(() -> {
+        ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
+        try {
+          processMessage(consumerMessages.getMessage());
+        } catch (Exception e) {
+          String errorMsg = getStackTrace(e);
+          processError(consumerMessages, errorMsg);
+          log.error("error", e);
         }
-        return consumerMessage.getMessage();
+      });
     }
+    offset.set(record.offset());
+    return CompletableFuture.completedFuture(Done.getInstance());
+  }
 
-    String processFirstTimeError(String str,String errorMsg) {
-        log.error(" Processing first time error" + errorMsg);
-        ConsumerMessages consumerMessage = new ConsumerMessages();
-        consumerMessage.setId(topic + DateTime.now().getMillis());
-        consumerMessage.setMessage(str);
-        consumerMessage.setRetryCount(1L);
-        consumerMessage.setTopic(topic);
-        consumerMessage.setCreatedAt(DateTime.now().getMillis());
-        consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
-        consumerMessage.setErrorMsg("1"+errorMsg);
+  private CompletionStage<Long> loadOffset() {
+    return CompletableFuture.completedFuture(offset.get());
+  }
 
-        consumerMessagesRepository.save(consumerMessage);
-        ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), errorTopic, kafkaTemplate);
-        timer.newTimeout(task, 5, TimeUnit.MINUTES);
+  public abstract String processMessage(String str) throws IOException;
 
-        return str;
+  String processError(ConsumerMessages consumerMessage, String errorMsg) {
+    log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount() + 1L) + errorMsg);
+    if (consumerMessage.getRetryCount() < getNumRetries()) {
+      consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
+      consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
+      consumerMessage.setErrorMsg(consumerMessage.getErrorMsg() + ", Retry number " + consumerMessage.getRetryCount().toString() + " " + errorMsg);
+      consumerMessagesRepository.save(consumerMessage);
+      ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
+      timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
     }
+    return consumerMessage.getMessage();
+  }
 
-    public static String getStackTrace(Throwable t) {
-        StringWriter sw = new StringWriter();
-        t.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
+  String processFirstTimeError(String str, String errorMsg) {
+    log.error(" Processing first time error" + errorMsg);
+    ConsumerMessages consumerMessage = new ConsumerMessages();
+    consumerMessage.setId(getTopic() + DateTime.now().getMillis());
+    consumerMessage.setMessage(str);
+    consumerMessage.setRetryCount(1L);
+    consumerMessage.setTopic(getTopic());
+    consumerMessage.setCreatedAt(DateTime.now().getMillis());
+    consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
+    consumerMessage.setErrorMsg("1" + errorMsg);
+
+    consumerMessagesRepository.save(consumerMessage);
+    ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
+    timer.newTimeout(task, 5, TimeUnit.MINUTES);
+
+    return str;
+  }
+
+  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+    Set<String> topics = new HashSet<>();
+    topics.add(getTopic());
+    topics.add(getErrorTopic());
 
 
-    public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
-        Set<String> topics = new HashSet<>();
-        topics.add(topic);
-        topics.add(errorTopic);
-
-
-        this.loadOffset()
-                .thenAccept(fromOffset -> Consumer
-                        .plainSource(
-                                consumerSettings,
-                                Subscriptions.topics(topics)
-                        )
-                        .mapAsync(1, this::save)
-                        .runWith(Sink.ignore(), materializer));
-    }
+    this.loadOffset()
+        .thenAccept(fromOffset -> Consumer
+            .plainSource(
+                consumerSettings,
+                Subscriptions.topics(topics)
+            )
+            .mapAsync(1, this::save)
+            .runWith(Sink.ignore(), materializer));
+  }
 }
