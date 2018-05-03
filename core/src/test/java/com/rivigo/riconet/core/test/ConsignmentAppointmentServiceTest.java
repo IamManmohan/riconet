@@ -28,7 +28,7 @@ import java.util.List;
 
 
 @Slf4j
-public class ConsignmentAppointmentServiceTest extends TesterBase {
+public class ConsignmentAppointmentServiceTest {
 
     @Autowired
     ConsignmentAppointmentService consignmentAppointmentService;
@@ -45,7 +45,7 @@ public class ConsignmentAppointmentServiceTest extends TesterBase {
         return str;
     }
 
-    @Test
+    
     public void appointmentMissedSummaryNotification() throws IOException {
         ConsignmentAppointmentRecord appointment=consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l,true);
         appointment.setAppointmentTime(DateTime.now().minusDays(1));
@@ -54,13 +54,13 @@ public class ConsignmentAppointmentServiceTest extends TesterBase {
         processMessage(str);
     }
 
-    @Test
+    
     public void appointmentNotOfdNotification() throws IOException {
         String str ="{\"notificationType\":\"APPOINTMENT_NOT_OFD_FIRST_HALF\"}";
         processMessage(str);
     }
 
-    @Test
+    
     public void appointmentMissedNotification() throws IOException {
         ConsignmentAppointmentRecord appointment=consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l,true);
         appointment.setAppointmentTime(DateTime.now().minusMinutes(30));
@@ -70,7 +70,7 @@ public class ConsignmentAppointmentServiceTest extends TesterBase {
         processMessage(str);
     }
 
-    @Test
+    
     public void appointmentDeliveredLateNotification() throws IOException {
         AppointmentNotificationDTO dto=new AppointmentNotificationDTO();
         dto.setConsignmentId(11l);
@@ -82,7 +82,7 @@ public class ConsignmentAppointmentServiceTest extends TesterBase {
         processMessage(str);
     }
 
-    @Test
+    
     public void appointmentDeliveredDayLateNotification() throws IOException {
         AppointmentNotificationDTO dto=new AppointmentNotificationDTO();
         dto.setConsignmentId(11l);

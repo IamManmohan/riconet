@@ -38,6 +38,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public abstract class ConsumerModel {
 
+  public static final Long NUM_RETRIES=5l;
+
   public abstract String getTopic();
 
   public abstract String getErrorTopic();
@@ -49,7 +51,7 @@ public abstract class ConsumerModel {
    * @return
    */
   public Long getNumRetries() {
-    return 5L;
+    return NUM_RETRIES;
   }
 
   private final AtomicLong offset = new AtomicLong();

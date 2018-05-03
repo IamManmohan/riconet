@@ -1,5 +1,6 @@
 package com.rivigo.riconet.notification.consumer;
 
+import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
@@ -17,6 +18,9 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
 
   @Autowired
   private DocumentIssueNotificationService documentIssueNotificationService;
+
+  @Autowired
+  private TopicNameConfig topicNameConfig;
 
   @Override
   public String getTopic() {

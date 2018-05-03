@@ -3,6 +3,7 @@ package com.rivigo.riconet.notification.consumer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.ConsignmentAppointmentService;
 import com.rivigo.zoom.common.dto.AppointmentNotificationDTO;
@@ -36,6 +37,9 @@ public class AppointmentNotificationConsumer extends ConsumerModel {
   public String getErrorTopic() {
     return Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION_ERROR.name();
   }
+
+  @Autowired
+  private TopicNameConfig topicNameConfig;
 
   public String processMessage(String str) throws IOException {
     TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {
