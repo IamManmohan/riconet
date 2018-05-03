@@ -1,22 +1,21 @@
 package com.rivigo.riconet.core.service;
 
 
-import com.rivigo.common.util.MailUtils;
 import com.rivigo.zoom.common.enums.EmailDlName;
 import com.rivigo.zoom.common.model.EmailDL;
 import com.rivigo.zoom.common.pojo.AbstractMailNotificationEntity;
 import com.rivigo.zoom.common.repository.mysql.EmailDLRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.stereotype.Service;
-
+import com.rivigo.zoom.common.utils.MailUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.stereotype.Service;
 
 
 @Service
