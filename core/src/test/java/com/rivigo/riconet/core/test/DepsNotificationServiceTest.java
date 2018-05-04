@@ -54,21 +54,21 @@ public class DepsNotificationServiceTest extends TesterBase {
 
     }
 
-    @Test
+    //@Test
     public void prsUnloadingNotification()
     {
         String str ="[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]";
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void tripUnloadingNotification()
     {
         String str ="[{\"id\":2,\"consignmentId\":2,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"TRIP\",\"taskId\":3,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"UNLOADING\"}]";
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void returnScanNotification()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
@@ -81,7 +81,7 @@ public class DepsNotificationServiceTest extends TesterBase {
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void returnScanNotification2()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
@@ -94,7 +94,7 @@ public class DepsNotificationServiceTest extends TesterBase {
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void returnScanNotification3()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
@@ -106,7 +106,7 @@ public class DepsNotificationServiceTest extends TesterBase {
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void returnScanNotification4()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,1l);
@@ -118,7 +118,7 @@ public class DepsNotificationServiceTest extends TesterBase {
         processNotification(str);
     }
 
-    @Test
+    //@Test
     public void instockNotification()
     {
         String str ="[{\"id\":4,\"consignmentId\":3,\"depsType\":\"SHORTAGE\",\"taskId\":25,\"reportedById\":1505,\"inboundLocationId\":20,\"depsTaskType\":\"STOCK_CHECK\"}]";

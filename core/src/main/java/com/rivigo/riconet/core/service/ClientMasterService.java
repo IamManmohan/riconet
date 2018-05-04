@@ -1,23 +1,12 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.zoom.common.model.Client;
-import com.rivigo.zoom.common.repository.mysql.ClientRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
-public class ClientMasterService {
+public interface ClientMasterService {
 
-    @Autowired
-    ClientRepository clientRepository;
+  Client getClientById(Long id);
 
-    public Client getClientById(Long id) {
-        return clientRepository.findOne(id);
-    }
-
-    public Client getClientByCode(String code) {
-        return clientRepository.findByClientCode(code);
-    }
+  Client getClientByCode(String code);
 }

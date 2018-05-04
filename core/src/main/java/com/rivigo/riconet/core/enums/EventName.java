@@ -5,9 +5,12 @@ package com.rivigo.riconet.core.enums;
  */
 public enum EventName {
   DEFAULT,
-  /**
-   * Events to be consumed by external users
-   */
+  CN_COMPLETION_ALL_INSTANCES,
+  CN_RECEIVED_AT_OU,
+  CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU,
+  CN_RECIEVED_AT_OU_ALL_INSTANCES,
+  CN_CNOTE_TYPE_CHANGED_FROM_NORMAL,
+
   CN_CREATION,
   CN_COMPLETION,
   PICKUP_CREATION,
@@ -27,8 +30,5 @@ public enum EventName {
   CN_PAYMENT_DETAILS_V2_UPDATE,
   CN_DELIVERY,
 
-  /**
-   * Events to be consumed by system
-   */
   CLIENT_USER_CREATION,
 }

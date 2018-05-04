@@ -3,6 +3,7 @@ package com.rivigo.riconet.notification.consumer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.DEPSRecordService;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
@@ -10,15 +11,14 @@ import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
 import com.rivigo.zoom.common.enums.DEPSType;
 import com.rivigo.zoom.common.enums.Topic;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
@@ -44,6 +44,9 @@ public class DEPSNotificationConsumer extends ConsumerModel {
   public String getErrorTopic() {
     return Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name();
   }
+
+  @Autowired
+  private TopicNameConfig topicNameConfig;
 
   public String processMessage(String str) throws IOException {
     DEPSNotificationContext context = null;

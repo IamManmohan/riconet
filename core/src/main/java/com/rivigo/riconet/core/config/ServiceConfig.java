@@ -2,21 +2,26 @@ package com.rivigo.riconet.core.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.client.RestTemplate;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @ComponentScan(basePackages = {
     "com.rivigo.riconet.notification",
     "com.rivigo.riconet.core.service",
+    "com.rivigo.riconet.core.test.consumer",
+    "com.rivigo.oauth2.resource.service",
+    "com.rivigo.riconet.ruleengine",
     "com.rivigo.riconet.core.config",
     "com.rivigo.riconet.core.test.consumer"
 })
@@ -55,4 +60,14 @@ public class ServiceConfig {
   ObjectMapper getObjectMapper() {
     return new ObjectMapper();
   }
+
+  @Bean(
+      name = {"myProperties"}
+  )
+  public static PropertiesFactoryBean mapper(@Value("${login.profiles.active:staging}") String classPath) {
+    PropertiesFactoryBean bean = new PropertiesFactoryBean();
+    bean.setLocation(new ClassPathResource(classPath + "/authresource.properties"));
+    return bean;
+  }
+
 }

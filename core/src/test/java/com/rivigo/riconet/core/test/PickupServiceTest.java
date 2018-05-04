@@ -28,7 +28,7 @@ import java.util.List;
 
 
 @Slf4j
-public class PickupServiceTest extends TesterBase {
+public class PickupServiceTest {
     @Autowired
     PickupService pickupService;
 
@@ -46,49 +46,49 @@ public class PickupServiceTest extends TesterBase {
         return str;
     }
 
-    @Test
+    
     public void createPickup()
     {
         String str ="[{\"id\":1,\"lastUpdatedAt\":1510036034224,\"notificationType\":\"PICKUP_CREATED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void createPickupBpAutoAssign()
     {
         String str ="[{\"id\":2,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_CREATED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void AssignBp()
     {
         String str ="[{\"id\":3,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void AssignBpCaptain()
     {
         String str ="[{\"id\":4,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void AssignZoomUser()
     {
         String str ="[{\"id\":5,\"lastUpdatedAt\":1510037019087,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void markPickupReached()
     {
         String str ="[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
         processMessage(str);
     }
 
-    @Test
+    
     public void initiateDelayedPickupsNotification()
     {
         String str ="[{\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_DELAYED\"}]";

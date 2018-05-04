@@ -174,4 +174,8 @@ public enum ZoomPropertyName {
     , ZOOM_COMMUNICATION_DND_START_TIME
     , ZOOM_COMMUNICATION_DND_END_TIME
 
+    /**Rule engine consttants*/
+    , MINIMUM_NUMBER_OF_CN_REQUIRED
+    , REQUIRED_CLIENT_TYPE
+
 }

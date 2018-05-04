@@ -1,44 +1,20 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.repository.mysql.ZoomUserRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-@Slf4j
 @Service
-public class ZoomUserMasterService {
+public interface ZoomUserMasterService {
 
-    @Autowired
-    ZoomUserRepository zoomUserRepository;
+  ZoomUser getZoomUser(String userName);
 
-    public ZoomUser getZoomUser(String userName) {
-        return zoomUserRepository.findByEmail(userName);
-    }
+  List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId, String zoomUserType,
+      String excludedZoomUserType);
 
-    public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId, String zoomUserType, String excludedZoomUserType) {
-        if (zoomUserType == null) {
-            throw new ZoomException("ZoomUserType cannot be null or empty.");
-        }
-        return zoomUserRepository.findByLocationIdAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus
-                (locationId, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
-    }
+  List<ZoomUser> getActiveZoomUsersByLocationInAndZoomUserType(List<Long> locationIdList,
+      String zoomUserType, String excludedZoomUserType);
 
-    public List<ZoomUser> getActiveZoomUsersByLocationInAndZoomUserType(List<Long> locationIdList, String zoomUserType, String excludedZoomUserType) {
-        if (zoomUserType == null) {
-            throw new ZoomException("ZoomUserType cannot be null or empty.");
-        }
-        return zoomUserRepository.findByLocationIdInAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus
-                (locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
-   }
-
-    public ZoomUser getByUserId(Long userId){
-        return zoomUserRepository.findByUserId(userId);
-    }
+  ZoomUser getByUserId(Long userId);
 
 }
