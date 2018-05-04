@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 
-import com.rivigo.common.util.MailUtils;
+import com.rivigo.zoom.common.utils.MailUtils;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.zoom.common.enums.EmailDlName;
 import com.rivigo.zoom.common.model.EmailDL;
