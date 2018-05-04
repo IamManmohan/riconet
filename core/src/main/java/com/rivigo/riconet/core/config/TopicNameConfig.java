@@ -4,48 +4,53 @@ package com.rivigo.riconet.core.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @Slf4j
 @SuppressWarnings("unused")
-@Component
 public class TopicNameConfig {
 
   @Value("${RAW_EVENT_SINK}")
-  private String RAW_EVENT_SINK;
+  private String rawEventSink;
 
   @Value("${ENRICHED_EVENT_SINK}")
-  private String ENRICHED_EVENT_SINK;
+  private String enrichedEventSink;
+
+  @Value("${RAW_EVENT_SINK_ERROR}")
+  private String rawEventSinkError;
 
   @Value("${ENRICHED_EVENT_SINK_ERROR}")
-  private String ENRICHED_EVENT_SINK_ERROR;
+  private String enrichedEventSinkError;
 
   @Value("${SMS_SINK}")
-  private String SMS_SINK;
+  private String smsSink;
 
   @Value("${SMS_SINK_ERROR}")
-  private String SMS_SINK_ERROR;
+  private String smsSinkError;
 
 
-  public String ENRICHED_EVENT_SINK_TOPIC() {
-    return ENRICHED_EVENT_SINK;
+  public String enrichedEventSinkTopic() {
+    return enrichedEventSink;
   }
 
-  public String ENRICHED_EVENT_SINK_ERROR_TOPIC() {
-    return ENRICHED_EVENT_SINK_ERROR;
+  public String rawEventSinkTopic() {
+    return rawEventSink;
   }
 
-  public String RAW_EVENT_SINK() {
-    return RAW_EVENT_SINK;
+  public String enrichedEventSinkErrorTopic() {
+    return enrichedEventSinkError;
   }
 
-  public String SMS_SINK() {
-    return SMS_SINK;
+  public String rawEventSinkErrorTopic() {
+    return rawEventSinkError;
   }
 
-  public String SMS_SINK_ERROR() {
-    return SMS_SINK_ERROR;
+  public String smsSink() {
+    return smsSink;
+  }
+
+  public String smsSinkError() {
+    return smsSinkError;
   }
 
 }

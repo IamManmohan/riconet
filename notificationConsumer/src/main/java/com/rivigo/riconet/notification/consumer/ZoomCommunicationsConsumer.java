@@ -6,12 +6,10 @@ import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.service.ZoomCommunicationsService;
-import com.rivigo.zoom.common.enums.Topic;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 /**
  * Created by aditya on 22/2/18.
@@ -35,15 +33,16 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.SMS_SINK();
+    log.info(" Zoom Communication Consumer topic {}", topicNameConfig.smsSink());
+    return topicNameConfig.smsSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.SMS_SINK_ERROR();
+    log.info(" Zoom Communication Consumer error topic {}", topicNameConfig.smsSinkError());
+    return topicNameConfig.smsSinkError();
   }
 
-  @Override
   public String processMessage(String str) throws IOException {
     log.info("Processing message in ZoomCommunicationConsumer {}", str);
     ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;

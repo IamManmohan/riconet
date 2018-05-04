@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 
 @Slf4j
-public class ZoomPropertyServiceTest extends TesterBase {
+public class ZoomPropertyServiceTest {
 
     @Autowired
     ZoomPropertyService zoomPropertyService;
@@ -25,7 +25,7 @@ public class ZoomPropertyServiceTest extends TesterBase {
     @Autowired
     ZoomPropertiesRepository zoomPropertiesRepository;
 
-    @Test
+    
     public void nullChecks(){
         zoomPropertyService.getByPropertyName("");
         zoomPropertyService.getString(ZoomPropertyName.TESTING);
@@ -47,13 +47,13 @@ public class ZoomPropertyServiceTest extends TesterBase {
         zoomPropertyService.getByPropertyName(ZoomPropertyName.BOOLEAN_TESTING.name());
     }
 
-    @Test
+    
     public void defaultProperty(){
         zoomPropertyService.getBoolean(ZoomPropertyName.TESTING,true);
         zoomPropertyService.getInteger(ZoomPropertyName.TESTING,1);
     }
 
-    @Test
+    
     public void testBooleanProperty(){
         ZoomProperty zoomProperty=zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(),1).get(0);
         zoomProperty.setVariableValue("true");
@@ -76,7 +76,7 @@ public class ZoomPropertyServiceTest extends TesterBase {
         zoomPropertyService.getBoolean(ZoomPropertyName.BOOLEAN_TESTING,true);
     }
 
-    @Test
+    
     public void testIntegerProperty(){
         ZoomProperty zoomProperty=zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.INTEGER_TESTING.name(),1).get(0);
         zoomProperty.setVariableValue("1");

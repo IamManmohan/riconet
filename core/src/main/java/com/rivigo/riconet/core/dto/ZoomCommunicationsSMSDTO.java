@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Created by aditya on 23/2/18.
  */
@@ -20,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class ZoomCommunicationsSMSDTO {
-  private final Boolean confidential = Boolean.TRUE;
+  private Boolean confidential = Boolean.TRUE;
 
   private String message;
   private String phoneNumber;

@@ -30,7 +30,7 @@ import java.util.List;
  */
 
 @Slf4j
-public class DocIssueNotificationServiceTest extends TesterBase {
+public class DocIssueNotificationServiceTest {
 
     @Autowired
     DocumentIssueNotificationService documentIssueNotificationService;
@@ -61,7 +61,7 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         return str;
     }
 
-    @Test
+    
     public void prsUnloadingNotification()
     {
         List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(8l);
@@ -71,14 +71,14 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         processMessage("8|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
-    @Test
+    
     public void documentNonMissingNotification()
     {
 
         processMessage("8|1505|lol|RECEIVED_AT_OU");
     }
 
-    @Test
+    
     public void vehicleUnloadingWithinTwoHoursNotification()
     {
         List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
@@ -88,7 +88,7 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
-    @Test
+    
     public void vehicleUnloadingAfterTwoHoursNotification()
     {
         List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
@@ -99,7 +99,7 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
     }
 
-    @Test
+    
     public void undeliveredNotification1()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,2l);
@@ -110,7 +110,7 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         processMessage("10|1505|Invoice missing|UNDELIVERED");
     }
 
-    @Test
+    
     public void undeliveredNotification2()
     {
         TransportationPartnerMapping tpm=transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS,2l);
@@ -121,9 +121,8 @@ public class DocIssueNotificationServiceTest extends TesterBase {
         processMessage("10|1505|Invoice missing|UNDELIVERED");
     }
 
-    @Test(expected = ZoomException.class)
     public void noUser(){
-        processMessage("10|150500|lol|UNDELIVERED");
+        processMessage("10|150500|invalid|UNDELIVERED");
     }
 
 

@@ -34,12 +34,12 @@ public class ZoomEventTriggerConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.ENRICHED_EVENT_SINK_TOPIC();
+    return topicNameConfig.enrichedEventSinkTopic();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.ENRICHED_EVENT_SINK_ERROR_TOPIC();
+    return topicNameConfig.enrichedEventSinkErrorTopic();
   }
 
   @Override

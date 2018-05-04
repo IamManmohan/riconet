@@ -1,18 +1,14 @@
 package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -64,7 +60,7 @@ public class TicketingClientService {
           .queryParams(queryParams);
       ResponseEntity<JsonNode> responseEntity = restTemplate.exchange(builder.build().encode().toUri(),HttpMethod.PUT, entity, JsonNode.class);
       log.info("call made successfully, response {}" , responseEntity);
-      JsonNode responseJson = responseEntity.getBody();
+      responseEntity.getBody();
     } catch (Exception e) {
       log.error("Unknown exception while trying to make request to ticketing {}, Exception is {}", requestUrl,e);
       throw new ZoomException("Unknown exception while trying to make request to ticketing");
