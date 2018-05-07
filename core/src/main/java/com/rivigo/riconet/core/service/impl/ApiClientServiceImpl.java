@@ -103,6 +103,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     log.debug("Calling  {} ", uri);
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
+      log.info("No existing token found. New token is being generated ");
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
       accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
@@ -115,6 +116,7 @@ public class ApiClientServiceImpl implements ApiClientService {
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
+        log.info("Existing token expired. New token is being generated ");
         token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
         accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
         HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto,uri);
