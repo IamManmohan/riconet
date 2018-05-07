@@ -104,6 +104,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
+      accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
     HttpEntity<Object> entity = getHttpEntity(getHeaders(token), dto,uri);
     RestTemplate restTemplate = new RestTemplate();
