@@ -27,6 +27,9 @@ public class EventTriggerService {
   @Autowired
   private ConsignmentService consignmentService;
 
+  @Autowired
+  private ChequeBounceService chequeBounceService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
@@ -57,6 +60,9 @@ public class EventTriggerService {
       case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
         ConsignmentBasicDTO consignment = getBasicConsignmentDTO(notificationDTO);
         qcService.consumeCnoteTypeChangeEvent(consignment);
+        break;
+      case COLLECTION_CHEQUE_BOUNCE:
+        chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
