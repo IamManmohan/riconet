@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -56,16 +58,38 @@ public class ApiClientServiceImpl implements ApiClientService {
         return null;
       }
       try {
-        return objectMapper.readValue(responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
+        return objectMapper
+            .readValue(responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
       } catch (IOException e) {
         log.error("Error while parsing ticketing response,  {} at epoch {} :",
-            responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), DateTime.now().getMillis(), e);
+            responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(),
+            DateTime.now().getMillis(), e);
         throw new ZoomException(
             "Error while parsing ticketing response: errorCode-" + DateTime.now().getMillis() + " :"
                 + e.getMessage());
       }
     }
     throw new ZoomException(responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString());
+  }
+
+  private HttpHeaders getHeaders(String token) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return headers;
+  }
+
+  private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri)
+      throws JsonProcessingException {
+    if (dto != null) {
+      String requestJson = objectMapper.writeValueAsString(dto);
+      log.info("Calling Ticketing API {} for  requestJson {}", uri, requestJson);
+      return new HttpEntity<Object>(requestJson, headers);
+    } else {
+      log.info("Calling Ticketing API {}", uri);
+      return new HttpEntity<>(headers);
+    }
   }
 
   @Override
@@ -75,43 +99,30 @@ public class ApiClientServiceImpl implements ApiClientService {
     if (queryParams != null) {
       builder = builder.queryParams(queryParams);
     }
-    log.debug("Calling  {} ", builder.build().encode().toUri());
+    URI uri = builder.build().encode().toUri();
+    log.debug("Calling  {} ", uri);
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
+      log.info("No existing token found. New token is being generated ");
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
+      accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-    HttpEntity<Object> entity;
+    HttpEntity<Object> entity = getHttpEntity(getHeaders(token), dto,uri);
     RestTemplate restTemplate = new RestTemplate();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-
-    if (dto != null) {
-      String requestJson = objectMapper.writeValueAsString(dto);
-      entity = new HttpEntity<>(requestJson, headers);
-      log.info("Calling Ticketing API {} for  requestJson {}", baseUrl + url,
-          requestJson);
-    } else {
-      entity = new HttpEntity<>(headers);
-      log.info("Calling Ticketing API {}", baseUrl + url);
-    }
 
     try {
       ResponseEntity<JsonNode> response = restTemplate
-          .exchange(builder.build().encode().toUri(), httpMethod,
-              entity, JsonNode.class);
+          .exchange(uri, httpMethod, entity, JsonNode.class);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-        entity.getHeaders().remove(HttpHeaders.AUTHORIZATION);
+        log.info("Existing token expired. New token is being generated ");
         token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
         accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
-        entity.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+        HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto,uri);
         try {
           ResponseEntity<JsonNode> response = restTemplate
-              .exchange(builder.build().encode().toUri(), httpMethod,
-                  entity, JsonNode.class);
+              .exchange(uri, httpMethod, retryEntity, JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
           log.error("Invalid response from ticketing  while calling {}", DateTime.now(), e2);
