@@ -6,6 +6,6 @@ public class RedisTokenConstant {
     throw new IllegalStateException("Utility class");
   }
 
-  public static final String RICONET_MASTER_LOGIN_TOKEN ="riconet master login token";
+  public static final String RICONET_MASTER_LOGIN_TOKEN ="riconet_master_login_token";
 
 }
