@@ -158,7 +158,7 @@ public class QcServiceImpl implements QcService {
     if (bindings.isEmpty()) {
       return false;
     }
-    log.debug("Calling QCRuleEngine to getRulesFromDBAndApply bindings Map: {}", bindings);
+    log.info("Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",consignment.getCnote(), bindings);
     return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
@@ -340,7 +340,7 @@ public class QcServiceImpl implements QcService {
           .put(RuleEngineVariableNameConstant.NUMBER_OF_CN,
               completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
     } else {
-      log.debug("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
+      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
@@ -355,7 +355,7 @@ public class QcServiceImpl implements QcService {
           .put(RuleEngineVariableNameConstant.MAX_WEIGHT,
               completionData.getClientPincodeMetadataDTO().getMaxWeight());
     } else {
-      log.debug("one of the ACTUAL_WEIGHT param is null...returning bindings as emptyMap");
+      log.info("one of the ACTUAL_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
@@ -370,7 +370,7 @@ public class QcServiceImpl implements QcService {
       bindings.put(RuleEngineVariableNameConstant.MAX_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight());
     } else {
-      log.debug("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
+      log.info("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
@@ -383,7 +383,7 @@ public class QcServiceImpl implements QcService {
       bindings.put(RuleEngineVariableNameConstant.MAX_INVOICE_VALUE_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight());
     } else {
-      log.debug("one of the INVOICE_VALUE param is null...returning bindings as emptyMap");
+      log.info("one of the INVOICE_VALUE param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
