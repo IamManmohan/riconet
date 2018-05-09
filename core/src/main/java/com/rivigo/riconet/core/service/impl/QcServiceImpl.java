@@ -361,7 +361,7 @@ public class QcServiceImpl implements QcService {
 
     if (consignment.getChargedWeight() != null
         && consignment.getWeight()!=null
-        && !consignment.getWeight().equals(0.0)
+        && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null ) {
@@ -378,7 +378,7 @@ public class QcServiceImpl implements QcService {
 
     if (consignment.getValue() != null
         && consignment.getWeight()!=null
-        && !consignment.getWeight().equals(0.0)
+        && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight() != null) {
