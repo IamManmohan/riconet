@@ -360,11 +360,13 @@ public class QcServiceImpl implements QcService {
     }
 
     if (consignment.getChargedWeight() != null
+        && consignment.getWeight()!=null
+        && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
-        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
+        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null ) {
       bindings.put(RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
-          consignment.getChargedWeight());
+          consignment.getChargedWeight()/consignment.getWeight());
       bindings.put(RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());
       bindings.put(RuleEngineVariableNameConstant.MAX_CHARGED_WEIGHT_PER_WEIGHT,
@@ -374,10 +376,13 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
 
-    if (consignment.getValue() != null && completionData.getClientPincodeMetadataDTO() != null
+    if (consignment.getValue() != null
+        && consignment.getWeight()!=null
+        && consignment.getWeight() > 0.001
+        && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight() != null) {
-      bindings.put(RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT, consignment.getValue());
+      bindings.put(RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT, consignment.getValue()/consignment.getWeight());
       bindings.put(RuleEngineVariableNameConstant.MIN_INVOICE_VALUE_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight());
       bindings.put(RuleEngineVariableNameConstant.MAX_INVOICE_VALUE_PER_WEIGHT,
