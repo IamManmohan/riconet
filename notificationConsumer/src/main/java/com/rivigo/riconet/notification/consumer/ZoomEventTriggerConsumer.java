@@ -49,10 +49,10 @@ public class ZoomEventTriggerConsumer extends ConsumerModel {
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
       log.debug("NotificationDTO {}", notificationDTO);
-      eventTriggerService.processNotification(notificationDTO);
     } catch (Exception e) {
       log.error("failed", e);
     }
+    eventTriggerService.processNotification(notificationDTO);
     return str;
   }
 }

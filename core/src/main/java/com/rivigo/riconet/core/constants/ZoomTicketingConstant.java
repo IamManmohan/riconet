@@ -15,6 +15,8 @@ public class ZoomTicketingConstant {
 
   public static final String QC_GROUP_NAME = "QC";
 
+  public static final String RETAIL_GROUP_NAME = "RETAIL";
+
   public static final String QC_TASK_TITLE = "Qc task";
 
   public static final String QC_RECHECK_TASK_CREATION_MESSAGE = "Complete the QC verification task by clicking \"COMPLETE QC\" button at the top";
