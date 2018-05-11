@@ -10,6 +10,7 @@ import com.rivigo.riconet.core.enums.zoomTicketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomTicketing.TicketEntityType;
 import com.rivigo.riconet.core.service.ChequeBounceService;
+import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.model.User;
@@ -25,13 +26,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class ChequeBounceServiceImple implements ChequeBounceService {
+public class ChequeBounceServiceImpl implements ChequeBounceService {
 
   @Autowired
   private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Autowired
-  private UserMasterServiceImpl userMasterService;
+  private UserMasterService userMasterService;
 
   @Override
   public void consumeChequeBounceEvent(NotificationDTO notificationDTO) {
@@ -98,12 +99,12 @@ public class ChequeBounceServiceImple implements ChequeBounceService {
   private String getConsignorOrConsignee(NotificationDTO dto) {
     StringBuilder sb = new StringBuilder();
     String paymentMode = dto.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
-    if (paymentMode.equals(PaymentMode.PREPAID.toString())) {
+    if (paymentMode.equals(PaymentMode.PREPAID.name())) {
       sb.append(dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_NAME.name()))
           .append(" , ")
           .append(
               dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_PHONE.name()));
-    } else if (paymentMode.equals(PaymentMode.COD.toString())) {
+    } else if (paymentMode.equals(PaymentMode.COD.name())) {
       sb.append(
           dto.getMetadata().get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_NAME.name()))
           .append(" , ")
