@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.dto.zoomTicketing;
+package com.rivigo.riconet.core.dto.zoomticketing;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

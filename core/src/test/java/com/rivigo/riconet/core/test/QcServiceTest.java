@@ -14,13 +14,13 @@ import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsEventDTO;
-import com.rivigo.riconet.core.dto.zoomTicketing.GroupDTO;
-import com.rivigo.riconet.core.dto.zoomTicketing.TicketDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
-import com.rivigo.riconet.core.enums.zoomTicketing.AssigneeType;
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketStatus;
+import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -33,6 +33,7 @@ import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.enums.ruleengine.RuleType;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
@@ -58,7 +59,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-@Ignore
 @Slf4j
 public class QcServiceTest {
 
@@ -328,38 +328,40 @@ public class QcServiceTest {
     data.setConsignmentId(1l);
     data.setCnote("1234567890");
     Consignment consignment=new Consignment();
+    ConsignmentCodDod consignmentCodDod = new ConsignmentCodDod();
+    consignmentCodDod.setPaymentType(PaymentType.CHEQUE);
     when(consignmentService.getConsignmentById(1l)).thenReturn(consignment);
     //Following exception shouldn't stop the flow
     doThrow(new ZoomException()).when(zoomBackendAPIClientService).triggerPolicyGeneration(1l);
-    when(consignmentCodDodService.getActiveCodDod(consignment.getId())).thenReturn(new ConsignmentCodDod());
+    when(consignmentCodDodService.getActiveCodDod(consignment.getId())).thenReturn(consignmentCodDod);
     qcService.consumeCompletionEvent(data);
     verify(smsService,times(1)).sendSms(any(),any());
     verify(zoomBackendAPIClientService,times(1)).triggerPolicyGeneration(1l);
   }
 
-  @Test
-  //positive test case when task creation is not required
-  public void checkTest1(){
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO,consignment);
-    assertEquals(result,false);
-
-  }
-
-  @Test
-  //test case for different business logic
-  public void checkTest2(){
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO,consignment);
-    assertEquals(result,false);
-
-  }
+//  @Test
+//  //positive test case when task creation is not required
+//  public void checkTest1(){
+//
+//    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+//    Consignment consignment = getConsignmentDTO();
+//    mockingParamsForCheckFunction();
+//    boolean result = qcService.check(consignmentCompletionEventDTO,consignment);
+//    assertEquals(result,false);
+//
+//  }
+//
+//  @Test
+//  //test case for different business logic
+//  public void checkTest2(){
+//
+//    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+//    Consignment consignment = getConsignmentDTO();
+//    mockingParamsForCheckFunction();
+//    boolean result = qcService.check(consignmentCompletionEventDTO,consignment);
+//    assertEquals(result,false);
+//
+//  }
 
   @Test
   //negative test case when condition fails for min_weight

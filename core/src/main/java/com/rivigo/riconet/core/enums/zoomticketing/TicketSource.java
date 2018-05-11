@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.enums.zoomTicketing;
+package com.rivigo.riconet.core.enums.zoomticketing;
 
 public enum  TicketSource {
     PHONE,

@@ -1,6 +1,6 @@
-package com.rivigo.riconet.core.dto.zoomTicketing;
+package com.rivigo.riconet.core.dto.zoomticketing;
 
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

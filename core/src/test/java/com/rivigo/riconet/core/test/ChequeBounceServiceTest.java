@@ -1,9 +1,9 @@
 package com.rivigo.riconet.core.test;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.zoomTicketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.enums.EventName;
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.impl.ChequeBounceServiceImpl;
 import com.rivigo.riconet.core.service.impl.UserMasterServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
@@ -24,7 +24,7 @@ import org.mockito.MockitoAnnotations;
  * Created by ashfakh on 11/5/18.
  */
 
-@Ignore
+//@Ignore
 @Slf4j
 public class ChequeBounceServiceTest {
 

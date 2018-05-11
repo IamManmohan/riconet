@@ -1,7 +1,7 @@
-package com.rivigo.riconet.core.dto.zoomTicketing;
+package com.rivigo.riconet.core.dto.zoomticketing;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.rivigo.riconet.core.enums.zoomTicketing.UserType;
+import com.rivigo.riconet.core.enums.zoomticketing.UserType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

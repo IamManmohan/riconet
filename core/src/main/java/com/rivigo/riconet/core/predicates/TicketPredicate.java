@@ -1,8 +1,8 @@
 package com.rivigo.riconet.core.predicates;
 
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
-import com.rivigo.riconet.core.dto.zoomTicketing.TicketDTO;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketStatus;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;

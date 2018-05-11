@@ -1,11 +1,11 @@
-package com.rivigo.riconet.core.dto.zoomTicketing;
+package com.rivigo.riconet.core.dto.zoomticketing;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.rivigo.riconet.core.enums.zoomTicketing.AutoAssignSuggestion;
-import com.rivigo.riconet.core.enums.zoomTicketing.AutoClosureTrigger;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketEntityType;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketFieldType;
+import com.rivigo.riconet.core.enums.zoomticketing.AutoAssignSuggestion;
+import com.rivigo.riconet.core.enums.zoomticketing.AutoClosureTrigger;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketFieldType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

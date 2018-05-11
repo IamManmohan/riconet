@@ -1,13 +1,13 @@
-package com.rivigo.riconet.core.dto.zoomTicketing;
+package com.rivigo.riconet.core.dto.zoomticketing;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.rivigo.riconet.core.enums.zoomTicketing.AssigneeType;
-import com.rivigo.riconet.core.enums.zoomTicketing.EscalationLevel;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketEntityType;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketPriority;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketSource;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketStatus;
+import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
+import com.rivigo.riconet.core.enums.zoomticketing.EscalationLevel;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketPriority;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
