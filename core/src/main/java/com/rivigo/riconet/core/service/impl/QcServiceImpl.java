@@ -158,7 +158,7 @@ public class QcServiceImpl implements QcService {
     if (bindings.isEmpty()) {
       return false;
     }
-    log.debug("Calling QCRuleEngine to getRulesFromDBAndApply bindings Map: {}", bindings);
+    log.info("Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",consignment.getCnote(), bindings);
     return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
@@ -340,7 +340,7 @@ public class QcServiceImpl implements QcService {
           .put(RuleEngineVariableNameConstant.NUMBER_OF_CN,
               completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
     } else {
-      log.debug("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
+      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
@@ -355,35 +355,40 @@ public class QcServiceImpl implements QcService {
           .put(RuleEngineVariableNameConstant.MAX_WEIGHT,
               completionData.getClientPincodeMetadataDTO().getMaxWeight());
     } else {
-      log.debug("one of the ACTUAL_WEIGHT param is null...returning bindings as emptyMap");
+      log.info("one of the ACTUAL_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
     if (consignment.getChargedWeight() != null
+        && consignment.getWeight()!=null
+        && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
-        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
+        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null ) {
       bindings.put(RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
-          consignment.getChargedWeight());
+          consignment.getChargedWeight()/consignment.getWeight());
       bindings.put(RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());
       bindings.put(RuleEngineVariableNameConstant.MAX_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight());
     } else {
-      log.debug("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
+      log.info("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
-    if (consignment.getValue() != null && completionData.getClientPincodeMetadataDTO() != null
+    if (consignment.getValue() != null
+        && consignment.getWeight()!=null
+        && consignment.getWeight() > 0.001
+        && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight() != null) {
-      bindings.put(RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT, consignment.getValue());
+      bindings.put(RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT, consignment.getValue()/consignment.getWeight());
       bindings.put(RuleEngineVariableNameConstant.MIN_INVOICE_VALUE_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight());
       bindings.put(RuleEngineVariableNameConstant.MAX_INVOICE_VALUE_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight());
     } else {
-      log.debug("one of the INVOICE_VALUE param is null...returning bindings as emptyMap");
+      log.info("one of the INVOICE_VALUE param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
 
