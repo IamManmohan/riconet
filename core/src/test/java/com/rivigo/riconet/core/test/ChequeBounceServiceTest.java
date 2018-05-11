@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.impl.ChequeBounceServiceImpl;
@@ -13,11 +14,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -40,6 +44,9 @@ public class ChequeBounceServiceTest {
   @Mock
   private UserMasterServiceImpl userMasterService;
 
+  @Captor
+  private ArgumentCaptor<Object> valueCapture;
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
@@ -59,15 +66,22 @@ public class ChequeBounceServiceTest {
     user.setEmail("dummyuser@rivigo.com");
     user.setMobileNo("9876543210");
     user.setName("Dummy User");
+    TicketDTO ticketDTO = new TicketDTO();
+    ticketDTO.setId(1L);
     Mockito.when(zoomTicketingAPIClientService
         .getGroupId(15L, "RETAIL", LocationType.OU))
         .thenReturn(groupDTO);
     Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com"))
         .thenReturn(user);
-    chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    Mockito.when(zoomTicketingAPIClientService.createTicket((TicketDTO) valueCapture.capture()))
+        .thenReturn(ticketDTO);
+    TicketDTO resultDTO=chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    Assert.assertEquals((Object) resultDTO.getId(),1L);
+    ticketDTO.setId(2L);
     NotificationDTO notificationDTO = getNotificationDTO();
     notificationDTO.getMetadata().put("PAYMENT_MODE","COD");
-    chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+    resultDTO=chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+    Assert.assertEquals((Object) resultDTO.getId(),2L);
   }
 
   @Test
@@ -93,7 +107,8 @@ public class ChequeBounceServiceTest {
     Mockito.when(zoomTicketingAPIClientService
         .getGroupId(15L, "RETAIL", LocationType.OU))
         .thenReturn(groupDTO);
-    chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    TicketDTO ticketDTO = chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    Assert.assertEquals(null,ticketDTO);
   }
 
   private NotificationDTO getNotificationDTO() {

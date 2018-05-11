@@ -35,7 +35,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
   private UserMasterService userMasterService;
 
   @Override
-  public void consumeChequeBounceEvent(NotificationDTO notificationDTO) {
+  public TicketDTO consumeChequeBounceEvent(NotificationDTO notificationDTO) {
     TicketDTO ticketDTO = new TicketDTO();
     ticketDTO.setTypeId(ZoomTicketingConstant.RETAIL_CHEQUE_BOUNCE_TYPE_ID);
     ticketDTO.setEntityType(TicketEntityType.CN);
@@ -56,7 +56,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     User user = userMasterService.getByEmail(requestorEmail);
     if (user == null) {
       log.error("User not in our system, email {}", requestorEmail);
-      return;
+      return null;
     }
     UserDTO requestor = new UserDTO();
     requestor.setEmail(user.getEmail());
@@ -65,7 +65,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     ticketDTO.setRequestor(requestor);
     ticketDTO.setAssigneeId(group.getId());
     ticketDTO.setAssigneeType(AssigneeType.GROUP);
-    zoomTicketingAPIClientService.createTicket(ticketDTO);
+    return zoomTicketingAPIClientService.createTicket(ticketDTO);
   }
 
   private String getTitle(NotificationDTO dto) {
