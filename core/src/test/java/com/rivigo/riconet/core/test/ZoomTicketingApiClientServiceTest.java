@@ -107,7 +107,7 @@ public class ZoomTicketingApiClientServiceTest {
     TicketDTO ticketDTO = getTicketDTO();
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while creating qc tickets with cnote 1234567890");
+    expectedException.expectMessage("Error while creating tickets with entity 1234567890");
     zoomTicketingAPIClientService.createTicket(ticketDTO);
   }
 
