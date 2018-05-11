@@ -8,13 +8,16 @@ import com.rivigo.riconet.core.service.impl.ChequeBounceServiceImpl;
 import com.rivigo.riconet.core.service.impl.UserMasterServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,6 +39,9 @@ public class ChequeBounceServiceTest {
 
   @Mock
   private UserMasterServiceImpl userMasterService;
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void initMocks() {
@@ -59,7 +65,35 @@ public class ChequeBounceServiceTest {
     Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com"))
         .thenReturn(user);
     chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    NotificationDTO notificationDTO = getNotificationDTO();
+    notificationDTO.getMetadata().put("PAYMENT_MODE","COD");
+    chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+  }
 
+  @Test
+  public void createTicketGroupExceptionTest() {
+    User user = new User();
+    user.setId(1L);
+    user.setEmail("dummyuser@rivigo.com");
+    user.setMobileNo("9876543210");
+    user.setName("Dummy User");
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage("Group cannot be null, creating ticket failed");
+    Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com"))
+        .thenReturn(user);
+    chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+  }
+
+  @Test
+  public void createTicketNullUserTest() {
+    GroupDTO groupDTO = new GroupDTO();
+    groupDTO.setId(1L);
+    groupDTO.setLocationId(15L);
+    groupDTO.setGroupTypeId(1L);
+    Mockito.when(zoomTicketingAPIClientService
+        .getGroupId(15L, "RETAIL", LocationType.OU))
+        .thenReturn(groupDTO);
+    chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
   }
 
   private NotificationDTO getNotificationDTO() {
