@@ -100,16 +100,26 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     StringBuilder sb = new StringBuilder();
     String paymentMode = dto.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
     if (paymentMode.equals(PaymentMode.PREPAID.name())) {
-      sb.append(dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_NAME.name()))
-          .append(" , ")
+      sb.append("Consignor - ")
+          .append(dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_NAME.name()))
+          .append(" - ")
           .append(
-              dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_PHONE.name()));
+              dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_PHONE.name()))
+          .append(" (")
+          .append(
+              dto.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNER_ADDRESS.name()))
+          .append(")");
     } else if (paymentMode.equals(PaymentMode.COD.name())) {
-      sb.append(
-          dto.getMetadata().get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_NAME.name()))
-          .append(" , ")
+      sb.append("Consignee - ")
+          .append(
+              dto.getMetadata().get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_NAME.name()))
+          .append(" - ")
           .append(dto.getMetadata()
-              .get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_PHONE.name()));
+              .get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_PHONE.name()))
+          .append(" (")
+          .append(
+              dto.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNEE_ADDRESS.name()))
+          .append(")");
     }
     return sb.toString();
   }
