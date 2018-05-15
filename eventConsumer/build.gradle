@@ -1,4 +1,4 @@
-mainClassName = "com.rivigo.riconet.notification.main.EventMain"
+mainClassName = "com.rivigo.riconet.event.main.EventMain"
 
 apply plugin: 'application'
 apply plugin: 'java'
