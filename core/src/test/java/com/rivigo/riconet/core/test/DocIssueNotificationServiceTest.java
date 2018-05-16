@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.test;
 
-import com.rivigo.common.util.MailUtils;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
@@ -14,14 +13,10 @@ import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleRepository;
 import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.junit.Test;
-import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.File;
-import java.util.List;
 
 
 

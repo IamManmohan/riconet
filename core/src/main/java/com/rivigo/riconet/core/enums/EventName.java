@@ -31,4 +31,6 @@ public enum EventName {
   CN_DELIVERY,
 
   CLIENT_USER_CREATION,
+
+  COLLECTION_CHEQUE_BOUNCE,
 }
