@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-
 public class EventTriggerService {
 
   @Autowired
@@ -26,6 +25,9 @@ public class EventTriggerService {
 
   @Autowired
   private ConsignmentService consignmentService;
+
+  @Autowired
+  private ChequeBounceService chequeBounceService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
@@ -57,6 +59,9 @@ public class EventTriggerService {
       case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
         ConsignmentBasicDTO consignment = getBasicConsignmentDTO(notificationDTO);
         qcService.consumeCnoteTypeChangeEvent(consignment);
+        break;
+      case COLLECTION_CHEQUE_BOUNCE:
+        chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

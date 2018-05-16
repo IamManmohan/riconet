@@ -11,4 +11,6 @@ public interface UserMasterService {
   <V> V adaptUserTo(User user, Class<V> classType);
 
   <V> boolean canAdaptTo(User user, Class<V> classType);
+
+  User getByEmail(String email);
 }

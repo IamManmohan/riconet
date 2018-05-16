@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @ComponentScan(basePackages = {
     "com.rivigo.riconet.notification",
+    "com.rivigo.riconet.event",
     "com.rivigo.riconet.core.service",
     "com.rivigo.riconet.core.test.consumer",
     "com.rivigo.oauth2.resource.service",

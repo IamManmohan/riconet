@@ -1,8 +1,8 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.riconet.core.dto.zoomTicketing.GroupDTO;
-import com.rivigo.riconet.core.dto.zoomTicketing.TicketDTO;
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
+import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import java.util.List;
 
 

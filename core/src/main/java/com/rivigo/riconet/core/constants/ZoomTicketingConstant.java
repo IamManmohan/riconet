@@ -11,7 +11,11 @@ public class ZoomTicketingConstant {
 
   public static final Long QC_MEASUREMENT_TYPE_ID = 2L;
 
+  public static final Long RETAIL_CHEQUE_BOUNCE_TYPE_ID = 70L;
+
   public static final String QC_GROUP_NAME = "QC";
+
+  public static final String RETAIL_GROUP_NAME = "RETAIL";
 
   public static final String QC_TASK_TITLE = "Qc task";
 

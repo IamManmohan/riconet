@@ -38,6 +38,11 @@ public class UserMasterServiceImpl implements UserMasterService {
   }
 
   @Override
+  public User getByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
+
+  @Override
   public <V> V adaptUserTo(User user, Class<V> classType) {
     if (classType.equals(ZoomUser.class)) {
       return (V) getZoomUser(user);

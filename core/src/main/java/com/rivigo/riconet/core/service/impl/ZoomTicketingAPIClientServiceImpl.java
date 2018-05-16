@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
-import com.rivigo.riconet.core.dto.zoomTicketing.GroupDTO;
-import com.rivigo.riconet.core.dto.zoomTicketing.TicketDTO;
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
+import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -65,9 +65,9 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     try {
       responseJson = apiClientService.getEntity(ticketDTO, HttpMethod.POST, url, null,ticketingBaseUrl);
     } catch (IOException e) {
-      log.error("Error while creating qc tickets with cnote {}", ticketDTO.getEntityId(), e);
+      log.error("Error while creating tickets with entity {}", ticketDTO.getEntityId(), e);
       throw new ZoomException(
-          "Error while creating qc tickets with cnote " + ticketDTO.getEntityId());
+          "Error while creating tickets with entity " + ticketDTO.getEntityId());
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {
     };

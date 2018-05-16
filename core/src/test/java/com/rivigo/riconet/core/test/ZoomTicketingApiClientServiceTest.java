@@ -4,14 +4,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
-import com.rivigo.riconet.core.dto.zoomTicketing.TicketDTO;
-import com.rivigo.riconet.core.enums.zoomTicketing.LocationType;
-import com.rivigo.riconet.core.enums.zoomTicketing.TicketStatus;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
-import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -32,7 +29,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 
 
 @Slf4j
@@ -107,7 +103,7 @@ public class ZoomTicketingApiClientServiceTest {
     TicketDTO ticketDTO = getTicketDTO();
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while creating qc tickets with cnote 1234567890");
+    expectedException.expectMessage("Error while creating tickets with entity 1234567890");
     zoomTicketingAPIClientService.createTicket(ticketDTO);
   }
 
