@@ -34,7 +34,7 @@ import org.mockito.MockitoAnnotations;
 public class ChequeBounceServiceTest {
 
   @InjectMocks
-  ChequeBounceServiceImpl chequeBounceService;
+  private ChequeBounceServiceImpl chequeBounceService;
 
   @Mock
   private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService;

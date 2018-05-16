@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-
 public class EventTriggerService {
 
   @Autowired
