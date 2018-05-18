@@ -72,12 +72,12 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     StringBuilder sb = new StringBuilder();
     sb.append("Cheque ")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name()))
-        .append(" | (")
+        .append(" | ")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.DRAWEE_BANK.name()))
-        .append(") | ")
+        .append(" | Rs.")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.AMOUNT.name()))
         .append(" | CMS Date ")
-        .append(new DateTime(
+        .append(getDateTimeString(
             Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))));
     return sb.toString();
   }
@@ -87,7 +87,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     sb.append("This cheque deposited from your branch for CN ")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
         .append("  to CMS on ")
-        .append(new DateTime(
+        .append(getDateTimeString(
             Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))))
         .append(" has bounced. Please reach out to the ")
         .append(getConsignorOrConsignee(dto))
@@ -121,6 +121,17 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
               dto.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNEE_ADDRESS.name()))
           .append(")");
     }
+    return sb.toString();
+  }
+
+  private String getDateTimeString(Long millis) {
+    DateTime time = new DateTime(millis);
+    StringBuilder sb = new StringBuilder();
+    sb.append(time.year().get())
+        .append("-")
+        .append(time.monthOfYear().get())
+        .append("-")
+        .append(time.dayOfMonth().get());
     return sb.toString();
   }
 
