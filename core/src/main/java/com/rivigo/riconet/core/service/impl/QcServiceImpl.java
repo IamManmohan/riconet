@@ -95,6 +95,9 @@ public class QcServiceImpl implements QcService {
   private LocationService locationService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
+    if(ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())){
+      return;
+    }
     List<TicketDTO> ticketList = zoomTicketingAPIClientService
         .getTicketsByCnoteAndType(loadingData.getCnote(), getQcTicketTypes()).stream()
         .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO)).collect(Collectors.toList());
@@ -244,12 +247,12 @@ public class QcServiceImpl implements QcService {
       groupId = group == null ? null : group.getId();
       autoClose = (group == null) && location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
     }
-    if (!autoClose) {
-      zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
-    }
     log.info("cnote: {}  locationId: {}  groupId: {}", consignment.getCnote(),
         consignment.getLocationId(), groupId);
     createTicketsIfNeeded(reCheckQcNeeded, measurementQcNeeded, groupId, consignment, autoClose);
+    if (!autoClose && reCheckQcNeeded) {
+      zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
+    }
   }
 
   private void createTicketsIfNeeded(Boolean reCheckQcNeeded, Boolean measurementQcNeeded,
@@ -335,7 +338,8 @@ public class QcServiceImpl implements QcService {
         minimumNumberOfCnRequired);
     bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
     bindings.put(RuleEngineVariableNameConstant.CLIENT_TYPE, consignment.getCnoteType().name());
-    if (completionData.getClientPincodeMetadataDTO() != null) {
+    if (completionData.getClientPincodeMetadataDTO() != null
+        && completionData.getClientPincodeMetadataDTO().getCount() != null) {
       bindings
           .put(RuleEngineVariableNameConstant.NUMBER_OF_CN,
               completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
