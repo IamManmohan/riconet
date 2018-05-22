@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
+import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE","1234567890");
     metadata.put("CONSIGNMENT_ID","5");
     metadata.put("LOCATION_ID","12");
+    metadata.put("STATUS","LOADED");
     NotificationDTO notificationDTO=NotificationDTO.builder()
         .eventName(EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU)
         .metadata(metadata)
@@ -72,6 +74,7 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890",consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId()==12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId()==5l);
+    Assert.assertEquals(ConsignmentStatus.LOADED,consignmentBasicDTOArgumentCaptor.getValue().getStatus());
   }
 
   @Test
@@ -119,6 +122,23 @@ public class EventTriggerServiceTest {
         .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService,times(1)).consumeCnoteTypeChangeEvent(consignmentBasicDTOArgumentCaptor.capture());
+    Assert.assertEquals("1234567890",consignmentBasicDTOArgumentCaptor.getValue().getCnote());
+    Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId()==12l);
+    Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId()==5l);
+  }
+
+  @Test
+  public void cnDeliveryLoadedtest(){
+    Map<String,String> metadata=new HashMap<>();
+    metadata.put("CNOTE","1234567890");
+    metadata.put("CONSIGNMENT_ID","5");
+    metadata.put("LOCATION_ID","12");
+    NotificationDTO notificationDTO=NotificationDTO.builder()
+        .eventName(EventName.CN_DELIVERY_LOADED)
+        .metadata(metadata)
+        .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService,times(1)).consumeLoadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     Assert.assertEquals("1234567890",consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId()==12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId()==5l);

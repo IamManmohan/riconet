@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketEntityType;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,10 @@ public class EventTriggerService {
         qcService.consumeUnloadingEvent(unloadingData);
         consignmentService.triggerBfCpdCalcualtion(unloadingData);
         break;
+      case CN_DELIVERY_LOADED:
+        ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
+        qcService.consumeLoadingEvent(deliveryUnloadingData);
+        break;
       case CN_COMPLETION_ALL_INSTANCES:
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         qcService.consumeCompletionEvent(completionData);
@@ -69,12 +74,17 @@ public class EventTriggerService {
   }
 
   private ConsignmentBasicDTO getBasicConsignmentDTO(NotificationDTO notificationDTO) {
+    ConsignmentStatus status =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STATUS.name()) == null ? null
+            : ConsignmentStatus.valueOf(
+                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STATUS.name()));
     return ConsignmentBasicDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
         .consignmentId(Long.parseLong(notificationDTO.getMetadata().get(
             ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
         .locationId(Long.parseLong(notificationDTO.getMetadata().get(
             ZoomCommunicationFieldNames.LOCATION_ID.name())))
+        .status(status)
         .build();
   }
 

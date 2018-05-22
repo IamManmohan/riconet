@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import lombok.AllArgsConstructor;

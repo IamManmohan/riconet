@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +18,5 @@ public class ConsignmentBasicDTO {
   private String cnote;
   private Long consignmentId;
   private Long locationId;
+  private ConsignmentStatus status;
 }

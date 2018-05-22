@@ -43,15 +43,16 @@ public class ZoomEventTriggerConsumer extends ConsumerModel {
   }
 
   @Override
-  public String processMessage(String str) throws IOException {
+  public String processMessage(String str) {
     log.info("Processing message in ZoomEventTrigger {}", str);
     NotificationDTO notificationDTO = null;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
-      log.debug("NotificationDTO {}", notificationDTO);
-    } catch (Exception e) {
-      log.error("failed", e);
+    } catch (IOException ex) {
+      log.error("Error occured while processing message {} ", str, ex);
+      return str;
     }
+    log.debug("NotificationDTO {}", notificationDTO);
     eventTriggerService.processNotification(notificationDTO);
     return str;
   }

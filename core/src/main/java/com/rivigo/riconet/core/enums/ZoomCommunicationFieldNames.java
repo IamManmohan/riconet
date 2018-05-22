@@ -5,6 +5,7 @@ public enum ZoomCommunicationFieldNames {
   CNOTE,
   LOCATION_ID,
   CONSIGNMENT_ID,
+  STATUS,
   INSTRUMENT_NUMBER,
   DRAWEE_BANK,
   AMOUNT,
