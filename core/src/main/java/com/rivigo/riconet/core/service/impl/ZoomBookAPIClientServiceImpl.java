@@ -1,11 +1,16 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.constants.UrlConstant;
+import com.rivigo.riconet.core.dto.zoombook.ZoomBookTransactionResponseDTO;
+import com.rivigo.riconet.core.dto.zoombook.ZoomBookTransactionStatusDTO;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
+import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
 import com.rivigo.zoom.common.repository.mysql.ZoomBookTransactionRecordRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -13,7 +18,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,8 +33,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,10 +48,13 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
   private static final String FAILURE = "FAILURE";
   private static final String STATUS = "status";
   private static final String SUCCESS = "SUCCESS";
+  private static final String TIMEOUT="TIMEOUT";
   private static final String CLIENT_TOKEN = "clientToken";
   private static final String CLIENT_KEY = "clientKey";
   private static final String RESPONSE = "response";
   private static final String STATUS_CODE = "statusCode";
+
+
 
   @Value("${zoom.zoombook.url}")
   private String zoomBookUrl;
@@ -57,6 +72,13 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
   private ZoomBookTransactionRecordRepository zoomBookTransactionRecordRepository;
 
   private RestTemplate restTemplate = new RestTemplate();
+
+  @Getter
+  @Setter
+  private class ZoomBookResponse<E> {
+    Map<String, String> responseMap;
+    List<E> zoomBookResponseList;
+  }
 
 
   @Override
@@ -173,6 +195,134 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
           requestUrl, queryParams.toString());
       throw new ZoomException("Unknown exception while trying to get data from zoom-book");
     }
+  }
+
+  @Override
+  public Map<String, String> processZoomBookTransaction(List<ZoomBookTransactionRequestDTO> zoomBookTransactionRequestDTOList) {
+
+    if(CollectionUtils.isEmpty(zoomBookTransactionRequestDTOList)){
+      throw new ZoomException("zoomBookTransactionRequestDTOList can not be empty or null");
+    }
+    Map<String, String> response = new HashMap<>();
+    String uuid = UUID.randomUUID().toString().replace("-", "");
+    zoomBookTransactionRequestDTOList.forEach(dto->{
+      if(dto.getClientRequestId()==null){
+        dto.setClientRequestId(UUID.randomUUID().toString().replace("-", ""));
+      }
+    });
+    ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransactionResponse = zoomBookTransaction(zoomBookTransactionRequestDTOList,uuid);
+
+    response.put(STATUS,FAILURE);
+    response.put("uuid",uuid);
+
+    Map<String, String> responseMap =  zoomBookTransactionResponse.getResponseMap();
+    if (responseMap != null && SUCCESS.equals(responseMap.get(STATUS))) {
+
+      Map<String,String> clientRequestIdtoTxnNumberMap = new HashMap<>();
+      for(ZoomBookTransactionResponseDTO zoomBookTransactionResponseDTO:zoomBookTransactionResponse.getZoomBookResponseList()){
+        clientRequestIdtoTxnNumberMap.put(zoomBookTransactionResponseDTO.getClientRequestId(),zoomBookTransactionResponseDTO.getTxnNo());
+      }
+
+      response.put(STATUS, SUCCESS);
+      return response;
+    }
+      throw new ZoomException("Exception from ZoomBook ");
+
+  }
+
+  private ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransaction(List<ZoomBookTransactionRequestDTO> zoomBookTransactionRequestDTOList, String uuid){
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(CLIENT_KEY, zoombookClientKey);
+    String commaSeparatedOrgIds = StringUtils.join(
+        zoomBookTransactionRequestDTOList
+            .stream()
+            .map(ZoomBookTransactionRequestDTO::getOrgId)
+            .collect(Collectors.toList())
+        , ",");
+    String commaSeparatedClientRequestIds = StringUtils.join(
+        zoomBookTransactionRequestDTOList
+            .stream()
+            .map(ZoomBookTransactionRequestDTO::getClientRequestId)
+            .collect(Collectors.toList())
+        , ",");
+    String commaSeparatedFunctionTypes = StringUtils.join(
+        zoomBookTransactionRequestDTOList
+            .stream()
+            .map(ZoomBookTransactionRequestDTO::getFunctionType)
+            .collect(Collectors.toList())
+        , ",");
+    headers.add(CLIENT_TOKEN, FinanceUtils.createToken(commaSeparatedClientRequestIds,
+        commaSeparatedOrgIds,
+        commaSeparatedFunctionTypes,zoombookClientSecret));
+
+
+    String requestJson ;
+
+    try {
+      requestJson = objectMapper.writeValueAsString(zoomBookTransactionRequestDTOList);
+    } catch (JsonProcessingException e) {
+      throw new ZoomException("Unable to write zoomBookTransactionRequestDTOList to string");
+    }
+
+    HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2);
+
+    TypeReference type=new TypeReference<List<ZoomBookTransactionResponseDTO>>(){};
+
+    log.info("Calling API {} for zoomBookTransaction for uuid {}, requestJson {}", zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2
+        , uuid, requestJson);
+    return callZoomBook(type,HttpMethod.POST,entity,builder);
+  }
+
+  private ZoomBookResponse callZoomBook(TypeReference type, HttpMethod httpMethod, HttpEntity entity,
+      UriComponentsBuilder builder){
+    ZoomBookResponse zoomBookResponse = new ZoomBookResponse<>();
+    Map<String, String> responseMap = new HashMap<>();
+    List<Object> obj=null;
+    try {
+      ResponseEntity<JsonNode> oauthResponse = restTemplate.exchange(builder.build().encode().toUri(), httpMethod, entity, JsonNode.class);
+      JsonNode responseJson = oauthResponse.getBody();
+      log.debug("Response from zoombook: {}", responseJson);
+
+      String statusCode = responseJson.get(STATUS_CODE).toString();
+      String status = responseJson.get(STATUS).toString();
+
+      if (oauthResponse.getStatusCode() == HttpStatus.OK
+          && 200 == Integer.valueOf(statusCode)
+          && "\"SUCCESS\"".equals(status)) {
+        obj = objectMapper.readValue(responseJson.get(RESPONSE).toString(),type);
+        responseMap.put(STATUS, SUCCESS);
+        responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
+
+        //add txn detail to audit transaction
+      } else {
+        responseMap.put(STATUS, FAILURE);
+        responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
+
+      }
+    } catch (HttpStatusCodeException e) {
+      log.error(e.getMessage(), e);
+      HttpStatus status = e.getStatusCode();
+      if (status == HttpStatus.GATEWAY_TIMEOUT
+          || status == HttpStatus.REQUEST_TIMEOUT
+          || status == HttpStatus.BAD_GATEWAY) {
+        responseMap.put(STATUS, TIMEOUT);
+        responseMap.put(STATUS_CODE, status.name());
+        log.info("Timeout happened from zoombook side for request entity: {}",entity);
+      }
+    }
+    catch(Exception e){
+      log.error(e.getMessage(), e);
+      responseMap.put(STATUS, FAILURE);
+    }
+    log.debug("responseMap: {}", responseMap);
+    zoomBookResponse.setResponseMap(responseMap);
+    zoomBookResponse.setZoomBookResponseList(obj);
+    return zoomBookResponse;
   }
 
 

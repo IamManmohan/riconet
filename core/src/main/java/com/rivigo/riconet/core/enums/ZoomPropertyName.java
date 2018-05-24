@@ -176,6 +176,6 @@ public enum ZoomPropertyName {
 
     /**Rule engine consttants*/
     , MINIMUM_NUMBER_OF_CN_REQUIRED
-    , REQUIRED_CLIENT_TYPE
+    , MINIMUM_PICKUP_CHARGES_FOR_BF, BF_PICKUP_CHARGE_PER_KG, REQUIRED_CLIENT_TYPE
 
 }

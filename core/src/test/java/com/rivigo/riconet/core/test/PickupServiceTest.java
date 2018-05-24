@@ -1,98 +1,147 @@
 package com.rivigo.riconet.core.test;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.service.DEPSRecordService;
-import com.rivigo.riconet.core.service.PickupService;
-import com.rivigo.zoom.common.dto.DEPSNotificationContext;
-import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
-import com.rivigo.zoom.common.dto.PickupNotificationDTO;
-import com.rivigo.zoom.common.enums.PartnerType;
-import com.rivigo.zoom.common.enums.ZoomTripType;
-import com.rivigo.zoom.common.model.TransportationPartnerMapping;
-import com.rivigo.zoom.common.model.mongo.DEPSNotification;
-import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.client.ResourceAccessException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.riconet.core.service.impl.PickupServiceImpl;
+import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
+import com.rivigo.zoom.common.enums.ConsignmentCompletionStatus;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionHeader;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionSubHeader;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionType;
+import com.rivigo.zoom.common.model.ConsignmentReadOnly;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
-
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 
 @Slf4j
 public class PickupServiceTest {
-    @Autowired
-    PickupService pickupService;
 
-    public String processMessage(String str){
-        DEPSNotificationContext context = null;
-        List<PickupNotificationDTO> pickupNotificationDTOList=null;
-        try {
-            TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {};
-            ObjectMapper objectMapper =new ObjectMapper();
-            pickupNotificationDTOList= objectMapper.readValue(str, mapType);
-        }catch (Exception e){
-            log.error("DepsNotification mapping failed", e);
-        }
-        pickupService.processPickupNotificationDTOList(pickupNotificationDTOList);
-        return str;
-    }
+  @InjectMocks
+  private PickupServiceImpl pickupService;
 
-    
-    public void createPickup()
-    {
-        String str ="[{\"id\":1,\"lastUpdatedAt\":1510036034224,\"notificationType\":\"PICKUP_CREATED\"}]";
-        processMessage(str);
-    }
+  @Mock
+  private ZoomBookAPIClientService zoomBookAPIClientService;
 
-    
-    public void createPickupBpAutoAssign()
-    {
-        String str ="[{\"id\":2,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_CREATED\"}]";
-        processMessage(str);
-    }
+  @Mock
+  private ConsignmentReadOnlyService consignmentReadOnlyService;
 
-    
-    public void AssignBp()
-    {
-        String str ="[{\"id\":3,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
-        processMessage(str);
-    }
+  @Mock
+  private ZoomPropertyService zoomPropertyService;
 
-    
-    public void AssignBpCaptain()
-    {
-        String str ="[{\"id\":4,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
-        processMessage(str);
-    }
+  @Spy
+  private ObjectMapper objectMapper;
 
-    
-    public void AssignZoomUser()
-    {
-        String str ="[{\"id\":5,\"lastUpdatedAt\":1510037019087,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
-        processMessage(str);
-    }
+  @Captor
+  private ArgumentCaptor<List<ZoomBookTransactionRequestDTO>> transactionListCaptor;
 
-    
-    public void markPickupReached()
-    {
-        String str ="[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
-        processMessage(str);
-    }
+  @Before
+  public void initMocks() {
+    MockitoAnnotations.initMocks(this);
+  }
 
-    
-    public void initiateDelayedPickupsNotification()
-    {
-        String str ="[{\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_DELAYED\"}]";
-        processMessage(str);
-    }
+  @Test
+  public void deductPickupChargesPickupIdNullTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.ORGANIZTION_ID.name(), "23");
+    pickupService.deductPickupCharges(metadata);
+    verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
+  }
+
+  @Test
+  public void deductPickupChargesOrganizationIdNullTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    pickupService.deductPickupCharges(metadata);
+    verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
+  }
+
+  @Test
+  public void deductPickupChargesOrganizationRivigoTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.ORGANIZTION_ID.name(),
+        String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID));
+    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    pickupService.deductPickupCharges(metadata);
+    verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
+  }
+
+  @Test
+  public void deductPickupChargesIncompleteConsignmentTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.ORGANIZTION_ID.name(),
+        String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID + 10));
+    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    ConsignmentReadOnly consignmentReadOnly1 = new ConsignmentReadOnly();
+    consignmentReadOnly1.setId(10l);
+    consignmentReadOnly1.setCompletionStatus(ConsignmentCompletionStatus.INCOMPLETE);
+    ConsignmentReadOnly consignmentReadOnly2 = new ConsignmentReadOnly();
+    consignmentReadOnly2.setId(11l);
+    consignmentReadOnly2.setCompletionStatus(ConsignmentCompletionStatus.COMPLETE);
+    when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
+        .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
+    pickupService.deductPickupCharges(metadata);
+    verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
+  }
+
+  @Test
+  public void deductPickupChargesHappyCaseTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.ORGANIZTION_ID.name(),"100");
+    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    ConsignmentReadOnly consignmentReadOnly1 = new ConsignmentReadOnly();
+    consignmentReadOnly1.setId(10l);
+    consignmentReadOnly1.setWeight(10.0);
+    consignmentReadOnly1.setCompletionStatus(ConsignmentCompletionStatus.COMPLETE);
+    ConsignmentReadOnly consignmentReadOnly2 = new ConsignmentReadOnly();
+    consignmentReadOnly2.setId(10l);
+    consignmentReadOnly2.setWeight(20.0);
+    consignmentReadOnly2.setCompletionStatus(ConsignmentCompletionStatus.COMPLETE);
+    when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
+        .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
+
+    when(zoomPropertyService
+        .getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0)).thenReturn(100.0);
+    when(zoomPropertyService.getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3))
+        .thenReturn(1.3);
+    pickupService.deductPickupCharges(metadata);
+    verify(zoomBookAPIClientService, times(1)).processZoomBookTransaction(transactionListCaptor.capture());
+    List<ZoomBookTransactionRequestDTO> transactionList=transactionListCaptor.getValue();
+    Assert.assertTrue(transactionList.size()==1);
+    Assert.assertEquals(BigDecimal.valueOf(39.0),transactionList.get(0).getAmount());
+    Assert.assertEquals("pickup|23|completion",transactionList.get(0).getClientRequestId());
+    Assert.assertEquals(ZoomBookFunctionType.PASSBOOK,transactionList.get(0).getFunctionType());
+    Assert.assertEquals(ZoomBookTenantType.BF,transactionList.get(0).getTenantType());
+    Assert.assertTrue(100l==transactionList.get(0).getOrgId());
+    Assert.assertEquals("pickup|23",transactionList.get(0).getReference());
+    Assert.assertEquals(ZoomBookTransactionType.DEBIT,transactionList.get(0).getTransactionType());
+    Assert.assertEquals(ZoomBookTransactionHeader.PICKUP,transactionList.get(0).getTransactionHeader());
+    Assert.assertEquals(ZoomBookTransactionSubHeader.CREATE,transactionList.get(0).getTransactionSubHeader());
+
+  }
 
 }

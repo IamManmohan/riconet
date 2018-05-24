@@ -1,20 +1,35 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
+import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.StockAccumulatorService;
+import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.zoom.common.dto.PickupNotificationDTO;
+import com.rivigo.zoom.common.dto.zoombook.ZoomBookBfPickupChargesRemarksDTO;
+import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
+import com.rivigo.zoom.common.enums.ConsignmentCompletionStatus;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.PickupNotificationType;
 import com.rivigo.zoom.common.enums.PickupStatus;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.enums.ZoomUserType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionHeader;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionSubHeader;
+import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionType;
 import com.rivigo.zoom.common.model.Client;
+import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.ZoomUser;
@@ -23,7 +38,9 @@ import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mongo.PickupNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +83,15 @@ public class PickupServiceImpl implements PickupService {
 
   @Autowired
   private SmsService smsService;
+
+  @Autowired
+  private ConsignmentReadOnlyService consignmentReadOnlyService;
+
+  @Autowired
+  private ZoomBookAPIClientService zoomBookAPIClientService;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @Override
   public Map<Long, Pickup> getPickupMapByIdIn(List<Long> pickupTripIdList) {
@@ -319,5 +345,65 @@ public class PickupServiceImpl implements PickupService {
     valuesMap.put("contactPerson", pickupNotification.getContactPerson());
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
     return sub.replace(template);
+  }
+
+  @Override
+  public void deductPickupCharges(Map<String, String> metadata) {
+
+    if (metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()) == null
+        || metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()) == null) {
+      return;
+    }
+    Long pickupId=Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
+    Long organizationId=Long.parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()));
+    if(organizationId==ConsignmentConstant.RIVIGO_ORGANIZATION_ID){
+      return;
+    }
+    List<ConsignmentReadOnly> consignments = consignmentReadOnlyService
+        .findConsignmentByPickupId(pickupId);
+    if (CollectionUtils.isEmpty(consignments)) {
+      return;
+    }
+    Boolean isPickupConsignmentIncomplete = consignments.stream().anyMatch(
+        consignment -> ConsignmentCompletionStatus.INCOMPLETE
+            .equals(consignment.getCompletionStatus()));
+    if (isPickupConsignmentIncomplete) {
+      return;
+    }
+    Double totalWeight = consignments.stream().mapToDouble(ConsignmentReadOnly::getWeight).sum();
+    Double minimumCharges = zoomPropertyService
+        .getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0);
+    Double chargePerKg = zoomPropertyService
+        .getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3);
+    BigDecimal totalCost = BigDecimal.valueOf(Math.min(minimumCharges, totalWeight * chargePerKg));
+    ZoomBookBfPickupChargesRemarksDTO remarksDTO = ZoomBookBfPickupChargesRemarksDTO.builder()
+        .pickupId(pickupId)
+        .minimumCharges(minimumCharges)
+        .chargePerKg(chargePerKg)
+        .totalCost(totalCost)
+        .totalCnWeight(totalWeight)
+        .build();
+    remarksDTO.setComments("Pickup charges: " + totalCost);
+    String remarks = "";
+    try {
+      remarks = objectMapper.writeValueAsString(remarksDTO);
+    } catch (JsonProcessingException e) {
+      log.error("Error while writing pickup remarks to String");
+    }
+    List<ZoomBookTransactionRequestDTO> request = Collections
+        .singletonList(ZoomBookTransactionRequestDTO
+            .builder()
+            .amount(totalCost)
+            .clientRequestId("pickup|" + pickupId + "|completion")
+            .functionType(ZoomBookFunctionType.PASSBOOK)
+            .tenantType(ZoomBookTenantType.BF)
+            .orgId(organizationId)
+            .reference("pickup|" + pickupId)
+            .transactionType(ZoomBookTransactionType.DEBIT)
+            .transactionHeader(ZoomBookTransactionHeader.PICKUP)
+            .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)
+            .remarks(remarks)
+            .build());
+    zoomBookAPIClientService.processZoomBookTransaction(request);
   }
 }

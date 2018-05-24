@@ -95,7 +95,7 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   @Override
   public DocumentIssueNotification createNotificationData(Long consignmentId, Long userId,
       String subReason, ConsignmentStatus status) {
-    ConsignmentReadOnly cn = consignmentReadOnlyService.findByConsignmentById(consignmentId);
+    ConsignmentReadOnly cn = consignmentReadOnlyService.findConsignmentById(consignmentId);
     if (cn == null) {
       throw new ZoomException("No consignment with this id exists");
     }

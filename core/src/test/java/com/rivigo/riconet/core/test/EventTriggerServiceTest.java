@@ -11,6 +11,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
+import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
@@ -42,6 +43,9 @@ public class EventTriggerServiceTest {
 
   @Mock
   private ConsignmentService consignmentService;
+
+  @Mock
+  private PickupService pickupService;
 
   @Captor
   private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
@@ -106,6 +110,7 @@ public class EventTriggerServiceTest {
         .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService,times(1)).consumeCompletionEvent(consignmentCompletionEventDTOCaptor.capture());
+    verify(pickupService,times(1)).deductPickupCharges(metadata);
     Assert.assertEquals("1234567890",consignmentCompletionEventDTOCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentCompletionEventDTOCaptor.getValue().getConsignmentId()==5l);
   }
@@ -142,5 +147,19 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890",consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId()==12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId()==5l);
+  }
+
+  @Test
+  public void cnDeletedtest(){
+    Map<String,String> metadata=new HashMap<>();
+    metadata.put("CNOTE","1234567890");
+    metadata.put("CONSIGNMENT_ID","5");
+    metadata.put("LOCATION_ID","12");
+    NotificationDTO notificationDTO=NotificationDTO.builder()
+        .eventName(EventName.CN_DELETED)
+        .metadata(metadata)
+        .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(pickupService,times(1)).deductPickupCharges(metadata);
   }
 }

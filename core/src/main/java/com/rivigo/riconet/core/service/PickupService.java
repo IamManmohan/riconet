@@ -13,5 +13,5 @@ public interface PickupService {
 
   void processPickupNotificationDTOList(List<PickupNotificationDTO> pickupNotificationDTOList);
 
-
+  void deductPickupCharges(Map<String, String> metadata);
 }

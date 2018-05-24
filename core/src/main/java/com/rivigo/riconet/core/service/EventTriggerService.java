@@ -30,6 +30,9 @@ public class EventTriggerService {
   @Autowired
   private ChequeBounceService chequeBounceService;
 
+  @Autowired
+  private PickupService pickupService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
@@ -60,6 +63,8 @@ public class EventTriggerService {
       case CN_COMPLETION_ALL_INSTANCES:
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         qcService.consumeCompletionEvent(completionData);
+        //TODO:Separate the following action into different consumer
+        pickupService.deductPickupCharges(notificationDTO.getMetadata());
         break;
       case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
         ConsignmentBasicDTO consignment = getBasicConsignmentDTO(notificationDTO);
@@ -67,6 +72,9 @@ public class EventTriggerService {
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+        break;
+      case CN_DELETED:
+        pickupService.deductPickupCharges(notificationDTO.getMetadata());
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
