@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoombook.ZoomBookTransactionResponseDTO;
-import com.rivigo.riconet.core.dto.zoombook.ZoomBookTransactionStatusDTO;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
