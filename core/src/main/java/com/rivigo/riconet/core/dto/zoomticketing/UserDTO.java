@@ -13,7 +13,6 @@ import lombok.Setter;
  * @author ramesh
  * @date 27-Feb-2018
  */
-
 @Getter
 @Setter
 @Builder
@@ -22,21 +21,21 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
 
-    private Long id;
+  private Long id;
 
-    private Long zoomUserId;
+  private Long zoomUserId;
 
-    private String email;
+  private String email;
 
-    private String mobileNo;
+  private String mobileNo;
 
-    private String name;
+  private String name;
 
-    private OperationalStatus status;
+  private OperationalStatus status;
 
-    private Long organizationId;
+  private Long organizationId;
 
-    private UserType userType;
+  private UserType userType;
 
-    private  String locationCode;
+  private String locationCode;
 }

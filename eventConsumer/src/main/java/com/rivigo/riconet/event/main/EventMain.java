@@ -17,21 +17,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by ashfakh on 12/05/18.
- */
+/** Created by ashfakh on 12/05/18. */
 @Component
 @Slf4j
 public class EventMain {
 
-  @Autowired
-  private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
+  @Autowired private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context = new AnnotationConfigApplicationContext(
-        ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context =
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -45,7 +43,8 @@ public class EventMain {
     consumer.load(materializer, consumerSettings);
   }
 
-  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
   }
 }

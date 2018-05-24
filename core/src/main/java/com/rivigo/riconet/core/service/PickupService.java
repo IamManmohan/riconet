@@ -12,6 +12,4 @@ public interface PickupService {
   Map<Long, Pickup> getPickupMapByIdIn(List<Long> pickupTripIdList);
 
   void processPickupNotificationDTOList(List<PickupNotificationDTO> pickupNotificationDTOList);
-
-
 }

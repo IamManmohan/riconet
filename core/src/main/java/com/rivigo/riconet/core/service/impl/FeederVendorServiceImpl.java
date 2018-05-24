@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FeederVendorServiceImpl implements FeederVendorService {
 
-  @Autowired
-  FeederVendorRepository feederVendorRepository;
+  @Autowired FeederVendorRepository feederVendorRepository;
 
   @Override
   public FeederVendor getFeederVendorById(Long id) {

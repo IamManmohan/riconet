@@ -15,13 +15,11 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class ZoomPropertyServiceImpl implements ZoomPropertyService {
 
-  @Autowired
-  private ZoomPropertiesRepository zoomPropertiesRepository;
+  @Autowired private ZoomPropertiesRepository zoomPropertiesRepository;
 
   @Override
   public ZoomProperty getByPropertyName(String str) {
-    List<ZoomProperty> zpList =
-        zoomPropertiesRepository.findByVariableNameAndIsActive(str, 1);
+    List<ZoomProperty> zpList = zoomPropertiesRepository.findByVariableNameAndIsActive(str, 1);
     if (CollectionUtils.isEmpty(zpList)) {
       return null;
     }
@@ -33,8 +31,8 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
       if (zp.getSpringProfile() == null) {
         propertyForEveryProfile = zp;
       }
-      if ((profile == null && zp.getSpringProfile() == null) ||
-          (profile != null && profile.equals(zp.getSpringProfile()))) {
+      if ((profile == null && zp.getSpringProfile() == null)
+          || (profile != null && profile.equals(zp.getSpringProfile()))) {
         return zp;
       }
     }
@@ -59,8 +57,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
   @Override
   public String getString(ZoomPropertyName propertyName) {
     ZoomProperty property = getByPropertyName(propertyName.name());
-    if (property == null)
-      return null;
+    if (property == null) return null;
 
     return property.getVariableValue();
   }
@@ -107,8 +104,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
   @Override
   public double getDouble(ZoomPropertyName propertyName, double defaultVal) {
     ZoomProperty property = getByPropertyName(propertyName.name());
-    if (property == null)
-      return defaultVal;
+    if (property == null) return defaultVal;
 
     try {
       return Double.valueOf(property.getVariableValue());

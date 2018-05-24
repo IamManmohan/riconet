@@ -8,18 +8,16 @@ import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.ConsignmentAppointmentService;
 import com.rivigo.zoom.common.dto.AppointmentNotificationDTO;
 import com.rivigo.zoom.common.enums.Topic;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Slf4j
 @Component
 public class AppointmentNotificationConsumer extends ConsumerModel {
 
-  @Autowired
-  private ConsignmentAppointmentService consignmentAppointmentService;
+  @Autowired private ConsignmentAppointmentService consignmentAppointmentService;
 
   private ObjectMapper objectMapper;
 
@@ -38,12 +36,11 @@ public class AppointmentNotificationConsumer extends ConsumerModel {
     return Topic.COM_RIVIGO_ZOOM_APPOINTMENT_NOTIFICATION_ERROR.name();
   }
 
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   public String processMessage(String str) throws IOException {
-    TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {
-    };
+    TypeReference<AppointmentNotificationDTO> mapType =
+        new TypeReference<AppointmentNotificationDTO>() {};
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
     return str;

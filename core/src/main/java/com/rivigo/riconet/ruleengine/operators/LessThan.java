@@ -4,9 +4,7 @@ import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
 import java.util.Map;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 public class LessThan extends Operation {
 
   public LessThan() {
@@ -27,6 +25,5 @@ public class LessThan extends Operation {
     Boolean result = (Double) leftBT.getValue() < (Double) rightBT.getValue();
 
     return new BaseType(result, Boolean.class);
-
   }
 }

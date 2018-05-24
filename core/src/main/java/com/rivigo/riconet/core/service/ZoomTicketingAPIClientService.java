@@ -5,7 +5,6 @@ import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import java.util.List;
 
-
 public interface ZoomTicketingAPIClientService {
 
   List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId);
@@ -18,4 +17,3 @@ public interface ZoomTicketingAPIClientService {
 
   void makeComment(Long ticketId, String comment);
 }
-

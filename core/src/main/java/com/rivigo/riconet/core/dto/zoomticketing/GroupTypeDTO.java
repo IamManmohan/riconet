@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
  * @author ramesh
  * @date 27-Feb-2018
  */
-
 @Getter
 @Setter
 @Builder
@@ -27,5 +25,4 @@ public class GroupTypeDTO {
   private String name;
 
   private Boolean isActive;
-
 }

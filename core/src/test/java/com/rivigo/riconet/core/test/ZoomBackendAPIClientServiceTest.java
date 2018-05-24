@@ -23,28 +23,20 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.MultiValueMap;
 
-/**
- * Created by aditya on 3/5/18.
- */
+/** Created by aditya on 3/5/18. */
 public class ZoomBackendAPIClientServiceTest {
 
-  @InjectMocks
-  private ZoomBackendAPIClientServiceImpl zoomBackendAPIClientServiceImpl;
+  @InjectMocks private ZoomBackendAPIClientServiceImpl zoomBackendAPIClientServiceImpl;
 
-  @Mock
-  private ApiClientService apiClientService;
+  @Mock private ApiClientService apiClientService;
 
-  @Captor
-  private ArgumentCaptor<JsonNode> jsonNodeArgumentCaptor;
+  @Captor private ArgumentCaptor<JsonNode> jsonNodeArgumentCaptor;
 
-  @Captor
-  private ArgumentCaptor<MultiValueMap<String, String>> multiValueMapArgumentCaptor;
+  @Captor private ArgumentCaptor<MultiValueMap<String, String>> multiValueMapArgumentCaptor;
 
-  @Captor
-  private ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor;
+  @Captor private ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor;
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void initMocks() {
@@ -66,7 +58,8 @@ public class ZoomBackendAPIClientServiceTest {
   public void updateQcCheckExceptionTest() throws IOException {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while marking consignment qcCheck needed  with consignmentId: 1234");
+    expectedException.expectMessage(
+        "Error while marking consignment qcCheck needed  with consignmentId: 1234");
     zoomBackendAPIClientServiceImpl.updateQcCheck(consignmentId, true);
   }
 
@@ -82,7 +75,8 @@ public class ZoomBackendAPIClientServiceTest {
   public void recalculateCpdOfBfExceptionTest() throws IOException {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while recalculating cpd of BF consignment with id: 1234");
+    expectedException.expectMessage(
+        "Error while recalculating cpd of BF consignment with id: 1234");
     zoomBackendAPIClientServiceImpl.recalculateCpdOfBf(consignmentId);
   }
 
@@ -98,31 +92,42 @@ public class ZoomBackendAPIClientServiceTest {
   public void triggerPolicyGenerationExceptionTest() throws IOException {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while triggering policy generation with consignmentId:  1234");
+    expectedException.expectMessage(
+        "Error while triggering policy generation with consignmentId:  1234");
     zoomBackendAPIClientServiceImpl.triggerPolicyGeneration(consignmentId);
   }
 
-  private void validateReturnedData(JsonNode jsonNode, HttpMethod httpMethod, Boolean verifyConsignmentId) throws IOException {
-    verify(apiClientService,times(1))
-        .getEntity(Mockito.any(), httpMethodArgumentCaptor.capture(), Mockito.anyString(),
-            multiValueMapArgumentCaptor.capture(), Mockito.any());
+  private void validateReturnedData(
+      JsonNode jsonNode, HttpMethod httpMethod, Boolean verifyConsignmentId) throws IOException {
+    verify(apiClientService, times(1))
+        .getEntity(
+            Mockito.any(),
+            httpMethodArgumentCaptor.capture(),
+            Mockito.anyString(),
+            multiValueMapArgumentCaptor.capture(),
+            Mockito.any());
     Assert.assertEquals(httpMethod, httpMethodArgumentCaptor.getValue());
     if (verifyConsignmentId)
-      Assert.assertEquals(consignmentId.toString(), multiValueMapArgumentCaptor.getValue().get("consignmentId").get(0));
+      Assert.assertEquals(
+          consignmentId.toString(),
+          multiValueMapArgumentCaptor.getValue().get("consignmentId").get(0));
 
-    verify(apiClientService,times(1))
+    verify(apiClientService, times(1))
         .parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 
   private void mockApiClientServiceGetEntity(JsonNode jsonNode) throws IOException {
-    Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(
+            apiClientService.getEntity(
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenReturn(jsonNode);
   }
 
   private void mockApiClientServiceGetEntityException() throws IOException {
-    Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(
+            apiClientService.getEntity(
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenThrow(new IOException());
   }
-
 }

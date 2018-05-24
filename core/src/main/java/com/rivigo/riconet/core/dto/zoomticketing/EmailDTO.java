@@ -12,20 +12,17 @@ import lombok.Setter;
  * @author ramesh
  * @date 04-Apr-2018
  */
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-
 public class EmailDTO {
 
-    private List<String> recipient;
+  private List<String> recipient;
 
-    private String subject;
+  private String subject;
 
-    private String  body;
-
+  private String body;
 }

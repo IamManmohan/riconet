@@ -22,37 +22,29 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by ashfakh on 9/10/17.
- */
+/** Created by ashfakh on 9/10/17. */
 @Component
 @Slf4j
 public class NotificationMain {
 
-  @Autowired
-  private DEPSNotificationConsumer depsNotificationConsumer;
+  @Autowired private DEPSNotificationConsumer depsNotificationConsumer;
 
-  @Autowired
-  private DocIssueNotificationConsumer docIssueNotificationConsumer;
+  @Autowired private DocIssueNotificationConsumer docIssueNotificationConsumer;
 
-  @Autowired
-  private PickupNotificationConsumer pickupNotificationConsumer;
+  @Autowired private PickupNotificationConsumer pickupNotificationConsumer;
 
-  @Autowired
-  private AppointmentNotificationConsumer appointmentNotificationConsumer;
+  @Autowired private AppointmentNotificationConsumer appointmentNotificationConsumer;
 
-  @Autowired
-  private RetailNotificationConsumer retailNotificationConsumer;
+  @Autowired private RetailNotificationConsumer retailNotificationConsumer;
 
-  @Autowired
-  private ZoomCommunicationsConsumer zoomCommunicationsConsumer;
-
+  @Autowired private ZoomCommunicationsConsumer zoomCommunicationsConsumer;
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("notifications");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context = new AnnotationConfigApplicationContext(
-        ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context =
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     NotificationMain consumer = context.getBean(NotificationMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -66,7 +58,8 @@ public class NotificationMain {
     consumer.load(materializer, consumerSettings);
   }
 
-  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     depsNotificationConsumer.load(materializer, consumerSettings);
     docIssueNotificationConsumer.load(materializer, consumerSettings);
     pickupNotificationConsumer.load(materializer, consumerSettings);

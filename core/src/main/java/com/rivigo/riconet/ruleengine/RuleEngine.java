@@ -15,13 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author ajay mittal
- */
-
+/** @author ajay mittal */
 public interface RuleEngine {
 
-   default boolean applyRules(Map<String, Object> bindings, List<RuleEngineRule> basicRuleList,
+  default boolean applyRules(
+      Map<String, Object> bindings,
+      List<RuleEngineRule> basicRuleList,
       List<RuleEngineRule> businessRuleList) {
     // create a singleton container for operations
     Operations operations = Operations.INSTANCE;
@@ -46,8 +45,9 @@ public interface RuleEngine {
 
     List<Expression> businessExpressionList = new ArrayList<>();
     for (RuleEngineRule businessRule : businessRuleList) {
-      Expression ex = ExpressionParser
-          .fromPostFixStringBusinessRule(businessRule.getRule(), basicExpressiosMap);
+      Expression ex =
+          ExpressionParser.fromPostFixStringBusinessRule(
+              businessRule.getRule(), basicExpressiosMap);
       businessExpressionList.add(ex);
     }
 

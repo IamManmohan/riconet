@@ -4,9 +4,7 @@ import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
 import java.util.Map;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 public class Or extends Operation {
 
   public Or() {
@@ -30,6 +28,5 @@ public class Or extends Operation {
     Boolean result = (Boolean) leftBT.getValue() || (Boolean) rightBT.getValue();
 
     return new BaseType(result, Boolean.class);
-
   }
 }

@@ -15,12 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocIssueNotificationConsumer extends ConsumerModel {
 
+  @Autowired private DocumentIssueNotificationService documentIssueNotificationService;
 
-  @Autowired
-  private DocumentIssueNotificationService documentIssueNotificationService;
-
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   @Override
   public String getTopic() {
@@ -41,11 +38,12 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
     Long userId = Long.parseLong(split[1]);
     String subReason = split[2];
     ConsignmentStatus status = ConsignmentStatus.valueOf(split[3]);
-    DocumentIssueNotification notification = documentIssueNotificationService.createNotificationData(consignmentId, userId, subReason, status);
+    DocumentIssueNotification notification =
+        documentIssueNotificationService.createNotificationData(
+            consignmentId, userId, subReason, status);
     if (notification != null) {
       documentIssueNotificationService.sendNotifications(notification);
     }
     return str;
   }
-
 }
