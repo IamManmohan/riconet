@@ -3,6 +3,8 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
@@ -352,21 +354,42 @@ public class PickupServiceImpl implements PickupService {
   }
 
   @Override
-  public void deductPickupCharges(@NotNull Map<String, String> metadata) {
-
-    if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()))
-        || StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()))) {
-      return;
+  public void deductPickupCharges(@NotNull NotificationDTO notificationDTO){
+    Map<String, String> metadata=notificationDTO.getMetadata();
+    switch (notificationDTO.getEventName()){
+      case CN_RECIEVED_AT_OU_ALL_INSTANCES:
+      case CN_DELETED:
+        if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()))
+            || StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()))) {
+          return;
+        }
+        Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
+        Long organizationId = Long
+            .parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()));
+        deductPickupCharges(pickupRepository.findOne(pickupId),organizationId);
+        break;
+      case PICKUP_COMPLETION:
+        Pickup pickup=pickupRepository.findOne(notificationDTO.getEntityId());
+        if(pickup==null){
+          return;
+        }
+        Client client=clientMasterService.getClientByCode(pickup.getClientCode());
+        if(client==null){
+          return;
+        }
+        deductPickupCharges(pickup,client.getOrganizationId());
+        break;
     }
-    Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
-    Long organizationId = Long
-        .parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()));
+  }
+
+  private void deductPickupCharges(@NotNull Pickup pickup,@NotNull Long organizationId) {
+
     if (organizationId.longValue() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       return;
     }
     List<ConsignmentReadOnly> consignments = consignmentReadOnlyService
-        .findConsignmentByPickupId(pickupId);
-    if (CollectionUtils.isEmpty(consignments)) {
+        .findConsignmentByPickupId(pickup.getId());
+    if (!PickupStatus.COMPLETE.equals(pickup.getPickupStatus()) || CollectionUtils.isEmpty(consignments)) {
       return;
     }
     Boolean isPickupConsignmentIncomplete = consignments.stream().anyMatch(
@@ -382,7 +405,7 @@ public class PickupServiceImpl implements PickupService {
         .getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3);
     BigDecimal totalCost = BigDecimal.valueOf(Math.min(minimumCharges, totalWeight * chargePerKg));
     ZoomBookBfPickupChargesRemarksDTO remarksDTO = ZoomBookBfPickupChargesRemarksDTO.builder()
-        .pickupId(pickupId)
+        .pickupId(pickup.getId())
         .minimumCharges(minimumCharges)
         .chargePerKg(chargePerKg)
         .totalCost(totalCost)
@@ -399,11 +422,11 @@ public class PickupServiceImpl implements PickupService {
         .singletonList(ZoomBookTransactionRequestDTO
             .builder()
             .amount(totalCost)
-            .clientRequestId(ZoomUtilFunctions.concat("pickup|", pickupId, "|completion"))
+            .clientRequestId(ZoomUtilFunctions.concat("pickup|", pickup.getId(), "|completion"))
             .functionType(ZoomBookFunctionType.PASSBOOK)
             .tenantType(ZoomBookTenantType.BF)
             .orgId(organizationId)
-            .reference(ZoomUtilFunctions.concat("pickup|", pickupId))
+            .reference(ZoomUtilFunctions.concat("pickup|", pickup.getId()))
             .transactionType(ZoomBookTransactionType.DEBIT)
             .transactionHeader(ZoomBookTransactionHeader.PICKUP)
             .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)

@@ -9,13 +9,15 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.PickupService;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ConsignmentCompletionPickupChargesActionConsumer extends ConsumerModel {
+public class BfPickupChargesActionConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
@@ -25,7 +27,7 @@ public class ConsignmentCompletionPickupChargesActionConsumer extends ConsumerMo
   @Autowired
   private TopicNameConfig topicNameConfig;
 
-  public ConsignmentCompletionPickupChargesActionConsumer() {
+  public BfPickupChargesActionConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
@@ -40,6 +42,10 @@ public class ConsignmentCompletionPickupChargesActionConsumer extends ConsumerMo
     return topicNameConfig.enrichedEventSinkErrorTopic();
   }
 
+  public List<EventName> eventNamesToBeConsumed(){
+    return Arrays.asList(EventName.CN_COMPLETION_ALL_INSTANCES,EventName.CN_DELETED,EventName.PICKUP_COMPLETION);
+  }
+
   @Override
   public String processMessage(String str) {
     log.info("Processing message in ZoomEventTrigger {}", str);
@@ -51,8 +57,8 @@ public class ConsignmentCompletionPickupChargesActionConsumer extends ConsumerMo
       return str;
     }
     log.debug("NotificationDTO {}", notificationDTO);
-    if(EventName.CN_COMPLETION_ALL_INSTANCES.equals(notificationDTO.getEventName())){
-      pickupService.deductPickupCharges(notificationDTO.getMetadata());
+    if(eventNamesToBeConsumed().contains(notificationDTO.getEventName())){
+      pickupService.deductPickupCharges(notificationDTO);
     }
     return str;
   }

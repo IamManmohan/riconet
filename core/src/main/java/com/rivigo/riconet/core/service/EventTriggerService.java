@@ -71,9 +71,6 @@ public class EventTriggerService {
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
-      case CN_DELETED:
-        pickupService.deductPickupCharges(notificationDTO.getMetadata());
-        break;
       default:
         log.info("Event does not trigger anything {}", eventName);
     }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.zoom.common.dto.PickupNotificationDTO;
 import com.rivigo.zoom.common.model.Pickup;
 import java.util.List;
@@ -13,5 +14,5 @@ public interface PickupService {
 
   void processPickupNotificationDTOList(List<PickupNotificationDTO> pickupNotificationDTOList);
 
-  void deductPickupCharges(Map<String, String> metadata);
+  void deductPickupCharges(NotificationDTO notificationDTO);
 }
