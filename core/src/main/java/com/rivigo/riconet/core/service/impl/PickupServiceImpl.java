@@ -430,6 +430,7 @@ public class PickupServiceImpl implements PickupService {
             .transactionType(ZoomBookTransactionType.DEBIT)
             .transactionHeader(ZoomBookTransactionHeader.PICKUP)
             .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)
+            .effectedAt(DateTime.now().getMillis())
             .remarks(remarks)
             .build());
     zoomBookAPIClientService.processZoomBookTransaction(request);
