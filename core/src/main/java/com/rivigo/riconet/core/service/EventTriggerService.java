@@ -63,8 +63,6 @@ public class EventTriggerService {
       case CN_COMPLETION_ALL_INSTANCES:
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         qcService.consumeCompletionEvent(completionData);
-        //TODO:Separate the following action into different consumer
-        pickupService.deductPickupCharges(notificationDTO.getMetadata());
         break;
       case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
         ConsignmentBasicDTO consignment = getBasicConsignmentDTO(notificationDTO);

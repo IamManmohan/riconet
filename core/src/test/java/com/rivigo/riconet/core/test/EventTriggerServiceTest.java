@@ -110,7 +110,6 @@ public class EventTriggerServiceTest {
         .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService,times(1)).consumeCompletionEvent(consignmentCompletionEventDTOCaptor.capture());
-    verify(pickupService,times(1)).deductPickupCharges(metadata);
     Assert.assertEquals("1234567890",consignmentCompletionEventDTOCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentCompletionEventDTOCaptor.getValue().getConsignmentId()==5l);
   }
