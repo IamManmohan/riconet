@@ -37,8 +37,10 @@ import com.rivigo.zoom.common.model.mongo.PickupNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mongo.PickupNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
+import com.rivigo.zoom.common.utils.ZoomUtilFunctions;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +48,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -348,15 +352,16 @@ public class PickupServiceImpl implements PickupService {
   }
 
   @Override
-  public void deductPickupCharges(Map<String, String> metadata) {
+  public void deductPickupCharges(@NotNull Map<String, String> metadata) {
 
-    if (metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()) == null
-        || metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()) == null) {
+    if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()))
+        || StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()))) {
       return;
     }
-    Long pickupId=Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
-    Long organizationId=Long.parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()));
-    if(organizationId==ConsignmentConstant.RIVIGO_ORGANIZATION_ID){
+    Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
+    Long organizationId = Long
+        .parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZTION_ID.name()));
+    if (organizationId.longValue() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       return;
     }
     List<ConsignmentReadOnly> consignments = consignmentReadOnlyService
@@ -388,17 +393,17 @@ public class PickupServiceImpl implements PickupService {
     try {
       remarks = objectMapper.writeValueAsString(remarksDTO);
     } catch (JsonProcessingException e) {
-      log.error("Error while writing pickup remarks to String");
+      log.error("Error while writing pickup remarks {} to String", remarksDTO);
     }
     List<ZoomBookTransactionRequestDTO> request = Collections
         .singletonList(ZoomBookTransactionRequestDTO
             .builder()
             .amount(totalCost)
-            .clientRequestId("pickup|" + pickupId + "|completion")
+            .clientRequestId(ZoomUtilFunctions.concat("pickup|", pickupId, "|completion"))
             .functionType(ZoomBookFunctionType.PASSBOOK)
             .tenantType(ZoomBookTenantType.BF)
             .orgId(organizationId)
-            .reference("pickup|" + pickupId)
+            .reference(ZoomUtilFunctions.concat("pickup|", pickupId))
             .transactionType(ZoomBookTransactionType.DEBIT)
             .transactionHeader(ZoomBookTransactionHeader.PICKUP)
             .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)
@@ -406,4 +411,5 @@ public class PickupServiceImpl implements PickupService {
             .build());
     zoomBookAPIClientService.processZoomBookTransaction(request);
   }
+
 }
