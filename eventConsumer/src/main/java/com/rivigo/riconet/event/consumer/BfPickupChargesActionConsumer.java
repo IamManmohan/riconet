@@ -48,7 +48,7 @@ public class BfPickupChargesActionConsumer extends ConsumerModel {
 
   @Override
   public String processMessage(String str) {
-    log.info("Processing message in ZoomEventTrigger {}", str);
+    log.info("Processing message in BfPickupChargesActionConsumer {}", str);
     NotificationDTO notificationDTO = null;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
