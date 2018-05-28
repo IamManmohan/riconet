@@ -17,5 +17,9 @@ public enum ZoomCommunicationFieldNames {
   DESTINATION_FIELD_USER_PHONE,
   CREATED_BY,
   CONSIGNER_ADDRESS,
-  CONSIGNEE_ADDRESS
+  CONSIGNEE_ADDRESS;
+
+  public enum Reason {
+    CHEQUE_BOUNCE_REASON_ID
+  }
 }
