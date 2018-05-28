@@ -400,10 +400,10 @@ public class PickupServiceImpl implements PickupService {
     }
     Double totalWeight = consignments.stream().mapToDouble(ConsignmentReadOnly::getWeight).sum();
     Double minimumCharges = zoomPropertyService
-        .getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0);
+        .getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 400.0);
     Double chargePerKg = zoomPropertyService
         .getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3);
-    BigDecimal totalCost = BigDecimal.valueOf(Math.min(minimumCharges, totalWeight * chargePerKg));
+    BigDecimal totalCost = BigDecimal.valueOf(Math.max(minimumCharges, totalWeight * chargePerKg));
     ZoomBookBfPickupChargesRemarksDTO remarksDTO = ZoomBookBfPickupChargesRemarksDTO.builder()
         .pickupId(pickup.getId())
         .minimumCharges(minimumCharges)
