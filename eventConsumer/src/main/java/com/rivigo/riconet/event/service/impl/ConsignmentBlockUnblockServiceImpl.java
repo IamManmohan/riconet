@@ -61,8 +61,8 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
     ConsignmentBlockerRequestDTO requestDTO = ConsignmentBlockerRequestDTO.builder()
         .requestType(requestType)
         .isActive(Boolean.TRUE)
-        .reason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name()))
-        .subReason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_SUB_REASON.name()))
+        .reason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.REASON.name()))
+        .subReason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.SUB_REASON.name()))
         .consignmentId(notificationDTO.getEntityId())
         .build();
     try {
