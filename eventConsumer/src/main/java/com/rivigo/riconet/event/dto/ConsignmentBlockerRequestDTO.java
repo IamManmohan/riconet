@@ -17,7 +17,8 @@ import lombok.ToString;
 public class ConsignmentBlockerRequestDTO {
 
   private Long consignmentId;
-  private Long reasonId;
+  private String reason;
+  private String subReason;
   private Boolean isActive;
   private ConsignmentBlockerRequestType requestType;
 

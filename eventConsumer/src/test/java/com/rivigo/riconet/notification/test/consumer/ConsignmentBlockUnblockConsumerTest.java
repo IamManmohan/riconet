@@ -1,6 +1,5 @@
 package com.rivigo.riconet.notification.test.consumer;
 
-import com.amazonaws.services.ec2.model.PaymentOption;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.oauth2.resource.controller.Response;
@@ -13,7 +12,6 @@ import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import com.rivigo.riconet.event.service.impl.ConsignmentBlockUnblockServiceImpl;
 import com.rivigo.zoom.common.enums.PaymentMode;
-import org.apache.log4j.NDC;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
@@ -70,7 +68,7 @@ public class ConsignmentBlockUnblockConsumerTest {
   public void processMessagePrepaid() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PREPAID.name());
-    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON_ID.name(), REASON_ID.toString());
+    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name(), REASON_ID.toString());
     NotificationDTO dto = NotificationDTO.builder()
         .entityId(ENTITY_ID)
         .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
@@ -84,7 +82,7 @@ public class ConsignmentBlockUnblockConsumerTest {
   public void processMessageUnblock() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PREPAID.name());
-    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON_ID.name(), REASON_ID.toString());
+    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name(), REASON_ID.toString());
     NotificationDTO dto = NotificationDTO.builder()
         .entityId(ENTITY_ID)
         .eventName(EventName.CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED)

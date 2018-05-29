@@ -45,18 +45,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
   }
 
   private void unblockCn(NotificationDTO notificationDTO) {
-    ConsignmentBlockerRequestDTO requestDTO = ConsignmentBlockerRequestDTO.builder()
-        .requestType(ConsignmentBlockerRequestType.UNBLOCK)
-        .isActive(Boolean.TRUE)
-        .reasonId(Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON_ID.name())))
-        .consignmentId(notificationDTO.getEntityId())
-        .build();
-    try {
-      JsonNode responseJson = apiClientService.getEntity(requestDTO, HttpMethod.POST, "/consignmentBlocker", null, zoomBackendBaseUrl);
-      log.debug("response {}", responseJson);
-    } catch (IOException e) {
-      log.error("Exception occurred while unblocking cn in zoom tech", e);
-    }
+    blockUnblockRequest(notificationDTO, ConsignmentBlockerRequestType.UNBLOCK);
   }
 
   private void blockCn(NotificationDTO notificationDTO) {
@@ -65,10 +54,15 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
       log.info("Cheque bounce occurred for to pay cn. So cn {} will not be blocked", notificationDTO.getEntityId());
       return;
     }
+    blockUnblockRequest(notificationDTO, ConsignmentBlockerRequestType.BLOCK);
+  }
+
+  private void blockUnblockRequest(NotificationDTO notificationDTO, ConsignmentBlockerRequestType requestType) {
     ConsignmentBlockerRequestDTO requestDTO = ConsignmentBlockerRequestDTO.builder()
-        .requestType(ConsignmentBlockerRequestType.BLOCK)
+        .requestType(requestType)
         .isActive(Boolean.TRUE)
-        .reasonId(Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON_ID.name())))
+        .reason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name()))
+        .subReason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_SUB_REASON.name()))
         .consignmentId(notificationDTO.getEntityId())
         .build();
     try {

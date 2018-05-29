@@ -20,6 +20,7 @@ public enum ZoomCommunicationFieldNames {
   CONSIGNEE_ADDRESS;
 
   public enum Reason {
-    CHEQUE_BOUNCE_REASON_ID
+    CHEQUE_BOUNCE_REASON,
+    CHEQUE_BOUNCE_SUB_REASON
   }
 }
