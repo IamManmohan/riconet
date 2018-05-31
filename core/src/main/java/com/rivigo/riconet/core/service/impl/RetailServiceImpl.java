@@ -109,7 +109,7 @@ public class RetailServiceImpl implements RetailService {
             retailNotificationDTOList
                 .stream()
                 .map(RetailNotificationDTO::getTotalAmount)
-                .reduce((x, y) -> x.add(y))
+                .reduce(BigDecimal::add)
                 .get()
                 .setScale(1, BigDecimal.ROUND_HALF_EVEN))
         .append(" for ")

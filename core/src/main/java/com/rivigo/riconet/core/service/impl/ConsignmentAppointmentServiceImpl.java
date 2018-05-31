@@ -258,25 +258,23 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
     if (templateString != null && isEmailEnabled) {
       String body = designEmailTemplate(notificationList.get(0), templateString);
       String subject = designEmailTemplate(notificationList.get(0), subjectTemplate);
-      SXSSFWorkbook wb = new SXSSFWorkbook(100);
-      Sheet sheet = wb.createSheet("Consignments");
-      Row headerRow = sheet.createRow(0);
-      Cell headerCell = headerRow.createCell(0);
-      headerCell.setCellValue("Cnote");
-      int[] counter = {1};
-      notificationList.forEach(
-          p -> {
-            Row row = sheet.createRow(counter[0]++);
-            Cell cell = row.createCell(0);
-            cell.setCellValue(p.getCnote());
-          });
-      File file = new File("Missed_Appointment_Delivery.xlsx");
-      ByteArrayOutputStream output = new ByteArrayOutputStream();
-      try {
+      try (SXSSFWorkbook wb = new SXSSFWorkbook(100)) {
+        Sheet sheet = wb.createSheet("Consignments");
+        Row headerRow = sheet.createRow(0);
+        Cell headerCell = headerRow.createCell(0);
+        headerCell.setCellValue("Cnote");
+        int[] counter = {1};
+        notificationList.forEach(
+            p -> {
+              Row row = sheet.createRow(counter[0]++);
+              Cell cell = row.createCell(0);
+              cell.setCellValue(p.getCnote());
+            });
+        File file = new File("Missed_Appointment_Delivery.xlsx");
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         wb.write(output);
         output.close();
         wb.dispose();
-        wb.close();
         byte[] contents = output.toByteArray();
         FileUtils.writeByteArrayToFile(file, contents);
         emailService.sendAppointmentEmail(
