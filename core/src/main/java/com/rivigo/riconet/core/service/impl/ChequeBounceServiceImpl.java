@@ -70,8 +70,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
         .append(" | Rs.")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.AMOUNT.name()))
         .append(" | CMS Date ")
-        .append(getDateTimeString(
-            Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))));
+        .append(getDateTimeString(Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))));
     return sb.toString();
   }
 
@@ -80,8 +79,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
     sb.append("This cheque deposited from your branch for CN ")
         .append(dto.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
         .append("  to CMS on ")
-        .append(getDateTimeString(
-            Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))))
+        .append(getDateTimeString(Long.valueOf(dto.getMetadata().get(ZoomCommunicationFieldNames.DEPOSIT_DATE.name()))))
         .append(" has bounced. Please reach out to the ")
         .append(getConsignorOrConsignee(dto))
         .append(" and resolve this payment. You may reach out to Finance team for further details.");
@@ -114,12 +112,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
   private String getDateTimeString(Long millis) {
     DateTime time = new DateTime(millis);
     StringBuilder sb = new StringBuilder();
-    sb.append(time.year().get())
-        .append("-")
-        .append(time.monthOfYear().get())
-        .append("-")
-        .append(time.dayOfMonth().get());
+    sb.append(time.year().get()).append("-").append(time.monthOfYear().get()).append("-").append(time.dayOfMonth().get());
     return sb.toString();
   }
-
 }
