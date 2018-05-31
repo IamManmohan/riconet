@@ -9,15 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 @Slf4j
 @Component
 public class QCRuleEngine implements RuleEngine {
 
-  @Autowired
-  private RuleEngineRuleRepository ruleEngineRuleRepository;
+  @Autowired private RuleEngineRuleRepository ruleEngineRuleRepository;
 
   @Override
   public boolean getRulesFromDBAndApply(Map<String, Object> bindings, String businessRuleName) {
@@ -27,14 +24,13 @@ public class QCRuleEngine implements RuleEngine {
     List<RuleEngineRule> businessRuleList = getBusinessRuleListFromDB(businessRuleName);
 
     log.info("QCRuleEngine calling applyRules");
-    //result is...is task creation required or not
+    // result is...is task creation required or not
     return applyRules(bindings, basicRuleList, businessRuleList);
   }
 
   private List<RuleEngineRule> getBasicRuleListFromDB() {
 
-    List<RuleEngineRule> basicRuleList = ruleEngineRuleRepository
-        .findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true);
+    List<RuleEngineRule> basicRuleList = ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true);
 
     log.debug("QCRuleEngine BasicRuleListFromDB {}", basicRuleList);
     return basicRuleList;
@@ -42,11 +38,11 @@ public class QCRuleEngine implements RuleEngine {
 
   private List<RuleEngineRule> getBusinessRuleListFromDB(String businessRuleName) {
 
-    List<RuleEngineRule> businessRuleList = ruleEngineRuleRepository
-        .findByRuleNameAndRuleTypeAndIsActive(businessRuleName, RuleType.BUSINESS_RULE, true);
+    List<RuleEngineRule> businessRuleList =
+        ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive(businessRuleName, RuleType.BUSINESS_RULE, true);
     log.debug("QCRuleEngine BusinessRuleListFromDB {}", businessRuleList);
 
-    //pending...sorting it based on priority
+    // pending...sorting it based on priority
     return businessRuleList;
   }
 }

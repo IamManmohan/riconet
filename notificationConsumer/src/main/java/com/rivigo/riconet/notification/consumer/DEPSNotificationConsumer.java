@@ -24,11 +24,9 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class DEPSNotificationConsumer extends ConsumerModel {
 
-
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private DEPSRecordService depsRecordService;
+  @Autowired private DEPSRecordService depsRecordService;
 
   public DEPSNotificationConsumer() {
     objectMapper = new ObjectMapper();
@@ -45,17 +43,18 @@ public class DEPSNotificationConsumer extends ConsumerModel {
     return Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name();
   }
 
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   public String processMessage(String str) throws IOException {
     DEPSNotificationContext context = null;
-    TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {
-    };
+    TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {};
     List<DEPSNotificationDTO> depsRecordList = objectMapper.readValue(str, mapType);
-    Set<Long> shortageConsignmentIds = depsRecordList.stream()
-        .filter(depsRecord -> depsRecord.getDepsType() == DEPSType.SHORTAGE)
-        .map(DEPSNotificationDTO::getConsignmentId).collect(Collectors.toSet());
+    Set<Long> shortageConsignmentIds =
+        depsRecordList
+            .stream()
+            .filter(depsRecord -> depsRecord.getDepsType() == DEPSType.SHORTAGE)
+            .map(DEPSNotificationDTO::getConsignmentId)
+            .collect(Collectors.toSet());
 
     if (CollectionUtils.isEmpty(shortageConsignmentIds)) {
       log.info("No shortage tickets found ");

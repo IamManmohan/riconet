@@ -7,16 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Slf4j
 @Service
 public class ConsignmentCodDodServiceImpl implements ConsignmentCodDodService {
 
-  @Autowired
-  private ConsignmentCodDodRepository consignmentCodDodRepository;
+  @Autowired private ConsignmentCodDodRepository consignmentCodDodRepository;
 
   @Override
   public ConsignmentCodDod getActiveCodDod(Long consignmentId) {
-    return consignmentCodDodRepository.findByConsignmentIdAndIsActive(consignmentId,true);
+    return consignmentCodDodRepository.findByConsignmentIdAndIsActive(consignmentId, true);
   }
 }

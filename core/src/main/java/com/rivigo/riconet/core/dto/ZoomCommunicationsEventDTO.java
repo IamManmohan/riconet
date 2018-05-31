@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,10 +27,9 @@ public class ZoomCommunicationsEventDTO {
 
   private String eventUID;
 
-  private Map<String, String> metadata ;
+  private Map<String, String> metadata;
 
   private List<Object> subscribers;
 
   private List<String> conditions;
-
 }

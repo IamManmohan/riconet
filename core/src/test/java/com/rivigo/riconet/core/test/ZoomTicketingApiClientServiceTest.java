@@ -30,27 +30,20 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.MultiValueMap;
 
-
 @Slf4j
 public class ZoomTicketingApiClientServiceTest {
 
-  @InjectMocks
-  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService;
+  @InjectMocks private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService;
 
-  @Mock
-  private ApiClientService apiClientService;
+  @Mock private ApiClientService apiClientService;
 
-  @Captor
-  private ArgumentCaptor<JsonNode> jsonNodeArgumentCaptor;
+  @Captor private ArgumentCaptor<JsonNode> jsonNodeArgumentCaptor;
 
-  @Captor
-  private ArgumentCaptor<MultiValueMap<String, String>> multiValueMapArgumentCaptor;
+  @Captor private ArgumentCaptor<MultiValueMap<String, String>> multiValueMapArgumentCaptor;
 
-  @Captor
-  private ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor;
+  @Captor private ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor;
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void initMocks() {
@@ -58,22 +51,21 @@ public class ZoomTicketingApiClientServiceTest {
   }
 
   private String cnote = "1234567890";
-  private List<String> typeId = Arrays
-      .asList(ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
-          ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
+  private List<String> typeId =
+      Arrays.asList(ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(), ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
 
   @Test
   public void getTicketsByCnoteNullCheck() {
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Please provide a valid cnote");
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(null,null);
+    zoomTicketingAPIClientService.getTicketsByCnoteAndType(null, null);
   }
 
   @Test
   public void getTicketsByCnoteAndTypeTest() throws IOException {
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote,typeId);
+    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote, typeId);
     validateReturnedData(HttpMethod.GET);
     Assert.assertEquals(cnote, multiValueMapArgumentCaptor.getValue().get("entityId").get(0));
     Assert.assertEquals(typeId, multiValueMapArgumentCaptor.getValue().get("typeId"));
@@ -85,7 +77,7 @@ public class ZoomTicketingApiClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while getting qc tickets with cnote 1234567890");
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote,typeId);
+    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote, typeId);
   }
 
   @Test
@@ -176,23 +168,21 @@ public class ZoomTicketingApiClientServiceTest {
   }
 
   private void validateReturnedData(HttpMethod httpMethod) throws IOException {
-    verify(apiClientService,times(1))
-        .getEntity(Mockito.any(), httpMethodArgumentCaptor.capture(), Mockito.anyString(),
-            multiValueMapArgumentCaptor.capture(), Mockito.any());
+    verify(apiClientService, times(1))
+        .getEntity(
+            Mockito.any(), httpMethodArgumentCaptor.capture(), Mockito.anyString(), multiValueMapArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(httpMethod, httpMethodArgumentCaptor.getValue());
   }
 
   private void validateParsingCallDone(JsonNode jsonNode) {
-    verify(apiClientService,times(1))
-        .parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
+    verify(apiClientService, times(1)).parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 
-
   private void mockApiClientServiceGetEntity(JsonNode jsonNode) throws IOException {
-  Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-      .thenReturn(jsonNode);
-}
+    Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn(jsonNode);
+  }
 
   private void mockApiClientServiceGetEntityException() throws IOException {
     Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -207,6 +197,4 @@ public class ZoomTicketingApiClientServiceTest {
         .id(1L)
         .build();
   }
-
-
 }

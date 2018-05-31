@@ -31,35 +31,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConsignmentServiceImpl implements ConsignmentService {
 
-  @Autowired
-  private ConsignmentRepository consignmentRepo;
+  @Autowired private ConsignmentRepository consignmentRepo;
 
-  @Autowired
-  private ConsignmentHistoryRepository historyRepo;
+  @Autowired private ConsignmentHistoryRepository historyRepo;
 
-  @Autowired
-  private OrganizationService organizationService;
+  @Autowired private OrganizationService organizationService;
 
-  @Autowired
-  private ConsignmentScheduleService consignmentScheduleService;
+  @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
-  @Autowired
-  private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Override
-  public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(List<Long> cnIds,
-      List<String> statusList) {
-    List<ConsignmentHistory> historyList = historyRepo.
-        findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(cnIds, statusList);
-    return historyList.stream()
-        .collect(Collectors.toMap(ConsignmentHistory::getConsignmentId, c -> c));
+  public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(List<Long> cnIds, List<String> statusList) {
+    List<ConsignmentHistory> historyList = historyRepo.findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(cnIds, statusList);
+    return historyList.stream().collect(Collectors.toMap(ConsignmentHistory::getConsignmentId, c -> c));
   }
 
   @Override
   public ConsignmentHistory getLastScanByCnId(Long cnId, List<String> statusList) {
-    List<ConsignmentHistory> historyList = historyRepo.
-        findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(
-            Arrays.asList(cnId), statusList);
+    List<ConsignmentHistory> historyList =
+        historyRepo.findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(Arrays.asList(cnId), statusList);
     return historyList.isEmpty() ? null : historyList.get(0);
   }
 
@@ -71,8 +62,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public List<Consignment> findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
       List<Long> consignmentIdList, List<ConsignmentStatus> statusList) {
-    return consignmentRepo
-        .findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList, statusList);
+    return consignmentRepo.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList, statusList);
   }
 
   @Override
@@ -95,8 +85,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
   @Override
   public void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO) {
-    BigInteger organizationId=consignmentRepo.getOrganizationId(unloadingEventDTO.getConsignmentId());
-    if(organizationId==null){
+    BigInteger organizationId = consignmentRepo.getOrganizationId(unloadingEventDTO.getConsignmentId());
+    if (organizationId == null) {
       return;
     }
     Organization organization = organizationService.getById(organizationId.longValue());
@@ -104,16 +94,17 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     if (organization == null || organization.getType() != OrganizationType.BF) {
       return;
     }
-    Boolean rivigoOuLeft=consignmentScheduleService.getActivePlan(unloadingEventDTO.getConsignmentId()).stream()
-        .anyMatch(this::isLeftRivigoLocation);
-    if(rivigoOuLeft){
+    Boolean rivigoOuLeft =
+        consignmentScheduleService.getActivePlan(unloadingEventDTO.getConsignmentId()).stream().anyMatch(this::isLeftRivigoLocation);
+    if (rivigoOuLeft) {
       return;
     }
     zoomBackendAPIClientService.recalculateCpdOfBf(unloadingEventDTO.getConsignmentId());
   }
 
-  private Boolean isLeftRivigoLocation(ConsignmentSchedule schedule){
-    List<LocationTag> nonRivigoLocationTag=Arrays.asList(LocationTag.BF,LocationTag.DF,LocationTag.FROM_PINCODE,LocationTag.TO_PINCODE);
+  private Boolean isLeftRivigoLocation(ConsignmentSchedule schedule) {
+    List<LocationTag> nonRivigoLocationTag =
+        Arrays.asList(LocationTag.BF, LocationTag.DF, LocationTag.FROM_PINCODE, LocationTag.TO_PINCODE);
     return LocationTypeV2.LOCATION.equals(schedule.getLocationType())
         && ConsignmentLocationStatus.LEFT.equals(schedule.getPlanStatus())
         && !nonRivigoLocationTag.contains(schedule.getLocationTag());

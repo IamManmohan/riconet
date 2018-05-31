@@ -14,5 +14,4 @@ public interface DEPSRecordService {
   void sendNotifications(List<DEPSNotification> depsNotificationList);
 
   DEPSNotificationContext getNotificationContext(List<DEPSNotificationDTO> depsRecordList);
-
 }

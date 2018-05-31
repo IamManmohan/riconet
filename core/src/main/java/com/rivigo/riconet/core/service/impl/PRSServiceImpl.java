@@ -15,14 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PRSServiceImpl implements PRSService {
 
-  @Autowired
-  private PRSRepository prsRepository;
+  @Autowired private PRSRepository prsRepository;
 
   @Override
   public Map<Long, PickupRunSheet> getPrsMapByPRSIdIn(List<Long> prsTripIdList) {
-    return ((List<PickupRunSheet>) prsRepository.findAll(prsTripIdList)).stream()
+    return ((List<PickupRunSheet>) prsRepository.findAll(prsTripIdList))
+        .stream()
         .collect(Collectors.toMap(PickupRunSheet::getId, Function.identity()));
   }
 }
-
-

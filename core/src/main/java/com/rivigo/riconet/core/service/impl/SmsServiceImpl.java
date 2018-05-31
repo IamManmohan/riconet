@@ -26,7 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class SmsServiceImpl implements SmsService {
 
-  public static final  String X_USER_AGENT_HEADER = "X-User-Agent";
+  public static final String X_USER_AGENT_HEADER = "X-User-Agent";
 
   private static final String SMS_DISABLED = "sending sms is disabled";
 
@@ -48,8 +48,7 @@ public class SmsServiceImpl implements SmsService {
   @Value("${notification.client.code}")
   private String notificationClientCode;
 
-  @Autowired
-  public ZoomPropertyService zoomPropertyService;
+  @Autowired public ZoomPropertyService zoomPropertyService;
 
   public String sendSms(String mobileNo, String message) {
 
@@ -69,13 +68,14 @@ public class SmsServiceImpl implements SmsService {
     if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
       phoneNumbers.add(mobileNo);
     } else {
-      String defaultPhone = zoomPropertyService
-          .getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
+      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
       String[] defaultPhones = defaultPhone.split(",");
-      Arrays.stream(defaultPhones).forEach(phoneNumber -> {
-        log.info("Default phone no is : " + defaultPhone);
-        phoneNumbers.add(phoneNumber);
-      });
+      Arrays.stream(defaultPhones)
+          .forEach(
+              phoneNumber -> {
+                log.info("Default phone no is : " + defaultPhone);
+                phoneNumbers.add(phoneNumber);
+              });
       smsString = mobileNo + " - " + smsString;
     }
 
@@ -99,8 +99,7 @@ public class SmsServiceImpl implements SmsService {
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
       log.info("sms api from properties {}", smsApi);
       String url = rootUrl.concat(smsApi);
-      ResponseEntity responseEng = restTemplate.exchange(url,
-          HttpMethod.POST, entity, Object.class);
+      ResponseEntity responseEng = restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
 
       if (responseEng == null) {
         throw new ZoomException("SMS is not sent properly");

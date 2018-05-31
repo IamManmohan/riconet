@@ -20,17 +20,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserMasterServiceImpl implements UserMasterService {
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private ZoomUserMasterService zoomUserMasterService;
+  @Autowired private ZoomUserMasterService zoomUserMasterService;
 
-  @Autowired
-  private ClientUserRepository clientUserRepository;
+  @Autowired private ClientUserRepository clientUserRepository;
 
-  @Autowired
-  private StockAccumulatorRepository stockAccumulatorRepository;
+  @Autowired private StockAccumulatorRepository stockAccumulatorRepository;
 
   @Override
   public User getById(Long id) {
@@ -87,6 +83,4 @@ public class UserMasterServiceImpl implements UserMasterService {
     }
     return stockAccumulator;
   }
-
-
 }

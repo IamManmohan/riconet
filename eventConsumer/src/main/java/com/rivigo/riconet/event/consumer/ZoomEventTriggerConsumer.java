@@ -11,21 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by ashfakh on 19/4/18.
- */
-
+/** Created by ashfakh on 19/4/18. */
 @Slf4j
 @Component
 public class ZoomEventTriggerConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private EventTriggerService eventTriggerService;
+  @Autowired private EventTriggerService eventTriggerService;
 
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   public ZoomEventTriggerConsumer() {
     objectMapper = new ObjectMapper();

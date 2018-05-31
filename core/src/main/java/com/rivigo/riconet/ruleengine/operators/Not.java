@@ -1,9 +1,6 @@
 package com.rivigo.riconet.ruleengine.operators;
 
-/**
- * @author ajay mittal
- */
-
+/** @author ajay mittal */
 import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Expression;
 import com.rivigo.riconet.ruleengine.Operation;
@@ -26,7 +23,6 @@ public class Not extends Operation {
 
     this.rightOperand = right;
     stack.push(this);
-
   }
 
   @Override

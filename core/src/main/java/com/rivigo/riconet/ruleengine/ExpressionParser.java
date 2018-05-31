@@ -1,16 +1,13 @@
 package com.rivigo.riconet.ruleengine;
 
-/**
- * @author ajay mittal
- */
-
+/** @author ajay mittal */
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
 public class ExpressionParser {
 
-  ExpressionParser(){}
+  ExpressionParser() {}
 
   private static final Operations operations = Operations.INSTANCE;
 
@@ -28,14 +25,12 @@ public class ExpressionParser {
 
         stack.push(new Variable(tokens[i]));
       }
-
     }
 
     return stack.pop();
   }
 
-  public static Expression fromPostFixStringBusinessRule(String expr,
-      Map<String, Expression> basicExpressionMap) {
+  public static Expression fromPostFixStringBusinessRule(String expr, Map<String, Expression> basicExpressionMap) {
     Deque<Expression> stack = new ArrayDeque<>();
 
     String[] tokens = expr.split("\\s");
@@ -49,10 +44,8 @@ public class ExpressionParser {
 
         stack.push(basicExpressionMap.get(tokens[i]));
       }
-
     }
 
     return stack.pop();
   }
-
 }

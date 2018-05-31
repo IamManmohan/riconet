@@ -10,5 +10,3 @@ public interface PRSService {
 
   Map<Long, PickupRunSheet> getPrsMapByPRSIdIn(List<Long> prsTripIdList);
 }
-
-

@@ -15,10 +15,9 @@ public final class TicketPredicate {
   }
 
   public static Predicate<TicketDTO> isOpenQcTicket() {
-    return ticketDTO -> Arrays.asList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID,
-        ZoomTicketingConstant.QC_RECHECK_TYPE_ID).contains(ticketDTO.getTypeId())
-        && !TicketStatus.CLOSED.equals(ticketDTO.getStatus());
+    return ticketDTO ->
+        Arrays.asList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID, ZoomTicketingConstant.QC_RECHECK_TYPE_ID)
+                .contains(ticketDTO.getTypeId())
+            && !TicketStatus.CLOSED.equals(ticketDTO.getStatus());
   }
-
-
 }

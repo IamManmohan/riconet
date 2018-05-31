@@ -5,24 +5,18 @@ import org.jboss.netty.util.Timeout;
 import org.jboss.netty.util.TimerTask;
 import org.springframework.kafka.core.KafkaTemplate;
 
-/**
- * Created by ashfakh on 9/10/17.
- */
+/** Created by ashfakh on 9/10/17. */
 @AllArgsConstructor
 public class ConsumerTimer implements TimerTask {
 
-    private final String msgId;
+  private final String msgId;
 
-    private final String topic;
+  private final String topic;
 
-    private KafkaTemplate kafkaTemplate;
+  private KafkaTemplate kafkaTemplate;
 
-
-
-
-    @Override
-    public void run(Timeout timeout) throws Exception{
-        kafkaTemplate.send(topic,msgId);
-    }
-
+  @Override
+  public void run(Timeout timeout) throws Exception {
+    kafkaTemplate.send(topic, msgId);
+  }
 }

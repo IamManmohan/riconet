@@ -1,9 +1,6 @@
 package com.rivigo.riconet.ruleengine;
 
-/**
- * @author ajay mittal
- */
-
+/** @author ajay mittal */
 import java.util.Deque;
 
 public abstract class Operation implements Expression {
@@ -31,7 +28,5 @@ public abstract class Operation implements Expression {
     this.rightOperand = right;
 
     stack.push(this);
-
   }
-
 }
