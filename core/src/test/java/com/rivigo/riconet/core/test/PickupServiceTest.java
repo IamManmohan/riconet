@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.PickupServiceImpl;
@@ -58,6 +59,8 @@ public class PickupServiceTest {
   @Mock private PickupRepository pickupRepository;
 
   @Mock private ClientMasterService clientMasterService;
+
+  @Mock private ConsignmentService consignmentService;
 
   @Spy private ObjectMapper objectMapper;
 
@@ -153,7 +156,7 @@ public class PickupServiceTest {
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
     when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
-
+    when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
     when(zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0))
         .thenReturn(100.0);
     when(zoomPropertyService.getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3))
@@ -195,6 +198,7 @@ public class PickupServiceTest {
 
     Client client = new Client();
     client.setOrganizationId(100l);
+    when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
     when(clientMasterService.getClientByCode(pickup.getClientCode())).thenReturn(client);
     when(consignmentReadOnlyService.findConsignmentByPickupId(23l))

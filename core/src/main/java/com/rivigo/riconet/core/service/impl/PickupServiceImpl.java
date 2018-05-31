@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.SmsService;
@@ -85,6 +86,8 @@ public class PickupServiceImpl implements PickupService {
   @Autowired private ZoomBookAPIClientService zoomBookAPIClientService;
 
   @Autowired private ObjectMapper objectMapper;
+
+  @Autowired private ConsignmentService consignmentService;
 
   @Override
   public Map<Long, Pickup> getPickupMapByIdIn(List<Long> pickupTripIdList) {
@@ -426,7 +429,13 @@ public class PickupServiceImpl implements PickupService {
       return;
     }
     List<ConsignmentReadOnly> consignments =
-        consignmentReadOnlyService.findConsignmentByPickupId(pickup.getId());
+        consignmentReadOnlyService
+            .findConsignmentByPickupId(pickup.getId())
+            .stream()
+            .filter(
+                consignmentReadOnly ->
+                    consignmentService.isPrimaryConsignment(consignmentReadOnly.getCnote()))
+            .collect(Collectors.toList());
     if (!PickupStatus.COMPLETE.equals(pickup.getPickupStatus())
         || CollectionUtils.isEmpty(consignments)) {
       return;
