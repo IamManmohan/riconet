@@ -35,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -46,7 +45,6 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
   private static final String FAILURE = "FAILURE";
   private static final String STATUS = "status";
   private static final String SUCCESS = "SUCCESS";
-  private static final String TIMEOUT="TIMEOUT";
   private static final String CLIENT_TOKEN = "clientToken";
   private static final String CLIENT_KEY = "clientKey";
   private static final String RESPONSE = "response";

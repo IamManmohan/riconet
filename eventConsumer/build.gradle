@@ -13,10 +13,3 @@ dependencies {
     compile project(':core')
 }
 
-apply plugin: "com.diffplug.gradle.spotless"
-
-spotless {
-    java {
-        googleJavaFormat('15.9')
-    }
-}
