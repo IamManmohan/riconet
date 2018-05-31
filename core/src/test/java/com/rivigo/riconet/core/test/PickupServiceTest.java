@@ -17,7 +17,8 @@ public class PickupServiceTest {
     DEPSNotificationContext context = null;
     List<PickupNotificationDTO> pickupNotificationDTOList = null;
     try {
-      TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {};
+      TypeReference<List<PickupNotificationDTO>> mapType =
+          new TypeReference<List<PickupNotificationDTO>>() {};
       ObjectMapper objectMapper = new ObjectMapper();
       pickupNotificationDTOList = objectMapper.readValue(str, mapType);
     } catch (Exception e) {
@@ -28,32 +29,38 @@ public class PickupServiceTest {
   }
 
   public void createPickup() {
-    String str = "[{\"id\":1,\"lastUpdatedAt\":1510036034224,\"notificationType\":\"PICKUP_CREATED\"}]";
+    String str =
+        "[{\"id\":1,\"lastUpdatedAt\":1510036034224,\"notificationType\":\"PICKUP_CREATED\"}]";
     processMessage(str);
   }
 
   public void createPickupBpAutoAssign() {
-    String str = "[{\"id\":2,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_CREATED\"}]";
+    String str =
+        "[{\"id\":2,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_CREATED\"}]";
     processMessage(str);
   }
 
   public void AssignBp() {
-    String str = "[{\"id\":3,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
+    String str =
+        "[{\"id\":3,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
     processMessage(str);
   }
 
   public void AssignBpCaptain() {
-    String str = "[{\"id\":4,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
+    String str =
+        "[{\"id\":4,\"lastUpdatedAt\":1510036961494,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
     processMessage(str);
   }
 
   public void AssignZoomUser() {
-    String str = "[{\"id\":5,\"lastUpdatedAt\":1510037019087,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
+    String str =
+        "[{\"id\":5,\"lastUpdatedAt\":1510037019087,\"notificationType\":\"PICKUP_ASSIGNED\"}]";
     processMessage(str);
   }
 
   public void markPickupReached() {
-    String str = "[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
+    String str =
+        "[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
     processMessage(str);
   }
 

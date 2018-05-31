@@ -67,19 +67,26 @@ public class PickupServiceImpl implements PickupService {
   }
 
   @Override
-  public void processPickupNotificationDTOList(List<PickupNotificationDTO> pickupNotificationDTOList) {
+  public void processPickupNotificationDTOList(
+      List<PickupNotificationDTO> pickupNotificationDTOList) {
     if (CollectionUtils.isEmpty(pickupNotificationDTOList)) {
       return;
     }
     if (pickupNotificationDTOList.size() == 1
         && pickupNotificationDTOList.get(0).getId() == null
-        && PickupNotificationType.PICKUP_DELAYED.equals(pickupNotificationDTOList.get(0).getNotificationType())) {
+        && PickupNotificationType.PICKUP_DELAYED.equals(
+            pickupNotificationDTOList.get(0).getNotificationType())) {
       processDelayedPickups(pickupNotificationDTOList.get(0).getLastUpdatedAt());
       return;
     }
     Map<Long, Pickup> pickupMap =
-        getPickupMapByIdIn(pickupNotificationDTOList.stream().map(PickupNotificationDTO::getId).collect(Collectors.toList()));
-    String locationCodes = zoomPropertyService.getString(ZoomPropertyName.PICKUP_NOTIFICATION_ALLOWED_LOCATIONS);
+        getPickupMapByIdIn(
+            pickupNotificationDTOList
+                .stream()
+                .map(PickupNotificationDTO::getId)
+                .collect(Collectors.toList()));
+    String locationCodes =
+        zoomPropertyService.getString(ZoomPropertyName.PICKUP_NOTIFICATION_ALLOWED_LOCATIONS);
     pickupNotificationDTOList.forEach(
         pickupNotificationDTO -> {
           PickupNotification pickupNotification =
@@ -91,7 +98,8 @@ public class PickupServiceImpl implements PickupService {
             return;
           }
 
-          if (locationCodes == null || locationCodes.contains(pickupNotification.getLocationCode())) {
+          if (locationCodes == null
+              || locationCodes.contains(pickupNotification.getLocationCode())) {
             sendSms(pickupNotification, getSmsTemplate(pickupNotification));
           }
           pickupNotificationRepository.save(pickupNotification);
@@ -99,31 +107,43 @@ public class PickupServiceImpl implements PickupService {
   }
 
   private void processDelayedPickups(Long lastExecutedAt) {
-    List<Pickup> pickupList = pickupRepository.findByPickupStatusInAndUserIdNotNull(Arrays.asList(PickupStatus.CREATED));
+    List<Pickup> pickupList =
+        pickupRepository.findByPickupStatusInAndUserIdNotNull(Arrays.asList(PickupStatus.CREATED));
     Long prevCutOffTime =
-        lastExecutedAt + zoomPropertyService.getInteger(ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS, 15 * 60) * 1000l;
+        lastExecutedAt
+            + zoomPropertyService.getInteger(
+                    ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS, 15 * 60)
+                * 1000l;
     Long cutOffTime =
-        DateTime.now().getMillis() + zoomPropertyService.getInteger(ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS, 15 * 60) * 1000l;
+        DateTime.now().getMillis()
+            + zoomPropertyService.getInteger(
+                    ZoomPropertyName.PICKUP_DELAY_NOTIFICATION_SECONDS, 15 * 60)
+                * 1000l;
     List<Pickup> delayedPickupList =
         pickupList
             .stream()
             .filter(
                 pickup ->
-                    ((prevCutOffTime < pickup.getPickupEndTime() || lastExecutedAt < pickup.getLastUpdatedAt().getMillis())
+                    ((prevCutOffTime < pickup.getPickupEndTime()
+                            || lastExecutedAt < pickup.getLastUpdatedAt().getMillis())
                         && pickup.getPickupEndTime() < cutOffTime))
             .collect(Collectors.toList());
     String smsTemplate = zoomPropertyService.getString(ZoomPropertyName.PICKUP_DELAYED_SMS_STRING);
     delayedPickupList.forEach(
         pickup -> {
           PickupNotification pickupNotification =
-              getPickupNotification(pickup, pickup.getLastUpdatedAt().getMillis(), PickupNotificationType.PICKUP_DELAYED);
+              getPickupNotification(
+                  pickup,
+                  pickup.getLastUpdatedAt().getMillis(),
+                  PickupNotificationType.PICKUP_DELAYED);
           if (pickupNotification != null) {
             sendSms(pickupNotification, smsTemplate);
           }
         });
   }
 
-  private PickupNotification getPickupNotification(Pickup pickup, Long lastUpdatedAt, PickupNotificationType type) {
+  private PickupNotification getPickupNotification(
+      Pickup pickup, Long lastUpdatedAt, PickupNotificationType type) {
     PickupNotification pickupNotification = new PickupNotification();
     if (lastUpdatedAt > pickup.getLastUpdatedAt().getMillis()) {
       throw new ZoomException("Pickup is not saved properly");
@@ -137,9 +157,11 @@ public class PickupServiceImpl implements PickupService {
     pickupNotification.setPickupId(pickup.getId());
     pickupNotification.setStatus(pickup.getPickupStatus());
     pickupNotification.setBusinessPartnerId(pickup.getBusinessPartnerId());
-    pickupNotification.setBpName(pickup.getBusinessPartner() == null ? null : pickup.getBusinessPartner().getName());
+    pickupNotification.setBpName(
+        pickup.getBusinessPartner() == null ? null : pickup.getBusinessPartner().getName());
     pickupNotification.setUserName(pickup.getUser() == null ? null : pickup.getUser().getName());
-    pickupNotification.setUserMobile(pickup.getUser() == null ? null : pickup.getUser().getMobileNo());
+    pickupNotification.setUserMobile(
+        pickup.getUser() == null ? null : pickup.getUser().getMobileNo());
     pickupNotification.setUserId(pickup.getUserId());
     pickupNotification.setPickupDate(pickup.getPickupDate().getMillis());
     pickupNotification.setPickupTimeSlot(pickup.getPickupTimeSlot());
@@ -152,7 +174,9 @@ public class PickupServiceImpl implements PickupService {
     pickupNotification.setContactPerson(pickup.getContactPerson());
     pickupNotification.setConsignorMobile(pickup.getContactNumber());
     pickupNotification.setReachedAtClientWareHouseTime(
-        PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getPickupStatus()) ? pickup.getLastUpdatedAt().getMillis() : null);
+        PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getPickupStatus())
+            ? pickup.getLastUpdatedAt().getMillis()
+            : null);
     Client client = clientMasterService.getClientByCode(pickup.getClientCode());
     if (client == null) {
       throw new ZoomException("No client with this Id exists");
@@ -177,7 +201,13 @@ public class PickupServiceImpl implements PickupService {
           + "|"
           + pickup.getLastUpdatedAt();
     } else {
-      return pickup.getId() + "|" + type.name() + "|" + pickup.getPickupDate().getMillis() + "|" + pickup.getPickupTimeSlot();
+      return pickup.getId()
+          + "|"
+          + type.name()
+          + "|"
+          + pickup.getPickupDate().getMillis()
+          + "|"
+          + pickup.getPickupTimeSlot();
     }
   }
 
@@ -187,23 +217,31 @@ public class PickupServiceImpl implements PickupService {
     }
     List<StockAccumulator> saList =
         stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
-            StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, pickupNotification.getBusinessPartnerId(), OperationalStatus.ACTIVE);
+            StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN,
+            pickupNotification.getBusinessPartnerId(),
+            OperationalStatus.ACTIVE);
     saList.forEach(
         sa ->
             pickupNotification
                 .getRecipients()
-                .add(new PickupNotification.Recipient(sa.getUser().getId(), sa.getUser().getMobileNo(), null)));
+                .add(
+                    new PickupNotification.Recipient(
+                        sa.getUser().getId(), sa.getUser().getMobileNo(), null)));
   }
 
   private void fillPickupCoordinatorRecipients(PickupNotification pickupNotification) {
     List<ZoomUser> zuList =
         zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(
-            pickupNotification.getLocationId(), ZoomUserType.ZOOM_PCE.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name());
+            pickupNotification.getLocationId(),
+            ZoomUserType.ZOOM_PCE.name(),
+            ZoomUserType.ZOOM_TECH_SUPPORT.name());
     zuList.forEach(
         sa ->
             pickupNotification
                 .getRecipients()
-                .add(new PickupNotification.Recipient(sa.getUser().getId(), sa.getUser().getMobileNo(), null)));
+                .add(
+                    new PickupNotification.Recipient(
+                        sa.getUser().getId(), sa.getUser().getMobileNo(), null)));
   }
 
   private void fillRecipients(PickupNotification pickupNotification) {
@@ -215,13 +253,17 @@ public class PickupServiceImpl implements PickupService {
         fillBpAdminRecipients(pickupNotification);
         pickupNotification
             .getRecipients()
-            .add(new PickupNotification.Recipient(pickupNotification.getUserId(), pickupNotification.getUserMobile(), null));
+            .add(
+                new PickupNotification.Recipient(
+                    pickupNotification.getUserId(), pickupNotification.getUserMobile(), null));
         return;
       case PICKUP_ASSIGNED:
         if (pickupNotification.getUserId() != null) {
           pickupNotification
               .getRecipients()
-              .add(new PickupNotification.Recipient(pickupNotification.getUserId(), pickupNotification.getUserMobile(), null));
+              .add(
+                  new PickupNotification.Recipient(
+                      pickupNotification.getUserId(), pickupNotification.getUserMobile(), null));
         } else {
           fillBpAdminRecipients(pickupNotification);
         }
@@ -249,14 +291,17 @@ public class PickupServiceImpl implements PickupService {
         break;
       case PICKUP_ASSIGNED:
         if (pickupNotification.getUserId() != null) {
-          smsTemplate = zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_TO_USER_SMS_STRING);
+          smsTemplate =
+              zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_TO_USER_SMS_STRING);
         } else {
-          smsTemplate = zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_BP_USER_SMS_STRING);
+          smsTemplate =
+              zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_BP_USER_SMS_STRING);
         }
         break;
       case PICKUP_CREATED:
         if (pickupNotification.getBusinessPartnerId() != null) {
-          smsTemplate = zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_BP_USER_SMS_STRING);
+          smsTemplate =
+              zoomPropertyService.getString(ZoomPropertyName.PICKUP_ASSIGNED_BP_USER_SMS_STRING);
         } else {
           smsTemplate = zoomPropertyService.getString(ZoomPropertyName.PICKUP_CREATED_SMS_STRING);
         }
@@ -275,15 +320,21 @@ public class PickupServiceImpl implements PickupService {
     String smsString = designSms(pickupNotification, smsTemplate);
     log.info(smsTemplate);
     pickupNotification.setSmsString(smsString);
-    pickupNotification.getRecipients().forEach(recipient -> recipient.setSmsResponse(smsService.sendSms(recipient.getMobile(), smsString)));
+    pickupNotification
+        .getRecipients()
+        .forEach(
+            recipient ->
+                recipient.setSmsResponse(smsService.sendSms(recipient.getMobile(), smsString)));
   }
 
   private String designSms(PickupNotification pickupNotification, String template) {
     Map<String, String> valuesMap = new HashMap<>();
-    DateTimeFormatter formatter1 = DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
+    DateTimeFormatter formatter1 =
+        DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
     String dateStr1 = formatter1.print(pickupNotification.getPickupDate());
 
-    DateTimeFormatter formatter2 = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").withZone(DateTimeZone.forID("Asia/Kolkata"));
+    DateTimeFormatter formatter2 =
+        DateTimeFormat.forPattern("dd-MM-yyyy HH:mm").withZone(DateTimeZone.forID("Asia/Kolkata"));
     String dateStr2 =
         pickupNotification.getReachedAtClientWareHouseTime() != null
             ? formatter2.print(pickupNotification.getReachedAtClientWareHouseTime())

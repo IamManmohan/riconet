@@ -41,7 +41,8 @@ public class RetailNotificationConsumer extends ConsumerModel {
 
   public String processMessage(String str) throws IOException {
     List<RetailNotificationDTO> retailNotificationDTOList = null;
-    TypeReference<List<RetailNotificationDTO>> mapType = new TypeReference<List<RetailNotificationDTO>>() {};
+    TypeReference<List<RetailNotificationDTO>> mapType =
+        new TypeReference<List<RetailNotificationDTO>>() {};
     retailNotificationDTOList = objectMapper.readValue(str, mapType);
     log.info("retail notification recieved {}", str);
     retailService.processRetailNotificationDTOList(retailNotificationDTOList);

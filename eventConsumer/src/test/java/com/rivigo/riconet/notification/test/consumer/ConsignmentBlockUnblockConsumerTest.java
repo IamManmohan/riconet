@@ -27,11 +27,13 @@ public class ConsignmentBlockUnblockConsumerTest {
   private TopicNameConfig topicNameConfig = Mockito.mock(TopicNameConfig.class);
 
   @InjectMocks
-  private ConsignmentBlockUnblockService consignmentBlockUnblockService = new ConsignmentBlockUnblockServiceImpl(apiClientService);
+  private ConsignmentBlockUnblockService consignmentBlockUnblockService =
+      new ConsignmentBlockUnblockServiceImpl(apiClientService);
 
   @InjectMocks
   private ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer =
-      new ConsignmentBlockUnblockConsumer(objectMapper, consignmentBlockUnblockService, topicNameConfig);
+      new ConsignmentBlockUnblockConsumer(
+          objectMapper, consignmentBlockUnblockService, topicNameConfig);
 
   private static final Long ENTITY_ID = 1L;
 
@@ -55,9 +57,15 @@ public class ConsignmentBlockUnblockConsumerTest {
   public void processMessageCod() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.COD.name());
-    NotificationDTO dto = NotificationDTO.builder().eventName(EventName.COLLECTION_CHEQUE_BOUNCE).metadata(metadata).build();
+    NotificationDTO dto =
+        NotificationDTO.builder()
+            .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
+            .metadata(metadata)
+            .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer.processMessage(message).equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    assert consignmentBlockUnblockConsumer
+        .processMessage(message)
+        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
   }
 
   @Test
@@ -66,9 +74,15 @@ public class ConsignmentBlockUnblockConsumerTest {
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PREPAID.name());
     metadata.put(ZoomCommunicationFieldNames.Reason.REASON.name(), REASON_ID.toString());
     NotificationDTO dto =
-        NotificationDTO.builder().entityId(ENTITY_ID).eventName(EventName.COLLECTION_CHEQUE_BOUNCE).metadata(metadata).build();
+        NotificationDTO.builder()
+            .entityId(ENTITY_ID)
+            .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
+            .metadata(metadata)
+            .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer.processMessage(message).equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    assert consignmentBlockUnblockConsumer
+        .processMessage(message)
+        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
   }
 
   @Test
@@ -83,6 +97,8 @@ public class ConsignmentBlockUnblockConsumerTest {
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer.processMessage(message).equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    assert consignmentBlockUnblockConsumer
+        .processMessage(message)
+        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
   }
 }

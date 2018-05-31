@@ -41,7 +41,8 @@ public class PickupNotificationConsumer extends ConsumerModel {
 
   public String processMessage(String str) throws IOException {
     List<PickupNotificationDTO> pickupNotificationDTOList = null;
-    TypeReference<List<PickupNotificationDTO>> mapType = new TypeReference<List<PickupNotificationDTO>>() {};
+    TypeReference<List<PickupNotificationDTO>> mapType =
+        new TypeReference<List<PickupNotificationDTO>>() {};
     pickupNotificationDTOList = objectMapper.readValue(str, mapType);
     pickupService.processPickupNotificationDTOList(pickupNotificationDTOList);
     return str;

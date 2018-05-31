@@ -26,22 +26,23 @@ import org.springframework.transaction.annotation.Transactional;
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-    loader = AnnotationConfigWebContextLoader.class,
-    classes = {
-      MySQLTestConfig.class,
-      MongoTestConfig.class,
-      ZoomNeo4jConfig.class,
-      RedisTestConfig.class,
-      TestConfig.class,
-      KafkaProducerConfig.class,
-      KafkaConsumerConfig.class,
-      ServiceConfig.class,
-      AWSConfig.class,
-      PusherConfig.class,
-      NotificationConfig.class,
-      CacheInitializer.class,
-      CacheFactory.class
-    })
+  loader = AnnotationConfigWebContextLoader.class,
+  classes = {
+    MySQLTestConfig.class,
+    MongoTestConfig.class,
+    ZoomNeo4jConfig.class,
+    RedisTestConfig.class,
+    TestConfig.class,
+    KafkaProducerConfig.class,
+    KafkaConsumerConfig.class,
+    ServiceConfig.class,
+    AWSConfig.class,
+    PusherConfig.class,
+    NotificationConfig.class,
+    CacheInitializer.class,
+    CacheFactory.class
+  }
+)
 @Transactional
 @TransactionConfiguration(defaultRollback = true)
 public abstract class TesterBase {}

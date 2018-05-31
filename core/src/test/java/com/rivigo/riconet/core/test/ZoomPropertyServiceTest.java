@@ -20,7 +20,10 @@ public class ZoomPropertyServiceTest {
     zoomPropertyService.getByPropertyName("");
     zoomPropertyService.getString(ZoomPropertyName.TESTING);
 
-    ZoomProperty zoomProperty = zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(), 1).get(0);
+    ZoomProperty zoomProperty =
+        zoomPropertiesRepository
+            .findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(), 1)
+            .get(0);
     zoomProperty.setSpringProfile(null);
     zoomPropertiesRepository.save(zoomProperty);
     zoomPropertyService.getByPropertyName(ZoomPropertyName.BOOLEAN_TESTING.name());
@@ -42,7 +45,10 @@ public class ZoomPropertyServiceTest {
   }
 
   public void testBooleanProperty() {
-    ZoomProperty zoomProperty = zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(), 1).get(0);
+    ZoomProperty zoomProperty =
+        zoomPropertiesRepository
+            .findByVariableNameAndIsActive(ZoomPropertyName.BOOLEAN_TESTING.name(), 1)
+            .get(0);
     zoomProperty.setVariableValue("true");
     zoomPropertiesRepository.save(zoomProperty);
     zoomPropertyService.getBoolean(ZoomPropertyName.BOOLEAN_TESTING, true);
@@ -64,7 +70,10 @@ public class ZoomPropertyServiceTest {
   }
 
   public void testIntegerProperty() {
-    ZoomProperty zoomProperty = zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.INTEGER_TESTING.name(), 1).get(0);
+    ZoomProperty zoomProperty =
+        zoomPropertiesRepository
+            .findByVariableNameAndIsActive(ZoomPropertyName.INTEGER_TESTING.name(), 1)
+            .get(0);
     zoomProperty.setVariableValue("1");
     zoomPropertiesRepository.save(zoomProperty);
     zoomPropertyService.getInteger(ZoomPropertyName.INTEGER_TESTING, 1);

@@ -130,7 +130,8 @@ public class QcServiceImpl implements QcService {
       return;
     }
     GroupDTO group =
-        zoomTicketingAPIClientService.getGroupId(unloadingData.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
+        zoomTicketingAPIClientService.getGroupId(
+            unloadingData.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
     ticketList.forEach(
         ticketDTO -> {
           ticketDTO.setAssigneeId(group == null ? null : group.getId());
@@ -144,7 +145,9 @@ public class QcServiceImpl implements QcService {
     if (!location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)) {
       return;
     }
-    ticketList.forEach(ticketDTO -> closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
+    ticketList.forEach(
+        ticketDTO ->
+            closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
     zoomBackendAPIClientService.updateQcCheck(unloadingData.getConsignmentId(), false);
   }
 
@@ -154,42 +157,61 @@ public class QcServiceImpl implements QcService {
     if (bindings.isEmpty()) {
       return false;
     }
-    log.info("Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}", consignment.getCnote(), bindings);
+    log.info(
+        "Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",
+        consignment.getCnote(),
+        bindings);
     return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
-  private void fillClientMetadata(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+  private void fillClientMetadata(
+      ConsignmentCompletionEventDTO completionData, Consignment consignment) {
     if (consignment == null) {
       throw new ZoomException("Consignment is not present");
     }
     if (completionData == null) {
-      throw new ZoomException("CompletionData is not present for consignment with cnote: " + consignment.getCnote());
+      throw new ZoomException(
+          "CompletionData is not present for consignment with cnote: " + consignment.getCnote());
     }
-    AdministrativeEntity cluster = administrativeEntityRepository.findParentCluster(consignment.getFromId());
+    AdministrativeEntity cluster =
+        administrativeEntityRepository.findParentCluster(consignment.getFromId());
     ClientEntityMetadata clusterMetadata =
         clientEntityMetadataRepository.findByEntityTypeAndEntityIdAndClientIdAndStatus(
-            ClientEntityType.CLUSTER, cluster.getId(), consignment.getClient().getId(), OperationalStatus.ACTIVE);
+            ClientEntityType.CLUSTER,
+            cluster.getId(),
+            consignment.getClient().getId(),
+            OperationalStatus.ACTIVE);
     PinCode pincode = pinCodeRepository.findByCode(consignment.getFromPinCode());
     ClientEntityMetadata pincodeMetadata =
         clientEntityMetadataRepository.findByEntityTypeAndEntityIdAndClientIdAndStatus(
-            ClientEntityType.PINCODE, pincode.getId(), consignment.getClient().getId(), OperationalStatus.ACTIVE);
+            ClientEntityType.PINCODE,
+            pincode.getId(),
+            consignment.getClient().getId(),
+            OperationalStatus.ACTIVE);
     if (clusterMetadata != null) {
-      completionData.setClientClusterMetadataDTO(objectMapper.convertValue(clusterMetadata.getMetadata(), ClientClusterMetadataDTO.class));
+      completionData.setClientClusterMetadataDTO(
+          objectMapper.convertValue(clusterMetadata.getMetadata(), ClientClusterMetadataDTO.class));
     }
     if (pincodeMetadata != null) {
-      completionData.setClientPincodeMetadataDTO(objectMapper.convertValue(pincodeMetadata.getMetadata(), ClientPincodeMetadataDTO.class));
+      completionData.setClientPincodeMetadataDTO(
+          objectMapper.convertValue(pincodeMetadata.getMetadata(), ClientPincodeMetadataDTO.class));
     }
   }
 
   public void consumeCompletionEvent(ConsignmentCompletionEventDTO completionData) {
-    Consignment consignment = consignmentService.getConsignmentById(completionData.getConsignmentId());
+    Consignment consignment =
+        consignmentService.getConsignmentById(completionData.getConsignmentId());
     if (consignment == null) {
-      throw new ZoomException("No consignment exists with id :" + completionData.getConsignmentId());
+      throw new ZoomException(
+          "No consignment exists with id :" + completionData.getConsignmentId());
     }
     try {
       zoomBackendAPIClientService.triggerPolicyGeneration(completionData.getConsignmentId());
     } catch (Exception e) {
-      log.info("Policy trigger failed for consignment with id {} ", completionData.getConsignmentId(), e);
+      log.info(
+          "Policy trigger failed for consignment with id {} ",
+          completionData.getConsignmentId(),
+          e);
     }
     sendCodDodSms(completionData, consignment);
     log.info(
@@ -197,14 +219,20 @@ public class QcServiceImpl implements QcService {
         consignment.getCnote(),
         consignmentService.isPrimaryConsignment(consignment.getCnote()),
         consignment.getCnoteType());
-    if (!consignmentService.isPrimaryConsignment(consignment.getCnote()) || !CnoteType.NORMAL.equals(consignment.getCnoteType())) {
+    if (!consignmentService.isPrimaryConsignment(consignment.getCnote())
+        || !CnoteType.NORMAL.equals(consignment.getCnoteType())) {
       return;
     }
     fillClientMetadata(completionData, consignment);
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded =
-        completionData.getClientClusterMetadataDTO() != null && completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded();
-    log.info("cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {}", consignment.getCnote(), reCheckQcNeeded, measurementQcNeeded);
+        completionData.getClientClusterMetadataDTO() != null
+            && completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded();
+    log.info(
+        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {}",
+        consignment.getCnote(),
+        reCheckQcNeeded,
+        measurementQcNeeded);
     if (!measurementQcNeeded && !reCheckQcNeeded) {
       return;
     }
@@ -227,12 +255,19 @@ public class QcServiceImpl implements QcService {
     Boolean autoClose = false;
     if (ConsignmentStatus.RECEIVED_AT_OU.equals(consignment.getStatus())) {
       GroupDTO group =
-          zoomTicketingAPIClientService.getGroupId(consignment.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
+          zoomTicketingAPIClientService.getGroupId(
+              consignment.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
       Location location = locationService.getLocationById(consignment.getLocationId());
       groupId = group == null ? null : group.getId();
-      autoClose = (group == null) && location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+      autoClose =
+          (group == null)
+              && location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
     }
-    log.info("cnote: {}  locationId: {}  groupId: {}", consignment.getCnote(), consignment.getLocationId(), groupId);
+    log.info(
+        "cnote: {}  locationId: {}  groupId: {}",
+        consignment.getCnote(),
+        consignment.getLocationId(),
+        groupId);
     createTicketsIfNeeded(reCheckQcNeeded, measurementQcNeeded, groupId, consignment, autoClose);
     if (!autoClose && reCheckQcNeeded) {
       zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
@@ -240,7 +275,11 @@ public class QcServiceImpl implements QcService {
   }
 
   private void createTicketsIfNeeded(
-      Boolean reCheckQcNeeded, Boolean measurementQcNeeded, Long groupId, Consignment consignment, Boolean autoClose) {
+      Boolean reCheckQcNeeded,
+      Boolean measurementQcNeeded,
+      Long groupId,
+      Consignment consignment,
+      Boolean autoClose) {
     if (reCheckQcNeeded) {
       TicketDTO dto = getBasicQcTicketDTO(groupId, consignment.getCnote());
       dto.setTypeId(ZoomTicketingConstant.QC_RECHECK_TYPE_ID);
@@ -278,7 +317,8 @@ public class QcServiceImpl implements QcService {
       log.debug("CodDod is not activated for consignment with cnote: {}", consignment.getCnote());
       return;
     }
-    DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+    DateTimeFormatter formatter =
+        DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
     String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime());
 
     StringBuilder sb = new StringBuilder();
@@ -300,21 +340,31 @@ public class QcServiceImpl implements QcService {
   }
 
   public List<String> getQcTicketTypes() {
-    return Arrays.asList(ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(), ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
+    return Arrays.asList(
+        ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
+        ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
   }
 
-  private Map<String, Object> getVariablesMapToApplyQCRules(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+  private Map<String, Object> getVariablesMapToApplyQCRules(
+      ConsignmentCompletionEventDTO completionData, Consignment consignment) {
 
     Map<String, Object> bindings = new HashMap<>();
 
-    Double minimumNumberOfCnRequired = zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
+    Double minimumNumberOfCnRequired =
+        zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
 
-    String requiredClientType = zoomPropertyService.getString(ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
-    bindings.put(RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
+    String requiredClientType =
+        zoomPropertyService.getString(
+            ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
+    bindings.put(
+        RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
     bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
     bindings.put(RuleEngineVariableNameConstant.CLIENT_TYPE, consignment.getCnoteType().name());
-    if (completionData.getClientPincodeMetadataDTO() != null && completionData.getClientPincodeMetadataDTO().getCount() != null) {
-      bindings.put(RuleEngineVariableNameConstant.NUMBER_OF_CN, completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
+    if (completionData.getClientPincodeMetadataDTO() != null
+        && completionData.getClientPincodeMetadataDTO().getCount() != null) {
+      bindings.put(
+          RuleEngineVariableNameConstant.NUMBER_OF_CN,
+          completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
     } else {
       log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
@@ -325,8 +375,12 @@ public class QcServiceImpl implements QcService {
         && completionData.getClientPincodeMetadataDTO().getMinWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxWeight() != null) {
       bindings.put(RuleEngineVariableNameConstant.ACTUAL_WEIGHT, consignment.getWeight());
-      bindings.put(RuleEngineVariableNameConstant.MIN_WEIGHT, completionData.getClientPincodeMetadataDTO().getMinWeight());
-      bindings.put(RuleEngineVariableNameConstant.MAX_WEIGHT, completionData.getClientPincodeMetadataDTO().getMaxWeight());
+      bindings.put(
+          RuleEngineVariableNameConstant.MIN_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMinWeight());
+      bindings.put(
+          RuleEngineVariableNameConstant.MAX_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMaxWeight());
     } else {
       log.info("one of the ACTUAL_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
@@ -338,7 +392,9 @@ public class QcServiceImpl implements QcService {
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
-      bindings.put(RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT, consignment.getChargedWeight() / consignment.getWeight());
+      bindings.put(
+          RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
+          consignment.getChargedWeight() / consignment.getWeight());
       bindings.put(
           RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());
@@ -356,7 +412,9 @@ public class QcServiceImpl implements QcService {
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight() != null
         && completionData.getClientPincodeMetadataDTO().getMaxInvoicePerWeight() != null) {
-      bindings.put(RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT, consignment.getValue() / consignment.getWeight());
+      bindings.put(
+          RuleEngineVariableNameConstant.INVOICE_VALUE_PER_WEIGHT,
+          consignment.getValue() / consignment.getWeight());
       bindings.put(
           RuleEngineVariableNameConstant.MIN_INVOICE_VALUE_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinInvoicePerWeight());
@@ -382,7 +440,10 @@ public class QcServiceImpl implements QcService {
     if (CollectionUtils.isEmpty(ticketList)) {
       return;
     }
-    ticketList.forEach(ticketDTO -> closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE));
+    ticketList.forEach(
+        ticketDTO ->
+            closeTicket(
+                ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE));
     zoomBackendAPIClientService.updateQcCheck(consignment.getConsignmentId(), false);
   }
 }

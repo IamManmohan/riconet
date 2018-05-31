@@ -26,7 +26,9 @@ public class EventMain {
 
   private final ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer;
 
-  public EventMain(ZoomEventTriggerConsumer zoomEventTriggerConsumer, ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer) {
+  public EventMain(
+      ZoomEventTriggerConsumer zoomEventTriggerConsumer,
+      ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
   }
@@ -34,7 +36,9 @@ public class EventMain {
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context =
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -63,7 +67,9 @@ public class EventMain {
       ConsumerSettings<String, String> consignmentBlockerConsumerSettings) {
     log.info("Loading zoom event trigger consumer with settings {}", consumerSettings);
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
-    log.info("Loading consignment blocker consumer with settings {}", consignmentBlockerConsumerSettings);
+    log.info(
+        "Loading consignment blocker consumer with settings {}",
+        consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
   }
 }

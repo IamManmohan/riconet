@@ -25,7 +25,9 @@ public class ConsignmentBlockUnblockConsumer extends ConsumerModel {
 
   @Autowired
   public ConsignmentBlockUnblockConsumer(
-      ObjectMapper objectMapper, ConsignmentBlockUnblockService consignmentBlockUnblockService, TopicNameConfig topicNameConfig) {
+      ObjectMapper objectMapper,
+      ConsignmentBlockUnblockService consignmentBlockUnblockService,
+      TopicNameConfig topicNameConfig) {
     this.objectMapper = objectMapper;
     this.consignmentBlockUnblockService = consignmentBlockUnblockService;
     this.topicNameConfig = topicNameConfig;

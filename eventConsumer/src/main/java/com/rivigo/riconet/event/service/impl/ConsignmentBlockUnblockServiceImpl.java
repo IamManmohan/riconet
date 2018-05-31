@@ -39,7 +39,10 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
         unblockCn(notificationDTO);
         break;
       default:
-        log.info("Skipping event {} processing from {}", notificationDTO.getEventName(), this.getClass().getName());
+        log.info(
+            "Skipping event {} processing from {}",
+            notificationDTO.getEventName(),
+            this.getClass().getName());
     }
   }
 
@@ -48,24 +51,36 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
   }
 
   private void blockCn(NotificationDTO notificationDTO) {
-    if (!PaymentMode.PREPAID.name().equalsIgnoreCase(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name()))) {
-      log.info("Cheque bounce occurred for to pay cn. So cn {} will not be blocked", notificationDTO.getEntityId());
+    if (!PaymentMode.PREPAID
+        .name()
+        .equalsIgnoreCase(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name()))) {
+      log.info(
+          "Cheque bounce occurred for to pay cn. So cn {} will not be blocked",
+          notificationDTO.getEntityId());
       return;
     }
     blockUnblockRequest(notificationDTO, ConsignmentBlockerRequestType.BLOCK);
   }
 
-  private void blockUnblockRequest(NotificationDTO notificationDTO, ConsignmentBlockerRequestType requestType) {
+  private void blockUnblockRequest(
+      NotificationDTO notificationDTO, ConsignmentBlockerRequestType requestType) {
     ConsignmentBlockerRequestDTO requestDTO =
         ConsignmentBlockerRequestDTO.builder()
             .requestType(requestType)
             .isActive(Boolean.TRUE)
-            .reason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.REASON.name()))
-            .subReason(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.SUB_REASON.name()))
+            .reason(
+                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Reason.REASON.name()))
+            .subReason(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.Reason.SUB_REASON.name()))
             .consignmentId(notificationDTO.getEntityId())
             .build();
     try {
-      JsonNode responseJson = apiClientService.getEntity(requestDTO, HttpMethod.POST, "/consignmentBlocker", null, zoomBackendBaseUrl);
+      JsonNode responseJson =
+          apiClientService.getEntity(
+              requestDTO, HttpMethod.POST, "/consignmentBlocker", null, zoomBackendBaseUrl);
       log.debug("response {}", responseJson);
     } catch (IOException e) {
       log.error("Exception occurred while unblocking cn in zoom tech", e);

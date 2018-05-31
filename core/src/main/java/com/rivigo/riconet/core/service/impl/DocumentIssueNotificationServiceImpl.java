@@ -79,7 +79,8 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   @Autowired private DocumentIssueNotificationRepository documentIssueNotificationRepository;
 
   @Override
-  public DocumentIssueNotification createNotificationData(Long consignmentId, Long userId, String subReason, ConsignmentStatus status) {
+  public DocumentIssueNotification createNotificationData(
+      Long consignmentId, Long userId, String subReason, ConsignmentStatus status) {
     ConsignmentReadOnly cn = consignmentReadOnlyService.findByConsignmentById(consignmentId);
     if (cn == null) {
       throw new ZoomException("No consignment with this id exists");
@@ -94,9 +95,19 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     }
     DocumentIssueNotification notification = new DocumentIssueNotification();
     updateCnoteMetadata(notification, cn, subReason);
-    updateResponsiblePersonAndLocation(notification, user, zoomUser == null ? cn.getLocationId() : zoomUser.getLocationId(), cn, status);
+    updateResponsiblePersonAndLocation(
+        notification,
+        user,
+        zoomUser == null ? cn.getLocationId() : zoomUser.getLocationId(),
+        cn,
+        status);
     updateStakeHolders(notification);
-    notification.setId(notification.getCnote() + "|" + notification.getScenario() + "|" + notification.getReporter().getEmail());
+    notification.setId(
+        notification.getCnote()
+            + "|"
+            + notification.getScenario()
+            + "|"
+            + notification.getReporter().getEmail());
     if (documentIssueNotificationRepository.findOne(notification.getId()) == null) {
       documentIssueNotificationRepository.save(notification);
       return notification;
@@ -106,16 +117,20 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
 
   private DocumentIssueNotification.NotificationUserDTO getUserDTO(User user) {
     User responsibleUser = user;
-    DocumentIssueNotification.NotificationUserDTO userDTO = new DocumentIssueNotification.NotificationUserDTO();
+    DocumentIssueNotification.NotificationUserDTO userDTO =
+        new DocumentIssueNotification.NotificationUserDTO();
     boolean isBpUser = false;
     Organization organization = null;
     if (!responsibleUser.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)) {
       organization = organizationService.getById(responsibleUser.getOrganizationId());
     } else if (userMasterService.canAdaptTo(responsibleUser, StockAccumulator.class)) {
-      StockAccumulator stockAccumulator = userMasterService.adaptUserTo(responsibleUser, StockAccumulator.class);
+      StockAccumulator stockAccumulator =
+          userMasterService.adaptUserTo(responsibleUser, StockAccumulator.class);
       List<StockAccumulator> accumulatorList =
           stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
-              StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, stockAccumulator.getAccumulationPartnerId().getId(), OperationalStatus.ACTIVE);
+              StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN,
+              stockAccumulator.getAccumulationPartnerId().getId(),
+              OperationalStatus.ACTIVE);
       if (!CollectionUtils.isEmpty(accumulatorList)) {
         StockAccumulator accumulator = accumulatorList.get(0);
         responsibleUser = accumulator.getUser();
@@ -132,7 +147,8 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     userDTO.setName(responsibleUser.getName());
     userDTO.setOrgId(responsibleUser.getOrganizationId());
     if (responsibleUser.getOrganizationId() != 1) {
-      userDTO.setType(organizationService.getById(responsibleUser.getOrganizationId()).getType().name());
+      userDTO.setType(
+          organizationService.getById(responsibleUser.getOrganizationId()).getType().name());
     } else if (isBpUser) {
       userDTO.setType(StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN.name());
     } else {
@@ -145,7 +161,8 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   }
 
   private DocumentIssueNotification.NotificationLocationDTO getLocationDTO(Location location) {
-    DocumentIssueNotification.NotificationLocationDTO locationDTO = new DocumentIssueNotification.NotificationLocationDTO();
+    DocumentIssueNotification.NotificationLocationDTO locationDTO =
+        new DocumentIssueNotification.NotificationLocationDTO();
     locationDTO.setId(location.getId());
     locationDTO.setName(location.getName());
     locationDTO.setCode(location.getCode());
@@ -157,25 +174,32 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     Set<String> ccList = new HashSet<>();
     Location loc = locationServiceV2.getLocationById(locationId);
     List<Long> locIds =
-        locationServiceV2.getAllClusterSiblingsOfLocation(loc.getCode()).stream().map(Location::getId).collect(Collectors.toList());
+        locationServiceV2
+            .getAllClusterSiblingsOfLocation(loc.getCode())
+            .stream()
+            .map(Location::getId)
+            .collect(Collectors.toList());
 
     Location pc = locationServiceV2.getPcOrReportingPc(loc);
 
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationInAndZoomUserType(locIds, "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationInAndZoomUserType(
+                locIds, "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationAndZoomUserType(locationId, "ZOOM_BO_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                locationId, "ZOOM_BO_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationAndZoomUserType(pc.getId(), "ZOOM_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                pc.getId(), "ZOOM_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
@@ -198,31 +222,41 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   }
 
   private void updateResponsiblePersonAndLocation(
-      DocumentIssueNotification notification, User user, Long locationId, ConsignmentReadOnly consignment, ConsignmentStatus status) {
+      DocumentIssueNotification notification,
+      User user,
+      Long locationId,
+      ConsignmentReadOnly consignment,
+      ConsignmentStatus status) {
     // fill SCENARIO
-    Integer bufferMinutes = zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES, 120);
+    Integer bufferMinutes =
+        zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES, 120);
     User reporter = null;
     User reportee = null;
     Long reporterLocationId = null;
     Long reporteeLocationId = null;
     if (ConsignmentStatus.UNDELIVERED.equals(status)) {
       notification.setScenario("Missed at the time of delivery");
-      TransportationPartnerMapping tpm = transportationPartnerMappingService.getByDRSId(consignment.getDrsId());
+      TransportationPartnerMapping tpm =
+          transportationPartnerMappingService.getByDRSId(consignment.getDrsId());
       reporter = userMasterService.getById(tpm.getUserId());
       reporterLocationId = consignment.getLocationId();
     } else {
-      List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(notification.getConsignmentId());
+      List<ConsignmentSchedule> consignmentSchedules =
+          consignmentScheduleService.getActivePlan(notification.getConsignmentId());
       ConsignmentSchedule schedule = getCurrentSchedule(consignmentSchedules);
       if (schedule == null) {
-        throw new ZoomException("This consignment with id " + consignment.getId() + " is not present at any location");
+        throw new ZoomException(
+            "This consignment with id " + consignment.getId() + " is not present at any location");
       }
-      if (DateTime.now().getMillis() > schedule.getArrivalTime() + bufferMinutes * TimeUtilsZoom.MILLIS_IN_MINUTE) {
+      if (DateTime.now().getMillis()
+          > schedule.getArrivalTime() + bufferMinutes * TimeUtilsZoom.MILLIS_IN_MINUTE) {
         notification.setScenario("Within PC");
         reporter = user;
         reporterLocationId = locationId;
       } else {
         ConsignmentSchedule previousSchedule = getPreviousSchedule(consignmentSchedules);
-        if (previousSchedule == null || previousSchedule.getLocationType().equals(LocationTypeV2.PINCODE)) {
+        if (previousSchedule == null
+            || previousSchedule.getLocationType().equals(LocationTypeV2.PINCODE)) {
           notification.setScenario("Missed during pickup");
           reporter = userMasterService.getById(consignment.getCreatedById());
           reporterLocationId = locationId;
@@ -243,10 +277,12 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     }
 
     notification.setReporter(getUserDTO(reporter));
-    notification.setReporterLocation(getLocationDTO(locationServiceV2.getLocationById(reporterLocationId)));
+    notification.setReporterLocation(
+        getLocationDTO(locationServiceV2.getLocationById(reporterLocationId)));
     if (reportee != null) {
       notification.setReportee(getUserDTO(reportee));
-      notification.setReporteeLocation(getLocationDTO(locationServiceV2.getLocationById(reporteeLocationId)));
+      notification.setReporteeLocation(
+          getLocationDTO(locationServiceV2.getLocationById(reporteeLocationId)));
     }
   }
 
@@ -278,41 +314,67 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     return lastSchedule[0];
   }
 
-  private void updateCnoteMetadata(DocumentIssueNotification notification, ConsignmentReadOnly consignment, String subReason) {
+  private void updateCnoteMetadata(
+      DocumentIssueNotification notification, ConsignmentReadOnly consignment, String subReason) {
     notification.setCnote(consignment.getCnote());
     notification.setConsignmentId(consignment.getId());
     notification.setSubReason(subReason);
-    notification.setClientName(clientMasterService.getClientById(consignment.getClientId()).getName());
+    notification.setClientName(
+        clientMasterService.getClientById(consignment.getClientId()).getName());
   }
 
   @Override
   public void sendNotifications(DocumentIssueNotification notification) {
-    String templateString = zoomPropertyService.getString(ZoomPropertyName.DOCUMENT_ISSUE_NOTIFICATION_TEMPLATE);
-    Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.DOCUMENT_ISSUE_EMAIL_ENABLED, false);
-    String subjectTemplate = zoomPropertyService.getString(ZoomPropertyName.DOCUMENT_ISSUE_NOTIFICATION_SUBJECT); // get from zoom property
+    String templateString =
+        zoomPropertyService.getString(ZoomPropertyName.DOCUMENT_ISSUE_NOTIFICATION_TEMPLATE);
+    Boolean isEmailEnabled =
+        zoomPropertyService.getBoolean(ZoomPropertyName.DOCUMENT_ISSUE_EMAIL_ENABLED, false);
+    String subjectTemplate =
+        zoomPropertyService.getString(
+            ZoomPropertyName.DOCUMENT_ISSUE_NOTIFICATION_SUBJECT); // get from zoom property
     if (templateString != null && isEmailEnabled) {
       String body = designEmailTemplate(notification, templateString);
       String subject = designEmailTemplate(notification, subjectTemplate);
       emailService.sendDocumentIssueEmail(
-          notification.getEmailIdList(), notification.getCcList(), notification.getBccList(), subject, body, null);
+          notification.getEmailIdList(),
+          notification.getCcList(),
+          notification.getBccList(),
+          subject,
+          body,
+          null);
     }
   }
 
-  private String designEmailTemplate(DocumentIssueNotification notification, String templateString) {
+  private String designEmailTemplate(
+      DocumentIssueNotification notification, String templateString) {
     Map<String, String> valuesMap = new HashMap<>();
     valuesMap.put("cnote", notification.getCnote());
     valuesMap.put("client_name", notification.getClientName());
-    valuesMap.put("last_loading_ou", notification.getReporteeLocation() == null ? "-" : notification.getReporteeLocation().getCode());
-    valuesMap.put("last_loading_person", notification.getReportee() == null ? "-" : notification.getReportee().getName());
+    valuesMap.put(
+        "last_loading_ou",
+        notification.getReporteeLocation() == null
+            ? "-"
+            : notification.getReporteeLocation().getCode());
+    valuesMap.put(
+        "last_loading_person",
+        notification.getReportee() == null ? "-" : notification.getReportee().getName());
     valuesMap.put("reporting_ou", notification.getReporterLocation().getCode());
     valuesMap.put("reporting_person", notification.getReporter().getName());
     valuesMap.put("scenario", notification.getScenario());
     valuesMap.put("subReason", notification.getSubReason());
     if (notification.getReportee() != null) {
 
-      valuesMap.put("responsible_ou", notification.getReporteeLocation().getCode() + " - " + notification.getReporterLocation().getCode());
-      valuesMap.put("responsible_person", notification.getReportee().getName() + " - " + notification.getReporter().getName());
-      valuesMap.put("dear", notification.getReportee().getName() + " / " + notification.getReporter().getName());
+      valuesMap.put(
+          "responsible_ou",
+          notification.getReporteeLocation().getCode()
+              + " - "
+              + notification.getReporterLocation().getCode());
+      valuesMap.put(
+          "responsible_person",
+          notification.getReportee().getName() + " - " + notification.getReporter().getName());
+      valuesMap.put(
+          "dear",
+          notification.getReportee().getName() + " / " + notification.getReporter().getName());
     } else {
       valuesMap.put("responsible_ou", notification.getReporterLocation().getCode());
       valuesMap.put("responsible_person", notification.getReporter().getName());
