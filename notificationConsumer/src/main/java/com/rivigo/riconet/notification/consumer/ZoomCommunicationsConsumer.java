@@ -11,20 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by aditya on 22/2/18.
- */
+/** Created by aditya on 22/2/18. */
 @Slf4j
 @Component
 public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private ZoomCommunicationsService zoomCommunicationsService;
+  @Autowired private ZoomCommunicationsService zoomCommunicationsService;
 
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   public ZoomCommunicationsConsumer() {
     objectMapper = new ObjectMapper();
@@ -55,5 +51,4 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
     zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
     return str;
   }
-
 }

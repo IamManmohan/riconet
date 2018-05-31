@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyService {
 
-  @Autowired
-  private ConsignmentReadOnlyRepository consignmentRepo;
+  @Autowired private ConsignmentReadOnlyRepository consignmentRepo;
 
   @Override
   public Optional<ConsignmentReadOnly> findConsignmentById(Long id) {

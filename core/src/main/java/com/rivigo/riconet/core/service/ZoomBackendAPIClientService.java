@@ -8,4 +8,3 @@ public interface ZoomBackendAPIClientService {
 
   void triggerPolicyGeneration(Long consignmentId);
 }
-

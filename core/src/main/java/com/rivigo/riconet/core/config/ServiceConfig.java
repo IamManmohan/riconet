@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.config;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -16,17 +15,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@ComponentScan(basePackages = {
-    "com.rivigo.riconet.notification",
-    "com.rivigo.riconet.event",
-    "com.rivigo.riconet.core.service",
-    "com.rivigo.riconet.core.test.consumer",
-    "com.rivigo.oauth2.resource.service",
-    "com.rivigo.riconet.ruleengine",
-    "com.rivigo.riconet.core.config",
-    "com.rivigo.riconet.core.test.consumer"
-})
-
+@ComponentScan(
+    basePackages = {
+      "com.rivigo.riconet.notification",
+      "com.rivigo.riconet.event",
+      "com.rivigo.riconet.core.service",
+      "com.rivigo.riconet.core.test.consumer",
+      "com.rivigo.oauth2.resource.service",
+      "com.rivigo.riconet.ruleengine",
+      "com.rivigo.riconet.core.config",
+      "com.rivigo.riconet.core.test.consumer"
+    })
 public class ServiceConfig {
 
   private static final int CORE_POOL_SIZE = 10;
@@ -47,9 +46,13 @@ public class ServiceConfig {
 
   @Bean
   public ExecutorService getExecutorService() {
-    return new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE,
-        KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS,
-        new ArrayBlockingQueue<Runnable>(QUEUE_SIZE, true), new ThreadPoolExecutor.CallerRunsPolicy());
+    return new ThreadPoolExecutor(
+        CORE_POOL_SIZE,
+        MAX_POOL_SIZE,
+        KEEP_ALIVE_TIME,
+        TimeUnit.MILLISECONDS,
+        new ArrayBlockingQueue<Runnable>(QUEUE_SIZE, true),
+        new ThreadPoolExecutor.CallerRunsPolicy());
   }
 
   @Bean
@@ -62,13 +65,10 @@ public class ServiceConfig {
     return new ObjectMapper();
   }
 
-  @Bean(
-      name = {"myProperties"}
-  )
+  @Bean(name = {"myProperties"})
   public static PropertiesFactoryBean mapper(@Value("${login.profiles.active:staging}") String classPath) {
     PropertiesFactoryBean bean = new PropertiesFactoryBean();
     bean.setLocation(new ClassPathResource(classPath + "/authresource.properties"));
     return bean;
   }
-
 }

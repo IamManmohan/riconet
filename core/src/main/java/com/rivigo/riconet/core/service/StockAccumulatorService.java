@@ -9,13 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 public interface StockAccumulatorService {
 
-  List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(
-      StockAccumulatorRole role, Long partnerId);
+  List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(StockAccumulatorRole role, Long partnerId);
 
   List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
-      StockAccumulatorRole role,
-      Long partnerId, OperationalStatus status);
+      StockAccumulatorRole role, Long partnerId, OperationalStatus status);
 
   StockAccumulator getByUserId(Long userId);
-
 }

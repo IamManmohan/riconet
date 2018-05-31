@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
+import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 
 public interface QcService {
 

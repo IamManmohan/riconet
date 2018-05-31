@@ -1,16 +1,11 @@
 package com.rivigo.riconet.ruleengine;
 
-/**
- * @author ajay mittal
- */
-
+/** @author ajay mittal */
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Operations {
-  /**
-   * Application of the Singleton pattern using enum
-   **/
+  /** Application of the Singleton pattern using enum */
   // Should only have one INSTANCE, so please! don't add more values here
   INSTANCE;
 

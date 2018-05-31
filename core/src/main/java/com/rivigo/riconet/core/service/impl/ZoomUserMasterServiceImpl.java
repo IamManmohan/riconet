@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ZoomUserMasterServiceImpl implements ZoomUserMasterService {
 
-  @Autowired
-  private ZoomUserRepository zoomUserRepository;
+  @Autowired private ZoomUserRepository zoomUserRepository;
 
   @Override
   public ZoomUser getZoomUser(String userName) {
@@ -23,30 +22,26 @@ public class ZoomUserMasterServiceImpl implements ZoomUserMasterService {
   }
 
   @Override
-  public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId,
-      String zoomUserType, String excludedZoomUserType) {
+  public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId, String zoomUserType, String excludedZoomUserType) {
     if (zoomUserType == null) {
       throw new ZoomException("ZoomUserType cannot be null or empty.");
     }
-    return zoomUserRepository
-        .findByLocationIdAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus
-            (locationId, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
+    return zoomUserRepository.findByLocationIdAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
+        locationId, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
   }
 
   @Override
-  public List<ZoomUser> getActiveZoomUsersByLocationInAndZoomUserType(List<Long> locationIdList,
-      String zoomUserType, String excludedZoomUserType) {
+  public List<ZoomUser> getActiveZoomUsersByLocationInAndZoomUserType(
+      List<Long> locationIdList, String zoomUserType, String excludedZoomUserType) {
     if (zoomUserType == null) {
       throw new ZoomException("ZoomUserType cannot be null or empty.");
     }
-    return zoomUserRepository
-        .findByLocationIdInAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus
-            (locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
+    return zoomUserRepository.findByLocationIdInAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
+        locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
   }
 
   @Override
   public ZoomUser getByUserId(Long userId) {
     return zoomUserRepository.findByUserId(userId);
   }
-
 }

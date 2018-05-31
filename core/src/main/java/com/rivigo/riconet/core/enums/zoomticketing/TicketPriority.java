@@ -5,7 +5,7 @@ package com.rivigo.riconet.core.enums.zoomticketing;
  * @date 27-Feb-2018
  */
 public enum TicketPriority {
-    LOW,
-    MEDIUM,
-    HIGH
+  LOW,
+  MEDIUM,
+  HIGH
 }

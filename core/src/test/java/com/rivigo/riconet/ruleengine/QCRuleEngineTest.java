@@ -16,87 +16,74 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 public class QCRuleEngineTest {
 
-  @InjectMocks
-  QCRuleEngine qcRuleEngine;
+  @InjectMocks QCRuleEngine qcRuleEngine;
 
-  @Mock
-  private RuleEngineRuleRepository ruleEngineRuleRepository;
-
+  @Mock private RuleEngineRuleRepository ruleEngineRuleRepository;
 
   @Before
-  public void initMocks(){
+  public void initMocks() {
     MockitoAnnotations.initMocks(this);
   }
 
   @Test
-  //test case when all condition satisfies
-  public void getRuleFromDBAndApplyTest1(){
-    Map<String,Object> bindings = getBindingsMap();
+  // test case when all condition satisfies
+  public void getRuleFromDBAndApplyTest1() {
+    Map<String, Object> bindings = getBindingsMap();
     mockRuleRepositoryMethods();
     boolean result = qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
-    assertEquals(result,false);
-
+    assertEquals(result, false);
   }
 
   @Test
-  //test case when number of cnoteType is different
-  public void getRuleFromDBAndApplyTest2(){
-    Map<String,Object> bindings = getBindingsMap();
-    bindings.put("NUMBER_OF_CN",28.0);
+  // test case when number of cnoteType is different
+  public void getRuleFromDBAndApplyTest2() {
+    Map<String, Object> bindings = getBindingsMap();
+    bindings.put("NUMBER_OF_CN", 28.0);
     mockRuleRepositoryMethods();
     boolean result = qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
-    assertEquals(result,false);
-
+    assertEquals(result, false);
   }
 
   @Test
-  //test case when number of cn is less
-  public void getRuleFromDBAndApplyTest3(){
-    Map<String,Object> bindings = getBindingsMap();
-    bindings.put("CLIENT_TYPE","RETAIL");
+  // test case when number of cn is less
+  public void getRuleFromDBAndApplyTest3() {
+    Map<String, Object> bindings = getBindingsMap();
+    bindings.put("CLIENT_TYPE", "RETAIL");
     mockRuleRepositoryMethods();
     boolean result = qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
-    assertEquals(result,false);
-
+    assertEquals(result, false);
   }
 
   @Test
-  //test case when number mean weight condition fails
-  public void getRuleFromDBAndApplyTest4(){
-    Map<String,Object> bindings = getBindingsMap();
-    bindings.put("MEAN_ACTUAL_WEIGHT",0.0);
+  // test case when number mean weight condition fails
+  public void getRuleFromDBAndApplyTest4() {
+    Map<String, Object> bindings = getBindingsMap();
+    bindings.put("MEAN_ACTUAL_WEIGHT", 0.0);
     mockRuleRepositoryMethods();
     boolean result = qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
-    assertEquals(result,true);
-
+    assertEquals(result, true);
   }
 
   @Test
-  //test case when number mean invoie condition fails
-  public void getRuleFromDBAndApplyTest5(){
-    Map<String,Object> bindings = getBindingsMap();
-    bindings.put("MEAN_INVOICE_VALUE",50.0);
+  // test case when number mean invoie condition fails
+  public void getRuleFromDBAndApplyTest5() {
+    Map<String, Object> bindings = getBindingsMap();
+    bindings.put("MEAN_INVOICE_VALUE", 50.0);
     mockRuleRepositoryMethods();
     boolean result = qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
-    assertEquals(result,true);
-
+    assertEquals(result, true);
   }
 
-  private void mockRuleRepositoryMethods(){
-    Mockito.when(ruleEngineRuleRepository
-        .findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true))
-        .thenReturn(getBasicRuleList());
-    Mockito.when(ruleEngineRuleRepository
-        .findByRuleNameAndRuleTypeAndIsActive("QC_CHECK", RuleType.BUSINESS_RULE, true))
+  private void mockRuleRepositoryMethods() {
+    Mockito.when(ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true)).thenReturn(getBasicRuleList());
+    Mockito.when(ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive("QC_CHECK", RuleType.BUSINESS_RULE, true))
         .thenReturn(getBusinessRuleList());
   }
 
-  private List<RuleEngineRule> getBasicRuleList(){
+  private List<RuleEngineRule> getBasicRuleList() {
 
     String rule1 = "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * + < ";
     String rule2 = "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * - > ";
@@ -110,7 +97,6 @@ public class QCRuleEngineTest {
     String rule7 = "NUMBER_OF_CN MINIMUM_NUMBER_OF_CN_REQUIRED >";
     String rule8 = "CLIENT_TYPE REQUIRED_CLIENT_TYPE =";
 
-
     List<String> basicRuleStringList = new ArrayList<>();
     basicRuleStringList.add(rule1);
     basicRuleStringList.add(rule2);
@@ -122,21 +108,21 @@ public class QCRuleEngineTest {
     basicRuleStringList.add(rule8);
 
     List<RuleEngineRule> basicRuleList = new ArrayList<>();
-    for(int i =0;i<basicRuleStringList.size();++i){
+    for (int i = 0; i < basicRuleStringList.size(); ++i) {
       RuleEngineRule basicRule = new RuleEngineRule();
       basicRule.setId(i);
       basicRule.setRule(basicRuleStringList.get(i));
-      basicRule.setRuleName("rule"+i);
+      basicRule.setRuleName("rule" + i);
       basicRuleList.add(basicRule);
     }
 
     return basicRuleList;
   }
 
-  private List<RuleEngineRule> getBusinessRuleList(){
+  private List<RuleEngineRule> getBusinessRuleList() {
 
-    //#7 AND #8 AND ( #1 AND #2 OR #3 AND #4 OR #5 AND #6)
-    //#7 #8 AND #1 #2 AND #3 #4 AND OR #5 #6 AND OR AND
+    // #7 AND #8 AND ( #1 AND #2 OR #3 AND #4 OR #5 AND #6)
+    // #7 #8 AND #1 #2 AND #3 #4 AND OR #5 #6 AND OR AND
     String businessRule1 = "#6 #7 AND #0 #1 AND #2 #3 AND AND #4 #5 AND AND NOT AND";
     RuleEngineRule businessRule = new RuleEngineRule();
     businessRule.setId(1);
@@ -150,27 +136,27 @@ public class QCRuleEngineTest {
     return businessRuleList;
   }
 
-  Map<String,Object> getBindingsMap(){
+  Map<String, Object> getBindingsMap() {
 
     Map<String, Object> bindings = new HashMap<>();
 
-    bindings.put("ACTUAL_WEIGHT",10.0);
-    bindings.put("MEAN_ACTUAL_WEIGHT",10.0);
-    bindings.put("ACTUAL_WEIGHT_FACTOR",2.0);
-    bindings.put("ACTUAL_WEIGHT_SIGMA",1.0);
-    bindings.put("CHARGED_WEIGHT",10.0);
-    bindings.put("MEAN_CHARGED_WEIGHT",10.0);
-    bindings.put("CHARGED_WEIGHT_FACTOR",2.0);
-    bindings.put("CHARGED_WEIGHT_SIGMA",1.0);
-    bindings.put("INVOICE_VALUE",100.0);
-    bindings.put("MEAN_INVOICE_VALUE",100.0);
-    bindings.put("INVOICE_VALUE_FACTOR",2.0);
-    bindings.put("INVOICE_VALUE_SIGMA",10.0);
-    bindings.put("NUMBER_OF_CN",31.0);
-    bindings.put("MINIMUM_NUMBER_OF_CN_REQUIRED",30.0);
-    bindings.put("CLIENT_TYPE","NORMAL");
-    bindings.put("REQUIRED_CLIENT_TYPE","NORMAL");
-    //INVOICE_VALUE_SIGMA
+    bindings.put("ACTUAL_WEIGHT", 10.0);
+    bindings.put("MEAN_ACTUAL_WEIGHT", 10.0);
+    bindings.put("ACTUAL_WEIGHT_FACTOR", 2.0);
+    bindings.put("ACTUAL_WEIGHT_SIGMA", 1.0);
+    bindings.put("CHARGED_WEIGHT", 10.0);
+    bindings.put("MEAN_CHARGED_WEIGHT", 10.0);
+    bindings.put("CHARGED_WEIGHT_FACTOR", 2.0);
+    bindings.put("CHARGED_WEIGHT_SIGMA", 1.0);
+    bindings.put("INVOICE_VALUE", 100.0);
+    bindings.put("MEAN_INVOICE_VALUE", 100.0);
+    bindings.put("INVOICE_VALUE_FACTOR", 2.0);
+    bindings.put("INVOICE_VALUE_SIGMA", 10.0);
+    bindings.put("NUMBER_OF_CN", 31.0);
+    bindings.put("MINIMUM_NUMBER_OF_CN_REQUIRED", 30.0);
+    bindings.put("CLIENT_TYPE", "NORMAL");
+    bindings.put("REQUIRED_CLIENT_TYPE", "NORMAL");
+    // INVOICE_VALUE_SIGMA
 
     return bindings;
   }

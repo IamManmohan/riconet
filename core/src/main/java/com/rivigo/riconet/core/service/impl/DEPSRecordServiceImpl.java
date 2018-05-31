@@ -79,77 +79,63 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
   public static final String CENT_PERCENT = "100% ";
   public static final String SECOND_CENT_PERCENT = " - 100%";
 
+  @Autowired private TripService tripService;
 
-  @Autowired
-  private TripService tripService;
+  @Autowired private PRSService prsService;
 
-  @Autowired
-  private PRSService prsService;
+  @Autowired private ConsignmentService consignmentService;
 
-  @Autowired
-  private ConsignmentService consignmentService;
+  @Autowired private EmailService emailService;
 
-  @Autowired
-  private EmailService emailService;
+  @Autowired private UserMasterService userMasterService;
 
-  @Autowired
-  private UserMasterService userMasterService;
+  @Autowired private LocationService locationServiceV2;
 
-  @Autowired
-  private LocationService locationServiceV2;
+  @Autowired private ZoomUserMasterService zoomUserMasterService;
 
-  @Autowired
-  private ZoomUserMasterService zoomUserMasterService;
+  @Autowired private TransportationPartnerMappingService transportationPartnerMappingService;
 
-  @Autowired
-  private TransportationPartnerMappingService transportationPartnerMappingService;
+  @Autowired private StockAccumulatorService stockAccumulatorService;
 
-  @Autowired
-  private StockAccumulatorService stockAccumulatorService;
+  @Autowired private FeederVendorService feederVendorService;
 
-  @Autowired
-  private FeederVendorService feederVendorService;
+  @Autowired private OrganizationService organizationService;
 
-  @Autowired
-  private OrganizationService organizationService;
+  @Autowired private ZoomPropertyService zoomPropertyService;
 
-  @Autowired
-  private ZoomPropertyService zoomPropertyService;
+  @Autowired private DEPSNotificationRepository depsNotificationRepository;
 
-  @Autowired
-  private DEPSNotificationRepository depsNotificationRepository;
-
-  @Autowired
-  private ConsignmentScheduleService consignmentScheduleService;
+  @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Override
-  public List<DEPSNotification> createNotificationData(
-      DEPSNotificationContext depsNotificationContext) {
+  public List<DEPSNotification> createNotificationData(DEPSNotificationContext depsNotificationContext) {
     List<DEPSNotification> dtoList = new ArrayList<>();
 
-    Set<Long> shortageConsignmentIds = depsNotificationContext.getNewDEPSRecordList().stream()
-        .filter(depsRecord -> depsRecord.getDepsType() == DEPSType.SHORTAGE)
-        .map(DEPSNotificationDTO::getConsignmentId).collect(Collectors.toSet());
+    Set<Long> shortageConsignmentIds =
+        depsNotificationContext
+            .getNewDEPSRecordList()
+            .stream()
+            .filter(depsRecord -> depsRecord.getDepsType() == DEPSType.SHORTAGE)
+            .map(DEPSNotificationDTO::getConsignmentId)
+            .collect(Collectors.toSet());
 
     if (CollectionUtils.isEmpty(shortageConsignmentIds)) {
       log.info("No shortage tickets found ");
       return Collections.emptyList();
     }
-    Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap = depsNotificationContext
-        .getNewDEPSRecordList().stream()
-        .collect(Collectors.groupingBy(DEPSNotificationDTO::getConsignmentId));
+    Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap =
+        depsNotificationContext.getNewDEPSRecordList().stream().collect(Collectors.groupingBy(DEPSNotificationDTO::getConsignmentId));
     List<Long> tripIdList = getTripIdList(depsNotificationContext, ZoomTripType.TRIP);
     Map<Long, Trip> tripIdToTripMap = tripService.getTripsMapByIdIn(tripIdList);
     List<Long> prsIdList = getTripIdList(depsNotificationContext, ZoomTripType.PRS);
     Map<Long, PickupRunSheet> prsIdToPRSMap = prsService.getPrsMapByPRSIdIn(prsIdList);
 
-    Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap = consignmentService
-        .getLastScanByCnIdIn(new ArrayList<>(shortageConsignmentIds),
-            Arrays.asList(RECEIVED_AT_OU.name(),
-                STOCK_CHECK_DONE.name(), LOADED.name(), DELIVERY_LOADED.name(), EXCESS.name()));
+    Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap =
+        consignmentService.getLastScanByCnIdIn(
+            new ArrayList<>(shortageConsignmentIds),
+            Arrays.asList(RECEIVED_AT_OU.name(), STOCK_CHECK_DONE.name(), LOADED.name(), DELIVERY_LOADED.name(), EXCESS.name()));
 
-    Set<String> reportingCcList = getCcList(
-        depsNotificationContext.getNewDEPSRecordList().get(0).getInboundLocationId());
+    Set<String> reportingCcList = getCcList(depsNotificationContext.getNewDEPSRecordList().get(0).getInboundLocationId());
 
     Set<String> bccList = emailService.getEmails(EmailDlName.DEPS_NOTIFICATION);
 
@@ -157,38 +143,40 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
 
     boolean isTesting = zoomPropertyService.getBoolean(ZoomPropertyName.DEPS_EMAIL_TESTING, true);
 
-    shortageConsignmentIds.forEach(consignmentId -> {
-      DEPSNotification dto = new DEPSNotification();
-      dto.setId(
-          consignmentId + "_" + depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId()
-              + "_" + DateTime.now().getMillis());
-      dto.setTaskId(depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId());
-      updateCnoteMetadata(dto, consignmentId, consignmentIdToDepsRecordMap,
-          depsNotificationContext);
-      updateResponsiblePersonAndLocation(dto, consignmentId, consignmentIdToDepsRecordMap,
-          depsNotificationContext, tripIdToTripMap, prsIdToPRSMap, consignmentIdToLatestHistoryMap);
-      updateStakeHolders(dto, reportingCcList, bccList, defaultCcList, isTesting);
-      updateLastScanDetails(dto, consignmentId, consignmentIdToLatestHistoryMap);
-      dtoList.add(dto);
-    });
+    shortageConsignmentIds.forEach(
+        consignmentId -> {
+          DEPSNotification dto = new DEPSNotification();
+          dto.setId(
+              consignmentId + "_" + depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId() + "_" + DateTime.now().getMillis());
+          dto.setTaskId(depsNotificationContext.getNewDEPSRecordList().get(0).getTaskId());
+          updateCnoteMetadata(dto, consignmentId, consignmentIdToDepsRecordMap, depsNotificationContext);
+          updateResponsiblePersonAndLocation(
+              dto,
+              consignmentId,
+              consignmentIdToDepsRecordMap,
+              depsNotificationContext,
+              tripIdToTripMap,
+              prsIdToPRSMap,
+              consignmentIdToLatestHistoryMap);
+          updateStakeHolders(dto, reportingCcList, bccList, defaultCcList, isTesting);
+          updateLastScanDetails(dto, consignmentId, consignmentIdToLatestHistoryMap);
+          dtoList.add(dto);
+        });
     depsNotificationRepository.save(dtoList);
     return dtoList;
   }
 
-  private void updateLastScanDetails(DEPSNotification dto, Long consignmentId,
-      Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap) {
+  private void updateLastScanDetails(
+      DEPSNotification dto, Long consignmentId, Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap) {
     ConsignmentHistory history = consignmentIdToLatestHistoryMap.get(consignmentId);
     if (history == null) {
       return;
     }
-    addDEPSUserDTO(dto, userMasterService.getById(history.getCreatedById()),
-        DEPSLocationType.LAST_SCAN);
-    addDEPSLocationDTO(dto, locationServiceV2.getLocationById(history.getLocationId()),
-        DEPSLocationType.LAST_SCAN);
+    addDEPSUserDTO(dto, userMasterService.getById(history.getCreatedById()), DEPSLocationType.LAST_SCAN);
+    addDEPSLocationDTO(dto, locationServiceV2.getLocationById(history.getLocationId()), DEPSLocationType.LAST_SCAN);
   }
 
-  private void addDEPSLocationDTO(DEPSNotification dto, Location location,
-      DEPSLocationType locationType) {
+  private void addDEPSLocationDTO(DEPSNotification dto, Location location, DEPSLocationType locationType) {
     DEPSNotification.DEPSLocationDTO locationDTO = new DEPSNotification.DEPSLocationDTO();
     locationDTO.setId(location.getId());
     locationDTO.setName(location.getName());
@@ -206,25 +194,21 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
   private Set<String> getCcList(Long locationId) {
     Set<String> ccList = new HashSet<>();
     Location loc = locationServiceV2.getLocationById(locationId);
-    List<Long> locIds = locationServiceV2.getAllClusterSiblingsOfLocation(loc.getCode())
-        .stream().map(Location::getId).collect(Collectors.toList());
+    List<Long> locIds =
+        locationServiceV2.getAllClusterSiblingsOfLocation(loc.getCode()).stream().map(Location::getId).collect(Collectors.toList());
 
-    List<Long> regionLocIds = locationServiceV2.getAllClusterSiblingsOfLocation(loc.getCode())
-        .stream().map(Location::getId).collect(Collectors.toList());
+    List<Long> regionLocIds =
+        locationServiceV2.getAllClusterSiblingsOfLocation(loc.getCode()).stream().map(Location::getId).collect(Collectors.toList());
 
     Location pc = locationServiceV2.getPcOrReportingPc(loc);
-    List<ZoomUser> rmList = zoomUserMasterService
-        .getActiveZoomUsersByLocationInAndZoomUserType(regionLocIds,
-            "ZOOM_RM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
-    List<ZoomUser> clmList = zoomUserMasterService
-        .getActiveZoomUsersByLocationInAndZoomUserType(locIds,
-            "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
-    List<ZoomUser> pceList = zoomUserMasterService
-        .getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-            "ZOOM_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name());
-    List<ZoomUser> pcmList = zoomUserMasterService
-        .getActiveZoomUsersByLocationAndZoomUserType(pc.getId(),
-            "ZOOM_BO_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
+    List<ZoomUser> rmList =
+        zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(regionLocIds, "ZOOM_RM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
+    List<ZoomUser> clmList =
+        zoomUserMasterService.getActiveZoomUsersByLocationInAndZoomUserType(locIds, "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
+    List<ZoomUser> pceList =
+        zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(), "ZOOM_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name());
+    List<ZoomUser> pcmList =
+        zoomUserMasterService.getActiveZoomUsersByLocationAndZoomUserType(pc.getId(), "ZOOM_BO_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name());
     ccList.addAll(rmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
     ccList.addAll(clmList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
     ccList.addAll(pceList.stream().map(ZoomUser::getEmail).collect(Collectors.toList()));
@@ -238,23 +222,18 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
       return;
     }
     List<String> dummyEmailList = new ArrayList<>();
-    dto.getEmailIdList().forEach(email ->
-        dummyEmailList.add(email.split("@")[0] + "@rivigodummy.com")
-    );
+    dto.getEmailIdList().forEach(email -> dummyEmailList.add(email.split("@")[0] + "@rivigodummy.com"));
     dto.getEmailIdList().clear();
     dto.getEmailIdList().addAll(dummyEmailList);
 
     List<String> dummyCcList = new ArrayList<>();
-    dto.getCcList().forEach(email ->
-        dummyCcList.add(email.split("@")[0] + "@rivigodummy.com"));
+    dto.getCcList().forEach(email -> dummyCcList.add(email.split("@")[0] + "@rivigodummy.com"));
     dto.getCcList().clear();
     dto.getCcList().addAll(dummyCcList);
-
   }
 
-  private void updateStakeHolders(DEPSNotification dto, Set<String> reportingCcList,
-      Set<String> bccList,
-      Set<String> defaultCcList, boolean isTesting) {
+  private void updateStakeHolders(
+      DEPSNotification dto, Set<String> reportingCcList, Set<String> bccList, Set<String> defaultCcList, boolean isTesting) {
     dto.getCcList().addAll(reportingCcList);
     dto.getCcList().addAll(defaultCcList);
     switch (dto.getScenario()) {
@@ -285,21 +264,20 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     filterEmails(dto, bccList, isTesting);
   }
 
-  private void updateResponsiblePersonAndLocation(DEPSNotification dto, Long consignmentId,
+  private void updateResponsiblePersonAndLocation(
+      DEPSNotification dto,
+      Long consignmentId,
       Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap,
       DEPSNotificationContext depsNotificationContext,
       Map<Long, Trip> tripIdToTripMap,
       Map<Long, PickupRunSheet> prsIdToPRSMap,
       Map<Long, ConsignmentHistory> consignmentIdToLatestHistoryMap) {
     List<DEPSNotificationDTO> depsRecordList = consignmentIdToDepsRecordMap.get(consignmentId);
-    ConsignmentSchedule previousSchedule = getPreviousSchedule(depsNotificationContext,
-        consignmentId);
+    ConsignmentSchedule previousSchedule = getPreviousSchedule(depsNotificationContext, consignmentId);
     DEPSNotificationDTO depsRecord = depsRecordList.get(0);
     dto.setDepsTaskType(depsRecord.getDepsTaskType());
-    addDEPSUserDTO(dto, userMasterService.getById(depsRecord.getReportedById()),
-        DEPSLocationType.INBOUND);
-    addDEPSLocationDTO(dto, locationServiceV2.getLocationById(depsRecord.getInboundLocationId()),
-        DEPSLocationType.INBOUND);
+    addDEPSUserDTO(dto, userMasterService.getById(depsRecord.getReportedById()), DEPSLocationType.INBOUND);
+    addDEPSLocationDTO(dto, locationServiceV2.getLocationById(depsRecord.getInboundLocationId()), DEPSLocationType.INBOUND);
     ConsignmentHistory latestHistory;
     switch (depsRecord.getDepsTaskType()) {
       case UNLOADING:
@@ -310,21 +288,17 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
         dto.setScenario(DEPSScenario.WITHINPC);
         latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
         if (latestHistory != null) {
-          addDEPSUserDTO(dto, userMasterService.getById(latestHistory.getCreatedById()),
-              DEPSLocationType.OUTBOUND);
-          addDEPSLocationDTO(dto, locationServiceV2.getLocationById(latestHistory.getLocationId()),
-              DEPSLocationType.OUTBOUND);
+          addDEPSUserDTO(dto, userMasterService.getById(latestHistory.getCreatedById()), DEPSLocationType.OUTBOUND);
+          addDEPSLocationDTO(dto, locationServiceV2.getLocationById(latestHistory.getLocationId()), DEPSLocationType.OUTBOUND);
         }
         break;
       case RETURN_SCAN:
         dto.setScenario(DEPSScenario.RETURN_SCAN);
-        TransportationPartnerMapping transportationPartnerMapping = transportationPartnerMappingService
-            .getByDRSId(depsRecord.getTripId());
+        TransportationPartnerMapping transportationPartnerMapping = transportationPartnerMappingService.getByDRSId(depsRecord.getTripId());
         latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
         if (transportationPartnerMapping != null) {
           getDEPSReporteeDRSUserDTO(dto, transportationPartnerMapping);
-          addDEPSLocationDTO(dto, locationServiceV2.getLocationById(latestHistory.getLocationId()),
-              DEPSLocationType.OUTBOUND);
+          addDEPSLocationDTO(dto, locationServiceV2.getLocationById(latestHistory.getLocationId()), DEPSLocationType.OUTBOUND);
         }
         break;
       default:
@@ -332,30 +306,29 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     }
   }
 
-  private void handleUnloading(DEPSNotificationDTO depsRecord, ConsignmentSchedule previousSchedule,
-      DEPSNotification dto, Map<Long, Trip> tripIdToTripMap,
+  private void handleUnloading(
+      DEPSNotificationDTO depsRecord,
+      ConsignmentSchedule previousSchedule,
+      DEPSNotification dto,
+      Map<Long, Trip> tripIdToTripMap,
       Map<Long, PickupRunSheet> prsIdToPRSMap) {
     if (depsRecord.getTripType().equals(ZoomTripType.PRS)) {
       dto.setScenario(DEPSScenario.PICKUP);
       getDEPSReporteePRSDTO(dto, prsIdToPRSMap.get(depsRecord.getTripId()));
     } else if (depsRecord.getTripType().equals(ZoomTripType.TRIP)) {
-      if (tripIdToTripMap.containsKey(depsRecord.getTripId())
-          && tripIdToTripMap.get(depsRecord.getTripId()).getType() == BF) {
+      if (tripIdToTripMap.containsKey(depsRecord.getTripId()) && tripIdToTripMap.get(depsRecord.getTripId()).getType() == BF) {
         dto.setScenario(DEPSScenario.BFTRIP);
       } else {
         dto.setScenario(DEPSScenario.INBOUND);
       }
       if (previousSchedule != null && previousSchedule.getLoadedById() != null) {
-        addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()),
-            DEPSLocationType.OUTBOUND);
-        addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()),
-            DEPSLocationType.OUTBOUND);
+        addDEPSUserDTO(dto, userMasterService.getById(previousSchedule.getLoadedById()), DEPSLocationType.OUTBOUND);
+        addDEPSLocationDTO(dto, locationServiceV2.getLocationById(previousSchedule.getLocationId()), DEPSLocationType.OUTBOUND);
       }
     }
   }
 
-  private void getDEPSReporteeDRSUserDTO(DEPSNotification dto,
-      TransportationPartnerMapping transportationPartnerMapping) {
+  private void getDEPSReporteeDRSUserDTO(DEPSNotification dto, TransportationPartnerMapping transportationPartnerMapping) {
     User user = null;
     FeederVendor feederVendor = null;
     DEPSNotification.DEPSUserDTO userDTO = new DEPSNotification.DEPSUserDTO();
@@ -365,10 +338,9 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
         userDTO.setType(PartnerType.RIVIGO_CAPTAIN.name());
         break;
       case BUSINESS_PARTNER:
-        List<StockAccumulator> accumulatorList = stockAccumulatorService
-            .getByStockAccumulatorRoleAndAccumulationPartnerId(
-                StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN,
-                transportationPartnerMapping.getPartnerId());
+        List<StockAccumulator> accumulatorList =
+            stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(
+                StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, transportationPartnerMapping.getPartnerId());
         if (!CollectionUtils.isEmpty(accumulatorList)) {
           StockAccumulator accumulator = accumulatorList.get(0);
           user = accumulator.getUser();
@@ -381,8 +353,7 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
         break;
       case VENDOR:
         user = userMasterService.getById(transportationPartnerMapping.getUserId());
-        feederVendor = feederVendorService
-            .getFeederVendorById(transportationPartnerMapping.getPartnerId());
+        feederVendor = feederVendorService.getFeederVendorById(transportationPartnerMapping.getPartnerId());
         userDTO.setType(PartnerType.VENDOR.name());
         break;
       default:
@@ -395,16 +366,15 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     dto.setReportee(userDTO);
   }
 
-  private DEPSNotification.DEPSUserDTO getDEPSReporteePRSDTO(DEPSNotification dto,
-      PickupRunSheet pickupRunSheet) {
+  private DEPSNotification.DEPSUserDTO getDEPSReporteePRSDTO(DEPSNotification dto, PickupRunSheet pickupRunSheet) {
     DEPSNotification.DEPSUserDTO userDTO = new DEPSNotification.DEPSUserDTO();
     User user = pickupRunSheet.getUser();
     BusinessPartner businessPartner = pickupRunSheet.getBusinessPartner();
     boolean isBpUser = false;
     Organization organization = null;
     if (businessPartner != null) {
-      List<StockAccumulator> accumulatorList = stockAccumulatorService
-          .getByStockAccumulatorRoleAndAccumulationPartnerId(
+      List<StockAccumulator> accumulatorList =
+          stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(
               StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, businessPartner.getId());
       if (!CollectionUtils.isEmpty(accumulatorList)) {
         StockAccumulator accumulator = accumulatorList.get(0);
@@ -436,8 +406,7 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     return userDTO;
   }
 
-  private DEPSNotification.DEPSUserDTO addDEPSUserDTO(DEPSNotification dto, User user,
-      DEPSLocationType locationType) {
+  private DEPSNotification.DEPSUserDTO addDEPSUserDTO(DEPSNotification dto, User user, DEPSLocationType locationType) {
     DEPSNotification.DEPSUserDTO userDTO = new DEPSNotification.DEPSUserDTO();
     userDTO.setId(user.getId());
     userDTO.setEmail(user.getEmail());
@@ -464,43 +433,42 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     return userDTO;
   }
 
-
-  private ConsignmentSchedule getPreviousSchedule(DEPSNotificationContext depsNotificationContext,
-      Long consignmentId) {
-    List<ConsignmentSchedule> consignmentSchedules = depsNotificationContext
-        .getConsignmentIdToScheduleMap().get(consignmentId);
+  private ConsignmentSchedule getPreviousSchedule(DEPSNotificationContext depsNotificationContext, Long consignmentId) {
+    List<ConsignmentSchedule> consignmentSchedules = depsNotificationContext.getConsignmentIdToScheduleMap().get(consignmentId);
     Collections.sort(consignmentSchedules);
     final ConsignmentSchedule[] lastSchedule = new ConsignmentSchedule[1];
-    consignmentSchedules.forEach(consignmentSchedule -> {
-      if (consignmentSchedule.getPlanStatus() == ConsignmentLocationStatus.LEFT) {
-        lastSchedule[0] = consignmentSchedule;
-      }
-    });
+    consignmentSchedules.forEach(
+        consignmentSchedule -> {
+          if (consignmentSchedule.getPlanStatus() == ConsignmentLocationStatus.LEFT) {
+            lastSchedule[0] = consignmentSchedule;
+          }
+        });
 
     return lastSchedule[0];
   }
 
-  private List<Long> getTripIdList(DEPSNotificationContext depsNotificationContext,
-      ZoomTripType tripType) {
-    if (depsNotificationContext == null || CollectionUtils
-        .isEmpty(depsNotificationContext.getNewDEPSRecordList())) {
+  private List<Long> getTripIdList(DEPSNotificationContext depsNotificationContext, ZoomTripType tripType) {
+    if (depsNotificationContext == null || CollectionUtils.isEmpty(depsNotificationContext.getNewDEPSRecordList())) {
       return Collections.emptyList();
     }
-    return depsNotificationContext.getNewDEPSRecordList().stream()
+    return depsNotificationContext
+        .getNewDEPSRecordList()
+        .stream()
         .filter(depsRecord -> depsRecord.getTripType() == tripType)
-        .map(DEPSNotificationDTO::getTripId).collect(Collectors.toList());
+        .map(DEPSNotificationDTO::getTripId)
+        .collect(Collectors.toList());
   }
 
-  private void updateCnoteMetadata(DEPSNotification dto, Long consignmentId,
+  private void updateCnoteMetadata(
+      DEPSNotification dto,
+      Long consignmentId,
       Map<Long, List<DEPSNotificationDTO>> consignmentIdToDepsRecordMap,
       DEPSNotificationContext depsNotificationContext) {
     dto.setConsignmentId(consignmentId);
     dto.setDepsBoxesCount(consignmentIdToDepsRecordMap.get(consignmentId).size());
     dto.setDepsIdList(
-        consignmentIdToDepsRecordMap.get(consignmentId).stream().map(DEPSNotificationDTO::getId)
-            .collect(Collectors.toList()));
-    Consignment consignment = depsNotificationContext.getConsignmentIdToConsignmentMap()
-        .get(consignmentId);
+        consignmentIdToDepsRecordMap.get(consignmentId).stream().map(DEPSNotificationDTO::getId).collect(Collectors.toList()));
+    Consignment consignment = depsNotificationContext.getConsignmentIdToConsignmentMap().get(consignmentId);
     dto.setCnote(consignment.getCnote());
     dto.setClientName(consignment.getClient().getName());
     dto.setBookingDateTime(consignment.getBookingDateTime().getMillis());
@@ -516,31 +484,27 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     dto.setInvoiceValue(consignment.getValue());
     dto.setResolvedCount(0);
     if (dto.getCnote().contains(SECONDARY_CNOTE_SEPARATOR)) {
-      dto.setOriginalNumberOfBoxes(consignmentService
-          .getOriginalNumberOfBoxesByCnote(dto.getCnote().split(SECONDARY_CNOTE_SEPARATOR)[0]));
+      dto.setOriginalNumberOfBoxes(consignmentService.getOriginalNumberOfBoxesByCnote(dto.getCnote().split(SECONDARY_CNOTE_SEPARATOR)[0]));
     } else {
       dto.setOriginalNumberOfBoxes(consignment.getOriginalNoOfBoxes());
     }
-    dto.setExpectedLoss(dto.getInvoiceValue() == null ? null
-        : (dto.getInvoiceValue() * dto.getDepsBoxesCount()) / dto.getOriginalNumberOfBoxes());
+    dto.setExpectedLoss(
+        dto.getInvoiceValue() == null ? null : (dto.getInvoiceValue() * dto.getDepsBoxesCount()) / dto.getOriginalNumberOfBoxes());
   }
 
   @Override
   public void sendNotifications(List<DEPSNotification> depsNotificationList) {
-    String templateString = zoomPropertyService
-        .getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_TEMPLATE);
-    Boolean isEmailEnabled = zoomPropertyService
-        .getBoolean(ZoomPropertyName.DEPS_EMAIL_ENABLED, false);
-    String subjectTemplate = zoomPropertyService
-        .getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_SUBJECT);//get from zoom property
+    String templateString = zoomPropertyService.getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_TEMPLATE);
+    Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.DEPS_EMAIL_ENABLED, false);
+    String subjectTemplate = zoomPropertyService.getString(ZoomPropertyName.SHORTAGE_NOTIFICATION_SUBJECT); // get from zoom property
     if (templateString != null && isEmailEnabled) {
-      depsNotificationList.forEach(depsNotification -> {
-        String body = designEmailTemplate(depsNotification, templateString);
-        String subject = designEmailTemplate(depsNotification, subjectTemplate);
-        emailService
-            .sendShortageEmail(depsNotification.getEmailIdList(), depsNotification.getCcList(),
-                depsNotification.getBccList(), subject, body, null);
-      });
+      depsNotificationList.forEach(
+          depsNotification -> {
+            String body = designEmailTemplate(depsNotification, templateString);
+            String subject = designEmailTemplate(depsNotification, subjectTemplate);
+            emailService.sendShortageEmail(
+                depsNotification.getEmailIdList(), depsNotification.getCcList(), depsNotification.getBccList(), subject, body, null);
+          });
     }
   }
 
@@ -549,12 +513,13 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     valuesMap.put("cnote", depsNotification.getCnote());
     valuesMap.put("client_name", depsNotification.getClientName());
     valuesMap.put("shortage_count", Integer.toString(depsNotification.getDepsBoxesCount()));
-    valuesMap.put("estimated_loss", depsNotification.getExpectedLoss() == null ? "NA"
-        : Long.toString(Math.round(depsNotification.getExpectedLoss())));
-    valuesMap.put("last_scan_ou", depsNotification.getLastScannedAtLocation() == null ? "-"
-        : depsNotification.getLastScannedAtLocation().getCode());
-    valuesMap.put("last_scan_person", depsNotification.getLastScannedByUser() == null ? "-"
-        : depsNotification.getLastScannedByUser().getName());
+    valuesMap.put(
+        "estimated_loss",
+        depsNotification.getExpectedLoss() == null ? "NA" : Long.toString(Math.round(depsNotification.getExpectedLoss())));
+    valuesMap.put(
+        "last_scan_ou", depsNotification.getLastScannedAtLocation() == null ? "-" : depsNotification.getLastScannedAtLocation().getCode());
+    valuesMap.put(
+        "last_scan_person", depsNotification.getLastScannedByUser() == null ? "-" : depsNotification.getLastScannedByUser().getName());
     valuesMap.put("reporting_ou", depsNotification.getReporterLocation().getCode());
     valuesMap.put("reporting_person", depsNotification.getReporter().getName());
 
@@ -568,27 +533,33 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
         break;
       case INBOUND:
         valuesMap.put(SCENARIO, "Scan out -but not scan in");
-        valuesMap.put(RESPONSIBLE_OU, depsNotification.getReporteeLocation().getCode() +
-            " - " + depsNotification.getReporterLocation().getCode());
-        valuesMap.put(RESPONSIBLE_PERSON, CENT_PERCENT + depsNotification.getReportee().getName() +
-            SECOND_CENT_PERCENT + depsNotification.getReporter().getName());
-        valuesMap.put("dear", depsNotification.getReportee().getName() +
-            (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId()) ?
-                "" : (" / " + depsNotification.getReporter().getName())));
+        valuesMap.put(
+            RESPONSIBLE_OU, depsNotification.getReporteeLocation().getCode() + " - " + depsNotification.getReporterLocation().getCode());
+        valuesMap.put(
+            RESPONSIBLE_PERSON,
+            CENT_PERCENT + depsNotification.getReportee().getName() + SECOND_CENT_PERCENT + depsNotification.getReporter().getName());
+        valuesMap.put(
+            "dear",
+            depsNotification.getReportee().getName()
+                + (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId())
+                    ? ""
+                    : (" / " + depsNotification.getReporter().getName())));
         break;
       case WITHINPC:
         valuesMap.put(SCENARIO, "Within PC");
         valuesMap.put(RESPONSIBLE_OU, depsNotification.getReporterLocation().getCode());
-        valuesMap.put(RESPONSIBLE_PERSON,
-            "OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
-        valuesMap.put("dear", depsNotification.getReportee().getName() +
-            (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId()) ?
-                "" : (" / " + depsNotification.getReporter().getName())));
+        valuesMap.put(RESPONSIBLE_PERSON, "OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
+        valuesMap.put(
+            "dear",
+            depsNotification.getReportee().getName()
+                + (depsNotification.getReportee().getId().equals(depsNotification.getReporter().getId())
+                    ? ""
+                    : (" / " + depsNotification.getReporter().getName())));
         break;
       case RETURN_SCAN:
         valuesMap.put(SCENARIO, "Short at time of delivery");
-        valuesMap.put(RESPONSIBLE_OU, depsNotification.getReporteeLocation().getCode() +
-            " - " + depsNotification.getReporterLocation().getCode());
+        valuesMap.put(
+            RESPONSIBLE_OU, depsNotification.getReporteeLocation().getCode() + " - " + depsNotification.getReporterLocation().getCode());
         valuesMap.put(RESPONSIBLE_PERSON, CENT_PERCENT + depsNotification.getReportee().getName());
         valuesMap.put("dear", depsNotification.getReportee().getName());
         break;
@@ -599,31 +570,25 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
     return sub.replace(templateString);
   }
 
-
   @Override
   public DEPSNotificationContext getNotificationContext(List<DEPSNotificationDTO> depsRecordList) {
 
     DEPSNotificationContext context = new DEPSNotificationContext();
 
-    List<Long> consignmentIdList = depsRecordList.stream()
-        .map(DEPSNotificationDTO::getConsignmentId).collect(Collectors.toList());
+    List<Long> consignmentIdList = depsRecordList.stream().map(DEPSNotificationDTO::getConsignmentId).collect(Collectors.toList());
 
     List<Consignment> consignments = consignmentService.getConsignmentsByIds(consignmentIdList);
 
-    Map<Long, Consignment> idToConsignmentMap = consignments.stream()
-        .collect(Collectors.toMap(Consignment::getId, Function.identity()));
+    Map<Long, Consignment> idToConsignmentMap = consignments.stream().collect(Collectors.toMap(Consignment::getId, Function.identity()));
 
     context.setConsignmentIdToConsignmentMap(idToConsignmentMap);
 
-    Map<Long, List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService
-        .getActivePlansMapByIds(consignmentIdList);
+    Map<Long, List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
 
     context.setConsignmentIdToScheduleMap(cnToScheduleMap);
 
     context.setNewDEPSRecordList(depsRecordList);
 
     return context;
-
   }
-
 }

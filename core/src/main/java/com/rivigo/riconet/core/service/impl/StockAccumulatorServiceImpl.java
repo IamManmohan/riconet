@@ -14,28 +14,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class StockAccumulatorServiceImpl implements StockAccumulatorService {
 
-  @Autowired
-  private StockAccumulatorRepository stockAccumulatorRepo;
+  @Autowired private StockAccumulatorRepository stockAccumulatorRepo;
 
   @Override
-  public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(
-      StockAccumulatorRole role, Long partnerId) {
-    return stockAccumulatorRepo
-        .findByStockAccumulatorRoleAndAccumulationPartnerId(role.toString(), partnerId);
+  public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerId(StockAccumulatorRole role, Long partnerId) {
+    return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerId(role.toString(), partnerId);
   }
 
   @Override
   public List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
-      StockAccumulatorRole role,
-      Long partnerId, OperationalStatus status) {
-    return stockAccumulatorRepo
-        .findByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(role.toString(), partnerId,
-            status.name());
+      StockAccumulatorRole role, Long partnerId, OperationalStatus status) {
+    return stockAccumulatorRepo.findByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(role.toString(), partnerId, status.name());
   }
 
   @Override
   public StockAccumulator getByUserId(Long userId) {
     return stockAccumulatorRepo.findByUserId(userId);
   }
-
 }

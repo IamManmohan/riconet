@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.config;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +27,6 @@ public class TopicNameConfig {
   @Value("${SMS_SINK_ERROR}")
   private String smsSinkError;
 
-
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -52,5 +50,4 @@ public class TopicNameConfig {
   public String smsSinkError() {
     return smsSinkError;
   }
-
 }

@@ -12,3 +12,11 @@ dependencies {
     compile 'log4j:log4j:1.2.17'
     compile project(':core')
 }
+
+apply plugin: "com.diffplug.gradle.spotless"
+
+spotless {
+    java {
+        googleJavaFormat('15.9')
+    }
+}

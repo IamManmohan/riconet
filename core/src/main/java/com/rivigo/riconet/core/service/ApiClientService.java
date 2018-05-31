@@ -10,7 +10,6 @@ public interface ApiClientService {
 
   Object parseJsonNode(JsonNode responseJson, TypeReference mapType);
 
-  JsonNode getEntity(Object dto, HttpMethod httpMethod, String url,
-      MultiValueMap<String, String> queryParams, String baseUrl) throws IOException;
+  JsonNode getEntity(Object dto, HttpMethod httpMethod, String url, MultiValueMap<String, String> queryParams, String baseUrl)
+      throws IOException;
 }
-
