@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 /** Created by ashfakh on 29/9/17. */
 @Slf4j
@@ -22,7 +23,7 @@ public class EventTest {
 
   @Mock private EventTriggerService eventTriggerService;
 
-  @Mock private ObjectMapper objectMapper;
+  @Spy private ObjectMapper objectMapper;
 
   @Before
   public void initMocks() {
