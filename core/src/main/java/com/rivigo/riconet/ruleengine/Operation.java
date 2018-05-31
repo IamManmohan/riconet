@@ -1,7 +1,6 @@
 package com.rivigo.riconet.ruleengine;
 
 /** @author ajay mittal */
-
 import java.util.Deque;
 
 public abstract class Operation implements Expression {

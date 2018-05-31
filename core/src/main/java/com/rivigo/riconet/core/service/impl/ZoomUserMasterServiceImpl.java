@@ -22,14 +22,12 @@ public class ZoomUserMasterServiceImpl implements ZoomUserMasterService {
   }
 
   @Override
-  public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(
-      Long locationId, String zoomUserType, String excludedZoomUserType) {
+  public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(Long locationId, String zoomUserType, String excludedZoomUserType) {
     if (zoomUserType == null) {
       throw new ZoomException("ZoomUserType cannot be null or empty.");
     }
-    return zoomUserRepository
-        .findByLocationIdAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
-            locationId, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
+    return zoomUserRepository.findByLocationIdAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
+        locationId, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
   }
 
   @Override
@@ -38,9 +36,8 @@ public class ZoomUserMasterServiceImpl implements ZoomUserMasterService {
     if (zoomUserType == null) {
       throw new ZoomException("ZoomUserType cannot be null or empty.");
     }
-    return zoomUserRepository
-        .findByLocationIdInAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
-            locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
+    return zoomUserRepository.findByLocationIdInAndZoomUserTypeContainingAndZoomUserTypeNotContainingAndStatus(
+        locationIdList, zoomUserType, excludedZoomUserType, OperationalStatus.ACTIVE);
   }
 
   @Override

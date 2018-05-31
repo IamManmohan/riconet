@@ -52,9 +52,7 @@ public class ZoomTicketingApiClientServiceTest {
 
   private String cnote = "1234567890";
   private List<String> typeId =
-      Arrays.asList(
-          ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
-          ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
+      Arrays.asList(ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(), ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
 
   @Test
   public void getTicketsByCnoteNullCheck() {
@@ -128,8 +126,7 @@ public class ZoomTicketingApiClientServiceTest {
     mockApiClientServiceGetEntity(jsonNode);
     zoomTicketingAPIClientService.makeComment(ticketId, comment);
     validateReturnedData(HttpMethod.POST);
-    Assert.assertEquals(
-        ticketId.toString(), multiValueMapArgumentCaptor.getValue().get("ticketId").get(0));
+    Assert.assertEquals(ticketId.toString(), multiValueMapArgumentCaptor.getValue().get("ticketId").get(0));
     Assert.assertEquals(comment, multiValueMapArgumentCaptor.getValue().get("text").get(0));
     validateParsingCallDone(jsonNode);
   }
@@ -153,11 +150,9 @@ public class ZoomTicketingApiClientServiceTest {
     mockApiClientServiceGetEntity(jsonNode);
     zoomTicketingAPIClientService.getGroupId(locationId, groupName, locationType);
     validateReturnedData(HttpMethod.GET);
-    Assert.assertEquals(
-        locationId.toString(), multiValueMapArgumentCaptor.getValue().get("locationId").get(0));
+    Assert.assertEquals(locationId.toString(), multiValueMapArgumentCaptor.getValue().get("locationId").get(0));
     Assert.assertEquals(groupName, multiValueMapArgumentCaptor.getValue().get("groupName").get(0));
-    Assert.assertEquals(
-        locationType.name(), multiValueMapArgumentCaptor.getValue().get("locationType").get(0));
+    Assert.assertEquals(locationType.name(), multiValueMapArgumentCaptor.getValue().get("locationType").get(0));
     validateParsingCallDone(jsonNode);
   }
 
@@ -168,39 +163,29 @@ public class ZoomTicketingApiClientServiceTest {
     LocationType locationType = LocationType.OU;
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage(
-        "Error while getting groupId for locationId: 1200 and groupName: Test group name locationType: OU");
+    expectedException.expectMessage("Error while getting groupId for locationId: 1200 and groupName: Test group name locationType: OU");
     zoomTicketingAPIClientService.getGroupId(locationId, groupName, locationType);
   }
 
   private void validateReturnedData(HttpMethod httpMethod) throws IOException {
     verify(apiClientService, times(1))
         .getEntity(
-            Mockito.any(),
-            httpMethodArgumentCaptor.capture(),
-            Mockito.anyString(),
-            multiValueMapArgumentCaptor.capture(),
-            Mockito.any());
+            Mockito.any(), httpMethodArgumentCaptor.capture(), Mockito.anyString(), multiValueMapArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(httpMethod, httpMethodArgumentCaptor.getValue());
   }
 
   private void validateParsingCallDone(JsonNode jsonNode) {
-    verify(apiClientService, times(1))
-        .parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
+    verify(apiClientService, times(1)).parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 
   private void mockApiClientServiceGetEntity(JsonNode jsonNode) throws IOException {
-    Mockito.when(
-            apiClientService.getEntity(
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenReturn(jsonNode);
   }
 
   private void mockApiClientServiceGetEntityException() throws IOException {
-    Mockito.when(
-            apiClientService.getEntity(
-                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+    Mockito.when(apiClientService.getEntity(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenThrow(new IOException());
   }
 

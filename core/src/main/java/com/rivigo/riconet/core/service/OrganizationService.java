@@ -11,6 +11,5 @@ public interface OrganizationService {
 
   Organization getById(Long orgId);
 
-  List<Organization> getByOrganizationTypeAndOperationalStatus(
-      OrganizationType rivigo, OperationalStatus status);
+  List<Organization> getByOrganizationTypeAndOperationalStatus(OrganizationType rivigo, OperationalStatus status);
 }

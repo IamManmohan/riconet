@@ -22,8 +22,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
-  public List<Organization> getByOrganizationTypeAndOperationalStatus(
-      OrganizationType rivigo, OperationalStatus status) {
+  public List<Organization> getByOrganizationTypeAndOperationalStatus(OrganizationType rivigo, OperationalStatus status) {
     return organizationRepository.findByTypeAndStatus(rivigo, status);
   }
 }

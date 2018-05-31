@@ -27,9 +27,7 @@ public class EventMain {
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context =
-        new AnnotationConfigApplicationContext(
-            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -43,8 +41,7 @@ public class EventMain {
     consumer.load(materializer, consumerSettings);
   }
 
-  public void load(
-      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
   }
 }

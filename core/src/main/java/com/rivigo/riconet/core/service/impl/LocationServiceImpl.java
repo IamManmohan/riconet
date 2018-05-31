@@ -35,8 +35,7 @@ public class LocationServiceImpl implements LocationService {
   public List<Location> getAllClusterSiblingsOfLocation(String fromLocationCode) {
     Location fromLocation = getLocationByCode(fromLocationCode);
     List<Organization> organization =
-        organizationService.getByOrganizationTypeAndOperationalStatus(
-            OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
+        organizationService.getByOrganizationTypeAndOperationalStatus(OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
     List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
     return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
         fromLocation.getId(), orgIds, LocationType.CLUSTER.name());
@@ -56,8 +55,7 @@ public class LocationServiceImpl implements LocationService {
   public List<Location> getAllRegionSiblingsOfLocation(String fromLocationCode) {
     Location fromLocation = getLocationByCode(fromLocationCode);
     List<Organization> organization =
-        organizationService.getByOrganizationTypeAndOperationalStatus(
-            OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
+        organizationService.getByOrganizationTypeAndOperationalStatus(OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
     List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
     return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
         fromLocation.getId(), orgIds, LocationType.REGION.name());

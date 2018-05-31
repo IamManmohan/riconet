@@ -42,16 +42,14 @@ public class DocIssueNotificationServiceTest {
     String subReason = split[2];
     ConsignmentStatus status = ConsignmentStatus.valueOf(split[3]);
     DocumentIssueNotification notification =
-        documentIssueNotificationService.createNotificationData(
-            consignmentId, userId, subReason, status);
+        documentIssueNotificationService.createNotificationData(consignmentId, userId, subReason, status);
     documentIssueNotificationService.sendNotifications(notification);
     return str;
   }
 
   public void prsUnloadingNotification() {
     List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(8l);
-    ConsignmentSchedule schedule =
-        documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
+    ConsignmentSchedule schedule = documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
     schedule.setArrivalTime(DateTime.now().getMillis());
     consignmentScheduleRepository.save(schedule);
     processMessage("8|1505|Invoice missing|RECEIVED_AT_OU");
@@ -64,8 +62,7 @@ public class DocIssueNotificationServiceTest {
 
   public void vehicleUnloadingWithinTwoHoursNotification() {
     List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
-    ConsignmentSchedule schedule =
-        documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
+    ConsignmentSchedule schedule = documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
     schedule.setArrivalTime(DateTime.now().getMillis());
     consignmentScheduleRepository.save(schedule);
     processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
@@ -73,10 +70,8 @@ public class DocIssueNotificationServiceTest {
 
   public void vehicleUnloadingAfterTwoHoursNotification() {
     List<ConsignmentSchedule> consignmentSchedules = consignmentScheduleService.getActivePlan(9l);
-    ConsignmentSchedule schedule =
-        documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
-    Integer bufferMinutes =
-        zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES, 120);
+    ConsignmentSchedule schedule = documentIssueNotificationService.getCurrentSchedule(consignmentSchedules);
+    Integer bufferMinutes = zoomPropertyService.getInteger(ZoomPropertyName.DOCUMENT_ISSUE_BUFFER_MINUTES, 120);
     schedule.setArrivalTime(DateTime.now().minusMinutes(bufferMinutes + 1).getMillis());
     consignmentScheduleRepository.save(schedule);
     processMessage("9|1505|Invoice missing|RECEIVED_AT_OU");
@@ -84,8 +79,7 @@ public class DocIssueNotificationServiceTest {
 
   public void undeliveredNotification1() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
-            ZoomTripType.DRS, 2l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 2l);
     tpm.setPartnerType(PartnerType.MARKET);
     tpm.setPartnerId(null);
     tpm.setUserId(1118l);
@@ -95,8 +89,7 @@ public class DocIssueNotificationServiceTest {
 
   public void undeliveredNotification2() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
-            ZoomTripType.DRS, 2l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 2l);
     tpm.setPartnerType(PartnerType.BUSINESS_PARTNER);
     tpm.setPartnerId(1l);
     tpm.setUserId(58l);

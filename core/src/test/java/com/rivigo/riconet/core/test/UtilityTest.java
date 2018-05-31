@@ -14,8 +14,7 @@ import org.junit.Test;
 public class UtilityTest {
 
   @Test(expected = Exception.class)
-  public void consignmentConstant()
-      throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void consignmentConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     ConsignmentConstant consignmentConstant;
     Constructor<ConsignmentConstant> constructor =
         (Constructor<ConsignmentConstant>) ConsignmentConstant.class.getDeclaredConstructors()[0];
@@ -24,31 +23,25 @@ public class UtilityTest {
   }
 
   @Test(expected = Exception.class)
-  public void timeUtils()
-      throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void timeUtils() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     TimeUtilsZoom timeUtilsZoom;
-    Constructor<TimeUtilsZoom> constructor =
-        (Constructor<TimeUtilsZoom>) TimeUtilsZoom.class.getDeclaredConstructors()[0];
+    Constructor<TimeUtilsZoom> constructor = (Constructor<TimeUtilsZoom>) TimeUtilsZoom.class.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     timeUtilsZoom = constructor.newInstance();
   }
 
   @Test(expected = Exception.class)
-  public void reasonConstant()
-      throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void reasonConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     ReasonConstant reasonConstant;
-    Constructor<ReasonConstant> constructor =
-        (Constructor<ReasonConstant>) ReasonConstant.class.getDeclaredConstructors()[0];
+    Constructor<ReasonConstant> constructor = (Constructor<ReasonConstant>) ReasonConstant.class.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     reasonConstant = constructor.newInstance();
   }
 
   @Test(expected = Exception.class)
-  public void errorConstant()
-      throws IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void errorConstant() throws IllegalAccessException, InvocationTargetException, InstantiationException {
     ErrorConstant errorConstant;
-    Constructor<ErrorConstant> constructor =
-        (Constructor<ErrorConstant>) ErrorConstant.class.getDeclaredConstructors()[0];
+    Constructor<ErrorConstant> constructor = (Constructor<ErrorConstant>) ErrorConstant.class.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     errorConstant = constructor.newInstance();
   }

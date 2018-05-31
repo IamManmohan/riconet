@@ -18,10 +18,7 @@ import java.util.Map;
 /** @author ajay mittal */
 public interface RuleEngine {
 
-  default boolean applyRules(
-      Map<String, Object> bindings,
-      List<RuleEngineRule> basicRuleList,
-      List<RuleEngineRule> businessRuleList) {
+  default boolean applyRules(Map<String, Object> bindings, List<RuleEngineRule> basicRuleList, List<RuleEngineRule> businessRuleList) {
     // create a singleton container for operations
     Operations operations = Operations.INSTANCE;
 
@@ -45,9 +42,7 @@ public interface RuleEngine {
 
     List<Expression> businessExpressionList = new ArrayList<>();
     for (RuleEngineRule businessRule : businessRuleList) {
-      Expression ex =
-          ExpressionParser.fromPostFixStringBusinessRule(
-              businessRule.getRule(), basicExpressiosMap);
+      Expression ex = ExpressionParser.fromPostFixStringBusinessRule(businessRule.getRule(), basicExpressiosMap);
       businessExpressionList.add(ex);
     }
 

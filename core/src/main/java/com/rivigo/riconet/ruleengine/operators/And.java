@@ -1,7 +1,6 @@
 package com.rivigo.riconet.ruleengine.operators;
 
 /** @author ajay mittal */
-
 import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
 import java.util.Map;

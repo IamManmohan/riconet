@@ -28,16 +28,12 @@ public class EventTriggerService {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
       case CN_DELIVERY:
-        String entityId =
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.closeTicket(
-            entityId, TicketEntityType.CN.name(), EventName.CN_DELIVERY);
+        String entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        ticketingClientService.closeTicket(entityId, TicketEntityType.CN.name(), EventName.CN_DELIVERY);
         break;
       case PICKUP_COMPLETION:
         ticketingClientService.closeTicket(
-            notificationDTO.getEntityId().toString(),
-            TicketEntityType.PRQ.name(),
-            EventName.PICKUP_COMPLETION);
+            notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), EventName.PICKUP_COMPLETION);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
@@ -72,31 +68,19 @@ public class EventTriggerService {
     ConsignmentStatus status =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STATUS.name()) == null
             ? null
-            : ConsignmentStatus.valueOf(
-                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STATUS.name()));
+            : ConsignmentStatus.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STATUS.name()));
     return ConsignmentBasicDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
-        .consignmentId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
-        .locationId(
-            Long.parseLong(
-                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+        .consignmentId(Long.parseLong(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
+        .locationId(Long.parseLong(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
         .status(status)
         .build();
   }
 
-  private ConsignmentCompletionEventDTO getConsignmentCompletionDTO(
-      NotificationDTO notificationDTO) {
+  private ConsignmentCompletionEventDTO getConsignmentCompletionDTO(NotificationDTO notificationDTO) {
     return ConsignmentCompletionEventDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
-        .consignmentId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
+        .consignmentId(Long.parseLong(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
         .build();
   }
 }

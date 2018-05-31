@@ -17,6 +17,6 @@ apply plugin: "com.diffplug.gradle.spotless"
 
 spotless {
     java {
-        googleJavaFormat('1.5')
+        googleJavaFormat('15.9')
     }
 }

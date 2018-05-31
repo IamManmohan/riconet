@@ -1,7 +1,6 @@
 package com.rivigo.riconet.ruleengine;
 
 /** @author ajay mittal */
-
 import java.util.Map;
 
 public class BaseType<T> implements Expression {

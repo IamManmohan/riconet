@@ -52,18 +52,13 @@ public class TicketingClientService {
       headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
       headers.add(CLIENT_KEY, zoomTicketingClientKey);
       HttpEntity entity = new HttpEntity(headers);
-      UriComponentsBuilder builder =
-          UriComponentsBuilder.fromHttpUrl(requestUrl).queryParams(queryParams);
+      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(requestUrl).queryParams(queryParams);
       ResponseEntity<JsonNode> responseEntity =
-          restTemplate.exchange(
-              builder.build().encode().toUri(), HttpMethod.PUT, entity, JsonNode.class);
+          restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.PUT, entity, JsonNode.class);
       log.info("call made successfully, response {}", responseEntity);
       responseEntity.getBody();
     } catch (Exception e) {
-      log.error(
-          "Unknown exception while trying to make request to ticketing {}, Exception is {}",
-          requestUrl,
-          e);
+      log.error("Unknown exception while trying to make request to ticketing {}, Exception is {}", requestUrl, e);
       throw new ZoomException("Unknown exception while trying to make request to ticketing");
     }
   }

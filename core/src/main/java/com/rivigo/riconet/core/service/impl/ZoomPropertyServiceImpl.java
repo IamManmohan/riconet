@@ -31,8 +31,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
       if (zp.getSpringProfile() == null) {
         propertyForEveryProfile = zp;
       }
-      if ((profile == null && zp.getSpringProfile() == null)
-          || (profile != null && profile.equals(zp.getSpringProfile()))) {
+      if ((profile == null && zp.getSpringProfile() == null) || (profile != null && profile.equals(zp.getSpringProfile()))) {
         return zp;
       }
     }

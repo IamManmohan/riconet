@@ -8,14 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TransportationPartnerMappingServiceImpl
-    implements TransportationPartnerMappingService {
+public class TransportationPartnerMappingServiceImpl implements TransportationPartnerMappingService {
 
   @Autowired private TransportationPartnerMappingRepository transportationPartnerMappingRepository;
 
   @Override
   public TransportationPartnerMapping getByDRSId(Long drsId) {
-    return transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
-        ZoomTripType.DRS, drsId);
+    return transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, drsId);
   }
 }

@@ -21,10 +21,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableJpaRepositories(
-  basePackages = "com.rivigo.zoom.common.repository.mysql",
-  entityManagerFactoryRef = "entityManagerFactory",
-  transactionManagerRef = "zoomTransactionManager"
-)
+    basePackages = "com.rivigo.zoom.common.repository.mysql",
+    entityManagerFactoryRef = "entityManagerFactory",
+    transactionManagerRef = "zoomTransactionManager")
 @EnableTransactionManagement
 public class MySQLTestConfig {
 
@@ -88,8 +87,7 @@ public class MySQLTestConfig {
     Properties props = new Properties();
     props.setProperty("hibernate.generate_statistics", "false");
     props.setProperty("hibernate.cache.use_second_level_cache", "true");
-    props.setProperty(
-        "hibernate.cache.region.factory_class", "org.hibernate.cache.EhCacheRegionFactory");
+    props.setProperty("hibernate.cache.region.factory_class", "org.hibernate.cache.EhCacheRegionFactory");
     props.setProperty("hibernate.cache.use_query_cache", "true");
     props.setProperty("net.sf.ehcache.configurationResourceName", "/ehcache.xml");
     props.setProperty("hibernate.show_sql", "false");

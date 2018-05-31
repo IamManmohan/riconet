@@ -34,8 +34,7 @@ public class ZoomTicketingConstant {
   public static final String QC_AUTO_CLOSURE_MESSAGE_DISPATCH =
       "The ticket got auto-closed because the CN has been dispatched from the Source OU, without QC completion";
 
-  public static final String QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP =
-      "Ticket got auto-closed due to non availability of QC at the Source OU";
+  public static final String QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP = "Ticket got auto-closed due to non availability of QC at the Source OU";
 
   public static final String QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE =
       "The task got auto closed because of change of CN from credit to retail";

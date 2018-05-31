@@ -1,7 +1,6 @@
 package com.rivigo.riconet.ruleengine;
 
 /** @author ajay mittal */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

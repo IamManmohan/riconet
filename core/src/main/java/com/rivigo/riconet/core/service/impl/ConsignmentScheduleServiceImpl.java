@@ -21,16 +21,13 @@ public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleServic
   @Autowired private ConsignmentScheduleRepository consignmentScheduleRepository;
 
   @Override
-  public Map<Long, List<ConsignmentSchedule>> getActivePlansMapByIds(
-      Collection<Long> consignmentIds) {
+  public Map<Long, List<ConsignmentSchedule>> getActivePlansMapByIds(Collection<Long> consignmentIds) {
     List<ConsignmentSchedule> schedules =
-        consignmentScheduleRepository.findByConsignmentIdInAndIsActive(
-            new ArrayList<>(consignmentIds), 1);
+        consignmentScheduleRepository.findByConsignmentIdInAndIsActive(new ArrayList<>(consignmentIds), 1);
     Collections.sort(schedules);
     Map<Long, List<ConsignmentSchedule>> retMap = new HashMap<>();
     for (ConsignmentSchedule schedule : schedules) {
-      List<ConsignmentSchedule> scheduleList =
-          retMap.computeIfAbsent(schedule.getConsignmentId(), k -> new ArrayList<>());
+      List<ConsignmentSchedule> scheduleList = retMap.computeIfAbsent(schedule.getConsignmentId(), k -> new ArrayList<>());
       scheduleList.add(schedule);
     }
     return retMap;
@@ -38,8 +35,7 @@ public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleServic
 
   @Override
   public List<ConsignmentSchedule> getActivePlan(Long consignmentId) {
-    List<ConsignmentSchedule> csList =
-        consignmentScheduleRepository.findByConsignmentIdAndIsActive(consignmentId, 1);
+    List<ConsignmentSchedule> csList = consignmentScheduleRepository.findByConsignmentIdAndIsActive(consignmentId, 1);
     Collections.sort(csList);
     return csList;
   }

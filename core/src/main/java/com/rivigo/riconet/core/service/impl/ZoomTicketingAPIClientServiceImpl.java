@@ -44,8 +44,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     valuesMap.put("typeId", typeId);
     String url = UrlConstant.ZOOM_TICKETING_GET_BY_CNOTE_AND_TYPE;
     try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+      responseJson = apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
     } catch (IOException e) {
       log.error("Error while getting qc tickets with cnote {}", cnote, e);
       throw new ZoomException("Error while getting qc tickets with cnote " + cnote);
@@ -61,12 +60,10 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_TICKETING_POST_PUT_TICKET;
     try {
-      responseJson =
-          apiClientService.getEntity(ticketDTO, HttpMethod.POST, url, null, ticketingBaseUrl);
+      responseJson = apiClientService.getEntity(ticketDTO, HttpMethod.POST, url, null, ticketingBaseUrl);
     } catch (IOException e) {
       log.error("Error while creating tickets with entity {}", ticketDTO.getEntityId(), e);
-      throw new ZoomException(
-          "Error while creating tickets with entity " + ticketDTO.getEntityId());
+      throw new ZoomException("Error while creating tickets with entity " + ticketDTO.getEntityId());
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
 
@@ -78,12 +75,10 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_TICKETING_POST_PUT_TICKET;
     try {
-      responseJson =
-          apiClientService.getEntity(ticketDTO, HttpMethod.PUT, url, null, ticketingBaseUrl);
+      responseJson = apiClientService.getEntity(ticketDTO, HttpMethod.PUT, url, null, ticketingBaseUrl);
     } catch (IOException e) {
       log.error("Error while editing qc tickets with cnote {}", ticketDTO.getEntityId(), e);
-      throw new ZoomException(
-          "Error while editing qc tickets with cnote " + ticketDTO.getEntityId());
+      throw new ZoomException("Error while editing qc tickets with cnote " + ticketDTO.getEntityId());
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
 
@@ -97,8 +92,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     valuesMap.put("text", Collections.singletonList(comment));
     String url = UrlConstant.ZOOM_TICKETING_POST_COMMENT;
     try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.POST, url, valuesMap, ticketingBaseUrl);
+      responseJson = apiClientService.getEntity(null, HttpMethod.POST, url, valuesMap, ticketingBaseUrl);
     } catch (IOException e) {
       log.error("Error while making comments for ticket with id {}", ticketId, e);
       throw new ZoomException("Error while making comments for ticket with id " + ticketId);
@@ -116,22 +110,12 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     valuesMap.put("locationType", Collections.singletonList(locationType.name()));
     String url = UrlConstant.ZOOM_TICKETING_GET_GROUP_ID;
     try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+      responseJson = apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
     } catch (IOException e) {
       log.info(
-          "Error while getting groupId for locationId: {} and groupName: {} locationType: {} ",
-          locationId,
-          groupName,
-          locationType,
-          e);
+          "Error while getting groupId for locationId: {} and groupName: {} locationType: {} ", locationId, groupName, locationType, e);
       throw new ZoomException(
-          "Error while getting groupId for locationId: "
-              + locationId
-              + " and groupName: "
-              + groupName
-              + " locationType: "
-              + locationType);
+          "Error while getting groupId for locationId: " + locationId + " and groupName: " + groupName + " locationType: " + locationType);
     }
     TypeReference<GroupDTO> mapType = new TypeReference<GroupDTO>() {};
     return ((GroupDTO) apiClientService.parseJsonNode(responseJson, mapType));

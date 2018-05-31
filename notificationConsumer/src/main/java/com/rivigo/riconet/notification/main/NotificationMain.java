@@ -42,9 +42,7 @@ public class NotificationMain {
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("notifications");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context =
-        new AnnotationConfigApplicationContext(
-            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     NotificationMain consumer = context.getBean(NotificationMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -58,8 +56,7 @@ public class NotificationMain {
     consumer.load(materializer, consumerSettings);
   }
 
-  public void load(
-      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     depsNotificationConsumer.load(materializer, consumerSettings);
     docIssueNotificationConsumer.load(materializer, consumerSettings);
     pickupNotificationConsumer.load(materializer, consumerSettings);

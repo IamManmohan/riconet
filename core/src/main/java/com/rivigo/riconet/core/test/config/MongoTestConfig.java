@@ -40,12 +40,7 @@ public class MongoTestConfig extends AbstractMongoConfiguration {
   @Override
   public Mongo mongo() throws Exception {
     if (mongoClient == null) {
-      mongoClient =
-          new EmbeddedMongoBuilder()
-              .version(embeddedMongoVersion)
-              .bindIp(embeddedMongoHost)
-              .port(embeddedMongoPort)
-              .build();
+      mongoClient = new EmbeddedMongoBuilder().version(embeddedMongoVersion).bindIp(embeddedMongoHost).port(embeddedMongoPort).build();
     }
     return mongoClient;
   }

@@ -40,8 +40,7 @@ public abstract class ConsumerModel {
   public abstract String getErrorTopic();
 
   /**
-   * For all the consumers default retries are 5. One can change this number by overriding this in
-   * the respective consumer
+   * For all the consumers default retries are 5. One can change this number by overriding this in the respective consumer
    *
    * @return
    */
@@ -102,23 +101,14 @@ public abstract class ConsumerModel {
   public abstract String processMessage(String str) throws IOException;
 
   String processError(ConsumerMessages consumerMessage, String errorMsg) {
-    log.error(
-        "processing error:"
-            + consumerMessage.getId()
-            + (consumerMessage.getRetryCount() + 1L)
-            + errorMsg);
+    log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount() + 1L) + errorMsg);
     if (consumerMessage.getRetryCount() < getNumRetries()) {
       consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
       consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
       consumerMessage.setErrorMsg(
-          consumerMessage.getErrorMsg()
-              + ", Retry number "
-              + consumerMessage.getRetryCount().toString()
-              + " "
-              + errorMsg);
+          consumerMessage.getErrorMsg() + ", Retry number " + consumerMessage.getRetryCount().toString() + " " + errorMsg);
       consumerMessagesRepository.save(consumerMessage);
-      ConsumerTimer task =
-          new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
+      ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
       timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
     }
     return consumerMessage.getMessage();
@@ -142,8 +132,7 @@ public abstract class ConsumerModel {
     return str;
   }
 
-  public void load(
-      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     Set<String> topics = new HashSet<>();
     topics.add(getTopic());
     topics.add(getErrorTopic());

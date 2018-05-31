@@ -14,16 +14,15 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 @Configuration
 @ComponentScan(
-  basePackages = {
-    "com.rivigo.zoom.delivery",
-    "com.rivigo.zoom.test.config",
-    "com.rivigo.zoom.common.service",
-    "com.rivigo.zoom.common.audit",
-    "com.rivigo.zoom.common.queue",
-    "com.rivigo.zoom.common.utils",
-    "com.rivigo.zoom.component.query.utils"
-  }
-)
+    basePackages = {
+      "com.rivigo.zoom.delivery",
+      "com.rivigo.zoom.test.config",
+      "com.rivigo.zoom.common.service",
+      "com.rivigo.zoom.common.audit",
+      "com.rivigo.zoom.common.queue",
+      "com.rivigo.zoom.common.utils",
+      "com.rivigo.zoom.component.query.utils"
+    })
 public class TestConfig {
 
   @Bean
@@ -31,8 +30,7 @@ public class TestConfig {
     PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
     ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
     String profile = "test";
-    Resource[] resources =
-        patternResolver.getResources(String.format("classpath*:%s/*.properties", profile));
+    Resource[] resources = patternResolver.getResources(String.format("classpath*:%s/*.properties", profile));
     List<Resource> resourcesList = new ArrayList<>();
     resourcesList.addAll(Arrays.asList(resources));
     configurer.setLocations(resourcesList.toArray(new Resource[resourcesList.size()]));

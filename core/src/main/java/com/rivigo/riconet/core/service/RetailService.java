@@ -13,8 +13,7 @@ public interface RetailService {
 
   void processRetailNotificationDTOList(List<RetailNotificationDTO> retailNotificationDTOList);
 
-  void getPendingHandoverConsignments(
-      RetailNotification notification, List<TransactionModelDTO> transactionModelDTOList);
+  void getPendingHandoverConsignments(RetailNotification notification, List<TransactionModelDTO> transactionModelDTOList);
 
   Map<Long, PaymentDetailV2> getPaymentdetailsByConsignmentIdIn(List<Long> consignmentIds);
 }

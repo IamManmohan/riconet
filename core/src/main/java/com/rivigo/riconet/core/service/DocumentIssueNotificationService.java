@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface DocumentIssueNotificationService {
 
-  DocumentIssueNotification createNotificationData(
-      Long consignmentId, Long userId, String subReason, ConsignmentStatus status);
+  DocumentIssueNotification createNotificationData(Long consignmentId, Long userId, String subReason, ConsignmentStatus status);
 
   ConsignmentSchedule getPreviousSchedule(List<ConsignmentSchedule> consignmentSchedules);
 

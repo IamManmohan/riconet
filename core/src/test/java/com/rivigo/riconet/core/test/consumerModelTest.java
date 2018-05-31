@@ -32,9 +32,7 @@ public class consumerModelTest extends TesterBase {
     try {
       Method method = ConsumerModel.class.getDeclaredMethod("save", ConsumerRecord.class);
       method.setAccessible(true);
-      ConsumerRecord<String, String> abc =
-          new ConsumerRecord<>(
-              Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(), 0, 0l, null, "1");
+      ConsumerRecord<String, String> abc = new ConsumerRecord<>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(), 0, 0l, null, "1");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -57,8 +55,7 @@ public class consumerModelTest extends TesterBase {
       consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
       consumerMessagesRepository.save(consumerMessages);
       ConsumerRecord<String, String> abc =
-          new ConsumerRecord<String, String>(
-              Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test1");
+          new ConsumerRecord<String, String>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test1");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -75,8 +72,7 @@ public class consumerModelTest extends TesterBase {
       Method method = ConsumerModel.class.getDeclaredMethod("save", ConsumerRecord.class);
       method.setAccessible(true);
       ConsumerRecord<String, String> abc =
-          new ConsumerRecord<String, String>(
-              Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(), 0, 0l, null, "");
+          new ConsumerRecord<String, String>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION.name(), 0, 0l, null, "");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -99,8 +95,7 @@ public class consumerModelTest extends TesterBase {
       consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
       consumerMessagesRepository.save(consumerMessages);
       ConsumerRecord<String, String> abc =
-          new ConsumerRecord<String, String>(
-              Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test2");
+          new ConsumerRecord<String, String>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test2");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -123,8 +118,7 @@ public class consumerModelTest extends TesterBase {
       consumerMessages.setTopic(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name());
       consumerMessagesRepository.save(consumerMessages);
       ConsumerRecord<String, String> abc =
-          new ConsumerRecord<String, String>(
-              Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test3");
+          new ConsumerRecord<String, String>(Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name(), 0, 0l, null, "test3");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -140,8 +134,7 @@ public class consumerModelTest extends TesterBase {
     try {
       Method method = ConsumerModel.class.getDeclaredMethod("save", ConsumerRecord.class);
       method.setAccessible(true);
-      ConsumerRecord<String, String> abc =
-          new ConsumerRecord<String, String>("error", 0, 0l, null, "error");
+      ConsumerRecord<String, String> abc = new ConsumerRecord<String, String>("error", 0, 0l, null, "error");
       method.invoke(testConsumer, abc);
     } catch (NoSuchMethodException e) {
       e.printStackTrace();

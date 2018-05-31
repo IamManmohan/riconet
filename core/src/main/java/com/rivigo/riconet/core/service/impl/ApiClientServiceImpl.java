@@ -55,19 +55,14 @@ public class ApiClientServiceImpl implements ApiClientService {
         return null;
       }
       try {
-        return objectMapper.readValue(
-            responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
+        return objectMapper.readValue(responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
       } catch (IOException e) {
         log.error(
             "Error while parsing ticketing response,  {} at epoch {} :",
             responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(),
             DateTime.now().getMillis(),
             e);
-        throw new ZoomException(
-            "Error while parsing ticketing response: errorCode-"
-                + DateTime.now().getMillis()
-                + " :"
-                + e.getMessage());
+        throw new ZoomException("Error while parsing ticketing response: errorCode-" + DateTime.now().getMillis() + " :" + e.getMessage());
       }
     }
     throw new ZoomException(responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString());
@@ -81,8 +76,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     return headers;
   }
 
-  private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri)
-      throws JsonProcessingException {
+  private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri) throws JsonProcessingException {
     if (dto != null) {
       String requestJson = objectMapper.writeValueAsString(dto);
       log.info("Calling Ticketing API {} for  requestJson {}", uri, requestJson);
@@ -94,12 +88,7 @@ public class ApiClientServiceImpl implements ApiClientService {
   }
 
   @Override
-  public JsonNode getEntity(
-      Object dto,
-      HttpMethod httpMethod,
-      String url,
-      MultiValueMap<String, String> queryParams,
-      String baseUrl)
+  public JsonNode getEntity(Object dto, HttpMethod httpMethod, String url, MultiValueMap<String, String> queryParams, String baseUrl)
       throws IOException {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + url);
     if (queryParams != null) {
@@ -117,8 +106,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     RestTemplate restTemplate = new RestTemplate();
 
     try {
-      ResponseEntity<JsonNode> response =
-          restTemplate.exchange(uri, httpMethod, entity, JsonNode.class);
+      ResponseEntity<JsonNode> response = restTemplate.exchange(uri, httpMethod, entity, JsonNode.class);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
@@ -127,8 +115,7 @@ public class ApiClientServiceImpl implements ApiClientService {
         accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
         HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto, uri);
         try {
-          ResponseEntity<JsonNode> response =
-              restTemplate.exchange(uri, httpMethod, retryEntity, JsonNode.class);
+          ResponseEntity<JsonNode> response = restTemplate.exchange(uri, httpMethod, retryEntity, JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
           log.error("Invalid response from ticketing  while calling {}", DateTime.now(), e2);

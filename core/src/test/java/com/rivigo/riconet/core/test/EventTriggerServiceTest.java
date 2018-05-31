@@ -57,17 +57,13 @@ public class EventTriggerServiceTest {
     metadata.put("LOCATION_ID", "12");
     metadata.put("STATUS", "LOADED");
     NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU)
-            .metadata(metadata)
-            .build();
+        NotificationDTO.builder().eventName(EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeLoadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
-    Assert.assertEquals(
-        ConsignmentStatus.LOADED, consignmentBasicDTOArgumentCaptor.getValue().getStatus());
+    Assert.assertEquals(ConsignmentStatus.LOADED, consignmentBasicDTOArgumentCaptor.getValue().getStatus());
   }
 
   @Test
@@ -76,8 +72,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
+    NotificationDTO notificationDTO = NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeUnloadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     verify(consignmentService, times(1)).triggerBfCpdCalcualtion(any());
@@ -91,14 +86,9 @@ public class EventTriggerServiceTest {
     Map<String, String> metadata = new HashMap<>();
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
-            .metadata(metadata)
-            .build();
+    NotificationDTO notificationDTO = NotificationDTO.builder().eventName(EventName.CN_COMPLETION_ALL_INSTANCES).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1))
-        .consumeCompletionEvent(consignmentCompletionEventDTOCaptor.capture());
+    verify(qcService, times(1)).consumeCompletionEvent(consignmentCompletionEventDTOCaptor.capture());
     Assert.assertEquals("1234567890", consignmentCompletionEventDTOCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentCompletionEventDTOCaptor.getValue().getConsignmentId() == 5l);
   }
@@ -110,13 +100,9 @@ public class EventTriggerServiceTest {
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
     NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL)
-            .metadata(metadata)
-            .build();
+        NotificationDTO.builder().eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1))
-        .consumeCnoteTypeChangeEvent(consignmentBasicDTOArgumentCaptor.capture());
+    verify(qcService, times(1)).consumeCnoteTypeChangeEvent(consignmentBasicDTOArgumentCaptor.capture());
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
@@ -128,11 +114,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_DELIVERY_LOADED)
-            .metadata(metadata)
-            .build();
+    NotificationDTO notificationDTO = NotificationDTO.builder().eventName(EventName.CN_DELIVERY_LOADED).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeLoadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
