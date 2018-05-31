@@ -2,6 +2,7 @@ package com.rivigo.riconet.notification.test;
 
 import static org.junit.Assert.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.riconet.event.main.EventMain;
@@ -20,6 +21,9 @@ public class EventTest {
   @InjectMocks private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
 
   @Mock private EventTriggerService eventTriggerService;
+
+  @Mock
+  private ObjectMapper objectMapper;
 
   @Before
   public void initMocks() {
