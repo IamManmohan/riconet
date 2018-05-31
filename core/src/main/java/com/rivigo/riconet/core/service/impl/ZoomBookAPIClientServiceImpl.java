@@ -205,7 +205,7 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
 
     Map<String, String> responseMap = zoomBookTransactionResponse.getResponseMap();
     if (responseMap == null || !SUCCESS.equals(responseMap.get(STATUS))) {
-      throw new ZoomException("Exception from ZoomBook with status {} ", responseMap.get(STATUS));
+      throw new ZoomException("Exception from ZoomBook ");
     }
     Map<String, String> clientRequestIdtoTxnNumberMap = new HashMap<>();
     for (ZoomBookTransactionResponseDTO zoomBookTransactionResponseDTO : zoomBookTransactionResponse
