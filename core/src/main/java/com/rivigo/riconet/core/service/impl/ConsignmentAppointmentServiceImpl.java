@@ -90,18 +90,27 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
         processLateDelivery(dto);
         break;
       case APPOINTMENT_MISSED:
-        notificationList = processAppointmentMissed(new DateTime(dto.getLastExecutionTime()), now, statusList);
+        notificationList =
+            processAppointmentMissed(new DateTime(dto.getLastExecutionTime()), now, statusList);
         notificationList.forEach(
             notification ->
-                sendNotifications(notification, ZoomPropertyName.APPOINTMENT_MISSED_EMAIL, ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT));
+                sendNotifications(
+                    notification,
+                    ZoomPropertyName.APPOINTMENT_MISSED_EMAIL,
+                    ZoomPropertyName.APPOINTMENT_MISSED_SUBJECT));
         break;
       case APPOINTMENT_WRONG_UNDELIVERED_MARKED:
         processFakeUndeliveryReason(dto);
         break;
       case APPOINTMENT_MISSED_SUMMARY:
-        notificationList = processAppointmentMissed(new DateTime(dto.getLastExecutionTime()), now, statusList);
+        notificationList =
+            processAppointmentMissed(new DateTime(dto.getLastExecutionTime()), now, statusList);
         notificationMap =
-            notificationList.stream().collect(Collectors.groupingBy(notification -> notification.getResponsibleLocation().getId()));
+            notificationList
+                .stream()
+                .collect(
+                    Collectors.groupingBy(
+                        notification -> notification.getResponsibleLocation().getId()));
         notificationMap
             .keySet()
             .forEach(
@@ -112,10 +121,16 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
                         ZoomPropertyName.APPOINTMENT_MISSED_SUMMARY_SUBJECT));
         break;
       case APPOINTMENT_NOT_OFD_FIRST_HALF:
-        processAppointmentNotOfd(statusList, now, now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).withMillisOfDay(0).plusHours(12));
+        processAppointmentNotOfd(
+            statusList,
+            now,
+            now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).withMillisOfDay(0).plusHours(12));
         break;
       case APPOINTMENT_NOT_OFD_SECOND_HALF:
-        processAppointmentNotOfd(statusList, now, now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0));
+        processAppointmentNotOfd(
+            statusList,
+            now,
+            now.withZone(DateTimeZone.forID(IST_TIME_ZONE_ID)).plusDays(1).withMillisOfDay(0));
         break;
       default:
         log.info("This notificationType is not handled in this consumer");
@@ -123,27 +138,42 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
     }
   }
 
-  private void processAppointmentNotOfd(List<ConsignmentStatus> statusList, DateTime start, DateTime end) {
+  private void processAppointmentNotOfd(
+      List<ConsignmentStatus> statusList, DateTime start, DateTime end) {
     statusList.add(ConsignmentStatus.OUT_FOR_DELIVERY);
-    List<AppointmentNotification> notificationList = processAppointmentMissed(start, end, statusList);
+    List<AppointmentNotification> notificationList =
+        processAppointmentMissed(start, end, statusList);
     Map<Long, List<AppointmentNotification>> notificationMap =
-        notificationList.stream().collect(Collectors.groupingBy(notification -> notification.getResponsibleLocation().getId()));
+        notificationList
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    notification -> notification.getResponsibleLocation().getId()));
     notificationMap
         .keySet()
         .forEach(
             list ->
                 sendNotificationList(
-                    notificationMap.get(list), ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL, ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT));
+                    notificationMap.get(list),
+                    ZoomPropertyName.APPOINTMENT_NOT_OFD_EMAIL,
+                    ZoomPropertyName.APPOINTMENT_NOT_OFD_SUBJECT));
   }
 
   private List<AppointmentNotification> processAppointmentMissed(
       final DateTime start, final DateTime end, List<ConsignmentStatus> statusList) {
     List<ConsignmentAppointmentRecord> consignmentAppointmentRecordList =
-        consignmentAppointmentRepository.findByIsActiveAndAppointmentTimeBetween(Boolean.TRUE, start, end);
+        consignmentAppointmentRepository.findByIsActiveAndAppointmentTimeBetween(
+            Boolean.TRUE, start, end);
     List<Long> consignmentIdList =
-        consignmentAppointmentRecordList.stream().map(ConsignmentAppointmentRecord::getConsignmentId).collect(Collectors.toList());
-    List<Consignment> consignments = consignmentService.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(consignmentIdList, statusList);
-    Map<Long, List<ConsignmentSchedule>> cnToScheduleMap = consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
+        consignmentAppointmentRecordList
+            .stream()
+            .map(ConsignmentAppointmentRecord::getConsignmentId)
+            .collect(Collectors.toList());
+    List<Consignment> consignments =
+        consignmentService.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
+            consignmentIdList, statusList);
+    Map<Long, List<ConsignmentSchedule>> cnToScheduleMap =
+        consignmentScheduleService.getActivePlansMapByIds(consignmentIdList);
 
     Map<Long, Location> locationMap = locationService.getLocationMap();
 
@@ -155,7 +185,11 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
         .map(
             consignment ->
                 processAppointmentMissedConsignment(
-                    consignment, cnToScheduleMap.get(consignment.getId()), locationMap, defaultCcList, bccList))
+                    consignment,
+                    cnToScheduleMap.get(consignment.getId()),
+                    locationMap,
+                    defaultCcList,
+                    bccList))
         .collect(Collectors.toList());
   }
 
@@ -174,36 +208,45 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
     return appointmentNotification;
   }
 
-  private ConsignmentSchedule getCurrentSchedule(List<ConsignmentSchedule> consignmentScheduleList) {
+  private ConsignmentSchedule getCurrentSchedule(
+      List<ConsignmentSchedule> consignmentScheduleList) {
     Optional<ConsignmentSchedule> present =
         consignmentScheduleList
             .stream()
-            .filter(consignmentSchedule -> consignmentSchedule.getPlanStatus() != ConsignmentLocationStatus.LEFT)
+            .filter(
+                consignmentSchedule ->
+                    consignmentSchedule.getPlanStatus() != ConsignmentLocationStatus.LEFT)
             .findFirst();
 
     if (present.isPresent()) {
       return present.get();
     }
-    throw new ZoomException("Error in consignment schedule: consignment is not left from any location ");
+    throw new ZoomException(
+        "Error in consignment schedule: consignment is not left from any location ");
   }
 
   private void processLateDelivery(AppointmentNotificationDTO dto) {
     ConsignmentHistory cnHistory =
-        consignmentService.getLastScanByCnId(dto.getConsignmentId(), Arrays.asList(ConsignmentStatus.OUT_FOR_DELIVERY.name()));
+        consignmentService.getLastScanByCnId(
+            dto.getConsignmentId(), Arrays.asList(ConsignmentStatus.OUT_FOR_DELIVERY.name()));
     AppointmentNotification appointmentNotification = new AppointmentNotification();
     appointmentNotification.setConsignmentId(cnHistory.getConsignmentId());
     Location loc = locationService.getLocationById(cnHistory.getLocationId());
     appointmentNotification.setResponsibleLocation(getLocationDto(loc));
-    appointmentNotification.setCnote(consignmentService.getCnoteByIdAndIsActive(cnHistory.getConsignmentId()));
+    appointmentNotification.setCnote(
+        consignmentService.getCnoteByIdAndIsActive(cnHistory.getConsignmentId()));
     User user = userMasterService.getById(cnHistory.getCreatedById());
     appointmentNotification.setResponsiblePerson(getUserDto(user));
     appointmentNotification.getEmailIdList().add(user.getEmail());
     Set<String> bccList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION);
     Set<String> defaultCcList = emailService.getEmails(EmailDlName.APPOINTMENT_NOTIFICATION_CC);
     updateStakeHolders(appointmentNotification, loc, defaultCcList, bccList);
-    DateTime deliveryTime = (new DateTime(dto.getDeliveryTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
-    DateTime appointmentTime = (new DateTime(dto.getAppoitnmentTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
-    if (Days.daysBetween(deliveryTime.toLocalDate(), appointmentTime.toLocalDate()).getDays() == 0) {
+    DateTime deliveryTime =
+        (new DateTime(dto.getDeliveryTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
+    DateTime appointmentTime =
+        (new DateTime(dto.getAppoitnmentTime())).withZone(DateTimeZone.forID(IST_TIME_ZONE_ID));
+    if (Days.daysBetween(deliveryTime.toLocalDate(), appointmentTime.toLocalDate()).getDays()
+        == 0) {
       sendNotifications(
           appointmentNotification,
           ZoomPropertyName.APPOINTMENT_DELIVERED_LATE_SAME_DAY_EMAIL,
@@ -221,7 +264,8 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
     appointmentNotification.setConsignmentId(dto.getConsignmentId());
     Location loc = locationService.getLocationById(dto.getResponsibleLocationId());
     appointmentNotification.setResponsibleLocation(getLocationDto(loc));
-    appointmentNotification.setCnote(consignmentService.getCnoteByIdAndIsActive(dto.getConsignmentId()));
+    appointmentNotification.setCnote(
+        consignmentService.getCnoteByIdAndIsActive(dto.getConsignmentId()));
     User user = userMasterService.getById(dto.getResponsibleUserId());
     appointmentNotification.setResponsiblePerson(getUserDto(user));
     appointmentNotification.getEmailIdList().add(user.getEmail());
@@ -235,26 +279,39 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
   }
 
   private void sendNotifications(
-      AppointmentNotification notification, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName) {
+      AppointmentNotification notification,
+      ZoomPropertyName emailPropertyName,
+      ZoomPropertyName subjectPropertyName) {
     String templateString = zoomPropertyService.getString(emailPropertyName);
-    Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
-    String subjectTemplate = zoomPropertyService.getString(subjectPropertyName); // get from zoom property
+    Boolean isEmailEnabled =
+        zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
+    String subjectTemplate =
+        zoomPropertyService.getString(subjectPropertyName); // get from zoom property
     if (templateString != null && isEmailEnabled && subjectTemplate != null) {
       String body = designEmailTemplate(notification, templateString);
       String subject = designEmailTemplate(notification, subjectTemplate);
       emailService.sendAppointmentEmail(
-          notification.getEmailIdList(), notification.getCcList(), notification.getBccList(), subject, body, null);
+          notification.getEmailIdList(),
+          notification.getCcList(),
+          notification.getBccList(),
+          subject,
+          body,
+          null);
     }
   }
 
   private void sendNotificationList(
-      List<AppointmentNotification> notificationList, ZoomPropertyName emailPropertyName, ZoomPropertyName subjectPropertyName) {
+      List<AppointmentNotification> notificationList,
+      ZoomPropertyName emailPropertyName,
+      ZoomPropertyName subjectPropertyName) {
     if (CollectionUtils.isEmpty(notificationList)) {
       return;
     }
     String templateString = zoomPropertyService.getString(emailPropertyName);
-    Boolean isEmailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
-    String subjectTemplate = zoomPropertyService.getString(subjectPropertyName); // get from zoom property
+    Boolean isEmailEnabled =
+        zoomPropertyService.getBoolean(ZoomPropertyName.APPOINTMENT_NOTIFICATION_ENABLED, false);
+    String subjectTemplate =
+        zoomPropertyService.getString(subjectPropertyName); // get from zoom property
     if (templateString != null && isEmailEnabled) {
       String body = designEmailTemplate(notificationList.get(0), templateString);
       String subject = designEmailTemplate(notificationList.get(0), subjectTemplate);
@@ -293,7 +350,10 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
   }
 
   private void updateStakeHolders(
-      AppointmentNotification appointmentNotification, Location loc, Set<String> defaultCcList, Set<String> bccList) {
+      AppointmentNotification appointmentNotification,
+      Location loc,
+      Set<String> defaultCcList,
+      Set<String> bccList) {
     if (appointmentNotification.getEmailIdList().isEmpty()) {
       appointmentNotification.getEmailIdList().addAll(getCcList(loc));
       appointmentNotification.getEmailIdList().addAll(defaultCcList);
@@ -305,21 +365,32 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
   }
 
   private UserBasicDTO getUserDto(User user) {
-    return new UserBasicDTO(user.getId(), user.getName(), user.getEmail(), user.getOrganizationId());
+    return new UserBasicDTO(
+        user.getId(), user.getName(), user.getEmail(), user.getOrganizationId());
   }
 
   private LocationBasicDTO getLocationDto(Location location) {
-    return new LocationBasicDTO(location.getId(), location.getName(), location.getCode(), location.getLocationType().name());
+    return new LocationBasicDTO(
+        location.getId(),
+        location.getName(),
+        location.getCode(),
+        location.getLocationType().name());
   }
 
-  private String designEmailTemplate(AppointmentNotification appointmentNotification, String template) {
+  private String designEmailTemplate(
+      AppointmentNotification appointmentNotification, String template) {
     Map<String, String> valuesMap = new HashMap<>();
     valuesMap.put("cnote", appointmentNotification.getCnote());
     valuesMap.put(
-        "user", appointmentNotification.getResponsiblePerson() == null ? "-" : appointmentNotification.getResponsiblePerson().getName());
+        "user",
+        appointmentNotification.getResponsiblePerson() == null
+            ? "-"
+            : appointmentNotification.getResponsiblePerson().getName());
     valuesMap.put(
         "locationCode",
-        appointmentNotification.getResponsibleLocation() == null ? "-" : appointmentNotification.getResponsibleLocation().getCode());
+        appointmentNotification.getResponsibleLocation() == null
+            ? "-"
+            : appointmentNotification.getResponsibleLocation().getCode());
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
     return sub.replace(template);
   }
@@ -327,25 +398,32 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
   private Set<String> getCcList(Location loc) {
     Set<String> ccList = new HashSet<>();
     List<Long> locIds =
-        locationService.getAllClusterSiblingsOfLocation(loc.getCode()).stream().map(Location::getId).collect(Collectors.toList());
+        locationService
+            .getAllClusterSiblingsOfLocation(loc.getCode())
+            .stream()
+            .map(Location::getId)
+            .collect(Collectors.toList());
 
     Location pc = locationService.getPcOrReportingPc(loc);
 
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationInAndZoomUserType(locIds, ZoomUserType.ZOOM_CLM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationInAndZoomUserType(
+                locIds, ZoomUserType.ZOOM_CLM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationInAndZoomUserType(locIds, ZoomUserType.ZOOM_RM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationInAndZoomUserType(
+                locIds, ZoomUserType.ZOOM_RM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
-            .getActiveZoomUsersByLocationAndZoomUserType(pc.getId(), ZoomUserType.ZOOM_PCM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                pc.getId(), ZoomUserType.ZOOM_PCM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));

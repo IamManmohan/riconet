@@ -53,7 +53,11 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public Set<String> getEmails(EmailDlName dl) {
-    return emailDLRepository.findByDlAndIsActive(dl, 1).stream().map(EmailDL::getEmail).collect(Collectors.toSet());
+    return emailDLRepository
+        .findByDlAndIsActive(dl, 1)
+        .stream()
+        .map(EmailDL::getEmail)
+        .collect(Collectors.toSet());
   }
 
   @Override
@@ -97,11 +101,13 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void filterEmails(AbstractMailNotificationEntity dto, Set<String> bccList) {
     dto.getBccList().addAll(bccList);
-    if ("production".equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
+    if ("production"
+        .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
       return;
     }
     List<String> dummyEmailList = new ArrayList<>();
-    dto.getEmailIdList().forEach(email -> dummyEmailList.add(email.split("@")[0] + "@rivigodummy.com"));
+    dto.getEmailIdList()
+        .forEach(email -> dummyEmailList.add(email.split("@")[0] + "@rivigodummy.com"));
     dto.getEmailIdList().clear();
     dto.getEmailIdList().addAll(dummyEmailList);
 

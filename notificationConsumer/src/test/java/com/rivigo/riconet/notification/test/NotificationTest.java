@@ -57,7 +57,8 @@ public class NotificationTest {
   }
 
   public void processPickupNotificationConsumer() throws IOException {
-    String str = "[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
+    String str =
+        "[{\"id\":6,\"lastUpdatedAt\":1510037640211,\"notificationType\":\"PICKUP_REACHED\"}]";
     pickupNotificationConsumer.processMessage(str);
   }
 

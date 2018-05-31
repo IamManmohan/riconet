@@ -78,21 +78,30 @@ public class QCRuleEngineTest {
   }
 
   private void mockRuleRepositoryMethods() {
-    Mockito.when(ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true)).thenReturn(getBasicRuleList());
-    Mockito.when(ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive("QC_CHECK", RuleType.BUSINESS_RULE, true))
+    Mockito.when(ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true))
+        .thenReturn(getBasicRuleList());
+    Mockito.when(
+            ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive(
+                "QC_CHECK", RuleType.BUSINESS_RULE, true))
         .thenReturn(getBusinessRuleList());
   }
 
   private List<RuleEngineRule> getBasicRuleList() {
 
-    String rule1 = "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * + < ";
-    String rule2 = "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * - > ";
+    String rule1 =
+        "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * + < ";
+    String rule2 =
+        "ACTUAL_WEIGHT MEAN_ACTUAL_WEIGHT ACTUAL_WEIGHT_FACTOR ACTUAL_WEIGHT_SIGMA * - > ";
 
-    String rule3 = "CHARGED_WEIGHT MEAN_CHARGED_WEIGHT CHARGED_WEIGHT_FACTOR CHARGED_WEIGHT_SIGMA * + < ";
-    String rule4 = "CHARGED_WEIGHT MEAN_CHARGED_WEIGHT CHARGED_WEIGHT_FACTOR CHARGED_WEIGHT_SIGMA * - > ";
+    String rule3 =
+        "CHARGED_WEIGHT MEAN_CHARGED_WEIGHT CHARGED_WEIGHT_FACTOR CHARGED_WEIGHT_SIGMA * + < ";
+    String rule4 =
+        "CHARGED_WEIGHT MEAN_CHARGED_WEIGHT CHARGED_WEIGHT_FACTOR CHARGED_WEIGHT_SIGMA * - > ";
 
-    String rule5 = "INVOICE_VALUE MEAN_INVOICE_VALUE INVOICE_VALUE_FACTOR INVOICE_VALUE_SIGMA * + < ";
-    String rule6 = "INVOICE_VALUE MEAN_INVOICE_VALUE INVOICE_VALUE_FACTOR INVOICE_VALUE_SIGMA * - > ";
+    String rule5 =
+        "INVOICE_VALUE MEAN_INVOICE_VALUE INVOICE_VALUE_FACTOR INVOICE_VALUE_SIGMA * + < ";
+    String rule6 =
+        "INVOICE_VALUE MEAN_INVOICE_VALUE INVOICE_VALUE_FACTOR INVOICE_VALUE_SIGMA * - > ";
 
     String rule7 = "NUMBER_OF_CN MINIMUM_NUMBER_OF_CN_REQUIRED >";
     String rule8 = "CLIENT_TYPE REQUIRED_CLIENT_TYPE =";

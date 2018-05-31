@@ -58,9 +58,11 @@ public class ChequeBounceServiceTest {
     user.setName("Dummy User");
     TicketDTO ticketDTO = new TicketDTO();
     ticketDTO.setId(1L);
-    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU)).thenReturn(groupDTO);
+    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU))
+        .thenReturn(groupDTO);
     Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com")).thenReturn(user);
-    Mockito.when(zoomTicketingAPIClientService.createTicket((TicketDTO) valueCapture.capture())).thenReturn(ticketDTO);
+    Mockito.when(zoomTicketingAPIClientService.createTicket((TicketDTO) valueCapture.capture()))
+        .thenReturn(ticketDTO);
     TicketDTO resultDTO = chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
     Assert.assertEquals((Object) resultDTO.getId(), 1L);
     ticketDTO.setId(2L);
@@ -89,7 +91,8 @@ public class ChequeBounceServiceTest {
     groupDTO.setId(1L);
     groupDTO.setLocationId(15L);
     groupDTO.setGroupTypeId(1L);
-    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU)).thenReturn(groupDTO);
+    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU))
+        .thenReturn(groupDTO);
     TicketDTO ticketDTO = chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
     Assert.assertEquals(null, ticketDTO);
   }

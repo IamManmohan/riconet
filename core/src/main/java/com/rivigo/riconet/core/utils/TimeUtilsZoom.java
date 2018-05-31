@@ -16,5 +16,6 @@ public class TimeUtilsZoom {
   public static final long SECONDS_IN_MINUTE = 60l;
 
   public static final DateTimeZone IST = DateTimeZone.forID("Asia/Kolkata");
-  public static final DateTimeFormatter IST_DATE_TIME_FORMATTER = DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
+  public static final DateTimeFormatter IST_DATE_TIME_FORMATTER =
+      DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
 }

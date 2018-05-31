@@ -16,16 +16,17 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @ComponentScan(
-    basePackages = {
-      "com.rivigo.riconet.notification",
-      "com.rivigo.riconet.event",
-      "com.rivigo.riconet.core.service",
-      "com.rivigo.riconet.core.test.consumer",
-      "com.rivigo.oauth2.resource.service",
-      "com.rivigo.riconet.ruleengine",
-      "com.rivigo.riconet.core.config",
-      "com.rivigo.riconet.core.test.consumer"
-    })
+  basePackages = {
+    "com.rivigo.riconet.notification",
+    "com.rivigo.riconet.event",
+    "com.rivigo.riconet.core.service",
+    "com.rivigo.riconet.core.test.consumer",
+    "com.rivigo.oauth2.resource.service",
+    "com.rivigo.riconet.ruleengine",
+    "com.rivigo.riconet.core.config",
+    "com.rivigo.riconet.core.test.consumer"
+  }
+)
 public class ServiceConfig {
 
   private static final int CORE_POOL_SIZE = 10;
@@ -66,7 +67,8 @@ public class ServiceConfig {
   }
 
   @Bean(name = {"myProperties"})
-  public static PropertiesFactoryBean mapper(@Value("${login.profiles.active:staging}") String classPath) {
+  public static PropertiesFactoryBean mapper(
+      @Value("${login.profiles.active:staging}") String classPath) {
     PropertiesFactoryBean bean = new PropertiesFactoryBean();
     bean.setLocation(new ClassPathResource(classPath + "/authresource.properties"));
     return bean;

@@ -1,6 +1,7 @@
 package com.rivigo.riconet.ruleengine;
 
 /** @author ajay mittal */
+
 import java.util.Map;
 
 public class Variable implements Expression {

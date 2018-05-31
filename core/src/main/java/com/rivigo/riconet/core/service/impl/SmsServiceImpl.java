@@ -68,7 +68,8 @@ public class SmsServiceImpl implements SmsService {
     if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
       phoneNumbers.add(mobileNo);
     } else {
-      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
+      String defaultPhone =
+          zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
       String[] defaultPhones = defaultPhone.split(",");
       Arrays.stream(defaultPhones)
           .forEach(
@@ -99,7 +100,8 @@ public class SmsServiceImpl implements SmsService {
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
       log.info("sms api from properties {}", smsApi);
       String url = rootUrl.concat(smsApi);
-      ResponseEntity responseEng = restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
+      ResponseEntity responseEng =
+          restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
 
       if (responseEng == null) {
         throw new ZoomException("SMS is not sent properly");

@@ -47,7 +47,8 @@ public class DEPSNotificationConsumer extends ConsumerModel {
 
   public String processMessage(String str) throws IOException {
     DEPSNotificationContext context = null;
-    TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {};
+    TypeReference<List<DEPSNotificationDTO>> mapType =
+        new TypeReference<List<DEPSNotificationDTO>>() {};
     List<DEPSNotificationDTO> depsRecordList = objectMapper.readValue(str, mapType);
     Set<Long> shortageConsignmentIds =
         depsRecordList
@@ -60,7 +61,8 @@ public class DEPSNotificationConsumer extends ConsumerModel {
       log.info("No shortage tickets found ");
     } else {
       context = depsRecordService.getNotificationContext(depsRecordList);
-      List<DEPSNotification> depsNotificationList = depsRecordService.createNotificationData(context);
+      List<DEPSNotification> depsNotificationList =
+          depsRecordService.createNotificationData(context);
       depsRecordService.sendNotifications(depsNotificationList);
     }
     return str;

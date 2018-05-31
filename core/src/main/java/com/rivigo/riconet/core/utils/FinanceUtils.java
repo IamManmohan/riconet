@@ -17,7 +17,8 @@ public class FinanceUtils {
     throw new IllegalStateException("Utility class");
   }
 
-  public static String createToken(String orgId, String functionType, String tenantType, String zoombookClientSecret) {
+  public static String createToken(
+      String orgId, String functionType, String tenantType, String zoombookClientSecret) {
     try {
       return buildChecksum(Arrays.asList(orgId, functionType, tenantType, zoombookClientSecret));
     } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
@@ -26,7 +27,8 @@ public class FinanceUtils {
     return null;
   }
 
-  public static String buildChecksum(List<String> entities) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+  public static String buildChecksum(List<String> entities)
+      throws NoSuchAlgorithmException, UnsupportedEncodingException {
     Collections.sort(entities);
     String listString = entities.stream().map(Object::toString).collect(Collectors.joining(""));
     MessageDigest md;
