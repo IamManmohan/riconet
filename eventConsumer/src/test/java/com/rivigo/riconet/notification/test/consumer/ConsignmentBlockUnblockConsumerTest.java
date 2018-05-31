@@ -68,7 +68,7 @@ public class ConsignmentBlockUnblockConsumerTest {
   public void processMessagePrepaid() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PREPAID.name());
-    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name(), REASON_ID.toString());
+    metadata.put(ZoomCommunicationFieldNames.Reason.REASON.name(), REASON_ID.toString());
     NotificationDTO dto = NotificationDTO.builder()
         .entityId(ENTITY_ID)
         .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
@@ -82,7 +82,7 @@ public class ConsignmentBlockUnblockConsumerTest {
   public void processMessageUnblock() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PREPAID.name());
-    metadata.put(ZoomCommunicationFieldNames.Reason.CHEQUE_BOUNCE_REASON.name(), REASON_ID.toString());
+    metadata.put(ZoomCommunicationFieldNames.Reason.REASON.name(), REASON_ID.toString());
     NotificationDTO dto = NotificationDTO.builder()
         .entityId(ENTITY_ID)
         .eventName(EventName.CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED)
