@@ -3,10 +3,11 @@ package com.rivigo.riconet.event.consumer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.config.TopicNameConfig;
-import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.EventTriggerService;
-import java.io.IOException;
+import de.flapdoodle.embed.process.collections.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 /** Created by ashfakh on 19/4/18. */
 @Slf4j
 @Component
-public class ZoomEventTriggerConsumer extends ConsumerModel {
+public class ZoomEventTriggerConsumer extends EventConsumer {
 
   private ObjectMapper objectMapper;
 
@@ -38,17 +39,12 @@ public class ZoomEventTriggerConsumer extends ConsumerModel {
   }
 
   @Override
-  public String processMessage(String str) {
-    log.info("Processing message in ZoomEventTrigger {}", str);
-    NotificationDTO notificationDTO = null;
-    try {
-      notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
-    } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", str, ex);
-      return str;
-    }
-    log.debug("NotificationDTO {}", notificationDTO);
+  public List<EventName> eventNamesToBeConsumed() {
+    return Collections.newArrayList(EventName.values());
+  }
+
+  @Override
+  public void doAction(NotificationDTO notificationDTO) {
     eventTriggerService.processNotification(notificationDTO);
-    return str;
   }
 }
