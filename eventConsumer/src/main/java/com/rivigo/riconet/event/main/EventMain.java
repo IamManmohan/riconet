@@ -25,19 +25,20 @@ public class EventMain {
 
   @Autowired private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
 
-  @Autowired
-  private BfPickupChargesActionConsumer consignmentCompletionPickupChargesActionConsumer;
+  @Autowired private BfPickupChargesActionConsumer consignmentCompletionPickupChargesActionConsumer;
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context =
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
     String groupId = config.getString("group.id");
-    String groupConsignmentCompletionPickupCharges=config.getString("group.bfPickupCharges");
+    String groupConsignmentCompletionPickupCharges = config.getString("group.bfPickupCharges");
     final ConsumerSettings<String, String> defaultConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
@@ -49,14 +50,16 @@ public class EventMain {
             .withGroupId(groupConsignmentCompletionPickupCharges)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
     consumer.loadDefault(materializer, defaultConsumerSettings);
-    consumer.loadBfPickupCharges(materializer,bfPickupChargesConsumerSettings);
+    consumer.loadBfPickupCharges(materializer, bfPickupChargesConsumerSettings);
   }
 
-  public void loadDefault(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void loadDefault(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
   }
 
-  public void loadBfPickupCharges(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void loadBfPickupCharges(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     consignmentCompletionPickupChargesActionConsumer.load(materializer, consumerSettings);
   }
 }

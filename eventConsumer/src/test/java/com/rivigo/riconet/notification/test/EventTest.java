@@ -22,8 +22,7 @@ public class EventTest {
 
   @Mock private EventTriggerService eventTriggerService;
 
-  @Mock
-  private ObjectMapper objectMapper;
+  @Mock private ObjectMapper objectMapper;
 
   @Before
   public void initMocks() {

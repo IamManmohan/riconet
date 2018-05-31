@@ -18,8 +18,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private TopicNameConfig topicNameConfig;
+  @Autowired private TopicNameConfig topicNameConfig;
 
   public abstract List<EventName> eventNamesToBeConsumed();
 
@@ -40,7 +39,6 @@ public abstract class EventConsumer extends ConsumerModel {
     return topicNameConfig.enrichedEventSinkErrorTopic();
   }
 
-
   @Override
   public String processMessage(String str) {
     log.info("Processing message in BfPickupChargesActionConsumer {}", str);
@@ -52,7 +50,7 @@ public abstract class EventConsumer extends ConsumerModel {
       return str;
     }
     log.debug("NotificationDTO {}", notificationDTO);
-    if(eventNamesToBeConsumed().contains(notificationDTO.getEventName())){
+    if (eventNamesToBeConsumed().contains(notificationDTO.getEventName())) {
       doAction(notificationDTO);
     }
     return str;

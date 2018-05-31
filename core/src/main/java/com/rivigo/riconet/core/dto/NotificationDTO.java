@@ -37,7 +37,10 @@ public class NotificationDTO {
 
   private Map<String, String> metadata = new HashMap<>();
 
-  /** list of conditions for an event these conditions help in deciding template for subscribers in broker */
+  /**
+   * list of conditions for an event these conditions help in deciding template for subscribers in
+   * broker
+   */
   private List<String> conditions;
 
   public static NotificationDTO copy(NotificationDTO input) {

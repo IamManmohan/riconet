@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.enums;
 
 public enum ZoomPropertyName {
-
   PRIME_URL,
   SYSTEM_UNDER_MAINTENANCE,
   SYSTEM_UNDER_MAINTENANCE_MSG,
@@ -203,5 +202,6 @@ public enum ZoomPropertyName {
   /** Rule engine consttants */
   ,
   MINIMUM_NUMBER_OF_CN_REQUIRED,
-  MINIMUM_PICKUP_CHARGES_FOR_BF, REQUIRED_CLIENT_TYPE
+  MINIMUM_PICKUP_CHARGES_FOR_BF,
+  REQUIRED_CLIENT_TYPE
 }

@@ -23,14 +23,16 @@ public class ConsignmentAppointmentServiceTest {
   public String processMessage(String str) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     DEPSNotificationContext context = null;
-    TypeReference<AppointmentNotificationDTO> mapType = new TypeReference<AppointmentNotificationDTO>() {};
+    TypeReference<AppointmentNotificationDTO> mapType =
+        new TypeReference<AppointmentNotificationDTO>() {};
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
     return str;
   }
 
   public void appointmentMissedSummaryNotification() throws IOException {
-    ConsignmentAppointmentRecord appointment = consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l, true);
+    ConsignmentAppointmentRecord appointment =
+        consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l, true);
     appointment.setAppointmentTime(DateTime.now().minusDays(1));
     consignmentAppointmentRepository.save(appointment);
     String str = "{\"notificationType\":\"APPOINTMENT_MISSED_SUMMARY\"}";
@@ -43,7 +45,8 @@ public class ConsignmentAppointmentServiceTest {
   }
 
   public void appointmentMissedNotification() throws IOException {
-    ConsignmentAppointmentRecord appointment = consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l, true);
+    ConsignmentAppointmentRecord appointment =
+        consignmentAppointmentRepository.findByConsignmentIdAndIsActive(9l, true);
     appointment.setAppointmentTime(DateTime.now().minusMinutes(30));
     consignmentAppointmentRepository.save(appointment);
     String time = Long.toString(DateTime.now().minusMinutes(60).getMillis());

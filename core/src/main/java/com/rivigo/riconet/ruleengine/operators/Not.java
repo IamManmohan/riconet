@@ -1,6 +1,7 @@
 package com.rivigo.riconet.ruleengine.operators;
 
 /** @author ajay mittal */
+
 import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Expression;
 import com.rivigo.riconet.ruleengine.Operation;

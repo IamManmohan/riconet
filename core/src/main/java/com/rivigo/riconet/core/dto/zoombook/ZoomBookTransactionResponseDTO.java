@@ -16,11 +16,11 @@ import lombok.ToString;
 @Builder
 @ToString
 public class ZoomBookTransactionResponseDTO {
-    private ZoomBookTransactionStatus transactionStatus;
-    private BigDecimal openingBalance;
-    private BigDecimal closingBalance;
-    private BigDecimal amount;
-    private String txnNo;
-    private String clientRequestId;
-    private String reference;
+  private ZoomBookTransactionStatus transactionStatus;
+  private BigDecimal openingBalance;
+  private BigDecimal closingBalance;
+  private BigDecimal amount;
+  private String txnNo;
+  private String clientRequestId;
+  private String reference;
 }

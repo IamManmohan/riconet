@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class BfPickupChargesActionConsumer extends EventConsumer {
 
-  @Autowired
-  private PickupService pickupService;
+  @Autowired private PickupService pickupService;
 
   @Override
-  public List<EventName> eventNamesToBeConsumed(){
-    return Arrays.asList(EventName.CN_COMPLETION_ALL_INSTANCES,EventName.CN_DELETED,EventName.PICKUP_COMPLETION);
+  public List<EventName> eventNamesToBeConsumed() {
+    return Arrays.asList(
+        EventName.CN_COMPLETION_ALL_INSTANCES, EventName.CN_DELETED, EventName.PICKUP_COMPLETION);
   }
 
   @Override

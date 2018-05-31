@@ -30,7 +30,8 @@ public class QCRuleEngine implements RuleEngine {
 
   private List<RuleEngineRule> getBasicRuleListFromDB() {
 
-    List<RuleEngineRule> basicRuleList = ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true);
+    List<RuleEngineRule> basicRuleList =
+        ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true);
 
     log.debug("QCRuleEngine BasicRuleListFromDB {}", basicRuleList);
     return basicRuleList;
@@ -39,7 +40,8 @@ public class QCRuleEngine implements RuleEngine {
   private List<RuleEngineRule> getBusinessRuleListFromDB(String businessRuleName) {
 
     List<RuleEngineRule> businessRuleList =
-        ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive(businessRuleName, RuleType.BUSINESS_RULE, true);
+        ruleEngineRuleRepository.findByRuleNameAndRuleTypeAndIsActive(
+            businessRuleName, RuleType.BUSINESS_RULE, true);
     log.debug("QCRuleEngine BusinessRuleListFromDB {}", businessRuleList);
 
     // pending...sorting it based on priority

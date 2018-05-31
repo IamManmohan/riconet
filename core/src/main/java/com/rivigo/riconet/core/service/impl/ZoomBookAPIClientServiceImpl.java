@@ -50,8 +50,6 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
   private static final String RESPONSE = "response";
   private static final String STATUS_CODE = "statusCode";
 
-
-
   @Value("${zoom.zoombook.url}")
   private String zoomBookUrl;
 
@@ -74,10 +72,14 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
     List<E> zoomBookResponseList;
   }
 
-
   @Override
   public List<TransactionModelDTO> getEntityCollectionsSummary(
-      Long orgId, String functionType, String tenantType, Long fromDateTime, Long toDateTime, Boolean getAllByReference) {
+      Long orgId,
+      String functionType,
+      String tenantType,
+      Long fromDateTime,
+      Long toDateTime,
+      Boolean getAllByReference) {
     String requestURL = "zoombook/transaction/compile";
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -95,7 +97,8 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
             requestURL,
             queryParams,
             responseType,
-            FinanceUtils.createToken(String.valueOf(orgId), functionType, tenantType, zoombookClientSecret));
+            FinanceUtils.createToken(
+                String.valueOf(orgId), functionType, tenantType, zoombookClientSecret));
     if (response == null) {
       return Collections.emptyList();
     }
@@ -104,14 +107,19 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
 
   @Override
   public Object getDataFromZoomBook(
-      String requestUrl, MultiValueMap<String, String> queryParams, TypeReference responseType, String zoombookClientToken) {
+      String requestUrl,
+      MultiValueMap<String, String> queryParams,
+      TypeReference responseType,
+      String zoombookClientToken) {
 
-    Map<String, String> zoomBookReponse = getDataFromZoomBook(requestUrl, queryParams, zoombookClientToken);
+    Map<String, String> zoomBookReponse =
+        getDataFromZoomBook(requestUrl, queryParams, zoombookClientToken);
 
     return getTransactionModelDetails(zoomBookReponse, responseType);
   }
 
-  private Object getTransactionModelDetails(Map<String, String> zoomBookReponse, TypeReference responseType) {
+  private Object getTransactionModelDetails(
+      Map<String, String> zoomBookReponse, TypeReference responseType) {
     if (null == zoomBookReponse || zoomBookReponse.get(STATUS).equals(FAILURE)) {
       throw new ZoomException("Failed to get Collections Summary From ZoomBook");
     }
@@ -142,11 +150,13 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       HttpEntity entity = new HttpEntity(headers);
 
       // Sample requestUrl : status
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(zoomBookUrl + "/" + requestUrl).queryParams(queryParams);
+      UriComponentsBuilder builder =
+          UriComponentsBuilder.fromHttpUrl(zoomBookUrl + "/" + requestUrl).queryParams(queryParams);
 
       log.debug("Calling API for to GET data from Zoom-book");
       ResponseEntity<JsonNode> oauthResponse =
-          restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, entity, JsonNode.class);
+          restTemplate.exchange(
+              builder.build().encode().toUri(), HttpMethod.GET, entity, JsonNode.class);
       JsonNode responseJson = oauthResponse.getBody();
 
       log.info("Completed API to get data from Zoom-book");
@@ -178,7 +188,10 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       return responseMap;
 
     } catch (Exception e) {
-      log.error("Unknown exception while trying to get data from zoom-book for url {} with params: {}", requestUrl, queryParams.toString());
+      log.error(
+          "Unknown exception while trying to get data from zoom-book for url {} with params: {}",
+          requestUrl,
+          queryParams.toString());
       throw new ZoomException("Unknown exception while trying to get data from zoom-book");
     }
   }
@@ -192,13 +205,14 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
     }
     Map<String, String> response = new HashMap<>();
     String uuid = UUID.randomUUID().toString().replace("-", "");
-    zoomBookTransactionRequestDTOList.forEach(dto -> {
-      if (dto.getClientRequestId() == null) {
-        dto.setClientRequestId(UUID.randomUUID().toString().replace("-", ""));
-      }
-    });
-    ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransactionResponse = zoomBookTransaction(
-        zoomBookTransactionRequestDTOList, uuid);
+    zoomBookTransactionRequestDTOList.forEach(
+        dto -> {
+          if (dto.getClientRequestId() == null) {
+            dto.setClientRequestId(UUID.randomUUID().toString().replace("-", ""));
+          }
+        });
+    ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransactionResponse =
+        zoomBookTransaction(zoomBookTransactionRequestDTOList, uuid);
 
     response.put(STATUS, FAILURE);
     response.put("uuid", uuid);
@@ -208,9 +222,10 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       throw new ZoomException("Exception from ZoomBook ");
     }
     Map<String, String> clientRequestIdtoTxnNumberMap = new HashMap<>();
-    for (ZoomBookTransactionResponseDTO zoomBookTransactionResponseDTO : zoomBookTransactionResponse
-        .getZoomBookResponseList()) {
-      clientRequestIdtoTxnNumberMap.put(zoomBookTransactionResponseDTO.getClientRequestId(),
+    for (ZoomBookTransactionResponseDTO zoomBookTransactionResponseDTO :
+        zoomBookTransactionResponse.getZoomBookResponseList()) {
+      clientRequestIdtoTxnNumberMap.put(
+          zoomBookTransactionResponseDTO.getClientRequestId(),
           zoomBookTransactionResponseDTO.getTxnNo());
     }
 
@@ -218,36 +233,43 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
     return response;
   }
 
-  private ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransaction(List<ZoomBookTransactionRequestDTO> zoomBookTransactionRequestDTOList, String uuid){
+  private ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransaction(
+      List<ZoomBookTransactionRequestDTO> zoomBookTransactionRequestDTOList, String uuid) {
 
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.add(CLIENT_KEY, zoombookClientKey);
-    String commaSeparatedOrgIds = StringUtils.join(
-        zoomBookTransactionRequestDTOList
-            .stream()
-            .map(ZoomBookTransactionRequestDTO::getOrgId)
-            .collect(Collectors.toList())
-        , ",");
-    String commaSeparatedClientRequestIds = StringUtils.join(
-        zoomBookTransactionRequestDTOList
-            .stream()
-            .map(ZoomBookTransactionRequestDTO::getClientRequestId)
-            .collect(Collectors.toList())
-        , ",");
-    String commaSeparatedFunctionTypes = StringUtils.join(
-        zoomBookTransactionRequestDTOList
-            .stream()
-            .map(ZoomBookTransactionRequestDTO::getFunctionType)
-            .collect(Collectors.toList())
-        , ",");
-    headers.add(CLIENT_TOKEN, FinanceUtils.createToken(commaSeparatedClientRequestIds,
-        commaSeparatedOrgIds,
-        commaSeparatedFunctionTypes,zoombookClientSecret));
+    String commaSeparatedOrgIds =
+        StringUtils.join(
+            zoomBookTransactionRequestDTOList
+                .stream()
+                .map(ZoomBookTransactionRequestDTO::getOrgId)
+                .collect(Collectors.toList()),
+            ",");
+    String commaSeparatedClientRequestIds =
+        StringUtils.join(
+            zoomBookTransactionRequestDTOList
+                .stream()
+                .map(ZoomBookTransactionRequestDTO::getClientRequestId)
+                .collect(Collectors.toList()),
+            ",");
+    String commaSeparatedFunctionTypes =
+        StringUtils.join(
+            zoomBookTransactionRequestDTOList
+                .stream()
+                .map(ZoomBookTransactionRequestDTO::getFunctionType)
+                .collect(Collectors.toList()),
+            ",");
+    headers.add(
+        CLIENT_TOKEN,
+        FinanceUtils.createToken(
+            commaSeparatedClientRequestIds,
+            commaSeparatedOrgIds,
+            commaSeparatedFunctionTypes,
+            zoombookClientSecret));
 
-
-    String requestJson ;
+    String requestJson;
 
     try {
       requestJson = objectMapper.writeValueAsString(zoomBookTransactionRequestDTOList);
@@ -257,22 +279,28 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
 
     HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2);
+    UriComponentsBuilder builder =
+        UriComponentsBuilder.fromHttpUrl(zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2);
 
-    TypeReference type=new TypeReference<List<ZoomBookTransactionResponseDTO>>(){};
+    TypeReference type = new TypeReference<List<ZoomBookTransactionResponseDTO>>() {};
 
-    log.info("Calling API {} for zoomBookTransaction for uuid {}, requestJson {}", zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2
-        , uuid, requestJson);
-    return callZoomBook(type,HttpMethod.POST,entity,builder);
+    log.info(
+        "Calling API {} for zoomBookTransaction for uuid {}, requestJson {}",
+        zoomBookUrl + UrlConstant.ZOOMBOOK_TRANSACTION_V2,
+        uuid,
+        requestJson);
+    return callZoomBook(type, HttpMethod.POST, entity, builder);
   }
 
-  private ZoomBookResponse callZoomBook(TypeReference type, HttpMethod httpMethod, HttpEntity entity,
-      UriComponentsBuilder builder){
+  private ZoomBookResponse callZoomBook(
+      TypeReference type, HttpMethod httpMethod, HttpEntity entity, UriComponentsBuilder builder) {
     ZoomBookResponse zoomBookResponse = new ZoomBookResponse<>();
     Map<String, String> responseMap = new HashMap<>();
-    List<Object> obj=null;
+    List<Object> obj = null;
     try {
-      ResponseEntity<JsonNode> oauthResponse = restTemplate.exchange(builder.build().encode().toUri(), httpMethod, entity, JsonNode.class);
+      ResponseEntity<JsonNode> oauthResponse =
+          restTemplate.exchange(
+              builder.build().encode().toUri(), httpMethod, entity, JsonNode.class);
       JsonNode responseJson = oauthResponse.getBody();
       log.debug("Response from zoombook: {}", responseJson);
 
@@ -282,17 +310,16 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       if (oauthResponse.getStatusCode() == HttpStatus.OK
           && 200 == Integer.valueOf(statusCode)
           && "\"SUCCESS\"".equals(status)) {
-        obj = objectMapper.readValue(responseJson.get(RESPONSE).toString(),type);
+        obj = objectMapper.readValue(responseJson.get(RESPONSE).toString(), type);
         responseMap.put(STATUS, SUCCESS);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
 
-        //add txn detail to audit transaction
+        // add txn detail to audit transaction
       } else {
         responseMap.put(STATUS, FAILURE);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
-
       }
-    }catch(Exception e){
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       responseMap.put(STATUS, FAILURE);
     }
@@ -301,6 +328,4 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
     zoomBookResponse.setZoomBookResponseList(obj);
     return zoomBookResponse;
   }
-
-
 }

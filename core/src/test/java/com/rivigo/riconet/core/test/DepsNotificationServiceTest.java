@@ -34,7 +34,8 @@ public class DepsNotificationServiceTest extends TesterBase {
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     DEPSNotificationContext context = null;
     List<DEPSNotificationDTO> depsRecordList = new ArrayList<>();
-    TypeReference<List<DEPSNotificationDTO>> mapType = new TypeReference<List<DEPSNotificationDTO>>() {};
+    TypeReference<List<DEPSNotificationDTO>> mapType =
+        new TypeReference<List<DEPSNotificationDTO>>() {};
     try {
       depsRecordList = objectMapper.readValue(str, mapType);
     } catch (IOException e) {
@@ -62,7 +63,8 @@ public class DepsNotificationServiceTest extends TesterBase {
   // @Test
   public void returnScanNotification() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 1l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
+            ZoomTripType.DRS, 1l);
     tpm.setPartnerType(PartnerType.MARKET);
     tpm.setPartnerId(null);
     tpm.setUserId(1118l);
@@ -76,7 +78,8 @@ public class DepsNotificationServiceTest extends TesterBase {
   // @Test
   public void returnScanNotification2() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 1l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
+            ZoomTripType.DRS, 1l);
     tpm.setPartnerType(PartnerType.RIVIGO_CAPTAIN);
     tpm.setPartnerId(null);
     tpm.setUserId(2172l);
@@ -90,7 +93,8 @@ public class DepsNotificationServiceTest extends TesterBase {
   // @Test
   public void returnScanNotification3() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 1l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
+            ZoomTripType.DRS, 1l);
     tpm.setPartnerType(PartnerType.BUSINESS_PARTNER);
     tpm.setPartnerId(1l);
     tpm.setUserId(58l);
@@ -103,7 +107,8 @@ public class DepsNotificationServiceTest extends TesterBase {
   // @Test
   public void returnScanNotification4() {
     TransportationPartnerMapping tpm =
-        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(ZoomTripType.DRS, 1l);
+        transportationPartnerMappingRepository.findByTransportationTypeAndTransportationId(
+            ZoomTripType.DRS, 1l);
     tpm.setPartnerType(PartnerType.VENDOR);
     tpm.setPartnerId(1l);
     tpm.setUserId(1118l);
