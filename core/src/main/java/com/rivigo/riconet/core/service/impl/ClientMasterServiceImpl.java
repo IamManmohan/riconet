@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ClientMasterServiceImpl implements ClientMasterService {
 
-  @Autowired
-  ClientRepository clientRepository;
+  @Autowired ClientRepository clientRepository;
 
   @Override
   public Client getClientById(Long id) {

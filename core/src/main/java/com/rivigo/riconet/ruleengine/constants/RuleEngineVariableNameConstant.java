@@ -1,8 +1,6 @@
 package com.rivigo.riconet.ruleengine.constants;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 public class RuleEngineVariableNameConstant {
 
   private RuleEngineVariableNameConstant() {

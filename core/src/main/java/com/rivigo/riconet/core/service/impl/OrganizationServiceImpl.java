@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-  @Autowired
-  private OrganizationRepository organizationRepository;
+  @Autowired private OrganizationRepository organizationRepository;
 
   @Override
   public Organization getById(Long orgId) {
@@ -23,8 +22,8 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
-  public List<Organization> getByOrganizationTypeAndOperationalStatus(OrganizationType rivigo,
-      OperationalStatus status) {
+  public List<Organization> getByOrganizationTypeAndOperationalStatus(
+      OrganizationType rivigo, OperationalStatus status) {
     return organizationRepository.findByTypeAndStatus(rivigo, status);
   }
 }

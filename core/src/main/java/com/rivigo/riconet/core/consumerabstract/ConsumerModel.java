@@ -8,16 +8,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
 import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -28,26 +18,31 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.jboss.netty.util.HashedWheelTimer;
+import org.jboss.netty.util.Timer;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
-/**
- * Created by ashfakh on 26/9/17.
- */
-
-
+/** Created by ashfakh on 26/9/17. */
 @Slf4j
 @Component
 public abstract class ConsumerModel {
 
-  public static final Long NUM_RETRIES=5l;
+  public static final Long NUM_RETRIES = 5l;
 
   public abstract String getTopic();
 
   public abstract String getErrorTopic();
 
   /**
-   * For all the consumers default
-   * retries are 5. One can change this number
-   * by overriding this in the respective consumer
+   * For all the consumers default retries are 5. One can change this number by overriding this in
+   * the respective consumer
+   *
    * @return
    */
   public Long getNumRetries() {
@@ -56,14 +51,11 @@ public abstract class ConsumerModel {
 
   private final AtomicLong offset = new AtomicLong();
 
-  @Autowired
-  private ExecutorService executorService;
+  @Autowired private ExecutorService executorService;
 
-  @Autowired
-  private ConsumerMessagesRepository consumerMessagesRepository;
+  @Autowired private ConsumerMessagesRepository consumerMessagesRepository;
 
-  @Autowired
-  private KafkaTemplate kafkaTemplate;
+  @Autowired private KafkaTemplate kafkaTemplate;
 
   private Timer timer = new HashedWheelTimer();
 
@@ -76,26 +68,28 @@ public abstract class ConsumerModel {
   @Async
   private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
     if (record.topic().equals(getTopic())) {
-      executorService.submit(() -> {
-        try {
-          processMessage(record.value());
-        } catch (Exception e) {
-          String errorMsg = getStackTrace(e);
-          processFirstTimeError(record.value(), errorMsg);
-          log.error("First time error", e);
-        }
-      });
+      executorService.submit(
+          () -> {
+            try {
+              processMessage(record.value());
+            } catch (Exception e) {
+              String errorMsg = getStackTrace(e);
+              processFirstTimeError(record.value(), errorMsg);
+              log.error("First time error", e);
+            }
+          });
     } else if (record.topic().equals(getErrorTopic())) {
-      executorService.submit(() -> {
-        ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
-        try {
-          processMessage(consumerMessages.getMessage());
-        } catch (Exception e) {
-          String errorMsg = getStackTrace(e);
-          processError(consumerMessages, errorMsg);
-          log.error("error", e);
-        }
-      });
+      executorService.submit(
+          () -> {
+            ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
+            try {
+              processMessage(consumerMessages.getMessage());
+            } catch (Exception e) {
+              String errorMsg = getStackTrace(e);
+              processError(consumerMessages, errorMsg);
+              log.error("error", e);
+            }
+          });
     }
     offset.set(record.offset());
     return CompletableFuture.completedFuture(Done.getInstance());
@@ -108,13 +102,23 @@ public abstract class ConsumerModel {
   public abstract String processMessage(String str) throws IOException;
 
   String processError(ConsumerMessages consumerMessage, String errorMsg) {
-    log.error("processing error:" + consumerMessage.getId() + (consumerMessage.getRetryCount() + 1L) + errorMsg);
+    log.error(
+        "processing error:"
+            + consumerMessage.getId()
+            + (consumerMessage.getRetryCount() + 1L)
+            + errorMsg);
     if (consumerMessage.getRetryCount() < getNumRetries()) {
       consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
       consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
-      consumerMessage.setErrorMsg(consumerMessage.getErrorMsg() + ", Retry number " + consumerMessage.getRetryCount().toString() + " " + errorMsg);
+      consumerMessage.setErrorMsg(
+          consumerMessage.getErrorMsg()
+              + ", Retry number "
+              + consumerMessage.getRetryCount().toString()
+              + " "
+              + errorMsg);
       consumerMessagesRepository.save(consumerMessage);
-      ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
+      ConsumerTimer task =
+          new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
       timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
     }
     return consumerMessage.getMessage();
@@ -138,19 +142,17 @@ public abstract class ConsumerModel {
     return str;
   }
 
-  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
     Set<String> topics = new HashSet<>();
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-
     this.loadOffset()
-        .thenAccept(fromOffset -> Consumer
-            .plainSource(
-                consumerSettings,
-                Subscriptions.topics(topics)
-            )
-            .mapAsync(1, this::save)
-            .runWith(Sink.ignore(), materializer));
+        .thenAccept(
+            fromOffset ->
+                Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
+                    .mapAsync(1, this::save)
+                    .runWith(Sink.ignore(), materializer));
   }
 }

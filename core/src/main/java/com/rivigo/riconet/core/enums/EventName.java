@@ -1,8 +1,6 @@
 package com.rivigo.riconet.core.enums;
 
-/**
- * Created by aditya on 19/2/18.
- */
+/** Created by aditya on 19/2/18. */
 public enum EventName {
   DEFAULT,
   CN_COMPLETION_ALL_INSTANCES,
@@ -34,4 +32,5 @@ public enum EventName {
   CLIENT_USER_CREATION,
 
   COLLECTION_CHEQUE_BOUNCE,
+  CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED,
 }

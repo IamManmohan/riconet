@@ -33,11 +33,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class ApiClientServiceImpl implements ApiClientService {
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private SsoService ssoService;
+  @Autowired private SsoService ssoService;
 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
@@ -45,8 +43,7 @@ public class ApiClientServiceImpl implements ApiClientService {
   @Value("${rivigo.sso.password}")
   private String ssoPassword;
 
-  @Autowired
-  private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
+  @Autowired private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
 
   @Override
   public Object parseJsonNode(JsonNode responseJson, TypeReference mapType) {
@@ -58,14 +55,18 @@ public class ApiClientServiceImpl implements ApiClientService {
         return null;
       }
       try {
-        return objectMapper
-            .readValue(responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
+        return objectMapper.readValue(
+            responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
       } catch (IOException e) {
-        log.error("Error while parsing ticketing response,  {} at epoch {} :",
+        log.error(
+            "Error while parsing ticketing response,  {} at epoch {} :",
             responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(),
-            DateTime.now().getMillis(), e);
+            DateTime.now().getMillis(),
+            e);
         throw new ZoomException(
-            "Error while parsing ticketing response: errorCode-" + DateTime.now().getMillis() + " :"
+            "Error while parsing ticketing response: errorCode-"
+                + DateTime.now().getMillis()
+                + " :"
                 + e.getMessage());
       }
     }
@@ -93,8 +94,13 @@ public class ApiClientServiceImpl implements ApiClientService {
   }
 
   @Override
-  public JsonNode getEntity(Object dto, HttpMethod httpMethod, String url,
-      MultiValueMap<String, String> queryParams, String baseUrl) throws IOException {
+  public JsonNode getEntity(
+      Object dto,
+      HttpMethod httpMethod,
+      String url,
+      MultiValueMap<String, String> queryParams,
+      String baseUrl)
+      throws IOException {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + url);
     if (queryParams != null) {
       builder = builder.queryParams(queryParams);
@@ -107,22 +113,22 @@ public class ApiClientServiceImpl implements ApiClientService {
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
       accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
-    HttpEntity<Object> entity = getHttpEntity(getHeaders(token), dto,uri);
+    HttpEntity<Object> entity = getHttpEntity(getHeaders(token), dto, uri);
     RestTemplate restTemplate = new RestTemplate();
 
     try {
-      ResponseEntity<JsonNode> response = restTemplate
-          .exchange(uri, httpMethod, entity, JsonNode.class);
+      ResponseEntity<JsonNode> response =
+          restTemplate.exchange(uri, httpMethod, entity, JsonNode.class);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
         log.info("Existing token expired. New token is being generated ");
         token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
         accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
-        HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto,uri);
+        HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto, uri);
         try {
-          ResponseEntity<JsonNode> response = restTemplate
-              .exchange(uri, httpMethod, retryEntity, JsonNode.class);
+          ResponseEntity<JsonNode> response =
+              restTemplate.exchange(uri, httpMethod, retryEntity, JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
           log.error("Invalid response from ticketing  while calling {}", DateTime.now(), e2);
@@ -133,6 +139,4 @@ public class ApiClientServiceImpl implements ApiClientService {
       throw new ZoomException("Invalid response from ticketing " + e.getMessage());
     }
   }
-
 }
-

@@ -13,9 +13,7 @@ public interface StockAccumulatorService {
       StockAccumulatorRole role, Long partnerId);
 
   List<StockAccumulator> getByStockAccumulatorRoleAndAccumulationPartnerIdAndStatus(
-      StockAccumulatorRole role,
-      Long partnerId, OperationalStatus status);
+      StockAccumulatorRole role, Long partnerId, OperationalStatus status);
 
   StockAccumulator getByUserId(Long userId);
-
 }

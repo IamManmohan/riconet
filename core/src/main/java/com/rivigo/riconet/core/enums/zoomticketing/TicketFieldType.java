@@ -5,6 +5,6 @@ package com.rivigo.riconet.core.enums.zoomticketing;
  * @date 29-Mar-2018
  */
 public enum TicketFieldType {
-    EXTERNAL,
-    INTERNAL
+  EXTERNAL,
+  INTERNAL
 }

@@ -26,27 +26,19 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-/**
- * Created by ashfakh on 11/5/18.
- */
-
+/** Created by ashfakh on 11/5/18. */
 @Slf4j
 public class ChequeBounceServiceTest {
 
-  @InjectMocks
-  private ChequeBounceServiceImpl chequeBounceService;
+  @InjectMocks private ChequeBounceServiceImpl chequeBounceService;
 
-  @Mock
-  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService;
+  @Mock private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService;
 
-  @Mock
-  private UserMasterServiceImpl userMasterService;
+  @Mock private UserMasterServiceImpl userMasterService;
 
-  @Captor
-  private ArgumentCaptor<Object> valueCapture;
+  @Captor private ArgumentCaptor<Object> valueCapture;
 
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void initMocks() {
@@ -66,20 +58,18 @@ public class ChequeBounceServiceTest {
     user.setName("Dummy User");
     TicketDTO ticketDTO = new TicketDTO();
     ticketDTO.setId(1L);
-    Mockito.when(zoomTicketingAPIClientService
-        .getGroupId(15L, "RETAIL", LocationType.OU))
+    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU))
         .thenReturn(groupDTO);
-    Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com"))
-        .thenReturn(user);
+    Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com")).thenReturn(user);
     Mockito.when(zoomTicketingAPIClientService.createTicket((TicketDTO) valueCapture.capture()))
         .thenReturn(ticketDTO);
-    TicketDTO resultDTO=chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
-    Assert.assertEquals((Object) resultDTO.getId(),1L);
+    TicketDTO resultDTO = chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
+    Assert.assertEquals((Object) resultDTO.getId(), 1L);
     ticketDTO.setId(2L);
     NotificationDTO notificationDTO = getNotificationDTO();
-    notificationDTO.getMetadata().put("PAYMENT_MODE","COD");
-    resultDTO=chequeBounceService.consumeChequeBounceEvent(notificationDTO);
-    Assert.assertEquals((Object) resultDTO.getId(),2L);
+    notificationDTO.getMetadata().put("PAYMENT_MODE", "COD");
+    resultDTO = chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+    Assert.assertEquals((Object) resultDTO.getId(), 2L);
   }
 
   @Test
@@ -91,8 +81,7 @@ public class ChequeBounceServiceTest {
     user.setName("Dummy User");
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Group cannot be null, creating ticket failed");
-    Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com"))
-        .thenReturn(user);
+    Mockito.when(userMasterService.getByEmail("dummyuser@rivigo.com")).thenReturn(user);
     chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
   }
 
@@ -102,11 +91,10 @@ public class ChequeBounceServiceTest {
     groupDTO.setId(1L);
     groupDTO.setLocationId(15L);
     groupDTO.setGroupTypeId(1L);
-    Mockito.when(zoomTicketingAPIClientService
-        .getGroupId(15L, "RETAIL", LocationType.OU))
+    Mockito.when(zoomTicketingAPIClientService.getGroupId(15L, "RETAIL", LocationType.OU))
         .thenReturn(groupDTO);
     TicketDTO ticketDTO = chequeBounceService.consumeChequeBounceEvent(getNotificationDTO());
-    Assert.assertEquals(null,ticketDTO);
+    Assert.assertEquals(null, ticketDTO);
   }
 
   private NotificationDTO getNotificationDTO() {
@@ -136,11 +124,10 @@ public class ChequeBounceServiceTest {
     metadata.put("PAYMENT_MODE", "PREPAID");
     metadata.put("TOTAL_AMOUNT", "1060");
     metadata.put("PAYMENT_TYPE", "Cheque");
-    metadata.put("CREATED_BY","dummyuser@rivigo.com");
-    metadata.put("LOCATION_ID","15");
+    metadata.put("CREATED_BY", "dummyuser@rivigo.com");
+    metadata.put("LOCATION_ID", "15");
     notificationDTO.setMetadata(metadata);
     notificationDTO.setConditions(Arrays.asList("COLLECTION_CHEQUE_BOUNCE_PAID_CN"));
     return notificationDTO;
   }
-
 }

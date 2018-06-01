@@ -17,8 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TripServiceImpl implements TripService {
 
-  @Autowired
-  private TripRepository tripRepository;
+  @Autowired private TripRepository tripRepository;
 
   @Override
   public Map<Long, Trip> getTripsMapByIdIn(Collection<Long> tripIdList) {

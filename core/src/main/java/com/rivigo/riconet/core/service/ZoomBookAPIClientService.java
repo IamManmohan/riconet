@@ -6,17 +6,20 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
-
 @Service
 public interface ZoomBookAPIClientService {
 
-  List<TransactionModelDTO> getEntityCollectionsSummary(Long orgId, String functionType,
+  List<TransactionModelDTO> getEntityCollectionsSummary(
+      Long orgId,
+      String functionType,
       String tenantType,
-      Long fromDateTime, Long toDateTime, Boolean getAllByReference);
+      Long fromDateTime,
+      Long toDateTime,
+      Boolean getAllByReference);
 
-  Object getDataFromZoomBook(String requestUrl, MultiValueMap<String, String> queryParams,
+  Object getDataFromZoomBook(
+      String requestUrl,
+      MultiValueMap<String, String> queryParams,
       TypeReference responseType,
       String zoombookClientToken);
-
 }
-

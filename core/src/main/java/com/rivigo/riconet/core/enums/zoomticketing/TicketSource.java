@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.enums.zoomticketing;
 
-public enum  TicketSource {
-    PHONE,
-    EMAIL,
-    INTERNAL
+public enum TicketSource {
+  PHONE,
+  EMAIL,
+  INTERNAL
 }

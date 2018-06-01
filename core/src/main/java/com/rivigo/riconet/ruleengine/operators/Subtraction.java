@@ -4,9 +4,7 @@ import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
 import java.util.Map;
 
-/**
- * @author ajay mittal
- */
+/** @author ajay mittal */
 public class Subtraction extends Operation {
 
   public Subtraction() {
@@ -27,6 +25,5 @@ public class Subtraction extends Operation {
     Double result = (Double) leftBT.getValue() - (Double) rightBT.getValue();
 
     return new BaseType(result, Double.class);
-
   }
 }

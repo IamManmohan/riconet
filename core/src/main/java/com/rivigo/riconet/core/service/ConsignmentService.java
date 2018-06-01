@@ -17,8 +17,8 @@ public interface ConsignmentService {
 
   Integer getOriginalNumberOfBoxesByCnote(String cnote);
 
-  List<Consignment> findByIdInAndStatusNotInAndDeliveryHandoverIsNull(List<Long> consignmentIdList,
-      List<ConsignmentStatus> statusList);
+  List<Consignment> findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
+      List<Long> consignmentIdList, List<ConsignmentStatus> statusList);
 
   List<Consignment> getConsignmentsByIds(List<Long> consignmentIds);
 

@@ -4,6 +4,7 @@ import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
@@ -12,26 +13,32 @@ import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by ashfakh on 12/05/18.
- */
+/** Created by ashfakh on 12/05/18. */
 @Component
 @Slf4j
 public class EventMain {
 
-  @Autowired
-  private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
+  private final ZoomEventTriggerConsumer zoomEventTriggerConsumer;
+
+  private final ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer;
+
+  public EventMain(
+      ZoomEventTriggerConsumer zoomEventTriggerConsumer,
+      ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer) {
+    this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
+    this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
+  }
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
-    ApplicationContext context = new AnnotationConfigApplicationContext(
-        ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+    ApplicationContext context =
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -42,10 +49,27 @@ public class EventMain {
             .withBootstrapServers(bootstrapServers)
             .withGroupId(groupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-    consumer.load(materializer, consumerSettings);
+
+    groupId = config.getString("consignmentblocker.group.id");
+    log.info("group id for consignment blocker consumer {}", groupId);
+    final ConsumerSettings<String, String> consignmentBlockerConsumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(groupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+    consumer.load(materializer, consumerSettings, consignmentBlockerConsumerSettings);
   }
 
-  public void load(ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+  public void load(
+      ActorMaterializer materializer,
+      ConsumerSettings<String, String> consumerSettings,
+      ConsumerSettings<String, String> consignmentBlockerConsumerSettings) {
+    log.info("Loading zoom event trigger consumer with settings {}", consumerSettings);
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
+    log.info(
+        "Loading consignment blocker consumer with settings {}",
+        consignmentBlockerConsumerSettings);
+    consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
   }
 }

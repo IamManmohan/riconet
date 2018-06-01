@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestConsumer extends ConsumerModel {
 
-  @Autowired
-  private DEPSRecordService depsRecordService;
+  @Autowired private DEPSRecordService depsRecordService;
 
   @Override
   public String getTopic() {

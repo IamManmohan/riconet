@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * Created by aditya on 23/2/18.
- */
-
+/** Created by aditya on 23/2/18. */
 @Getter
 @Setter
 @Builder
@@ -28,5 +25,4 @@ public class ZoomCommunicationsSMSDTO {
   private String communicationId;
   private Integer clientResponded;
   private String urlDTO;
-
 }

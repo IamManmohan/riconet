@@ -20,11 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-  @Autowired
-  private LocationRepositoryV2 locationRepository;
+  @Autowired private LocationRepositoryV2 locationRepository;
 
-  @Autowired
-  private OrganizationService organizationService;
+  @Autowired private OrganizationService organizationService;
 
   public Location getLocationById(Long locationId) {
     return locationRepository.findById(locationId);
@@ -36,13 +34,12 @@ public class LocationServiceImpl implements LocationService {
 
   public List<Location> getAllClusterSiblingsOfLocation(String fromLocationCode) {
     Location fromLocation = getLocationByCode(fromLocationCode);
-    List<Organization> organization = organizationService
-        .getByOrganizationTypeAndOperationalStatus(OrganizationType.RIVIGO,
-            OperationalStatus.ACTIVE);
+    List<Organization> organization =
+        organizationService.getByOrganizationTypeAndOperationalStatus(
+            OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
     List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
-    return locationRepository
-        .getAllAdministrativeEntitySiblingsOfLocationAndOrganization(fromLocation.getId(), orgIds,
-            LocationType.CLUSTER.name());
+    return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
+        fromLocation.getId(), orgIds, LocationType.CLUSTER.name());
   }
 
   public Location getPcOrReportingPc(Location l) {
@@ -58,17 +55,17 @@ public class LocationServiceImpl implements LocationService {
 
   public List<Location> getAllRegionSiblingsOfLocation(String fromLocationCode) {
     Location fromLocation = getLocationByCode(fromLocationCode);
-    List<Organization> organization = organizationService
-        .getByOrganizationTypeAndOperationalStatus(OrganizationType.RIVIGO,
-            OperationalStatus.ACTIVE);
+    List<Organization> organization =
+        organizationService.getByOrganizationTypeAndOperationalStatus(
+            OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
     List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
-    return locationRepository
-        .getAllAdministrativeEntitySiblingsOfLocationAndOrganization(fromLocation.getId(), orgIds,
-            LocationType.REGION.name());
+    return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
+        fromLocation.getId(), orgIds, LocationType.REGION.name());
   }
 
   public Map<Long, Location> getLocationMap() {
-    return locationRepository.findByStatus(OperationalStatus.ACTIVE.name())
+    return locationRepository
+        .findByStatus(OperationalStatus.ACTIVE.name())
         .stream()
         .collect(Collectors.toMap(Location::getId, Function.identity()));
   }
