@@ -3,7 +3,7 @@ package com.rivigo.riconet.event.consumer;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.EventTriggerService;
-import de.flapdoodle.embed.process.collections.Collections;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class ZoomEventTriggerConsumer extends EventConsumer {
 
   @Override
   public List<EventName> eventNamesToBeConsumed() {
-    return Collections.newArrayList(EventName.values());
+    return Arrays.asList(EventName.values());
   }
 
   @Override
