@@ -393,6 +393,9 @@ public class PickupServiceImpl implements PickupService {
   @Override
   public void deductPickupCharges(@NotNull NotificationDTO notificationDTO) {
     Map<String, String> metadata = notificationDTO.getMetadata();
+    log.info("organizationId {} pick_up_id {} entity_id {}",metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()),
+        metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()),
+        notificationDTO.getEntityId());
     switch (notificationDTO.getEventName()) {
       case CN_COMPLETION_ALL_INSTANCES:
       case CN_DELETED:

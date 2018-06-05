@@ -25,4 +25,9 @@ public class BfPickupChargesActionConsumer extends EventConsumer {
   public void doAction(NotificationDTO notificationDTO) {
     pickupService.deductPickupCharges(notificationDTO);
   }
+
+  @Override
+  public String getConsumerName() {
+    return "BfPickupChargesActionConsumer";
+  }
 }

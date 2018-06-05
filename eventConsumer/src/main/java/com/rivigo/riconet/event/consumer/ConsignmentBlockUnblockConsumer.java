@@ -43,4 +43,9 @@ public class ConsignmentBlockUnblockConsumer extends EventConsumer {
   public void doAction(NotificationDTO notificationDTO) {
     consignmentBlockUnblockService.processNotification(notificationDTO);
   }
+
+  @Override
+  public String getConsumerName() {
+    return "ConsignmentBlockUnblockConsumer";
+  }
 }

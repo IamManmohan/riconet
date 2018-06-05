@@ -25,4 +25,9 @@ public class ZoomEventTriggerConsumer extends EventConsumer {
   public void doAction(NotificationDTO notificationDTO) {
     eventTriggerService.processNotification(notificationDTO);
   }
+
+  @Override
+  public String getConsumerName() {
+    return "ZoomEventTriggerConsumer";
+  }
 }

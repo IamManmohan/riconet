@@ -24,6 +24,8 @@ public abstract class EventConsumer extends ConsumerModel {
 
   public abstract void doAction(NotificationDTO notificationDTO);
 
+  public abstract String getConsumerName();
+
   public EventConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -41,7 +43,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   @Override
   public void processMessage(String str) {
-    log.info("Processing message in BfPickupChargesActionConsumer {}", str);
+    log.info("Processing message in {} {}",getConsumerName(), str);
     NotificationDTO notificationDTO = null;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
@@ -54,7 +56,7 @@ public abstract class EventConsumer extends ConsumerModel {
       doAction(notificationDTO);
     } else {
       log.debug(
-          "NotificationDTO is not consumed by  BfPickupChargesActionConsumer as eventName {} ",
+          "NotificationDTO is not consumed by  {} as eventName {} ",getConsumerName(),
           notificationDTO.getEventName());
     }
   }
