@@ -469,7 +469,7 @@ public class PickupServiceImpl implements PickupService {
             "",
             "Pickup charges: ",
             totalCost,
-            ", Total Weight: ",
+            ", Total Weight(Kg): ",
             totalWeight,
             ", Number of CNs: ",
             consignments.size()));
