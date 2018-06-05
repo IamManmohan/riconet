@@ -475,11 +475,11 @@ public class PickupServiceImpl implements PickupService {
         Collections.singletonList(
             ZoomBookTransactionRequestDTO.builder()
                 .amount(totalCost)
-                .clientRequestId(ZoomUtilFunctions.concat("pickup|", pickup.getId(), "|completion"))
+                .clientRequestId(ZoomUtilFunctions.concat("|","pickup", pickup.getId(), "completion"))
                 .functionType(ZoomBookFunctionType.PASSBOOK)
                 .tenantType(ZoomBookTenantType.BF)
                 .orgId(organizationId)
-                .reference(ZoomUtilFunctions.concat("pickup|", pickup.getId()))
+                .reference(ZoomUtilFunctions.concat("|","pickup", pickup.getId()))
                 .transactionType(ZoomBookTransactionType.DEBIT)
                 .transactionHeader(ZoomBookTransactionHeader.PICKUP)
                 .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)
