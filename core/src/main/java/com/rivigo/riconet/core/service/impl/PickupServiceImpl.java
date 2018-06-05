@@ -396,12 +396,12 @@ public class PickupServiceImpl implements PickupService {
     switch (notificationDTO.getEventName()) {
       case CN_COMPLETION_ALL_INSTANCES:
       case CN_DELETED:
-        if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()))
+        if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()))
             || StringUtils.isBlank(
                 metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()))) {
           return;
         }
-        Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICKUP_ID.name()));
+        Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
         Long organizationId =
             Long.parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()));
         deductPickupCharges(pickupRepository.findOne(pickupId), organizationId);

@@ -38,11 +38,10 @@ public class AppointmentNotificationConsumer extends ConsumerModel {
 
   @Autowired private TopicNameConfig topicNameConfig;
 
-  public String processMessage(String str) throws IOException {
+  public void processMessage(String str) throws IOException {
     TypeReference<AppointmentNotificationDTO> mapType =
         new TypeReference<AppointmentNotificationDTO>() {};
     AppointmentNotificationDTO appointmentNotificationDTO = objectMapper.readValue(str, mapType);
     consignmentAppointmentService.processAppointmentNotification(appointmentNotificationDTO);
-    return str;
   }
 }

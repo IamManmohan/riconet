@@ -86,7 +86,7 @@ public class PickupServiceTest {
   @Test
   public void deductPickupChargesOrganizationIdNullTest() {
     Map<String, String> metadata = new HashMap<>();
-    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
             .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
@@ -101,7 +101,7 @@ public class PickupServiceTest {
     metadata.put(
         ZoomCommunicationFieldNames.ORGANIZATION_ID.name(),
         String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID));
-    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
             .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
@@ -116,7 +116,7 @@ public class PickupServiceTest {
     metadata.put(
         ZoomCommunicationFieldNames.ORGANIZATION_ID.name(),
         String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID + 10));
-    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
     ConsignmentReadOnly consignmentReadOnly1 = new ConsignmentReadOnly();
     consignmentReadOnly1.setId(10l);
     consignmentReadOnly1.setCompletionStatus(ConsignmentCompletionStatus.INCOMPLETE);
@@ -141,7 +141,7 @@ public class PickupServiceTest {
   public void deductPickupChargesHappyCaseTest() {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.ORGANIZATION_ID.name(), "100");
-    metadata.put(ZoomCommunicationFieldNames.PICKUP_ID.name(), "23");
+    metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
     ConsignmentReadOnly consignmentReadOnly1 = new ConsignmentReadOnly();
     consignmentReadOnly1.setId(10l);
     consignmentReadOnly1.setWeight(10.0);

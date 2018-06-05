@@ -99,7 +99,7 @@ public abstract class ConsumerModel {
     return CompletableFuture.completedFuture(offset.get());
   }
 
-  public abstract String processMessage(String str) throws IOException;
+  public abstract void processMessage(String str) throws IOException;
 
   String processError(ConsumerMessages consumerMessage, String errorMsg) {
     log.error(

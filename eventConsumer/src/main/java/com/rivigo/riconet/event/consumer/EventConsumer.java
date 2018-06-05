@@ -40,19 +40,20 @@ public abstract class EventConsumer extends ConsumerModel {
   }
 
   @Override
-  public String processMessage(String str) {
+  public void processMessage(String str) {
     log.info("Processing message in BfPickupChargesActionConsumer {}", str);
     NotificationDTO notificationDTO = null;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", str, ex);
-      return str;
+      return ;
     }
     log.debug("NotificationDTO {}", notificationDTO);
     if (eventNamesToBeConsumed().contains(notificationDTO.getEventName())) {
       doAction(notificationDTO);
+    }else {
+      log.debug("NotificationDTO is not consumed by  BfPickupChargesActionConsumer as eventName {} ", notificationDTO.getEventName());
     }
-    return str;
   }
 }
