@@ -43,7 +43,6 @@ public class BfPickupChargesActionConsumerTest {
     when(topicNameConfig.enrichedEventSinkTopic()).thenReturn(topic);
     String result = bfPickupChargesActionConsumer.getTopic();
     Assert.assertEquals(topic, result);
-
   }
 
   @Test

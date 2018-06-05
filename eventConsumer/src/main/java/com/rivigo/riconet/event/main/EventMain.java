@@ -35,10 +35,8 @@ public class EventMain {
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
-    this.bfPickupChargesActionConsumer=bfPickupChargesActionConsumer;
+    this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
   }
-
-
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
@@ -70,7 +68,7 @@ public class EventMain {
             .withBootstrapServers(bootstrapServers)
             .withGroupId(bfPickupChargesGroupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-    consumer.loadBfPickupCharges(materializer,bfPickupChargesConsumerSettings);
+    consumer.loadBfPickupCharges(materializer, bfPickupChargesConsumerSettings);
   }
 
   public void load(

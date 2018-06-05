@@ -47,13 +47,15 @@ public abstract class EventConsumer extends ConsumerModel {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", str, ex);
-      return ;
+      return;
     }
     log.debug("NotificationDTO {}", notificationDTO);
     if (eventNamesToBeConsumed().contains(notificationDTO.getEventName())) {
       doAction(notificationDTO);
-    }else {
-      log.debug("NotificationDTO is not consumed by  BfPickupChargesActionConsumer as eventName {} ", notificationDTO.getEventName());
+    } else {
+      log.debug(
+          "NotificationDTO is not consumed by  BfPickupChargesActionConsumer as eventName {} ",
+          notificationDTO.getEventName());
     }
   }
 }

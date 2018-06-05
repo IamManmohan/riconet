@@ -12,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Created by imran on 24/5/18.
- */
+/** Created by imran on 24/5/18. */
 @Slf4j
 @Component
 public class ConsignmentBlockUnblockConsumer extends EventConsumer {
@@ -45,5 +43,4 @@ public class ConsignmentBlockUnblockConsumer extends EventConsumer {
   public void doAction(NotificationDTO notificationDTO) {
     consignmentBlockUnblockService.processNotification(notificationDTO);
   }
-
 }
