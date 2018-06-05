@@ -464,7 +464,9 @@ public class PickupServiceImpl implements PickupService {
             .totalCost(totalCost)
             .totalCnWeight(totalWeight)
             .build();
-    remarksDTO.setComments("Pickup charges: " + totalCost);
+    remarksDTO.setComments(
+        ZoomUtilFunctions.concat("", "Pickup charges: ", totalCost, ", Total Weight: ", totalWeight,
+            ", Number of CNs: ", consignments.size()));
     String remarks = "";
     try {
       remarks = objectMapper.writeValueAsString(remarksDTO);
@@ -482,7 +484,7 @@ public class PickupServiceImpl implements PickupService {
                 .reference(ZoomUtilFunctions.concat("|","pickup", pickup.getId()))
                 .transactionType(ZoomBookTransactionType.DEBIT)
                 .transactionHeader(ZoomBookTransactionHeader.PICKUP)
-                .transactionSubHeader(ZoomBookTransactionSubHeader.CREATE)
+                .transactionSubHeader(ZoomBookTransactionSubHeader.Creation)
                 .effectedAt(DateTime.now().getMillis())
                 .remarks(remarks)
                 .build());
