@@ -393,7 +393,7 @@ public class PickupServiceImpl implements PickupService {
   @Override
   public void deductPickupCharges(@NotNull NotificationDTO notificationDTO) {
     Map<String, String> metadata = notificationDTO.getMetadata();
-    log.info("organizationId {} pick_up_id {} entity_id {}",metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()),
+    log.debug("organizationId {} pick_up_id {} entity_id {}",metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()),
         metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()),
         notificationDTO.getEntityId());
     switch (notificationDTO.getEventName()) {
@@ -402,6 +402,7 @@ public class PickupServiceImpl implements PickupService {
         if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()))
             || StringUtils.isBlank(
                 metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()))) {
+          log.debug("CN_DELETED event is ignored as for pick_up_id {} and organization_id {} ",ZoomCommunicationFieldNames.PICK_UP_ID.name(),ZoomCommunicationFieldNames.ORGANIZATION_ID.name());
           return;
         }
         Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
@@ -412,10 +413,12 @@ public class PickupServiceImpl implements PickupService {
       case PICKUP_COMPLETION:
         Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
         if (pickup == null) {
+          log.debug("PICKUP_COMPLETION event is ignored as for pickupId {} as pickup doesn't exist",notificationDTO.getEntityId());
           return;
         }
         Client client = clientMasterService.getClientByCode(pickup.getClientCode());
         if (client == null) {
+          log.debug("PICKUP_COMPLETION event is ignored as for pickupId {}, clientCode {} as client doesn't exist",notificationDTO.getEntityId(),pickup.getClientCode());
           return;
         }
         deductPickupCharges(pickup, client.getOrganizationId());
@@ -429,6 +432,7 @@ public class PickupServiceImpl implements PickupService {
   private void deductPickupCharges(@NotNull Pickup pickup, @NotNull Long organizationId) {
 
     if (organizationId.longValue() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+      log.debug("Deduct pickup charges ignored for pickupId {} since it is a rivigo Pickup",pickup.getId());
       return;
     }
     List<ConsignmentReadOnly> consignments =
@@ -441,6 +445,7 @@ public class PickupServiceImpl implements PickupService {
             .collect(Collectors.toList());
     if (!PickupStatus.COMPLETE.equals(pickup.getPickupStatus())
         || CollectionUtils.isEmpty(consignments)) {
+      log.debug("Deduct pickup charges ignored for pickupId {} with status {} and numberOfConsignments {}",pickup.getId(),pickup.getPickupStatus(),consignments.size());
       return;
     }
     Boolean isPickupConsignmentIncomplete =
@@ -451,6 +456,7 @@ public class PickupServiceImpl implements PickupService {
                     ConsignmentCompletionStatus.INCOMPLETE.equals(
                         consignment.getCompletionStatus()));
     if (isPickupConsignmentIncomplete) {
+      log.debug("Deduct pickup charges ignored for pickupId {} as it has incomplete consignments",pickup.getId());
       return;
     }
     Double totalWeight = consignments.stream().mapToDouble(ConsignmentReadOnly::getWeight).sum();

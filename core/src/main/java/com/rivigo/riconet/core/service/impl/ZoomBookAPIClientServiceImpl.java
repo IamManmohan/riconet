@@ -49,6 +49,7 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
   private static final String CLIENT_KEY = "clientKey";
   private static final String RESPONSE = "response";
   private static final String STATUS_CODE = "statusCode";
+  private static final String HYPHEN = "-";
 
   @Value("${zoom.zoombook.url}")
   private String zoomBookUrl;
@@ -161,13 +162,13 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
 
       log.info("Completed API to get data from Zoom-book");
 
-      String statusCode = responseJson.get(STATUS_CODE).toString();
-      String status = responseJson.get(STATUS).toString();
+      String statusCode = responseJson.get(STATUS_CODE).asText();
+      String status = responseJson.get(STATUS).asText();
 
       if (oauthResponse.getStatusCode() == HttpStatus.OK) {
         responseMap.put(STATUS, SUCCESS);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
-        if (200 == Integer.valueOf(statusCode) && "\"SUCCESS\"".equals(status)) {
+        if (200 == Integer.valueOf(statusCode) && "SUCCESS".equals(status)) {
           responseMap.put(RESPONSE, responseJson.get(RESPONSE).toString());
           return responseMap;
         }
@@ -204,11 +205,11 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       throw new ZoomException("zoomBookTransactionRequestDTOList can not be empty or null");
     }
     Map<String, String> response = new HashMap<>();
-    String uuid = UUID.randomUUID().toString().replace("-", "");
+    String uuid = UUID.randomUUID().toString().replace(HYPHEN, "");
     zoomBookTransactionRequestDTOList.forEach(
         dto -> {
           if (dto.getClientRequestId() == null) {
-            dto.setClientRequestId(UUID.randomUUID().toString().replace("-", ""));
+            dto.setClientRequestId(UUID.randomUUID().toString().replace(HYPHEN, ""));
           }
         });
     ZoomBookResponse<ZoomBookTransactionResponseDTO> zoomBookTransactionResponse =
@@ -304,12 +305,12 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       JsonNode responseJson = oauthResponse.getBody();
       log.debug("Response from zoombook: {}", responseJson);
 
-      String statusCode = responseJson.get(STATUS_CODE).toString();
-      String status = responseJson.get(STATUS).toString();
+      String statusCode = responseJson.get(STATUS_CODE).asText();
+      String status = responseJson.get(STATUS).asText();
 
       if (oauthResponse.getStatusCode() == HttpStatus.OK
           && 200 == Integer.valueOf(statusCode)
-          && "\"SUCCESS\"".equals(status)) {
+          && "SUCCESS".equals(status)) {
         obj = objectMapper.readValue(responseJson.get(RESPONSE).toString(), type);
         responseMap.put(STATUS, SUCCESS);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
