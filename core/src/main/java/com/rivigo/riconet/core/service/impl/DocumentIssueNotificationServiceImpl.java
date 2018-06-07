@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -81,10 +82,12 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   @Override
   public DocumentIssueNotification createNotificationData(
       Long consignmentId, Long userId, String subReason, ConsignmentStatus status) {
-    ConsignmentReadOnly cn = consignmentReadOnlyService.findByConsignmentById(consignmentId);
-    if (cn == null) {
+    Optional<ConsignmentReadOnly> consignmentReadOnlyOptional =
+        consignmentReadOnlyService.findConsignmentById(consignmentId);
+    if (!consignmentReadOnlyOptional.isPresent()) {
       throw new ZoomException("No consignment with this id exists");
     }
+    ConsignmentReadOnly cn = consignmentReadOnlyOptional.get();
     User user = userMasterService.getById(userId);
     if (user == null) {
       throw new ZoomException("No user with this userId exists");

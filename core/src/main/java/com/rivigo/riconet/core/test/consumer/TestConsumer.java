@@ -24,9 +24,9 @@ public class TestConsumer extends ConsumerModel {
     return Topic.COM_RIVIGO_ZOOM_SHORTAGE_NOTIFICATION_ERROR.name();
   }
 
-  public String processMessage(String str) {
+  public void processMessage(String str) {
     if (str.equals("1")) {
-      return str;
+      return;
     }
     throw new ZoomException("test");
   }

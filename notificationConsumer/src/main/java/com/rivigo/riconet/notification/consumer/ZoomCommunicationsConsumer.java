@@ -39,7 +39,7 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
     return topicNameConfig.smsSinkError();
   }
 
-  public String processMessage(String str) throws IOException {
+  public void processMessage(String str) throws IOException {
     log.info("Processing message in ZoomCommunicationConsumer {}", str);
     ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;
     try {
@@ -49,6 +49,5 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
       log.error("failed", e);
     }
     zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
-    return str;
   }
 }

@@ -2,32 +2,32 @@ package com.rivigo.riconet.event.consumer;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
-import com.rivigo.riconet.core.service.EventTriggerService;
+import com.rivigo.riconet.core.service.PickupService;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Created by ashfakh on 19/4/18. */
 @Slf4j
 @Component
-public class ZoomEventTriggerConsumer extends EventConsumer {
+public class BfPickupChargesActionConsumer extends EventConsumer {
 
-  @Autowired private EventTriggerService eventTriggerService;
+  @Autowired private PickupService pickupService;
 
   @Override
   public List<EventName> eventNamesToBeConsumed() {
-    return Arrays.asList(EventName.values());
+    return Arrays.asList(
+        EventName.CN_COMPLETION_ALL_INSTANCES, EventName.CN_DELETED, EventName.PICKUP_COMPLETION);
   }
 
   @Override
   public void doAction(NotificationDTO notificationDTO) {
-    eventTriggerService.processNotification(notificationDTO);
+    pickupService.deductPickupCharges(notificationDTO);
   }
 
   @Override
   public String getConsumerName() {
-    return "ZoomEventTriggerConsumer";
+    return "BfPickupChargesActionConsumer";
   }
 }

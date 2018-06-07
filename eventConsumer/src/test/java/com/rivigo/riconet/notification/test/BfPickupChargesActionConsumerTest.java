@@ -1,11 +1,19 @@
 package com.rivigo.riconet.notification.test;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.service.EventTriggerService;
-import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
-import com.rivigo.riconet.event.main.EventMain;
-import java.io.IOException;
+import com.rivigo.riconet.core.config.TopicNameConfig;
+import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.service.PickupService;
+import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -13,15 +21,16 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
-/** Created by ashfakh on 29/9/17. */
 @Slf4j
-public class EventTest {
+public class BfPickupChargesActionConsumerTest {
 
-  @InjectMocks private ZoomEventTriggerConsumer zoomEventTriggerConsumer;
-
-  @Mock private EventTriggerService eventTriggerService;
+  @InjectMocks private BfPickupChargesActionConsumer bfPickupChargesActionConsumer;
 
   @Spy private ObjectMapper objectMapper;
+
+  @Mock private TopicNameConfig topicNameConfig;
+
+  @Mock private PickupService pickupService;
 
   @Before
   public void initMocks() {
@@ -29,10 +38,37 @@ public class EventTest {
   }
 
   @Test
-  public void processEventTrigger() throws IOException {
-    zoomEventTriggerConsumer.processMessage(
+  public void getTopicTest() {
+    String topic = "tempTopic";
+    when(topicNameConfig.enrichedEventSinkTopic()).thenReturn(topic);
+    String result = bfPickupChargesActionConsumer.getTopic();
+    Assert.assertEquals(topic, result);
+  }
+
+  @Test
+  public void getErrorTopicTest() {
+    String topic = "tempTopic";
+    when(topicNameConfig.enrichedEventSinkErrorTopic()).thenReturn(topic);
+    String result = bfPickupChargesActionConsumer.getErrorTopic();
+    Assert.assertEquals(topic, result);
+  }
+
+  @Test
+  public void eventsToBeConsumed() {
+    List<EventName> expected =
+        Arrays.asList(
+            EventName.CN_COMPLETION_ALL_INSTANCES,
+            EventName.CN_DELETED,
+            EventName.PICKUP_COMPLETION);
+    List<EventName> eventNameList = bfPickupChargesActionConsumer.eventNamesToBeConsumed();
+    Assert.assertEquals(expected, eventNameList);
+  }
+
+  @Test
+  public void processMessageTest() {
+    bfPickupChargesActionConsumer.processMessage(
         "{\"eventName\"\n"
-            + ":\"COLLECTION_CHEQUE_BOUNCE\",\"entityId\":1519260,\"entityName\":\"CN\","
+            + ":\"CN_COMPLETION_ALL_INSTANCES\",\"entityId\":1519260,\"entityName\":\"CN\","
             + "\"eventGUID\":\"CN_1519260\",\"tsMs\":1525910400000,"
             + "\"eventUID\":\"CN_CREATION_CN_15192\n"
             + "60_1525910400000\",\"metadata\":{\"AMOUNT_ORIGINAL\":\"1646\","
@@ -55,9 +91,13 @@ public class EventTest {
             + "\"CLIENT_CONSIGNMENT_TYPE\":\"RETAIL\"},\"s\n"
             + "ubscribers\":null,\"conditions\":[\"COLLECTION_CHEQUE_BOUNCE_PAID_CN\","
             + "\"COLLECTION_CHEQUE_BOUNCE_DEFAULT_PAID_CN\"]}");
+    verify(pickupService, times(0)).deductPickupCharges(any());
   }
 
-  public void processMain() {
-    EventMain.main(null);
+  @Test
+  public void processMessageHappyTest() {
+    bfPickupChargesActionConsumer.processMessage(
+        "{\"eventName\"" + ":\"CN_COMPLETION_ALL_INSTANCES\"}");
+    verify(pickupService, times(1)).deductPickupCharges(any());
   }
 }
