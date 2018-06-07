@@ -1,7 +1,5 @@
 package com.rivigo.riconet.notification.test;
 
-import static org.junit.Assert.assertEquals;
-
 import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
@@ -25,19 +23,13 @@ public class NotificationTest {
   @Autowired ZoomCommunicationsConsumer zoomCommunicationsConsumer;
 
   public void processDepsNotification() throws IOException {
-    String str =
-        depsNotificationConsumer.processMessage(
-            "[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]");
-
-    assertEquals(
-        str,
+    depsNotificationConsumer.processMessage(
         "[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]");
   }
 
   public void processEmptyDepsNotification() throws IOException {
-    String str =
-        depsNotificationConsumer.processMessage(
-            "[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"DAMAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]");
+    depsNotificationConsumer.processMessage(
+        "[{\"id\":1,\"consignmentId\":1,\"depsType\":\"SHORTAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"},{\"id\":2,\"consignmentId\":1,\"depsType\":\"DAMAGE\",\"tripId\":1,\"tripType\":\"PRS\",\"taskId\":1,\"reportedById\":50228,\"inboundLocationId\":15,\"depsTaskType\":\"UNLOADING\"}]");
   }
 
   public void processNotificationException() throws IOException {

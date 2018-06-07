@@ -102,6 +102,7 @@ public class PickupServiceTest {
         ZoomCommunicationFieldNames.ORGANIZATION_ID.name(),
         String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID));
     metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
+    when(pickupRepository.findOne(any())).thenReturn(new Pickup());
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
             .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
@@ -177,7 +178,7 @@ public class PickupServiceTest {
     Assert.assertEquals(
         ZoomBookTransactionHeader.PICKUP, transactionList.get(0).getTransactionHeader());
     Assert.assertEquals(
-        ZoomBookTransactionSubHeader.CREATE, transactionList.get(0).getTransactionSubHeader());
+        ZoomBookTransactionSubHeader.Creation, transactionList.get(0).getTransactionSubHeader());
   }
 
   @Test
@@ -228,6 +229,6 @@ public class PickupServiceTest {
     Assert.assertEquals(
         ZoomBookTransactionHeader.PICKUP, transactionList.get(0).getTransactionHeader());
     Assert.assertEquals(
-        ZoomBookTransactionSubHeader.CREATE, transactionList.get(0).getTransactionSubHeader());
+        ZoomBookTransactionSubHeader.Creation, transactionList.get(0).getTransactionSubHeader());
   }
 }

@@ -43,7 +43,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   @Override
   public void processMessage(String str) {
-    log.info("Processing message in {} {}",getConsumerName(), str);
+    log.info("Processing message in {} {}", getConsumerName(), str);
     NotificationDTO notificationDTO = null;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
@@ -56,7 +56,8 @@ public abstract class EventConsumer extends ConsumerModel {
       doAction(notificationDTO);
     } else {
       log.debug(
-          "NotificationDTO is not consumed by  {} as eventName {} ",getConsumerName(),
+          "NotificationDTO is not consumed by  {} as eventName {} ",
+          getConsumerName(),
           notificationDTO.getEventName());
     }
   }
