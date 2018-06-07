@@ -29,7 +29,7 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
     return Topic.COM_RIVIGO_ZOOM_DOCUMENT_ISSUE_NOTIFICATION_ERROR.name();
   }
 
-  public String processMessage(String str) {
+  public void processMessage(String str) {
     String[] split = str.split("\\|");
     if (split.length != 4) {
       throw new ZoomException("Error in message format");
@@ -44,6 +44,5 @@ public class DocIssueNotificationConsumer extends ConsumerModel {
     if (notification != null) {
       documentIssueNotificationService.sendNotifications(notification);
     }
-    return str;
   }
 }

@@ -16,7 +16,9 @@ public enum ZoomCommunicationFieldNames {
   DESTINATION_FIELD_USER_PHONE,
   CREATED_BY,
   CONSIGNER_ADDRESS,
-  CONSIGNEE_ADDRESS;
+  CONSIGNEE_ADDRESS,
+  ORGANIZATION_ID,
+  PICK_UP_ID;
 
   public enum Reason {
     REASON,

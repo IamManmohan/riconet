@@ -20,5 +20,7 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_BF_CPD_CALCULATION =
       "/operations/consignments/bfCpdCalculation";
 
+  public static final String ZOOMBOOK_TRANSACTION_V2 = "/zoombook/transaction/v2";
+
   public static final String ZOOM_BACKEND_POLICY_GENERATION = "/insurance/policy/";
 }

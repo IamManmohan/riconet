@@ -2,12 +2,12 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.oauth2.resource.controller.Response;
 import com.rivigo.riconet.core.config.TopicNameConfig;
-import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 /** Created by imran on 24/5/18. */
 @Slf4j
 @Component
-public class ConsignmentBlockUnblockConsumer extends ConsumerModel {
+public class ConsignmentBlockUnblockConsumer extends EventConsumer {
 
   private final ObjectMapper objectMapper;
 
@@ -35,27 +35,17 @@ public class ConsignmentBlockUnblockConsumer extends ConsumerModel {
   }
 
   @Override
-  public String getTopic() {
-    return topicNameConfig.enrichedEventSinkTopic();
+  public List<EventName> eventNamesToBeConsumed() {
+    return Arrays.asList(EventName.values());
   }
 
   @Override
-  public String getErrorTopic() {
-    return topicNameConfig.enrichedEventSinkErrorTopic();
-  }
-
-  @Override
-  public String processMessage(String str) {
-    log.info("Processing message in {} {}", this.getClass().getName(), str);
-    NotificationDTO notificationDTO = null;
-    try {
-      notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
-    } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", str, ex);
-      return Response.RequestStatus.FAILURE.name();
-    }
-    log.debug("NotificationDTO {}", notificationDTO);
+  public void doAction(NotificationDTO notificationDTO) {
     consignmentBlockUnblockService.processNotification(notificationDTO);
-    return Response.RequestStatus.SUCCESS.name();
+  }
+
+  @Override
+  public String getConsumerName() {
+    return "ConsignmentBlockUnblockConsumer";
   }
 }

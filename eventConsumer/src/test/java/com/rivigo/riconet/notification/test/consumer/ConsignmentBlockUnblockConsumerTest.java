@@ -2,7 +2,6 @@ package com.rivigo.riconet.notification.test.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.oauth2.resource.controller.Response;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
@@ -40,20 +39,6 @@ public class ConsignmentBlockUnblockConsumerTest {
   private static final Long REASON_ID = 1L;
 
   @Test
-  public void getTopicTest() {
-    String enrichedEventSink = "enriche-event-sink";
-    Mockito.when(topicNameConfig.enrichedEventSinkTopic()).thenReturn(enrichedEventSink);
-    assert enrichedEventSink.equalsIgnoreCase(consignmentBlockUnblockConsumer.getTopic());
-  }
-
-  @Test
-  public void getErrorTopicTest() {
-    String enrichedEventSinkEroor = "enriche-event-sink-error";
-    Mockito.when(topicNameConfig.enrichedEventSinkTopic()).thenReturn(enrichedEventSinkEroor);
-    assert enrichedEventSinkEroor.equalsIgnoreCase(consignmentBlockUnblockConsumer.getTopic());
-  }
-
-  @Test
   public void processMessageCod() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.COD.name());
@@ -63,9 +48,7 @@ public class ConsignmentBlockUnblockConsumerTest {
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer
-        .processMessage(message)
-        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    consignmentBlockUnblockConsumer.processMessage(message);
   }
 
   @Test
@@ -80,9 +63,7 @@ public class ConsignmentBlockUnblockConsumerTest {
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer
-        .processMessage(message)
-        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    consignmentBlockUnblockConsumer.processMessage(message);
   }
 
   @Test
@@ -97,8 +78,6 @@ public class ConsignmentBlockUnblockConsumerTest {
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
-    assert consignmentBlockUnblockConsumer
-        .processMessage(message)
-        .equalsIgnoreCase(Response.RequestStatus.SUCCESS.toString());
+    consignmentBlockUnblockConsumer.processMessage(message);
   }
 }

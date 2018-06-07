@@ -10,6 +10,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
+import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
@@ -37,6 +38,8 @@ public class EventTriggerServiceTest {
   @Mock private QcService qcService;
 
   @Mock private ConsignmentService consignmentService;
+
+  @Mock private PickupService pickupService;
 
   @Captor private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
 

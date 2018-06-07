@@ -4,6 +4,7 @@ import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
@@ -26,11 +27,15 @@ public class EventMain {
 
   private final ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer;
 
+  private final BfPickupChargesActionConsumer bfPickupChargesActionConsumer;
+
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
-      ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer) {
+      ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
+      BfPickupChargesActionConsumer bfPickupChargesActionConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
+    this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
   }
 
   public static void main(String[] args) {
@@ -44,12 +49,11 @@ public class EventMain {
     String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
     String groupId = config.getString("group.id");
-    final ConsumerSettings<String, String> consumerSettings =
+    final ConsumerSettings<String, String> defaultConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(groupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-
     groupId = config.getString("consignmentblocker.group.id");
     log.info("group id for consignment blocker consumer {}", groupId);
     final ConsumerSettings<String, String> consignmentBlockerConsumerSettings =
@@ -57,8 +61,14 @@ public class EventMain {
             .withBootstrapServers(bootstrapServers)
             .withGroupId(groupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-
-    consumer.load(materializer, consumerSettings, consignmentBlockerConsumerSettings);
+    consumer.load(materializer, defaultConsumerSettings, consignmentBlockerConsumerSettings);
+    String bfPickupChargesGroupId = config.getString("bfPickupCharges.group.id");
+    final ConsumerSettings<String, String> bfPickupChargesConsumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(bfPickupChargesGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+    consumer.loadBfPickupCharges(materializer, bfPickupChargesConsumerSettings);
   }
 
   public void load(
@@ -71,5 +81,10 @@ public class EventMain {
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
+  }
+
+  public void loadBfPickupCharges(
+      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+    bfPickupChargesActionConsumer.load(materializer, consumerSettings);
   }
 }

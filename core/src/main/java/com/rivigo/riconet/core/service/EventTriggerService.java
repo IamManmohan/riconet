@@ -24,6 +24,8 @@ public class EventTriggerService {
 
   @Autowired private ChequeBounceService chequeBounceService;
 
+  @Autowired private PickupService pickupService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {

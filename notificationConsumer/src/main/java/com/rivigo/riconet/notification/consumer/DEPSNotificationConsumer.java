@@ -45,7 +45,7 @@ public class DEPSNotificationConsumer extends ConsumerModel {
 
   @Autowired private TopicNameConfig topicNameConfig;
 
-  public String processMessage(String str) throws IOException {
+  public void processMessage(String str) throws IOException {
     DEPSNotificationContext context = null;
     TypeReference<List<DEPSNotificationDTO>> mapType =
         new TypeReference<List<DEPSNotificationDTO>>() {};
@@ -65,6 +65,5 @@ public class DEPSNotificationConsumer extends ConsumerModel {
           depsRecordService.createNotificationData(context);
       depsRecordService.sendNotifications(depsNotificationList);
     }
-    return str;
   }
 }
