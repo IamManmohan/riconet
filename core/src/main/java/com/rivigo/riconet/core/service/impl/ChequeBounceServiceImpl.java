@@ -99,7 +99,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
   private String getConsignorOrConsignee(NotificationDTO dto) {
     StringBuilder sb = new StringBuilder();
     String paymentMode = dto.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
-    if (paymentMode.equals(PaymentMode.PREPAID.name())) {
+    if (paymentMode.equals(PaymentMode.PAID.name())) {
       sb.append("Consignor - ")
           .append(dto.getMetadata().get(ZoomCommunicationFieldNames.ORIGIN_FIELD_USER_NAME.name()))
           .append(" - ")
@@ -107,7 +107,7 @@ public class ChequeBounceServiceImpl implements ChequeBounceService {
           .append(" (")
           .append(dto.getMetadata().get(ZoomCommunicationFieldNames.CONSIGNER_ADDRESS.name()))
           .append(")");
-    } else if (paymentMode.equals(PaymentMode.COD.name())) {
+    } else if (paymentMode.equals(PaymentMode.TO_PAY.name())) {
       sb.append("Consignee - ")
           .append(
               dto.getMetadata().get(ZoomCommunicationFieldNames.DESTINATION_FIELD_USER_NAME.name()))

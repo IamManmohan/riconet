@@ -27,6 +27,12 @@ public class TopicNameConfig {
   @Value("${SMS_SINK_ERROR}")
   private String smsSinkError;
 
+  @Value("${FINANCE_EVENT_SINK}")
+  private String financeEventSink;
+
+  @Value("${FINANCE_EVENT_SINK_ERROR}")
+  private String financeEventSinkError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -49,5 +55,13 @@ public class TopicNameConfig {
 
   public String smsSinkError() {
     return smsSinkError;
+  }
+
+  public String financeEventSink() {
+    return financeEventSink;
+  }
+
+  public String financeEventSinkError() {
+    return financeEventSinkError;
   }
 }

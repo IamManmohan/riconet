@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
+import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
@@ -29,13 +30,17 @@ public class EventMain {
 
   private final BfPickupChargesActionConsumer bfPickupChargesActionConsumer;
 
+  private final FinanceEventsConsumer financeEventsConsumer;
+
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
-      BfPickupChargesActionConsumer bfPickupChargesActionConsumer) {
+      BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
+      FinanceEventsConsumer financeEventsConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
+    this.financeEventsConsumer = financeEventsConsumer;
   }
 
   public static void main(String[] args) {
@@ -81,6 +86,8 @@ public class EventMain {
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
+    log.info("Loading Finance event consumer with settings {}", consignmentBlockerConsumerSettings);
+    financeEventsConsumer.load(materializer, consumerSettings);
   }
 
   public void loadBfPickupCharges(

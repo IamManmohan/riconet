@@ -20,6 +20,7 @@ import com.rivigo.zoom.common.repository.mysql.ConsignmentRepository;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,7 +56,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   public ConsignmentHistory getLastScanByCnId(Long cnId, List<String> statusList) {
     List<ConsignmentHistory> historyList =
         historyRepo.findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(
-            Arrays.asList(cnId), statusList);
+            Collections.singletonList(cnId), statusList);
     return historyList.isEmpty() ? null : historyList.get(0);
   }
 
@@ -67,8 +68,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public List<Consignment> findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
       List<Long> consignmentIdList, List<ConsignmentStatus> statusList) {
-    return consignmentRepo.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
-        consignmentIdList, statusList);
+    return consignmentRepo.findByIdInAndStatusNotIn(consignmentIdList, statusList);
   }
 
   @Override
@@ -124,5 +124,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public Boolean isPrimaryConsignment(String cNote) {
     return (cNote != null) && !cNote.contains(ConsignmentConstant.SECONDARY_CNOTE_SEPARATOR);
+  }
+
+  @Override
+  public Consignment getConsignmentByCnote(String cnote) {
+    return consignmentRepo.findByCnote(cnote);
   }
 }

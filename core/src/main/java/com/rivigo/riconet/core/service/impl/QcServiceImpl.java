@@ -20,6 +20,7 @@ import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
@@ -81,6 +82,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private LocationService locationService;
+
+  @Autowired private ZoomBillingAPIClientService zoomBillingAPIClientService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -322,7 +325,7 @@ public class QcServiceImpl implements QcService {
     String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime());
 
     StringBuilder sb = new StringBuilder();
-    sb.append("Dispatched: Your consignment %23")
+    sb.append("Dispatched: Your consignment #")
         .append(eventDTO.getCnote())
         .append(" from ")
         .append(consignment.getConsignorName())
@@ -386,7 +389,10 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
 
-    if (consignment.getChargedWeight() != null
+    Double chargedWeight =
+        zoomBillingAPIClientService.getChargedWeightForConsignment(consignment.getCnote());
+
+    if (chargedWeight != null
         && consignment.getWeight() != null
         && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
@@ -394,7 +400,7 @@ public class QcServiceImpl implements QcService {
         && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
       bindings.put(
           RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
-          consignment.getChargedWeight() / consignment.getWeight());
+          chargedWeight / consignment.getWeight());
       bindings.put(
           RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
           completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());

@@ -1,16 +1,26 @@
 package com.rivigo.riconet.core.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.mongodb.core.geo.GeoJsonModule;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
     "com.rivigo.riconet.event.service"
   }
 )
+@Slf4j
 public class ServiceConfig {
 
   private static final int CORE_POOL_SIZE = 10;
@@ -58,13 +69,31 @@ public class ServiceConfig {
   }
 
   @Bean
-  RestTemplate getRestTemplate() {
-    return new RestTemplate();
+  ObjectMapper objectMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JodaModule());
+    mapper.registerModule(new GeoJsonModule());
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper;
   }
 
   @Bean
-  ObjectMapper getObjectMapper() {
-    return new ObjectMapper();
+  @Qualifier("riconetRestTemplate")
+  RestTemplate riconetRestTemplate() {
+    RestTemplate restTemplate = new RestTemplate();
+    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
+        new MappingJackson2HttpMessageConverter();
+    mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
+
+    restTemplate
+        .setMessageConverters(Collections.singletonList(mappingJackson2HttpMessageConverter));
+    restTemplate.setInterceptors(Collections.singletonList(
+        (httpRequest, bytes, clientHttpRequestExecution) -> {
+          log.error("httpRequest: {}", objectMapper().writeValueAsString(httpRequest));
+          log.error("bytes: {}", IOUtils.toString(bytes, StandardCharsets.UTF_8.name()));
+          return clientHttpRequestExecution.execute(httpRequest, bytes);
+        }));
+    return restTemplate;
   }
 
   @Bean(name = {"myProperties"})
