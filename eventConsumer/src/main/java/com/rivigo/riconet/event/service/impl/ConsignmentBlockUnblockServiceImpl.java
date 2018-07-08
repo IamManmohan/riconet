@@ -51,7 +51,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
   }
 
   private void blockCn(NotificationDTO notificationDTO) {
-    if (!PaymentMode.PREPAID
+    if (!PaymentMode.PAID
         .name()
         .equalsIgnoreCase(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name()))) {

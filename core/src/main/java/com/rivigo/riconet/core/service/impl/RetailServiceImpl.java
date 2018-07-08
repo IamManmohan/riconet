@@ -253,7 +253,7 @@ public class RetailServiceImpl implements RetailService {
         notification.getPaymentMode() == null ? "-" : notification.getPaymentMode().displayName());
     switch (notification.getNotificationType()) {
       case CN_CREATION:
-        if (notification.getPaymentMode().equals(PaymentMode.COD)) {
+        if (notification.getPaymentMode().equals(PaymentMode.TO_PAY)) {
           String consignorSmsTemplate =
               zoomPropertyService.getString(
                   ZoomPropertyName.RETAIL_COD_CN_CREATION_CONSIGNOR_SMS_STRING);
@@ -275,7 +275,7 @@ public class RetailServiceImpl implements RetailService {
         }
         break;
       case CN_UPDATE:
-        if (notification.getPaymentMode().equals(PaymentMode.COD)) {
+        if (notification.getPaymentMode().equals(PaymentMode.TO_PAY)) {
           String consignorSmsTemplate =
               zoomPropertyService.getString(
                   ZoomPropertyName.RETAIL_COD_CN_UPDATE_CONSIGNOR_SMS_STRING);
@@ -296,7 +296,7 @@ public class RetailServiceImpl implements RetailService {
         }
         break;
       case DRS_DISPATCH:
-        if (notification.getPaymentMode().equals(PaymentMode.COD)) {
+        if (notification.getPaymentMode().equals(PaymentMode.TO_PAY)) {
           String consigneeSmsTemplate =
               zoomPropertyService.getString(
                   ZoomPropertyName.RETAIL_COD_DRS_DISPATCH_CONSIGNEE_SMS_STRING);

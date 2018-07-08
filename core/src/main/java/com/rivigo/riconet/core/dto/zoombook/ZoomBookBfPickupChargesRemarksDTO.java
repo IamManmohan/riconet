@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,11 +16,10 @@ import lombok.ToString;
 @ToString
 public class ZoomBookBfPickupChargesRemarksDTO extends ZoomBookBasicRemarksDTO {
 
-  //used in riconet
+  // used in riconet
   private Long pickupId;
   private Double totalCnWeight;
   private BigDecimal totalCost;
   private Double minimumCharges;
   private Double chargePerKg;
 }
-

@@ -195,13 +195,13 @@ public class PickupServiceTest {
     Pickup pickup = new Pickup();
     pickup.setPickupStatus(PickupStatus.COMPLETE);
     pickup.setId(23l);
-    pickup.setClientCode("AMZN");
+    pickup.setClientId(21L);
 
     Client client = new Client();
     client.setOrganizationId(100l);
     when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
-    when(clientMasterService.getClientByCode(pickup.getClientCode())).thenReturn(client);
+    when(clientMasterService.getClientById(pickup.getClientId())).thenReturn(client);
     when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
 

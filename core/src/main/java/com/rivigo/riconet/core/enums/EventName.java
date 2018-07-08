@@ -34,4 +34,7 @@ public enum EventName {
 
   COLLECTION_CHEQUE_BOUNCE,
   CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED,
+
+  /** Finance Events* */
+  CLIENT_CREATE_UPDATE
 }

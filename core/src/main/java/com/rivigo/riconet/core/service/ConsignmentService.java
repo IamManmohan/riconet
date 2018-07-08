@@ -26,6 +26,8 @@ public interface ConsignmentService {
 
   Consignment getConsignmentById(Long consignmentId);
 
+  Consignment getConsignmentByCnote(String cnote);
+
   void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO);
 
   Boolean isPrimaryConsignment(String cNote);

@@ -13,4 +13,7 @@ public class ConsignmentConstant {
   public static final long GLOBAL_ORGANIZATION = 9999;
   public static final long RIVIGO_ORGANIZATION_ID = 1;
   public static final long MAX_DF_ORGANIZATION_ID = 10001;
+
+  public static final String BUSINESS = "Business";
+
 }

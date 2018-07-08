@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -25,6 +26,7 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
@@ -82,6 +84,8 @@ public class QcServiceTest {
 
   @Mock private SmsService smsService;
 
+  @Mock private ZoomBillingAPIClientService zoomBillingAPIClientService;
+
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
@@ -89,6 +93,8 @@ public class QcServiceTest {
     MockitoAnnotations.initMocks(this);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcRuleEngine, "ruleEngineRuleRepository", ruleEngineRuleRepository);
+    Mockito.when(zoomBillingAPIClientService.getChargedWeightForConsignment(anyString()))
+        .thenReturn(10.0);
   }
 
   @Test
@@ -539,7 +545,6 @@ public class QcServiceTest {
   private Consignment getConsignmentDTO() {
     Consignment consignment = new Consignment();
     consignment.setWeight(10.0);
-    consignment.setChargedWeight(10.0);
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
 
