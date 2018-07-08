@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
 import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,7 +123,12 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setNotificationToList(dto.getNotificationToList());
     clientDTO.setNotificationCcList(dto.getNotificationCcList());
     clientDTO.setStatus(OperationalStatus.ACTIVE);
-    clientDTO.setOrganizationId(RIVIGO_ORGANIZATION_ID);
+    if (clientDTO.getClientCode().equals(RETAIL_CLIENT_CODE)){
+      clientDTO.setOrganizationId(GLOBAL_ORGANIZATION);
+    }
+    else {
+      clientDTO.setOrganizationId(RIVIGO_ORGANIZATION_ID);
+    }
     if (dto.getServiceType().equals(ZoomServiceType.ZOOM_CORPORATE.name())) {
       clientDTO.setCnoteType(CnoteType.NORMAL);
     } else if (dto.getServiceType().equals(ZoomServiceType.ZOOM_RETAIL.name())) {
