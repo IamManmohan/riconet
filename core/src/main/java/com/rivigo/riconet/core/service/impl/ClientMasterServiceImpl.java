@@ -91,6 +91,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       zoomBackendAPIClientService.addClient(clientDTO);
     } else {
       clientDTO.setId(existingClient.getId());
+      clientDTO.setLaneRateBypass(existingClient.getLaneRateBypass());
       clientDTO.setBillingEntities(
           getBillingEntityDTOList(
               clientCreateUpdateDTO.getBillingEntities(), existingClient.getId()));
@@ -123,6 +124,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setNotificationToList(dto.getNotificationToList());
     clientDTO.setNotificationCcList(dto.getNotificationCcList());
     clientDTO.setStatus(OperationalStatus.ACTIVE);
+    clientDTO.setLaneRateBypass(Boolean.FALSE);
     if (clientDTO.getClientCode().equals(RETAIL_CLIENT_CODE)){
       clientDTO.setOrganizationId(GLOBAL_ORGANIZATION);
     }
