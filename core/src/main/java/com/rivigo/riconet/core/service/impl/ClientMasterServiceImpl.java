@@ -1,9 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
@@ -30,6 +26,11 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 
 @Slf4j
 @Service
@@ -141,10 +142,14 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     User samUser = userMasterService.getByEmail(dto.getSamUserEmail());
     if (samUser != null) {
       clientDTO.setSamUserId(samUser.getId());
+    }else {
+      clientDTO.setSamUserId(CLIENT_DEFAULT_SAM_ID);
     }
     User samLead = userMasterService.getByEmail(dto.getSamLeadEmail());
     if (samLead != null) {
       clientDTO.setSamLeadId(samLead.getId());
+    }else {
+      clientDTO.setSamLeadId(CLIENT_DEFAULT_SAM_ID);
     }
     if (!dto.getBillingEntities().isEmpty()) {
       clientDTO.setHasBillingEntity(Boolean.TRUE);
