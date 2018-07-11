@@ -27,7 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.*;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 
 @Slf4j
 @Service
