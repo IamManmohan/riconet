@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
+
 @Slf4j
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
@@ -73,10 +75,14 @@ public class OrganizationServiceImpl implements OrganizationService {
     User samUser = userMasterService.getByEmail(dto.getSamUserEmail());
     if (samUser != null) {
       organizationDTO.setSamUserId(samUser.getId());
+    }else {
+      organizationDTO.setSamUserId(CLIENT_DEFAULT_SAM_ID);
     }
     User samLead = userMasterService.getByEmail(dto.getSamLeadEmail());
     if (samLead != null) {
       organizationDTO.setSamLeadId(samLead.getId());
+    }else {
+      organizationDTO.setSamLeadId(CLIENT_DEFAULT_SAM_ID);
     }
     organizationDTO.setDisableRetailBooking(Boolean.FALSE);
     return organizationDTO;
