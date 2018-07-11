@@ -90,6 +90,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     } else {
       clientDTO.setId(existingClient.getId());
       clientDTO.setLaneRateBypass(existingClient.getLaneRateBypass());
+      clientDTO.setOldClientCode(existingClient.getOldClientCode());
       clientDTO.setBillingEntities(
           getBillingEntityDTOList(
               clientCreateUpdateDTO.getBillingEntities(), existingClient.getId()));
@@ -123,6 +124,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setNotificationCcList(dto.getNotificationCcList());
     clientDTO.setStatus(OperationalStatus.ACTIVE);
     clientDTO.setLaneRateBypass(Boolean.FALSE);
+    clientDTO.setOldClientCode("--");
     if (clientDTO.getClientCode().equals(RETAIL_CLIENT_CODE)){
       clientDTO.setOrganizationId(GLOBAL_ORGANIZATION);
     }
