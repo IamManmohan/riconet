@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.InvoiceDocumentPreparedDTO;
-import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.SmsService;
