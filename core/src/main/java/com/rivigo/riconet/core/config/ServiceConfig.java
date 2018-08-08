@@ -3,7 +3,6 @@ package com.rivigo.riconet.core.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -85,14 +84,15 @@ public class ServiceConfig {
         new MappingJackson2HttpMessageConverter();
     mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
 
-    restTemplate
-        .setMessageConverters(Collections.singletonList(mappingJackson2HttpMessageConverter));
-    restTemplate.setInterceptors(Collections.singletonList(
-        (httpRequest, bytes, clientHttpRequestExecution) -> {
-          log.error("httpRequest: {}", objectMapper().writeValueAsString(httpRequest));
-          log.error("bytes: {}", IOUtils.toString(bytes, StandardCharsets.UTF_8.name()));
-          return clientHttpRequestExecution.execute(httpRequest, bytes);
-        }));
+    restTemplate.setMessageConverters(
+        Collections.singletonList(mappingJackson2HttpMessageConverter));
+    restTemplate.setInterceptors(
+        Collections.singletonList(
+            (httpRequest, bytes, clientHttpRequestExecution) -> {
+              log.error("httpRequest: {}", objectMapper().writeValueAsString(httpRequest));
+              log.error("bytes: {}", IOUtils.toString(bytes, StandardCharsets.UTF_8.name()));
+              return clientHttpRequestExecution.execute(httpRequest, bytes);
+            }));
     return restTemplate;
   }
 

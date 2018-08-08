@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.InvoiceDocumentPreparedDTO;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
@@ -16,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 
 /** Created by ashfakh on 20/6/18. */
 @Slf4j
@@ -41,7 +41,7 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     InvoiceDocumentPreparedDTO invoiceDocumentPreparedDTO = getInvoicePreparedDTO(dto);
     Consignment consignment =
         consignmentService.getConsignmentByCnote(invoiceDocumentPreparedDTO.getCnote());
-    if(!consignment.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID)){
+    if (!consignment.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID)) {
       return;
     }
     String shortUrl = urlShortnerService.shortenUrl(invoiceDocumentPreparedDTO.getEncodedUrl());

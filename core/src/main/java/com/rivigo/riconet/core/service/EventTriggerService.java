@@ -59,7 +59,8 @@ public class EventTriggerService {
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         try {
           TimeUnit.SECONDS.sleep(2);
-          //Fixme: Chirag: This is to ensure that qc is called after cn is created in billing service
+          // Fixme: Chirag: This is to ensure that qc is called after cn is created in billing
+          // service
           // We need charged weight from billing service as we don't have reliable volume data
         } catch (InterruptedException e) {
           log.warn(e.getMessage());

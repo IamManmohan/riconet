@@ -168,7 +168,7 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       if (oauthResponse.getStatusCode() == HttpStatus.OK) {
         responseMap.put(STATUS, SUCCESS);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
-        if (200 == Integer.valueOf(statusCode) && "SUCCESS".equals(status)) {
+        if (200 == Integer.valueOf(statusCode) && SUCCESS.equals(status)) {
           responseMap.put(RESPONSE, responseJson.get(RESPONSE).toString());
           return responseMap;
         }
@@ -310,7 +310,7 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
 
       if (oauthResponse.getStatusCode() == HttpStatus.OK
           && 200 == Integer.valueOf(statusCode)
-          && "SUCCESS".equals(status)) {
+          && SUCCESS.equals(status)) {
         obj = objectMapper.readValue(responseJson.get(RESPONSE).toString(), type);
         responseMap.put(STATUS, SUCCESS);
         responseMap.put(STATUS_CODE, oauthResponse.getStatusCode().name());
