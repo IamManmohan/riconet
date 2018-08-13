@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

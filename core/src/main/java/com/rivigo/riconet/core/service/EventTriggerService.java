@@ -31,16 +31,15 @@ public class EventTriggerService {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
       case CN_DELIVERY:
+      case CN_DELETED:
         String entityId =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.closeTicket(
-            entityId, TicketEntityType.CN.name(), EventName.CN_DELIVERY);
+        ticketingClientService.closeTicket(entityId, TicketEntityType.CN.name(), eventName);
         break;
       case PICKUP_COMPLETION:
+      case PICKUP_CANCELLATION:
         ticketingClientService.closeTicket(
-            notificationDTO.getEntityId().toString(),
-            TicketEntityType.PRQ.name(),
-            EventName.PICKUP_COMPLETION);
+            notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), eventName);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
@@ -59,7 +58,8 @@ public class EventTriggerService {
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         try {
           TimeUnit.SECONDS.sleep(2);
-          //Fixme: Chirag: This is to ensure that qc is called after cn is created in billing service
+          // Fixme: Chirag: This is to ensure that qc is called after cn is created in billing
+          // service
           // We need charged weight from billing service as we don't have reliable volume data
         } catch (InterruptedException e) {
           log.warn(e.getMessage());
