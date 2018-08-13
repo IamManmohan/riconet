@@ -47,8 +47,7 @@ public class ApiClientServiceImpl implements ApiClientService {
   @Value("${billing.base.url}")
   private String billingBaseUrl;
 
-  @Autowired
-  private RestTemplate riconetRestTemplate;
+  @Autowired private RestTemplate riconetRestTemplate;
 
   @Autowired private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
 
