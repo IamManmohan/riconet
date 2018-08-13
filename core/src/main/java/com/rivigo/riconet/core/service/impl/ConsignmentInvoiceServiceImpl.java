@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
+
 /** Created by ashfakh on 20/6/18. */
 @Slf4j
 @Service
@@ -39,6 +41,9 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     InvoiceDocumentPreparedDTO invoiceDocumentPreparedDTO = getInvoicePreparedDTO(dto);
     Consignment consignment =
         consignmentService.getConsignmentByCnote(invoiceDocumentPreparedDTO.getCnote());
+    if(!consignment.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID)){
+      return;
+    }
     String shortUrl = urlShortnerService.shortenUrl(invoiceDocumentPreparedDTO.getEncodedUrl());
     zoomBackendAPIClientService.addInvoice(
         invoiceDocumentPreparedDTO.getEncodedUrl(),

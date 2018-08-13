@@ -26,7 +26,7 @@ public class ZoomBillingAPIClientServiceImpl implements ZoomBillingAPIClientServ
     String url = UrlConstant.ZOOM_BILLING_CN_DETAILS.replace("{cnote}", cnote);
     try {
       responseJson = apiClientService.getEntity(null, HttpMethod.GET, url, null, billingBaseUrl);
-      return responseJson.get("response").get("chargedWeight").asDouble();
+      return responseJson.get("response").asDouble();
     } catch (Exception e) {
       log.error("Error while getting charged weight for cnote: {}", cnote, e);
       return 0.0;
