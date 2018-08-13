@@ -7,6 +7,7 @@ import static com.rivigo.zoom.common.enums.ConsignmentStatus.RECEIVED_AT_OU;
 import static com.rivigo.zoom.common.enums.ConsignmentStatus.STOCK_CHECK_DONE;
 import static com.rivigo.zoom.common.enums.ZoomTripType.BF;
 
+import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
@@ -585,7 +586,8 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
           depsNotification -> {
             String body = designEmailTemplate(depsNotification, templateString);
             String subject = designEmailTemplate(depsNotification, subjectTemplate);
-            emailService.sendShortageEmail(
+            emailService.sendEmail(
+                EmailConstant.SHORTAGE_EMAIL_ID,
                 depsNotification.getEmailIdList(),
                 depsNotification.getCcList(),
                 depsNotification.getBccList(),

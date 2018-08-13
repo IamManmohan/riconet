@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.ApiClientService;
@@ -135,5 +136,27 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     }
     TypeReference<GroupDTO> mapType = new TypeReference<GroupDTO>() {};
     return ((GroupDTO) apiClientService.parseJsonNode(responseJson, mapType));
+  }
+
+  @Override
+  public List<TicketCommentDTO> getComments(Long ticketId) {
+    if (StringUtils.isEmpty(ticketId)) {
+      throw new ZoomException("Please provide a valid cnote");
+    }
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put("ticketId", Collections.singletonList(ticketId.toString()));
+    String url = UrlConstant.ZOOM_TICKETING_GET_COMMENTS;
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting comments of ticket: {}", ticketId, e);
+      throw new ZoomException("Error while getting comments of ticket: %s", ticketId);
+    }
+
+    TypeReference<List<TicketCommentDTO>> mapType = new TypeReference<List<TicketCommentDTO>>() {};
+
+    return (List<TicketCommentDTO>) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }

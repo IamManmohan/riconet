@@ -1,13 +1,19 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
+import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
 import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.EmailConstant;
+import com.rivigo.riconet.core.constants.ReasonConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
+import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
@@ -16,9 +22,11 @@ import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -29,25 +37,27 @@ import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.PinCode;
-import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
+import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.PinCodeRepository;
 import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -73,7 +83,7 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private ConsignmentCodDodService consignmentCodDodService;
 
-  @Autowired private ClientEntityMetadataRepository clientEntityMetadataRepository;
+  @Autowired private ClientEntityMetadataServiceImpl clientEntityMetadataService;
 
   @Autowired private PinCodeRepository pinCodeRepository;
 
@@ -84,6 +94,10 @@ public class QcServiceImpl implements QcService {
   @Autowired private LocationService locationService;
 
   @Autowired private ZoomBillingAPIClientService zoomBillingAPIClientService;
+
+  @Autowired private EmailService emailService;
+
+  @Autowired private UserMasterService userMasterService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -98,17 +112,11 @@ public class QcServiceImpl implements QcService {
     if (CollectionUtils.isEmpty(ticketList)) {
       return;
     }
-    Location location = locationService.getLocationById(loadingData.getLocationId());
     ticketList.forEach(
         ticketDTO -> {
-          if (ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
-              || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
-            ticketDTO.setAssigneeId(null);
-            ticketDTO.setAssigneeType(AssigneeType.NONE);
-            zoomTicketingAPIClientService.editTicket(ticketDTO);
-          } else {
-            closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
-          }
+          ticketDTO.setAssigneeId(null);
+          ticketDTO.setAssigneeType(AssigneeType.NONE);
+          zoomTicketingAPIClientService.editTicket(ticketDTO);
         });
   }
 
@@ -151,6 +159,8 @@ public class QcServiceImpl implements QcService {
     ticketList.forEach(
         ticketDTO ->
             closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
+    handleQcConsignmentBlocker(
+        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK);
     zoomBackendAPIClientService.updateQcCheck(unloadingData.getConsignmentId(), false);
   }
 
@@ -167,6 +177,19 @@ public class QcServiceImpl implements QcService {
     return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
+  public Boolean isMeasurementQcRequired(ConsignmentCompletionEventDTO completionData) {
+
+    if (completionData.getClientClusterMetadataDTO() == null) return Boolean.FALSE;
+    if (!completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded())
+      return Boolean.FALSE;
+
+    if (completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
+      return Boolean.FALSE;
+
+    return Math.random()
+        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability();
+  }
+
   private void fillClientMetadata(
       ConsignmentCompletionEventDTO completionData, Consignment consignment) {
     if (consignment == null) {
@@ -176,21 +199,19 @@ public class QcServiceImpl implements QcService {
       throw new ZoomException(
           "CompletionData is not present for consignment with cnote: " + consignment.getCnote());
     }
-    AdministrativeEntity cluster =
-        administrativeEntityRepository.findParentCluster(consignment.getFromId());
+
     ClientEntityMetadata clusterMetadata =
-        clientEntityMetadataRepository.findByEntityTypeAndEntityIdAndClientIdAndStatus(
-            ClientEntityType.CLUSTER,
-            cluster.getId(),
-            consignment.getClient().getId(),
-            OperationalStatus.ACTIVE);
+        clientEntityMetadataService.getClientClusterMetadata(consignment);
+
     PinCode pincode = pinCodeRepository.findByCode(consignment.getFromPinCode());
     ClientEntityMetadata pincodeMetadata =
-        clientEntityMetadataRepository.findByEntityTypeAndEntityIdAndClientIdAndStatus(
+        clientEntityMetadataService.getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
             ClientEntityType.PINCODE,
             pincode.getId(),
             consignment.getClient().getId(),
+            null,
             OperationalStatus.ACTIVE);
+
     if (clusterMetadata != null) {
       completionData.setClientClusterMetadataDTO(
           objectMapper.convertValue(clusterMetadata.getMetadata(), ClientClusterMetadataDTO.class));
@@ -228,9 +249,7 @@ public class QcServiceImpl implements QcService {
     }
     fillClientMetadata(completionData, consignment);
     boolean reCheckQcNeeded = check(completionData, consignment);
-    boolean measurementQcNeeded =
-        completionData.getClientClusterMetadataDTO() != null
-            && completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded();
+    boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(
         "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {}",
         consignment.getCnote(),
@@ -272,9 +291,26 @@ public class QcServiceImpl implements QcService {
         consignment.getLocationId(),
         groupId);
     createTicketsIfNeeded(reCheckQcNeeded, measurementQcNeeded, groupId, consignment, autoClose);
-    if (!autoClose && reCheckQcNeeded) {
-      zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
+    if (autoClose) {
+      return;
     }
+    if (reCheckQcNeeded) {
+      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK);
+    }
+    zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
+  }
+
+  private void handleQcConsignmentBlocker(
+      Long consignmentId, ConsignmentBlockerRequestType requestType) {
+    ConsignmentBlockerRequestDTO qcValidationBlocker =
+        ConsignmentBlockerRequestDTO.builder()
+            .consignmentId(consignmentId)
+            .isActive(Boolean.TRUE)
+            .requestType(requestType)
+            .reason(ReasonConstant.QC_VALIDATION_BLOCKER_REASON)
+            .subReason(ReasonConstant.QC_VALIDATION_BLOCKER_SUB_REASON)
+            .build();
+    zoomBackendAPIClientService.handleConsignmentBlocker(qcValidationBlocker);
   }
 
   private void createTicketsIfNeeded(
@@ -450,6 +486,131 @@ public class QcServiceImpl implements QcService {
         ticketDTO ->
             closeTicket(
                 ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE));
+    handleQcConsignmentBlocker(
+        consignment.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK);
     zoomBackendAPIClientService.updateQcCheck(consignment.getConsignmentId(), false);
+  }
+
+  @Override
+  public void consumeCnoteChangeEvent(String oldCnote, String cnote) {
+    List<TicketDTO> tickets =
+        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            oldCnote,
+            Arrays.asList(
+                ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
+                ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString(),
+                ZoomTicketingConstant.QC_BLOCKER_TYPE_ID.toString()));
+    tickets.forEach(
+        ticketDTO -> {
+          ticketDTO.setEntityId(cnote);
+          zoomTicketingAPIClientService.editTicket(ticketDTO);
+        });
+  }
+
+  @Override
+  public void consumeDepsCreationEvent(String cnote) {
+    String primaryCnote = cnote.split("-")[0];
+    Consignment consignment = consignmentService.getConsignmentByCnote(primaryCnote);
+
+    if (consignment == null) {
+      throw new ZoomException("No consignment exists with cnote %s ", primaryCnote);
+    }
+
+    ConsignmentBlockerRequestDTO qcBlocker =
+        ConsignmentBlockerRequestDTO.builder()
+            .consignmentId(consignment.getId())
+            .isActive(Boolean.TRUE)
+            .requestType(ConsignmentBlockerRequestType.UNBLOCK)
+            .reason(QC_BLOCKER_REASON)
+            .subReason(QC_BLOCKER_SUB_REASON)
+            .build();
+    zoomBackendAPIClientService.handleConsignmentBlocker(qcBlocker);
+    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK);
+    zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
+    List<TicketDTO> tickets =
+        zoomTicketingAPIClientService.getTicketsByCnoteAndType(primaryCnote, getQcTicketTypes());
+    tickets.forEach(
+        ticketDTO -> {
+          if (!TicketStatus.CLOSED.equals(ticketDTO.getStatus())) {
+            closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_DEPS_CREATION);
+          }
+        });
+  }
+
+  @Override
+  public void consumeQcBlockerTicketClosedEvent(Long ticketId) {
+    if (ticketId != null) {
+      zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
+    }
+  }
+
+  @Override
+  public void consumeQcBlockerTicketCreationEvent(String cnote) {
+    List<TicketDTO> ticketList =
+        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            cnote,
+            Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString()));
+    if (CollectionUtils.isEmpty(ticketList)) {
+      log.info("No qc measurement tickets found for cnote {} ", cnote);
+      return;
+    }
+    TicketDTO recentTicket = ticketList.get(ticketList.size() - 1);
+    // TODO:tata add urlList to email
+    List<String> urlList =
+        zoomTicketingAPIClientService
+            .getComments(recentTicket.getId())
+            .stream()
+            .filter(comment -> comment.getAttachmentURL() != null)
+            .map(TicketCommentDTO::getAttachmentURL)
+            .collect(Collectors.toList());
+    StringBuilder imageLinks= new StringBuilder();
+    imageLinks.append("<br>");
+    for(String url: urlList){
+      imageLinks.append("<a href='")
+          .append(url)
+          .append("'>abcd</a><br>");
+    }
+
+    Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
+    String subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT);
+    String bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
+
+    Location fromLocation = locationService.getLocationById(consignment.getFromId());
+    Location toLocation = locationService.getLocationById(consignment.getFromId());
+    Location currentLocation = locationService.getLocationById(consignment.getLocationId());
+
+    Map<String, String> valuesMap = new HashMap<>();
+    valuesMap.put("consignmentId", consignment.getId().toString());
+    valuesMap.put("fromLocationCode", fromLocation.getCode());
+    valuesMap.put("fromLocationName", fromLocation.getName());
+    valuesMap.put("toLocationCode", toLocation.getCode());
+    valuesMap.put("toLocationName", toLocation.getName());
+    valuesMap.put("currentLocationCode", currentLocation.getCode());
+    valuesMap.put("currentLocationName", currentLocation.getName());
+    valuesMap.put("urlList", imageLinks.toString());
+    StrSubstitutor sub = new StrSubstitutor(valuesMap);
+
+    emailService.sendEmail(
+        EmailConstant.SERVICE_EMAIL_ID,
+        getToRecepients(consignment),
+        getCcRecepients(consignment),
+        Collections.emptyList(),
+        subject,
+        sub.replace(bodyTemplate),
+        null);
+  }
+
+  public Collection<String> getToRecepients(Consignment consignment) {
+    // TODO: tata update toRecepients
+    return Arrays.asList("update@rivigo.com");
+  }
+
+  public Collection<String> getCcRecepients(Consignment consignment) {
+    User sam = userMasterService.getById(consignment.getClient().getSamUserId());
+    if (sam == null) {
+      throw new ZoomException(
+          "Sam user is missing for client {} ", consignment.getClient().getId());
+    }
+    return Collections.singleton(sam.getEmail());
   }
 }

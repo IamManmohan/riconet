@@ -13,6 +13,8 @@ public class ZoomTicketingConstant {
 
   public static final Long RETAIL_CHEQUE_BOUNCE_TYPE_ID = 70L;
 
+  public static final Long QC_BLOCKER_TYPE_ID = 108L;
+
   public static final String QC_GROUP_NAME = "QC";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";
@@ -39,4 +41,7 @@ public class ZoomTicketingConstant {
 
   public static final String QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE =
       "The task got auto closed because of change of CN from credit to retail";
+
+  public static final String QC_AUTO_CLOSURE_DEPS_CREATION =
+      "The task got auto closed because consignment is marked as DEPS";
 }

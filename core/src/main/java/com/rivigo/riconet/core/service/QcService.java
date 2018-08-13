@@ -12,4 +12,12 @@ public interface QcService {
   void consumeCompletionEvent(ConsignmentCompletionEventDTO completionData);
 
   void consumeCnoteTypeChangeEvent(ConsignmentBasicDTO consignment);
+
+  void consumeCnoteChangeEvent(String oldCnote, String cnote);
+
+  void consumeDepsCreationEvent(String cnote);
+
+  void consumeQcBlockerTicketClosedEvent(Long ticketId);
+
+  void consumeQcBlockerTicketCreationEvent(String cnote);
 }

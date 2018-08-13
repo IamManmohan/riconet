@@ -142,4 +142,53 @@ public class EventTriggerServiceTest {
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
   }
+
+  @Test
+  public void cnCnoteChangeTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    metadata.put("OLD_CNOTE", "9234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_CNOTE_CHANGE).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeCnoteChangeEvent("9234567890", "1234567890");
+  }
+
+  @Test
+  public void cnDepsCreationTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_DEPS_CREATION).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeDepsCreationEvent("1234567890");
+  }
+
+  @Test
+  public void cnQcBlockerTicketClosedTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CN_QC_BLOCKER_TICKET_CLOSED)
+            .entityId(5l)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(5l);
+  }
+
+  @Test
+  public void cnQcBlockerTicketCreationTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CN_QC_BLOCKER_TICKET_CREATION)
+            .entityId(5l)
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeQcBlockerTicketCreationEvent("1234567890");
+  }
 }

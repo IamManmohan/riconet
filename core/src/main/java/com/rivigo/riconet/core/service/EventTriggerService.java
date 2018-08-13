@@ -74,6 +74,22 @@ public class EventTriggerService {
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
+      case CN_CNOTE_CHANGE:
+        qcService.consumeCnoteChangeEvent(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name()),
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case CN_DEPS_CREATION:
+        qcService.consumeDepsCreationEvent(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case CN_QC_BLOCKER_TICKET_CLOSED:
+        qcService.consumeQcBlockerTicketClosedEvent(notificationDTO.getEntityId());
+        break;
+      case CN_QC_BLOCKER_TICKET_CREATION:
+        qcService.consumeQcBlockerTicketCreationEvent(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
       default:
         log.info("Event does not trigger anything {}", eventName);
     }

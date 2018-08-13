@@ -5,7 +5,11 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.UserDTO;
+import com.rivigo.riconet.core.enums.SeverityLevel;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -171,6 +176,51 @@ public class ZoomTicketingApiClientServiceTest {
     expectedException.expectMessage(
         "Error while getting groupId for locationId: 1200 and groupName: Test group name locationType: OU");
     zoomTicketingAPIClientService.getGroupId(locationId, groupName, locationType);
+  }
+
+  @Test
+  public void getCommentsTest() throws IOException {
+    Long ticketId = 1200L;
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomTicketingAPIClientService.getComments(ticketId);
+    validateReturnedData(HttpMethod.GET);
+    Assert.assertEquals(
+        ticketId.toString(), multiValueMapArgumentCaptor.getValue().get("ticketId").get(0));
+    validateParsingCallDone(jsonNode);
+  }
+
+  @Test
+  public void getCommentsExceptionTest() throws IOException {
+    Long ticketId = 1200L;
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage("Error while getting comments of ticket: 1200");
+    zoomTicketingAPIClientService.getComments(ticketId);
+  }
+
+  @Test
+  public void testDTOcreation() {
+    TicketActionDTO action =
+        TicketActionDTO.builder()
+            .actionName("action")
+            .actionValue("value")
+            .id(100l)
+            .ticketId(1500l)
+            .build();
+    TicketDTO ticketDTO =
+        TicketDTO.builder().severity(SeverityLevel.FIVE).ticketActionDTOList(null).build();
+    TicketCommentDTO comment =
+        TicketCommentDTO.builder()
+            .attachmentURL("url")
+            .createdAt(DateTime.now())
+            .fileName("file.txt")
+            .userDTO(new UserDTO())
+            .text("text")
+            .userId(1l)
+            .id(6l)
+            .ticketId(3l)
+            .build();
   }
 
   private void validateReturnedData(HttpMethod httpMethod) throws IOException {
