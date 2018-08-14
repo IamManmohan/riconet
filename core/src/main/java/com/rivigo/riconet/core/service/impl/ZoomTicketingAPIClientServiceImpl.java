@@ -34,6 +34,8 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
 
   @Autowired private ApiClientService apiClientService;
 
+  private static final String TICKET_ID = "ticketId";
+
   @Override
   public List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId) {
     if (StringUtils.isEmpty(cnote)) {
@@ -94,7 +96,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   public void makeComment(Long ticketId, String comment) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("ticketId", Collections.singletonList(ticketId.toString()));
+    valuesMap.put(TICKET_ID, Collections.singletonList(ticketId.toString()));
     valuesMap.put("text", Collections.singletonList(comment));
     String url = UrlConstant.ZOOM_TICKETING_POST_COMMENT;
     try {
@@ -158,5 +160,27 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     TypeReference<List<TicketCommentDTO>> mapType = new TypeReference<List<TicketCommentDTO>>() {};
 
     return (List<TicketCommentDTO>) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public TicketDTO getTicketByTicketId(Long ticketId) {
+    if (null == ticketId) {
+      throw new ZoomException("null ticketId cannot be processed");
+    }
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_TICKETING_TICKET_DETAIL;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put(TICKET_ID, Collections.singletonList(String.valueOf(ticketId)));
+
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting ticket with ID {}", ticketId, e);
+      throw new ZoomException("Error while getting ticket with ID: %s", ticketId);
+    }
+    TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
+
+    return (TicketDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }

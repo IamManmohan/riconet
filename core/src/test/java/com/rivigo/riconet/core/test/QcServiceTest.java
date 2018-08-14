@@ -473,7 +473,25 @@ public class QcServiceTest {
   }
 
   @Test
-  public void consumeQcBlockerTicketClosedEventTest() {
+  public void qcActionNonBlockerTest() {
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+        .thenReturn(
+            TicketDTO.builder()
+                .typeId(ZoomTicketingConstant.QC_RECHECK_TYPE_ID + 1)
+                .status(TicketStatus.CLOSED)
+                .build());
+    qcService.consumeQcBlockerTicketClosedEvent(5l);
+    verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(5l);
+  }
+
+  @Test
+  public void qcBlockerActionTest() {
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+        .thenReturn(
+            TicketDTO.builder()
+                .typeId(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)
+                .status(TicketStatus.CLOSED)
+                .build());
     qcService.consumeQcBlockerTicketClosedEvent(5l);
     verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
   }

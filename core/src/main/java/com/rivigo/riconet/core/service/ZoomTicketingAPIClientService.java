@@ -19,4 +19,6 @@ public interface ZoomTicketingAPIClientService {
   void makeComment(Long ticketId, String comment);
 
   List<TicketCommentDTO> getComments(Long ticketId);
+
+  TicketDTO getTicketByTicketId(Long ticketId);
 }

@@ -169,10 +169,7 @@ public class EventTriggerServiceTest {
   @Test
   public void cnQcBlockerTicketClosedTest() {
     NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_QC_BLOCKER_TICKET_CLOSED)
-            .entityId(5l)
-            .build();
+        NotificationDTO.builder().eventName(EventName.QC_TICKET_ACTION).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(5l);
   }

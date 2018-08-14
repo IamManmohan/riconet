@@ -83,7 +83,7 @@ public class EventTriggerService {
         qcService.consumeDepsCreationEvent(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
-      case CN_QC_BLOCKER_TICKET_CLOSED:
+      case QC_TICKET_ACTION:
         qcService.consumeQcBlockerTicketClosedEvent(notificationDTO.getEntityId());
         break;
       case CN_QC_BLOCKER_TICKET_CREATION:

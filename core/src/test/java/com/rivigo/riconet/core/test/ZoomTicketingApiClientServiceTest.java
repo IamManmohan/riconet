@@ -200,6 +200,27 @@ public class ZoomTicketingApiClientServiceTest {
   }
 
   @Test
+  public void getTicketTest() throws IOException {
+    Long ticketId = 1200L;
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+    validateReturnedData(HttpMethod.GET);
+    Assert.assertEquals(
+        ticketId.toString(), multiValueMapArgumentCaptor.getValue().get("ticketId").get(0));
+    validateParsingCallDone(jsonNode);
+  }
+
+  @Test
+  public void getTicketExceptionTest() throws IOException {
+    Long ticketId = 1200L;
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage("Error while getting ticket with ID: 1200");
+    zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+  }
+
+  @Test
   public void testDTOcreation() {
     TicketActionDTO action =
         TicketActionDTO.builder()

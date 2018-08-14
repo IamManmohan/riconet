@@ -37,7 +37,7 @@ public enum EventName {
 
   CN_CNOTE_CHANGE,
   CN_DEPS_CREATION,
-  CN_QC_BLOCKER_TICKET_CLOSED,
+  QC_TICKET_ACTION,
   CN_QC_BLOCKER_TICKET_CREATION,
 
   /** Finance Events* */

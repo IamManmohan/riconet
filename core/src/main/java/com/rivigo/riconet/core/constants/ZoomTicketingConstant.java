@@ -44,4 +44,7 @@ public class ZoomTicketingConstant {
 
   public static final String QC_AUTO_CLOSURE_DEPS_CREATION =
       "The task got auto closed because consignment is marked as DEPS";
+
+  public static final String QC_BLOCKER_CLOSURE_MESSAE =
+      "Ticket got auto-closed after action is taken";
 }

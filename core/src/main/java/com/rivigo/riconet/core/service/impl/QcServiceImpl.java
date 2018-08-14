@@ -539,9 +539,20 @@ public class QcServiceImpl implements QcService {
 
   @Override
   public void consumeQcBlockerTicketClosedEvent(Long ticketId) {
-    if (ticketId != null) {
-      zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
+    if (ticketId == null) {
+      return;
     }
+    TicketDTO ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+    if (ticketDTO == null) {
+      throw new ZoomException("");
+    }
+    if (ticketDTO.getTypeId() != ZoomTicketingConstant.QC_RECHECK_TYPE_ID) {
+      return;
+    }
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      closeTicket(ticketDTO, ZoomTicketingConstant.QC_BLOCKER_CLOSURE_MESSAE);
+    }
+    zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
   }
 
   @Override
@@ -563,12 +574,10 @@ public class QcServiceImpl implements QcService {
             .filter(comment -> comment.getAttachmentURL() != null)
             .map(TicketCommentDTO::getAttachmentURL)
             .collect(Collectors.toList());
-    StringBuilder imageLinks= new StringBuilder();
+    StringBuilder imageLinks = new StringBuilder();
     imageLinks.append("<br>");
-    for(String url: urlList){
-      imageLinks.append("<a href='")
-          .append(url)
-          .append("'>abcd</a><br>");
+    for (String url : urlList) {
+      imageLinks.append("<a href='").append(url).append("'>abcd</a><br>");
     }
 
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
