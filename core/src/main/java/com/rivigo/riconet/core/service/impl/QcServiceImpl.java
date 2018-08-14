@@ -566,7 +566,6 @@ public class QcServiceImpl implements QcService {
       return;
     }
     TicketDTO recentTicket = ticketList.get(ticketList.size() - 1);
-    // TODO:tata add urlList to email
     List<String> urlList =
         zoomTicketingAPIClientService
             .getComments(recentTicket.getId())
