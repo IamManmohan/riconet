@@ -477,7 +477,7 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
         .thenReturn(
             TicketDTO.builder()
-                .typeId(ZoomTicketingConstant.QC_RECHECK_TYPE_ID + 1)
+                .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID + 1)
                 .status(TicketStatus.CLOSED)
                 .build());
     qcService.consumeQcBlockerTicketClosedEvent(5l);
@@ -489,7 +489,7 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
         .thenReturn(
             TicketDTO.builder()
-                .typeId(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)
+                .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
                 .status(TicketStatus.CLOSED)
                 .build());
     qcService.consumeQcBlockerTicketClosedEvent(5l);
