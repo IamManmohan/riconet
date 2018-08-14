@@ -88,19 +88,25 @@ public class EmailServiceImpl implements EmailService {
       if (defaultEmails == null) {
         return;
       }
-      finalBody =
-          "recipients: "
-              .concat(recipients.toString())
-              .concat("<br> cc: ")
-              .concat(cc == null ? "null" : cc.toString())
-              .concat("<br> bcc: ")
-              .concat(bcc == null ? "null" : bcc.toString())
-              .concat("<br><br>")
-              .concat(finalBody);
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder
+          .append("recipients: ")
+          .append(recipients)
+          .append("<br> cc: ")
+          .append(cc)
+          .append("<br> bcc: ")
+          .append(bcc)
+          .append("<br><br>")
+          .append(finalBody);
+      finalBody = stringBuilder.toString();
       recipients.clear();
       recipients.addAll(Arrays.asList(defaultEmails.split(",")));
-      cc.clear();
-      bcc.clear();
+      if (!CollectionUtils.isEmpty(cc)) {
+        cc.clear();
+      }
+      if (!CollectionUtils.isEmpty(bcc)) {
+        bcc.clear();
+      }
     }
     try {
       SendEmailRequestDTO request = new SendEmailRequestDTO();
