@@ -1,5 +1,6 @@
 package com.rivigo.riconet.event.consumer;
 
+import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -24,7 +25,7 @@ public class CnActionConsumer extends EventConsumer {
     return Arrays.asList(
         EventName.PICKUP_COMPLETION,
         EventName.CN_RECEIVED_AT_OU,
-        EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU,
+        EventName.CN_LOADED,
         EventName.CN_OUT_FOR_DELIVERY,
         EventName.CN_DELIVERY,
         EventName.CN_UNDELIVERY);
@@ -32,16 +33,13 @@ public class CnActionConsumer extends EventConsumer {
 
   private void eventFactory(NotificationDTO notificationDTO) {
 
-    String clientId;
-    try {
-      clientId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CLIENT_ID);
-    } catch (NumberFormatException ne) {
-      throw new ZoomException("Unable to get clientId from notificationDTO {}", notificationDTO, ne);
-    }
+    String clientId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CLIENT_ID);
 
+    if (Strings.isNullOrEmpty(clientId))
+      throw new ZoomException("Client Id not found in the event {}", notificationDTO);
     switch (clientId) {
       case ClientConstants.HILTI_CLIENT_ID:
-        hiltiApiService.getRequestDtosByType(notificationDTO).forEach(v-> hiltiApiService.addEventToQueue(v));
+        hiltiApiService.addEventsToQueue(hiltiApiService.getRequestDtosByType(notificationDTO));
         break;
       default:
         log.info("No event defined for this client {}", notificationDTO);

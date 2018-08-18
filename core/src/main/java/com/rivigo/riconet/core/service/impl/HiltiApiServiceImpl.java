@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.hilti.DeliveryDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryNotDeliveredDto;
@@ -13,16 +14,19 @@ import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitArrivedDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitDispatchedDto;
 import com.rivigo.riconet.core.dto.hilti.PickupDoneDto;
-import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.HiltiJobType;
 import com.rivigo.riconet.core.enums.HiltiStatusCode;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.HiltiApiService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
+import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
-import com.rivigo.zoom.common.model.ConsignmentHistory;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
@@ -34,11 +38,13 @@ import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository
 import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -58,8 +64,6 @@ public class HiltiApiServiceImpl implements HiltiApiService {
   @Value("${hilti.update.transactions.url}")
   private String hiltiUpdateTransactionsUrl;
 
-  public static final Long hiltiFixedDelay = 500L;
-
   @Autowired private RestClientUtilityService restClientUtilityService;
 
   @Autowired private PickupRepository pickupRepository;
@@ -72,6 +76,8 @@ public class HiltiApiServiceImpl implements HiltiApiService {
 
   @Autowired private ConsignmentHistoryRepository consignmentHistoryRepository;
 
+  @Autowired private ConsignmentScheduleService consignmentScheduleService;
+
   @Autowired private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
 
   private ObjectMapper objectMapper = new ObjectMapper();
@@ -81,8 +87,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
   private List<HiltiRequestDto> lastRequestDtos = new ArrayList<>();
 
   @SuppressWarnings("unchecked")
-  private Optional<?> sendRequestToHilti(List<HiltiRequestDto> requestDtos)
-      throws JsonProcessingException {
+  private Optional<?> sendRequestToHilti(List<HiltiRequestDto> requestDtos) {
     return restClientUtilityService.executeRest(
         hiltiUpdateTransactionsUrl,
         HttpMethod.POST,
@@ -90,109 +95,156 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         Object.class);
   }
 
-  public List<HiltiRequestDto> getRequestDtosByType(NotificationDTO notificationDTO) {
-    HiltiFieldData fieldData;
-    HiltiJobType jobType;
-    HiltiStatusCode statusCode;
-    ConsignmentReadOnly consignment =
-        notificationDTO.getEventName() == EventName.PICKUP_COMPLETION
-            ? new ConsignmentReadOnly()
-            : consignmentReadOnlyService
-                .findConsignmentById(notificationDTO.getEntityId())
-                .orElseThrow(
-                    () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
-
-    Location currentLocation;
-    switch (notificationDTO.getEventName()) {
-      case PICKUP_COMPLETION:
-        Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
-        List<ConsignmentReadOnly> cnList =
-            consignmentReadOnlyService.findConsignmentByPickupId(notificationDTO.getEntityId());
-        return cnList
-            .stream()
-            .map(
-                v -> {
-                  PickupDoneDto pickupDoneDto =
-                      PickupDoneDto.builder()
-                          .pickupTime(TimeUtilsZoom.getTime(pickup.getPickupDate()))
-                          .expectedDeliveryDate(
-                              TimeUtilsZoom.getDate(v.getPromisedDeliveryDateTime()))
-                          .build();
-                  pickupDoneDto.setDate(TimeUtilsZoom.getDate(pickup.getPickupDate()));
-                  return HiltiRequestDto.builder()
-                      .jobType(HiltiJobType.PICKUP.toString())
-                      .newStatusCode(HiltiStatusCode.PICKUP_DONE.toString())
-                      .referenceNumber(v.getCnote())
-                      .fieldData(pickupDoneDto)
+  private List<HiltiRequestDto> getPickupRequestDtos(NotificationDTO notificationDTO) {
+    Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
+    List<ConsignmentReadOnly> cnList =
+        consignmentReadOnlyService.findConsignmentByPickupId(notificationDTO.getEntityId());
+    return cnList
+        .stream()
+        .map(
+            v -> {
+              PickupDoneDto pickupDoneDto =
+                  PickupDoneDto.builder()
+                      .pickupTime(TimeUtilsZoom.getTime(pickup.getPickupDate()))
+                      .expectedDeliveryDate(TimeUtilsZoom.getDate(v.getPromisedDeliveryDateTime()))
                       .build();
-                })
-            .collect(Collectors.toList());
+              pickupDoneDto.setDate(TimeUtilsZoom.getDate(pickup.getPickupDate()));
+              return HiltiRequestDto.builder()
+                  .jobType(HiltiJobType.PICKUP.toString())
+                  .newStatusCode(HiltiStatusCode.PICKUP_DONE.toString())
+                  .referenceNumber(v.getCnote())
+                  .fieldData(pickupDoneDto)
+                  .build();
+            })
+        .collect(Collectors.toList());
+  }
+
+  private HiltiFieldData getIntransitFieldData(NotificationDTO notificationDTO) {
+    ConsignmentReadOnly consignment =
+        consignmentReadOnlyService
+            .findConsignmentById(notificationDTO.getEntityId())
+            .orElseThrow(
+                () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
+    List<ConsignmentSchedule> schedules =
+        consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
+
+    Optional<ConsignmentSchedule> nextSchedule =
+        schedules
+            .stream()
+            .filter(v -> v.getLocationType() == LocationTypeV2.LOCATION)
+            .filter(v -> v.getPlanStatus() == ConsignmentLocationStatus.NOT_REACHED)
+            .findFirst();
+    List<Location> locations =
+        locationRepositoryV2.findByIdIn(
+            nextSchedule
+                .map(v -> Arrays.asList(consignment.getLocationId(), v.getLocationId()))
+                .orElse(Collections.singletonList(consignment.getLocationId())));
+    Map<Long, String> idToLocationNameMap =
+        locations.stream().collect(Collectors.toMap(Location::getId, Location::getName));
+
+    switch (notificationDTO.getEventName()) {
       case CN_RECEIVED_AT_OU:
-        consignment =
-            consignmentReadOnlyService
-                .findConsignmentById(notificationDTO.getEntityId())
-                .orElseThrow(
-                    () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
-        currentLocation = locationRepositoryV2.findById(consignment.getLocationId());
-        fieldData =
-            IntransitArrivedDto.builder()
-                .arrivedAt(currentLocation.getName())
-                .atDestination(
-                    consignment.getLocationId() == consignment.getToLocationId() ? "yes" : "no")
-                .build();
-        jobType = HiltiJobType.INTRANSIT;
-        statusCode = HiltiStatusCode.ARRIVED;
-        break;
-      case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
-        List<Location> locations =
-            locationRepositoryV2.findByIdIn(
-                Arrays.asList(consignment.getFromLocationId(), consignment.getToLocationId()));
-        Map<Long, String> idToLocationNameMap =
-            locations.stream().collect(Collectors.toMap(Location::getId, Location::getName));
-        fieldData =
-            IntransitDispatchedDto.builder()
-                .dispatchedFrom(
-                    idToLocationNameMap.getOrDefault(consignment.getFromLocationId(), ""))
-                .dispatchedTo(idToLocationNameMap.getOrDefault(consignment.getToLocationId(), ""))
-                .build();
-        jobType = HiltiJobType.INTRANSIT;
-        statusCode = HiltiStatusCode.DISPATCHED;
-        break;
+        return IntransitArrivedDto.builder()
+            .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
+            .atDestination(
+                BooleanUtils.toStringYesNo(
+                    consignment.getLocationId() == consignment.getToLocationId()))
+            .build();
+      case CN_LOADED:
+        return IntransitDispatchedDto.builder()
+            .dispatchedFrom(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
+            .dispatchedTo(
+                idToLocationNameMap.getOrDefault(
+                    nextSchedule.map(ConsignmentSchedule::getLocationId).orElse(null), ""))
+            .build();
+      default:
+        log.error("Unrecognized intransit event {}", notificationDTO);
+        throw new ZoomException("Unrecognized intransit event {}", notificationDTO);
+    }
+  }
+
+  private HiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
+    switch (notificationDTO.getEventName()) {
       case CN_OUT_FOR_DELIVERY:
-        fieldData = DeliveryOFDDto.builder().build();
-        jobType = HiltiJobType.DELIVERY;
-        statusCode = HiltiStatusCode.OUT_FOR_DELIVERY;
-        break;
+        return DeliveryOFDDto.builder().build();
       case CN_DELIVERY:
         List<ConsignmentUploadedFiles> uploadedDocuments =
             consignmentUploadedFilesRepository.findByConsignmentId(notificationDTO.getEntityId());
-        Map<FileTypes, String> uploadedFilesMap =
+        Map<FileTypes, String> fileTypeToUrlMap =
             uploadedDocuments
                 .stream()
                 .collect(
                     Collectors.toMap(
                         ConsignmentUploadedFiles::getFileTypes,
                         ConsignmentUploadedFiles::getS3URL));
-        fieldData =
-            DeliveryDeliveredDto.builder()
-                .podDelivered(uploadedFilesMap.getOrDefault(FileTypes.POD, ""))
-                .codImage(uploadedFilesMap.getOrDefault(FileTypes.COD_DOD, ""))
-                .deliverySignature(uploadedFilesMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
-                .build();
-        jobType = HiltiJobType.DELIVERY;
-        statusCode = HiltiStatusCode.DELIVERED;
-        break;
+        return DeliveryDeliveredDto.builder()
+            .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
+            .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
+            .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
+            .build();
       case CN_UNDELIVERY:
         UndeliveredConsignment undeliveredConsignment =
             undeliveredConsignmentsRepository
                 .findTop1ByConsignmentIdAndOldDrsIdNotNullOrderByIdDesc(
                     notificationDTO.getEntityId());
-        fieldData =
-            DeliveryNotDeliveredDto.builder()
-                .undeliveryReason(
-                    undeliveredConsignment.getReason() + undeliveredConsignment.getSubReason())
-                .podUndelivered("")
-                .build();
+        return DeliveryNotDeliveredDto.builder()
+            .undeliveryReason(
+                undeliveredConsignment.getReason() + ": " + undeliveredConsignment.getSubReason())
+            .podUndelivered("")
+            .build();
+      default:
+        log.error("Unrecognized delivery event {}", notificationDTO);
+        throw new ZoomException("Unrecognized delivery event {}", notificationDTO);
+    }
+  }
+
+  private HiltiFieldData getFieldDataForCnEvents(NotificationDTO notificationDTO) {
+    HiltiFieldData fieldData;
+    switch (notificationDTO.getEventName()) {
+      case CN_RECEIVED_AT_OU:
+      case CN_LOADED:
+        fieldData = getIntransitFieldData(notificationDTO);
+        break;
+      case CN_OUT_FOR_DELIVERY:
+      case CN_DELIVERY:
+      case CN_UNDELIVERY:
+        fieldData = getDeliveryFieldData(notificationDTO);
+        break;
+      default:
+        log.error("Unrecognized event {}", notificationDTO);
+        throw new ZoomException("Unrecognized event {}", notificationDTO);
+    }
+    fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
+    fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+
+    return fieldData;
+  }
+
+  public List<HiltiRequestDto> getRequestDtosByType(NotificationDTO notificationDTO) {
+
+    HiltiJobType jobType;
+    HiltiStatusCode statusCode;
+
+    switch (notificationDTO.getEventName()) {
+      case PICKUP_COMPLETION:
+        return getPickupRequestDtos(notificationDTO);
+      case CN_RECEIVED_AT_OU:
+        jobType = HiltiJobType.INTRANSIT;
+        statusCode = HiltiStatusCode.ARRIVED;
+        break;
+      case CN_LOADED:
+        jobType = HiltiJobType.INTRANSIT;
+        statusCode = HiltiStatusCode.DISPATCHED;
+        break;
+      case CN_OUT_FOR_DELIVERY:
+        jobType = HiltiJobType.DELIVERY;
+        statusCode = HiltiStatusCode.OUT_FOR_DELIVERY;
+        break;
+      case CN_DELIVERY:
+        jobType = HiltiJobType.DELIVERY;
+        statusCode = HiltiStatusCode.DELIVERED;
+        break;
+      case CN_UNDELIVERY:
         jobType = HiltiJobType.DELIVERY;
         statusCode = HiltiStatusCode.NOT_DELIVERED;
         break;
@@ -200,14 +252,21 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         log.error("Invalid event captured. Unable to process {}", notificationDTO);
         throw new ZoomException("Invalid event captured. Unable to process {}", notificationDTO);
     }
-    fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
-    fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.toString());
+    if (Strings.isNullOrEmpty(cnote)) {
+      cnote =
+          consignmentReadOnlyService
+              .findConsignmentById(notificationDTO.getEntityId())
+              .map(ConsignmentReadOnly::getCnote)
+              .orElseThrow(
+                  () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
+    }
     return Collections.singletonList(
         HiltiRequestDto.builder()
             .jobType(jobType.toString())
             .newStatusCode(statusCode.toString())
-            .referenceNumber(consignment.getCnote())
-            .fieldData(fieldData)
+            .referenceNumber(cnote)
+            .fieldData(getFieldDataForCnEvents(notificationDTO))
             .build());
   }
 
@@ -216,25 +275,24 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     return eventBuffer.addAll(requestDtos);
   }
 
-  //  @Scheduled(fixedDelay = 500L)
+  @Scheduled(fixedDelay = 500L)
   public void publishEventsAndProcessErrors() {
     lastRequestDtos.clear();
     eventBuffer.drainTo(lastRequestDtos);
 
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    try {
-      HiltiResponseDto responseDto =
-          objectMapper.convertValue(
-              sendRequestToHilti(lastRequestDtos)
-                  .orElseThrow(() -> new ZoomException("Unable to get response from Hilti")),
-              HiltiResponseDto.class);
-      log.info("Response from Hilti: {}", responseDto);
+    if (!lastRequestDtos.isEmpty()) {
+      log.info("Sending requests for {}", lastRequestDtos);
+        HiltiResponseDto responseDto =
+            objectMapper.convertValue(
+                sendRequestToHilti(lastRequestDtos)
+                    .orElseThrow(() -> new ZoomException("Unable to get response from Hilti")),
+                HiltiResponseDto.class);
+        log.info("Response from Hilti: {}", responseDto);
 
-      if (responseDto.getFailCount() > 0) {
-        handleFailures(responseDto.getFailureList());
-      }
-    } catch (JsonProcessingException e) {
-      log.error("Unable to parse JSON ", e);
+        if (responseDto.getFailCount() > 0) {
+          handleFailures(responseDto.getFailureList());
+        }
     }
   }
 
