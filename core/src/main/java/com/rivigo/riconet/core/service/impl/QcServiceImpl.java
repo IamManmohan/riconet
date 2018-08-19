@@ -198,7 +198,7 @@ public class QcServiceImpl implements QcService {
       return Boolean.FALSE;
 
     return Math.random()
-        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability()/100.0;
+        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() / 100.0;
   }
 
   private void fillClientMetadata(
@@ -582,18 +582,22 @@ public class QcServiceImpl implements QcService {
             .getComments(recentTicket.getId())
             .stream()
             .filter(comment -> comment.getAttachmentURL() != null)
-        .reduce((first, second) -> second);
-    String imageZipUrl ="";
-    if(urlOptional.isPresent()){
-      imageZipUrl =urlOptional.get().getAttachmentURL();
+            .reduce((first, second) -> second);
+    String imageZipUrl = "";
+    if (urlOptional.isPresent()) {
+      imageZipUrl = urlOptional.get().getAttachmentURL();
     }
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
-    QcBlockerActionParams qcBlockerActionParams = QcBlockerActionParams.builder()
-        .consignmentId(consignment.getId())
-        .ticketId(recentTicket.getId()).build();
+    QcBlockerActionParams qcBlockerActionParams =
+        QcBlockerActionParams.builder()
+            .consignmentId(consignment.getId())
+            .ticketId(recentTicket.getId())
+            .build();
     String uuid = UUID.randomUUID().toString().replace("-", "");
-    Integer expiryHours = zoomPropertyService.getInteger(ZoomPropertyName.QC_BLOCKER_TICKET_EXPIRY_HOURS,72);
-    qcBlockerActionParamsRedisRepository.set(uuid,qcBlockerActionParams,expiryHours, TimeUnit.HOURS);
+    Integer expiryHours =
+        zoomPropertyService.getInteger(ZoomPropertyName.QC_BLOCKER_TICKET_EXPIRY_HOURS, 72);
+    qcBlockerActionParamsRedisRepository.set(
+        uuid, qcBlockerActionParams, expiryHours, TimeUnit.HOURS);
 
     String subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT);
     String bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
@@ -611,7 +615,7 @@ public class QcServiceImpl implements QcService {
     valuesMap.put("currentLocationCode", currentLocation.getCode());
     valuesMap.put("currentLocationName", currentLocation.getName());
     valuesMap.put("imageZipUrl", imageZipUrl);
-    valuesMap.put("uuid",uuid);
+    valuesMap.put("uuid", uuid);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
 
     emailService.sendEmail(
@@ -625,7 +629,7 @@ public class QcServiceImpl implements QcService {
   }
 
   public Collection<String> getToRecepients(Consignment consignment) {
-    if(consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID){
+    if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       return consignment.getClient().getClientNotificationList();
     }
     Organization organization = organizationService.getById(consignment.getOrganizationId());
