@@ -60,13 +60,17 @@ public class EmailServiceImpl implements EmailService {
   @Override
   public void sendEmail(
       String from,
-      Collection<String> recipients,
-      Collection<String> cc,
-      Collection<String> bcc,
+      Collection<String> inputRecipients,
+      Collection<String> inputCc,
+      Collection<String> inputBcc,
       String subject,
       String body,
       File f) {
     Boolean emailEnabled = zoomPropertyService.getBoolean(ZoomPropertyName.EMAIL_ENABLED, false);
+
+    Collection<String> recipients = inputRecipients;
+    Collection<String> cc = inputCc;
+    Collection<String> bcc = inputBcc;
     log.info(
         "from: {}, recipients: {}, cc: {}, bcc: {}, subject: {}, body: {}, file: {}",
         from,
@@ -99,14 +103,9 @@ public class EmailServiceImpl implements EmailService {
           .append("<br><br>")
           .append(finalBody);
       finalBody = stringBuilder.toString();
-      recipients.clear();
-      recipients.addAll(Arrays.asList(defaultEmails.split(",")));
-      if (!CollectionUtils.isEmpty(cc)) {
-        cc.clear();
-      }
-      if (!CollectionUtils.isEmpty(bcc)) {
-        bcc.clear();
-      }
+      recipients = Arrays.asList(defaultEmails.split(","));
+      cc = Collections.emptyList();
+      bcc = Collections.emptyList();
     }
     try {
       SendEmailRequestDTO request = new SendEmailRequestDTO();
