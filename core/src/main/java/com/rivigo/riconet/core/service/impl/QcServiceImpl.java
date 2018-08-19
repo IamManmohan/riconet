@@ -24,6 +24,7 @@ import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
+import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.UserMasterService;
@@ -43,11 +44,14 @@ import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
+import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PinCode;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
+import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
 import com.rivigo.zoom.common.repository.mysql.PinCodeRepository;
 import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
+import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -55,6 +59,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -98,6 +105,10 @@ public class QcServiceImpl implements QcService {
   @Autowired private EmailService emailService;
 
   @Autowired private UserMasterService userMasterService;
+
+  @Autowired private OrganizationService organizationService;
+
+  @Autowired private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -566,20 +577,24 @@ public class QcServiceImpl implements QcService {
       return;
     }
     TicketDTO recentTicket = ticketList.get(ticketList.size() - 1);
-    List<String> urlList =
+    Optional<TicketCommentDTO> urlOptional =
         zoomTicketingAPIClientService
             .getComments(recentTicket.getId())
             .stream()
             .filter(comment -> comment.getAttachmentURL() != null)
-            .map(TicketCommentDTO::getAttachmentURL)
-            .collect(Collectors.toList());
-    StringBuilder imageLinks = new StringBuilder();
-    imageLinks.append("<br>");
-    for (String url : urlList) {
-      imageLinks.append("<a href='").append(url).append("'>abcd</a><br>");
+        .reduce((first, second) -> second);
+    String imageZipUrl ="";
+    if(urlOptional.isPresent()){
+      imageZipUrl =urlOptional.get().getAttachmentURL();
     }
-
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
+    QcBlockerActionParams qcBlockerActionParams = QcBlockerActionParams.builder()
+        .consignmentId(consignment.getId())
+        .ticketId(recentTicket.getId()).build();
+    String uuid = UUID.randomUUID().toString().replace("-", "");
+    Integer expiryHours = zoomPropertyService.getInteger(ZoomPropertyName.QC_BLOCKER_TICKET_EXPIRY_HOURS,72);
+    qcBlockerActionParamsRedisRepository.set(uuid,qcBlockerActionParams,expiryHours, TimeUnit.HOURS);
+
     String subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT);
     String bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
 
@@ -595,7 +610,8 @@ public class QcServiceImpl implements QcService {
     valuesMap.put("toLocationName", toLocation.getName());
     valuesMap.put("currentLocationCode", currentLocation.getCode());
     valuesMap.put("currentLocationName", currentLocation.getName());
-    valuesMap.put("urlList", imageLinks.toString());
+    valuesMap.put("imageZipUrl", imageZipUrl);
+    valuesMap.put("uuid",uuid);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
 
     emailService.sendEmail(
@@ -609,8 +625,11 @@ public class QcServiceImpl implements QcService {
   }
 
   public Collection<String> getToRecepients(Consignment consignment) {
-    // TODO: tata update toRecepients
-    return Arrays.asList("update@rivigo.com");
+    if(consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID){
+      return consignment.getClient().getClientNotificationList();
+    }
+    Organization organization = organizationService.getById(consignment.getOrganizationId());
+    return Collections.singleton(organization.getEmail());
   }
 
   public Collection<String> getCcRecepients(Consignment consignment) {
