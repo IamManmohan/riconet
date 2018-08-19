@@ -187,7 +187,7 @@ public class QcServiceImpl implements QcService {
       return Boolean.FALSE;
 
     return Math.random()
-        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability();
+        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability()/100.0;
   }
 
   private void fillClientMetadata(

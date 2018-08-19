@@ -458,7 +458,7 @@ public class QcServiceTest {
     completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(0.0);
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
 
-    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(1.0);
+    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(100.0);
     Assert.assertTrue(qcService.isMeasurementQcRequired(completionEventDTO));
   }
 
