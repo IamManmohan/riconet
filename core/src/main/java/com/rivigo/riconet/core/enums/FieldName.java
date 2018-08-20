@@ -5,7 +5,6 @@ package com.rivigo.riconet.core.enums;
  * @date 15-Aug-2018
  */
 public enum FieldName {
-
   LAST_UPDATED_BY_ID;
 
   public enum Ticketing {

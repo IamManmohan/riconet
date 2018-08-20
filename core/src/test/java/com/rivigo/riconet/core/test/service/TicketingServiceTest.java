@@ -81,5 +81,4 @@ public class TicketingServiceTest {
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_COMMENT_CREATION);
     ticketingService.sendTicketCommentCreationEmail(notificationDTO);
   }
-
 }

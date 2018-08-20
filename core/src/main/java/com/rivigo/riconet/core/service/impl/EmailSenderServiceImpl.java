@@ -43,7 +43,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     this.restTemplate = restTemplate;
   }
 
-  @Autowired
+  @Override
   public void sendEmail(List<String> recipients, String subject, String body) {
     sendEmail(recipients, subject, body, null, null);
   }

@@ -24,7 +24,8 @@ public class NotificationDTOModel {
     metadata.put(FieldName.Ticketing.TICKET_ID.toString(), "1");
     metadata.put(FieldName.Ticketing.SEVERITY.toString(), "ONE");
     metadata.put(FieldName.Ticketing.SLA.toString(), "2 Days ");
-    metadata.put(FieldName.Ticketing.OWNER_GROUP_NAME_OR_OWNER_EMAIL.toString(), "rameshc10695@gmail.com");
+    metadata.put(
+        FieldName.Ticketing.OWNER_GROUP_NAME_OR_OWNER_EMAIL.toString(), "rameshc10695@gmail.com");
     metadata.put(FieldName.Ticketing.LAST_UPDATED_BY_EMAIL.toString(), "rameshc10695@gmail.com");
 
     // EventName.TICKET_ASSIGNEE_CHANGE
@@ -32,7 +33,8 @@ public class NotificationDTOModel {
         FieldName.Ticketing.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString(),
         "ramesh.chandra@rivigo.com");
     metadata.put(
-        FieldName.Ticketing.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString(), "rameshc10695@gmail.com");
+        FieldName.Ticketing.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString(),
+        "rameshc10695@gmail.com");
     metadata.put(FieldName.Ticketing.TICKET_TYPE.toString(), "QC - CN Validation");
 
     // EventName.TICKET_STATUS_CHANGE

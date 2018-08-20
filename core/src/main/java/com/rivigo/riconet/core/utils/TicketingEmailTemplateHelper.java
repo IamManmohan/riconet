@@ -124,7 +124,8 @@ public class TicketingEmailTemplateHelper {
     return new StringBuilder()
         .append(metadata.get(FieldName.Ticketing.LAST_UPDATED_BY_EMAIL.toString()))
         .append(" has changed the Assignee from ")
-        .append(metadata.get(FieldName.Ticketing.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString()))
+        .append(
+            metadata.get(FieldName.Ticketing.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString()))
         .append(" to ")
         .append(metadata.get(FieldName.Ticketing.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString()))
         .append(".<br><br>Regards,<br>Rivigo Tickets<br>")
