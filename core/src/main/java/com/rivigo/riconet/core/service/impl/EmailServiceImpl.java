@@ -132,7 +132,7 @@ public class EmailServiceImpl implements EmailService {
 
   /** Replace by notification service */
   @Deprecated
-  public static void sendEmail(
+  private static void sendEmail(
       String user,
       String password,
       List<String> toRecipients,

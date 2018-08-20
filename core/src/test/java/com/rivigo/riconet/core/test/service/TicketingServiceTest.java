@@ -24,12 +24,6 @@ public class TicketingServiceTest {
     RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
     ticketingService = new TicketingServiceImpl(emailSenderService);
-    // how to set local_mail.properties
-    // #mail properties
-    // email.notification.service.api=http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send
-    // sender.server.name=testing@devops.rivigo.com
-    // email.notification.service.user.agent=zoom-ticketing-dev
-
     ReflectionTestUtils.setField(
         emailSenderService, "senderServerName", "testing@devops.rivigo.com");
     ReflectionTestUtils.setField(

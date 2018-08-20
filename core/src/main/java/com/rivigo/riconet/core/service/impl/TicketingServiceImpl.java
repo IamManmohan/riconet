@@ -69,7 +69,7 @@ public class TicketingServiceImpl implements TicketingService {
     Map<String, String> metadata = notificationDTO.getMetadata();
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
-    TicketingEmailTemplateHelper.getValueFromMap(metadata, FieldName.NEWLY_CCED_EMAIL)
+    TicketingEmailTemplateHelper.getValueFromMap(metadata, FieldName.Ticketing.NEWLY_CCED_EMAIL)
         .ifPresent(
             to -> emailSenderService.sendEmail(Collections.singletonList(to), subject, body));
   }
