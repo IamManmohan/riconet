@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,9 +20,10 @@ public class TicketingServiceTest {
 
   private TicketingServiceImpl ticketingService;
 
+  @Mock private RestTemplate restTemplate;
+
   @Before
   public void setUp() {
-    RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
