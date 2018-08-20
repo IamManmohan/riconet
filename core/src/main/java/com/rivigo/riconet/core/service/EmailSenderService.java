@@ -1,6 +1,8 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

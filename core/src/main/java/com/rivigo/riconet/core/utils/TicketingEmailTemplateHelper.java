@@ -56,8 +56,9 @@ public class TicketingEmailTemplateHelper {
     List<String> emails = new ArrayList<>();
     for (String email : emailList) {
       if (StringUtils.isEmpty(email)) {
-        emails.add(email);
+        continue;
       }
+      emails.add(email);
     }
     return Optional.of(emails);
   }
@@ -72,11 +73,11 @@ public class TicketingEmailTemplateHelper {
   public static String getTicketCreationEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
         .append(metadata.get(FieldName.CREATOR_EMAIL.toString()))
-        .append("has created a new ticket of the issue type ")
+        .append(" has created a new ticket of the issue type ")
         .append(metadata.get(FieldName.TICKET_TYPE.toString()))
         .append(". The severity of the ticket is ")
         .append(metadata.get(FieldName.SEVERITY.toString()))
-        .append("The SLA for solving the ticket is ")
+        .append(". The SLA for solving the ticket is ")
         .append(metadata.get(FieldName.SLA.toString()))
         .append(". The ticket has been assigned to the ")
         .append(metadata.get(FieldName.OWNER_GROUP_NAME_OR_OWNER_EMAIL.toString()))
@@ -87,12 +88,12 @@ public class TicketingEmailTemplateHelper {
   public static String getTicketCommentCreationEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
         .append(metadata.get(FieldName.CREATOR_EMAIL.toString()))
-        .append("has commented.<br>")
+        .append(" has commented.<br>")
         .append(metadata.get(FieldName.COMMENT_TEXT.toString()))
         .append("<br> <a href=\"")
         .append(metadata.get(FieldName.S3URL.toString()))
         .append("\">Link to Attachment</a>")
-        .append("<br>Regards,<br>Rivigo Tickets<br>")
+        .append("<br><br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }
 
@@ -103,50 +104,51 @@ public class TicketingEmailTemplateHelper {
         .append(metadata.get(FieldName.OLD_SEVERITY.toString()))
         .append(" to ")
         .append(metadata.get(FieldName.SEVERITY.toString()))
-        .append("<br>Regards,<br>Rivigo Tickets<br>")
+        .append(".<br><br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }
 
   public static String getTicketStatusChangeEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
         .append(metadata.get(FieldName.LAST_UPDATED_BY_EMAIL.toString()))
-        .append("has changed the status of the ticket from ")
+        .append(" has changed the status of the ticket from ")
         .append(metadata.get(FieldName.OLD_STATUS.toString()))
         .append(" to ")
         .append(metadata.get(FieldName.STATUS.toString()))
-        .append("<br>Regards,<br>Rivigo Tickets<br>")
+        .append(".<br><br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }
 
   public static String getTicketAssigneeChangeEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
         .append(metadata.get(FieldName.LAST_UPDATED_BY_EMAIL.toString()))
-        .append("has changed the Assignee from ")
+        .append(" has changed the Assignee from ")
         .append(metadata.get(FieldName.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString()))
         .append(" to ")
         .append(metadata.get(FieldName.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString()))
-        .append("<br>Regards,<br>Rivigo Tickets<br>")
+        .append(".<br><br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }
 
   public static String getTicketEscalationChangeEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
-        .append("The ticket has been escalated to ")
+        .append("The ticket has been escalated to escalation level : ")
         .append(metadata.get(FieldName.ESCALATION_LEVEL.toString()))
-        .append(" escalation owner ")
+        .append(" and escalation owner : ")
         .append(metadata.get(FieldName.ESCALATED_TO_EMAIL.toString()))
         .append(" . The ticket needs to be closed on priority. ")
-        .append("<br>Regards,<br>Rivigo Tickets<br>")
+        .append("<br><br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }
 
   public static String getTicketCcNewPersonAdditionEmailBody(Map<String, String> metadata) {
     return new StringBuilder()
-        .append("The ticket has been escalated to ")
-        .append(metadata.get(FieldName.ESCALATION_LEVEL.toString()))
-        .append(" escalation owner ")
-        .append(metadata.get(FieldName.ESCALATED_TO_EMAIL.toString()))
-        .append(" . The ticket needs to be closed on priority. ")
+        .append(metadata.get(FieldName.ADDER_EMAIL.toString()))
+        .append(" has added ")
+        .append(metadata.get(FieldName.NEWLY_CCED_EMAIL.toString()))
+        .append(" in CC to this ticket. ")
+        .append("<br><br> Comment history : <br>")
+        .append(metadata.get(FieldName.COMMENT_HISTORY.toString()))
         .append("<br>Regards,<br>Rivigo Tickets<br>")
         .toString();
   }

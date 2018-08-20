@@ -27,15 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class EmailSenderServiceImpl implements EmailSenderService {
 
-  // how to set local_mail.properties
-  //  #mail properties
-  //
-  // email.notification.service.api=http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send
-  //  sender.server.name=testing@devops.rivigo.com
-  //  email.notification.service.user.agent=zoom-ticketing-dev
-  //  ticketing.master.email=zoom.ticketing@rivigo.com
-  //  ticketing.master.password=Ticketing@Z00m
-
   @Value("${sender.server.name}")
   private String senderServerName;
 
@@ -92,6 +83,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);
       log.info("Mail sent to recipients: {} , subject: {} , body: {} ", recipients, subject, body);
       log.info("Email response is {} ", responseObject);
+
     } catch (Exception e) {
       log.error(
           " Error while sending mail to recipients: {} with subject: {} and body: {} ",
