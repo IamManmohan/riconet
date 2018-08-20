@@ -16,4 +16,6 @@ public class ReasonConstant {
       "Consignment Qc validation is not complete";
   public static final String QC_VALIDATION_BLOCKER_SUB_REASON =
       "Consignment Qc validation is not complete";
+  public static final String QC_MEASUREMENT_BLOCKER_REASON ="Consignment Qc measurement is not complete";
+  public static final String QC_MEASUREMENT_BLOCKER_SUB_REASON ="Consignment Qc measurement is not complete";
 }

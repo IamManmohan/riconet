@@ -41,6 +41,7 @@ import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.OperationalStatus;
+import com.rivigo.zoom.common.enums.QcType;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
@@ -171,7 +172,9 @@ public class QcServiceImpl implements QcService {
         ticketDTO ->
             closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
     handleQcConsignmentBlocker(
-        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK);
+        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
+    handleQcConsignmentBlocker(
+        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(unloadingData.getConsignmentId(), false);
   }
 
@@ -306,14 +309,17 @@ public class QcServiceImpl implements QcService {
       return;
     }
     if (reCheckQcNeeded) {
-      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK);
+      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
+    }
+    if(measurementQcNeeded){
+      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
     }
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
   }
 
   private void handleQcConsignmentBlocker(
-      Long consignmentId, ConsignmentBlockerRequestType requestType) {
-    ConsignmentBlockerRequestDTO qcValidationBlocker =
+      Long consignmentId, ConsignmentBlockerRequestType requestType, QcType qcType) {
+    ConsignmentBlockerRequestDTO qcBlocker =
         ConsignmentBlockerRequestDTO.builder()
             .consignmentId(consignmentId)
             .isActive(Boolean.TRUE)
@@ -321,7 +327,14 @@ public class QcServiceImpl implements QcService {
             .reason(ReasonConstant.QC_VALIDATION_BLOCKER_REASON)
             .subReason(ReasonConstant.QC_VALIDATION_BLOCKER_SUB_REASON)
             .build();
-    zoomBackendAPIClientService.handleConsignmentBlocker(qcValidationBlocker);
+    if( qcType == QcType.RE_CHECK){
+      qcBlocker.setReason(ReasonConstant.QC_VALIDATION_BLOCKER_REASON);
+      qcBlocker.setSubReason(ReasonConstant.QC_VALIDATION_BLOCKER_SUB_REASON);
+    }else {
+      qcBlocker.setReason(ReasonConstant.QC_MEASUREMENT_BLOCKER_REASON);
+      qcBlocker.setSubReason(ReasonConstant.QC_MEASUREMENT_BLOCKER_SUB_REASON);
+    }
+    zoomBackendAPIClientService.handleConsignmentBlocker(qcBlocker);
   }
 
   private void createTicketsIfNeeded(
@@ -498,7 +511,9 @@ public class QcServiceImpl implements QcService {
             closeTicket(
                 ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE));
     handleQcConsignmentBlocker(
-        consignment.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK);
+        consignment.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
+    handleQcConsignmentBlocker(
+        consignment.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getConsignmentId(), false);
   }
 
@@ -536,7 +551,8 @@ public class QcServiceImpl implements QcService {
             .subReason(QC_BLOCKER_SUB_REASON)
             .build();
     zoomBackendAPIClientService.handleConsignmentBlocker(qcBlocker);
-    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK);
+    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
+    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
     List<TicketDTO> tickets =
         zoomTicketingAPIClientService.getTicketsByCnoteAndType(primaryCnote, getQcTicketTypes());

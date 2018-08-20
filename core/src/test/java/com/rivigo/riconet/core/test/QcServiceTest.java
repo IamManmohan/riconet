@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
@@ -46,6 +47,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.ruleengine.RuleEngineRule;
 import com.rivigo.zoom.common.repository.mysql.ruleengine.RuleEngineRuleRepository;
+import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,6 +96,8 @@ public class QcServiceTest {
   @Mock private UserMasterService userMasterService;
 
   @Mock private EmailService emailService;
+
+  @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -553,6 +557,7 @@ public class QcServiceTest {
     Consignment consignment = new Consignment();
     consignment.setId(100l);
     consignment.setClient(new Client());
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());

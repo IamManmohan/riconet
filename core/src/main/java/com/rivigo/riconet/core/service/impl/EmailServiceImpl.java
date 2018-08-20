@@ -126,7 +126,6 @@ public class EmailServiceImpl implements EmailService {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       HttpEntity entity = new HttpEntity<>(request, headers);
-      log.info("Email url: {}, Entity {}",notificationRootUrl + emailApi,entity);
       ResponseEntity<JsonNode> response =
           restTemplate.exchange(
               notificationRootUrl + emailApi, HttpMethod.POST, entity, JsonNode.class);
