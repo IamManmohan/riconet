@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.FieldName;
+import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
@@ -69,7 +69,7 @@ public class TicketingServiceImpl implements TicketingService {
     Map<String, String> metadata = notificationDTO.getMetadata();
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
-    TicketingEmailTemplateHelper.getValueFromMap(metadata, FieldName.Ticketing.NEWLY_CCED_EMAIL)
+    TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.NEWLY_CCED_EMAIL)
         .ifPresent(
             to -> emailSenderService.sendEmail(Collections.singletonList(to), subject, body));
   }

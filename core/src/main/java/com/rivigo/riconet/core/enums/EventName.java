@@ -38,7 +38,7 @@ public enum EventName {
   /** Finance Events* */
   CLIENT_CREATE_UPDATE,
 
-  /** Ticketing Event * */
+  /** TicketingFieldName Event * */
   TICKET_CREATION,
   TICKET_ASSIGNEE_CHANGE,
   TICKET_STATUS_CHANGE,

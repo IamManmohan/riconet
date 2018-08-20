@@ -13,6 +13,9 @@ import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
+import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
+import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
+import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +30,18 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class EventTriggerServiceTest {
 
   @InjectMocks private EventTriggerService eventTriggerService;
+
+  @Mock private TicketingServiceImpl ticketingService;
+
+  private EmailSenderServiceImpl emailSenderService;
+
+  @Mock private RestTemplate restTemplate;
 
   @Mock private TicketingClientService ticketingClientService;
 
@@ -141,5 +151,32 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+  }
+
+  @Test
+  public void ticketingEventEmailTest() {
+
+    NotificationDTO notificationDTO;
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_ASSIGNEE_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_STATUS_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_ESCALATION_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.TICKET_CC_NEW_PERSON_ADDITION);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_SEVERITY_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_COMMENT_CREATION);
+    eventTriggerService.processNotification(notificationDTO);
   }
 }
