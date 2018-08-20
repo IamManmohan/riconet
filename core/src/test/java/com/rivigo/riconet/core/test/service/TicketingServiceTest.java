@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -23,6 +24,19 @@ public class TicketingServiceTest {
     RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
     ticketingService = new TicketingServiceImpl(emailSenderService);
+    // how to set local_mail.properties
+    // #mail properties
+    // email.notification.service.api=http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send
+    // sender.server.name=testing@devops.rivigo.com
+    // email.notification.service.user.agent=zoom-ticketing-dev
+
+    ReflectionTestUtils.setField(
+        emailSenderService, "senderServerName", "testing@devops.rivigo.com");
+    ReflectionTestUtils.setField(
+        emailSenderService,
+        "emailServiceApi",
+        "http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send");
+    ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "zoom-ticketing-dev");
   }
 
   @Test
@@ -53,7 +67,6 @@ public class TicketingServiceTest {
     ticketingService.sendTicketEscalationChangeEmail(notificationDTO);
   }
 
-
   @Test
   public void sendTicketSeverityChangeEmailTest() {
     NotificationDTO notificationDTO =
@@ -75,11 +88,4 @@ public class TicketingServiceTest {
     ticketingService.sendTicketCommentCreationEmail(notificationDTO);
   }
 
-  {
-
-
-//
-//    void sendTicketCcNewPersonAdditionEmail(NotificationDTO notificationDTO);
-//
-  }
 }
