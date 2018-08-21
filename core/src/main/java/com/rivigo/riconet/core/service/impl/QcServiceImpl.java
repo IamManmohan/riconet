@@ -606,7 +606,7 @@ public class QcServiceImpl implements QcService {
   }
 
   @Override
-  public void consumeQcBlockerTicketCreationEvent(String cnote) {
+  public void consumeQcBlockerTicketCreationEvent(Long ticketId, String cnote) {
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService.getTicketsByCnoteAndType(
             cnote,
@@ -615,10 +615,10 @@ public class QcServiceImpl implements QcService {
       log.info("No qc measurement tickets found for cnote {} ", cnote);
       return;
     }
-    TicketDTO recentTicket = ticketList.get(ticketList.size() - 1);
+    TicketDTO recentQcMeasurementTicket = ticketList.get(ticketList.size() - 1);
     Optional<TicketCommentDTO> urlOptional =
         zoomTicketingAPIClientService
-            .getComments(recentTicket.getId())
+            .getComments(recentQcMeasurementTicket.getId())
             .stream()
             .filter(comment -> comment.getAttachmentURL() != null)
             .reduce((first, second) -> second);
@@ -630,7 +630,7 @@ public class QcServiceImpl implements QcService {
     QcBlockerActionParams qcBlockerActionParams =
         QcBlockerActionParams.builder()
             .consignmentId(consignment.getId())
-            .ticketId(recentTicket.getId())
+            .ticketId(ticketId)
             .build();
     String uuid = UUID.randomUUID().toString().replace("-", "");
     Integer expiryHours =

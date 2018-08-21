@@ -19,5 +19,5 @@ public interface QcService {
 
   void consumeQcBlockerTicketClosedEvent(Long ticketId, Long ticketingUserId);
 
-  void consumeQcBlockerTicketCreationEvent(String cnote);
+  void consumeQcBlockerTicketCreationEvent(Long ticketId, String cnote);
 }

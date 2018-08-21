@@ -92,7 +92,7 @@ public class EventTriggerService {
                     .get(ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())));
         break;
       case CN_QC_BLOCKER_TICKET_CREATION:
-        qcService.consumeQcBlockerTicketCreationEvent(
+        qcService.consumeQcBlockerTicketCreationEvent(notificationDTO.getEntityId(),
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
       default:
