@@ -41,13 +41,13 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),
           consignment.getClient().getId(),
-          null,
+          ClientEntityMetadata.getDefaultLongValue(),
           OperationalStatus.ACTIVE);
     } else {
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),
-          null,
+          ClientEntityMetadata.getDefaultLongValue(),
           consignment.getOrganizationId(),
           OperationalStatus.ACTIVE);
     }
