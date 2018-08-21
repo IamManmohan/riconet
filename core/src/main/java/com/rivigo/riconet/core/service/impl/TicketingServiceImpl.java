@@ -30,65 +30,87 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketCreationEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCreationEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
   @Override
   public void sendTicketAssigneeChangeEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketAssigneeChangeEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
   @Override
   public void sendTicketStatusChangeEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketStatusChangeEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
   @Override
   public void sendTicketEscalationChangeEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketEscalationChangeEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
   @Override
   public void sendTicketCcNewPersonAdditionEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
-    TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.NEWLY_CCED_EMAIL)
-        .ifPresent(
-            to -> emailSenderService.sendEmail(Collections.singletonList(to), subject, body));
+    Optional<String> to =
+        TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.NEWLY_CCED_EMAIL);
+    log.info("Sending Ticketing Email. To : {} Subject : {}  Body : {} ", to, subject, body);
+    to.ifPresent(
+        recipient ->
+            emailSenderService.sendEmail(Collections.singletonList(recipient), subject, body));
   }
 
   @Override
   public void sendTicketSeverityChangeEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketSeverityChangeEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
   @Override
   public void sendTicketCommentCreationEmail(NotificationDTO notificationDTO) {
+    log.info("Identified Event : {} ", notificationDTO.getEntityName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCommentCreationEmailBody(metadata);
+    log.info(
+        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 }
