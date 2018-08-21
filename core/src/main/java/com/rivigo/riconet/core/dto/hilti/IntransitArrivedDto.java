@@ -16,7 +16,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class IntransitArrivedDto extends HiltiFieldData {
+public class IntransitArrivedDto extends BaseHiltiFieldData {
   private String atDestination;
   private String arrivedAt;
 }

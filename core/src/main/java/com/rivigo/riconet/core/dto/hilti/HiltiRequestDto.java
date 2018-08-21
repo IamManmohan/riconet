@@ -17,5 +17,5 @@ public class HiltiRequestDto {
   private String referenceNumber;
   private String jobType;
   private String newStatusCode;
-  private HiltiFieldData fieldData;
+  private BaseHiltiFieldData fieldData;
 }

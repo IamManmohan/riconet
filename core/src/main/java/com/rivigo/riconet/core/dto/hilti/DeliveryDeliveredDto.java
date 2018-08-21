@@ -16,7 +16,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class DeliveryDeliveredDto extends HiltiFieldData {
+public class DeliveryDeliveredDto extends BaseHiltiFieldData {
   private String latLong;
   private String deliverySignature;
   private String podDelivered;

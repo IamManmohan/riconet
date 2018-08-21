@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -8,7 +7,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.hilti.DeliveryDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryNotDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryOFDDto;
-import com.rivigo.riconet.core.dto.hilti.HiltiFieldData;
+import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
 import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitArrivedDto;
@@ -86,7 +85,6 @@ public class HiltiApiServiceImpl implements HiltiApiService {
 
   private List<HiltiRequestDto> lastRequestDtos = new ArrayList<>();
 
-  @SuppressWarnings("unchecked")
   private Optional<?> sendRequestToHilti(List<HiltiRequestDto> requestDtos) {
     return restClientUtilityService.executeRest(
         hiltiUpdateTransactionsUrl,
@@ -119,7 +117,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         .collect(Collectors.toList());
   }
 
-  private HiltiFieldData getIntransitFieldData(NotificationDTO notificationDTO) {
+  private BaseHiltiFieldData getIntransitFieldData(NotificationDTO notificationDTO) {
     ConsignmentReadOnly consignment =
         consignmentReadOnlyService
             .findConsignmentById(notificationDTO.getEntityId())
@@ -163,7 +161,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     }
   }
 
-  private HiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
+  private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
     switch (notificationDTO.getEventName()) {
       case CN_OUT_FOR_DELIVERY:
         return DeliveryOFDDto.builder().build();
@@ -198,8 +196,8 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     }
   }
 
-  private HiltiFieldData getFieldDataForCnEvents(NotificationDTO notificationDTO) {
-    HiltiFieldData fieldData;
+  private BaseHiltiFieldData getFieldDataForCnEvents(NotificationDTO notificationDTO) {
+    BaseHiltiFieldData fieldData;
     switch (notificationDTO.getEventName()) {
       case CN_RECEIVED_AT_OU:
       case CN_LOADED:
