@@ -242,7 +242,7 @@ public class QcServiceImpl implements QcService {
             ClientEntityType.PINCODE,
             pincode.getId(),
             consignment.getClient().getId(),
-            null,
+            ClientEntityMetadata.getDefaultLongValue(),
             OperationalStatus.ACTIVE);
 
     if (clusterMetadata != null) {
