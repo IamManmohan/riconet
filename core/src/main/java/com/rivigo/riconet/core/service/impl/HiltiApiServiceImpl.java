@@ -278,10 +278,10 @@ public class HiltiApiServiceImpl implements HiltiApiService {
   @Scheduled(fixedDelay = 500L)
   public void publishEventsAndProcessErrors() {
     lastRequestDtos.clear();
-    eventBuffer.drainTo(lastRequestDtos);
+    int pushedEventCount = eventBuffer.drainTo(lastRequestDtos);
 
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-    if (!lastRequestDtos.isEmpty()) {
+    if (pushedEventCount > 0) {
       log.info("Sending requests for {}", lastRequestDtos);
         HiltiResponseDto responseDto =
             objectMapper.convertValue(
