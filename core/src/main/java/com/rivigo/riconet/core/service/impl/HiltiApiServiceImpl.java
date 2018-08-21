@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.DeliveryDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryNotDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryOFDDto;
-import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
 import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitArrivedDto;
@@ -36,16 +36,6 @@ import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository;
 import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
 import com.rivigo.zoom.exceptions.ZoomException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +45,15 @@ import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.BooleanUtils;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -281,16 +280,16 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     if (pushedEventCount > 0) {
       log.info("Sending requests for {}", lastRequestDtos);
-        HiltiResponseDto responseDto =
-            objectMapper.convertValue(
-                sendRequestToHilti(lastRequestDtos)
-                    .orElseThrow(() -> new ZoomException("Unable to get response from Hilti")),
-                HiltiResponseDto.class);
-        log.info("Response from Hilti: {}", responseDto);
+      HiltiResponseDto responseDto =
+          objectMapper.convertValue(
+              sendRequestToHilti(lastRequestDtos)
+                  .orElseThrow(() -> new ZoomException("Unable to get response from Hilti")),
+              HiltiResponseDto.class);
+      log.info("Response from Hilti: {}", responseDto);
 
-        if (responseDto.getFailCount() > 0) {
-          handleFailures(responseDto.getFailureList());
-        }
+      if (responseDto.getFailCount() > 0) {
+        handleFailures(responseDto.getFailureList());
+      }
     }
   }
 

@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.test;
 
+import static java.lang.Thread.sleep;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
@@ -10,11 +12,14 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.impl.HiltiApiServiceImpl;
 import com.rivigo.riconet.core.service.impl.RestClientUtilityServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.common.model.UndeliveredConsignment;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository;
 import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +29,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static java.lang.Thread.sleep;
 
 @Slf4j
 public class HiltiApiServiceTest extends TesterBase {
@@ -53,7 +51,8 @@ public class HiltiApiServiceTest extends TesterBase {
 
   @InjectMocks private HiltiApiServiceImpl hiltiApiService;
 
-  public static final List<String> CNOTES = Arrays.asList("6000320900", "6000339900", "6000345901", "6000472125");
+  public static final List<String> CNOTES =
+      Arrays.asList("6000320900", "6000339900", "6000345901", "6000472125");
 
   public static final int CNOTE_INDEX = 3;
 
@@ -169,7 +168,7 @@ public class HiltiApiServiceTest extends TesterBase {
   }
 
   @Test
-  public void allEventsE2ETest() throws InterruptedException{
+  public void allEventsE2ETest() throws InterruptedException {
 
     addPickupDoneEvent();
     addintransitArrivedEvent();

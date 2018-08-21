@@ -9,5 +9,7 @@ public enum HiltiJobType {
 
   @Override
   @JsonValue
-  public String toString() { return name().toLowerCase(); }
+  public String toString() {
+    return name().toLowerCase();
+  }
 }

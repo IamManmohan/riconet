@@ -5,11 +5,10 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.HiltiApiService;
-import java.util.Arrays;
-import java.util.List;
-
 import com.rivigo.riconet.event.constants.ClientConstants;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

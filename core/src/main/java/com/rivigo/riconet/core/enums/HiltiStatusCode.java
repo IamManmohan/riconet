@@ -13,5 +13,7 @@ public enum HiltiStatusCode {
 
   @Override
   @JsonValue
-  public String toString() { return this.name().toLowerCase(); }
+  public String toString() {
+    return this.name().toLowerCase();
+  }
 }

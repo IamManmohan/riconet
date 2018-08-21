@@ -1,10 +1,9 @@
 package com.rivigo.riconet.core.service;
 
+import java.util.Optional;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-
-import java.util.Optional;
 
 public interface RestClientUtilityService {
 
