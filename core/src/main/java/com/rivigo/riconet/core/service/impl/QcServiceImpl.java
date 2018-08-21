@@ -48,6 +48,7 @@ import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PinCode;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
 import com.rivigo.zoom.common.repository.mysql.PinCodeRepository;
@@ -152,6 +153,17 @@ public class QcServiceImpl implements QcService {
     if (CollectionUtils.isEmpty(ticketList)) {
       return;
     }
+    AdministrativeEntity currentCluster =
+        administrativeEntityRepository.findParentCluster(unloadingData.getLocationId());
+    AdministrativeEntity fromCluster =
+        administrativeEntityRepository.findParentCluster(unloadingData.getFromId());
+    if (!fromCluster.getCode().equals(currentCluster.getCode())) {
+      closeQcTickets(
+          ticketList,
+          unloadingData.getConsignmentId(),
+          ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
+      return;
+    }
     GroupDTO group =
         zoomTicketingAPIClientService.getGroupId(
             unloadingData.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
@@ -168,14 +180,21 @@ public class QcServiceImpl implements QcService {
     if (!location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)) {
       return;
     }
-    ticketList.forEach(
-        ticketDTO ->
-            closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
+    closeQcTickets(
+        ticketList,
+        unloadingData.getConsignmentId(),
+        ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
+  }
+
+  private void closeQcTickets(
+      List<TicketDTO> ticketList, Long consignmentId, String reasonOfClosure) {
+
+    ticketList.forEach(ticketDTO -> closeTicket(ticketDTO, reasonOfClosure));
     handleQcConsignmentBlocker(
-        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
+        consignmentId, ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
     handleQcConsignmentBlocker(
-        unloadingData.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
-    zoomBackendAPIClientService.updateQcCheck(unloadingData.getConsignmentId(), false);
+        consignmentId, ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
+    zoomBackendAPIClientService.updateQcCheck(consignmentId, false);
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
@@ -309,10 +328,12 @@ public class QcServiceImpl implements QcService {
       return;
     }
     if (reCheckQcNeeded) {
-      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
+      handleQcConsignmentBlocker(
+          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
     }
-    if(measurementQcNeeded){
-      handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
+    if (measurementQcNeeded) {
+      handleQcConsignmentBlocker(
+          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
     }
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
   }
@@ -327,10 +348,10 @@ public class QcServiceImpl implements QcService {
             .reason(ReasonConstant.QC_VALIDATION_BLOCKER_REASON)
             .subReason(ReasonConstant.QC_VALIDATION_BLOCKER_SUB_REASON)
             .build();
-    if( qcType == QcType.RE_CHECK){
+    if (qcType == QcType.RE_CHECK) {
       qcBlocker.setReason(ReasonConstant.QC_VALIDATION_BLOCKER_REASON);
       qcBlocker.setSubReason(ReasonConstant.QC_VALIDATION_BLOCKER_SUB_REASON);
-    }else {
+    } else {
       qcBlocker.setReason(ReasonConstant.QC_MEASUREMENT_BLOCKER_REASON);
       qcBlocker.setSubReason(ReasonConstant.QC_MEASUREMENT_BLOCKER_SUB_REASON);
     }
@@ -551,8 +572,10 @@ public class QcServiceImpl implements QcService {
             .subReason(QC_BLOCKER_SUB_REASON)
             .build();
     zoomBackendAPIClientService.handleConsignmentBlocker(qcBlocker);
-    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
-    handleQcConsignmentBlocker(consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
+    handleQcConsignmentBlocker(
+        consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
+    handleQcConsignmentBlocker(
+        consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
     List<TicketDTO> tickets =
         zoomTicketingAPIClientService.getTicketsByCnoteAndType(primaryCnote, getQcTicketTypes());
@@ -565,7 +588,7 @@ public class QcServiceImpl implements QcService {
   }
 
   @Override
-  public void consumeQcBlockerTicketClosedEvent(Long ticketId) {
+  public void consumeQcBlockerTicketClosedEvent(Long ticketId, Long ticketingUserId) {
     if (ticketId == null) {
       return;
     }
@@ -577,7 +600,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      closeTicket(ticketDTO, ZoomTicketingConstant.QC_BLOCKER_CLOSURE_MESSAE);
+      closeTicket(ticketDTO, ZoomTicketingConstant.QC_BLOCKER_CLOSURE_MESSAGE);
     }
     zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
   }

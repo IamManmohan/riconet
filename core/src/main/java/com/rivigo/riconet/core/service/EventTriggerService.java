@@ -84,7 +84,12 @@ public class EventTriggerService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
       case QC_TICKET_ACTION:
-        qcService.consumeQcBlockerTicketClosedEvent(notificationDTO.getEntityId());
+        qcService.consumeQcBlockerTicketClosedEvent(
+            notificationDTO.getEntityId(),
+            Long.parseLong(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())));
         break;
       case CN_QC_BLOCKER_TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(
@@ -111,6 +116,11 @@ public class EventTriggerService {
         .locationId(
             Long.parseLong(
                 notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+        .fromId(
+            Long.parseLong(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())))
         .status(status)
         .build();
   }
