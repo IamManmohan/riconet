@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -20,10 +21,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
+@EnableScheduling
 @ComponentScan(
   basePackages = {
     "com.rivigo.riconet.notification",
@@ -73,6 +76,7 @@ public class ServiceConfig {
     mapper.registerModule(new JodaModule());
     mapper.registerModule(new GeoJsonModule());
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     return mapper;
   }
 
