@@ -117,11 +117,13 @@ public class HiltiApiServiceImpl implements HiltiApiService {
   }
 
   private BaseHiltiFieldData getIntransitFieldData(NotificationDTO notificationDTO) {
-    ConsignmentReadOnly consignment =
+    log.info("Getting consignment for id {}", notificationDTO.getEntityId());
+    Optional<ConsignmentReadOnly> consignmentReadOnlyOptional =
         consignmentReadOnlyService
-            .findConsignmentById(notificationDTO.getEntityId())
-            .orElseThrow(
-                () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
+            .findConsignmentById(notificationDTO.getEntityId()) ;
+    consignmentReadOnlyOptional.orElseThrow(
+                () -> new ZoomException("Unable to get consignment from " + notificationDTO));
+    ConsignmentReadOnly consignment = consignmentReadOnlyOptional.get();
     List<ConsignmentSchedule> schedules =
         consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
 
