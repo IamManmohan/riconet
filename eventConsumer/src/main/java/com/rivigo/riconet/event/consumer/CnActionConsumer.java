@@ -7,12 +7,11 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.HiltiApiService;
 import com.rivigo.riconet.event.constants.ClientConstants;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Slf4j
 @Component
