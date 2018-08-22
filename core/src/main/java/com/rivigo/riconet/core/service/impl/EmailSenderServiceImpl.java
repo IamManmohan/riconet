@@ -78,6 +78,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("X-User-Agent", emailUserAgent);
       HttpEntity<SendEmailRequest> entity = new HttpEntity<>(request, headers);
+      // todo remove this log
+      log.info(
+          "senderServerName : {} ,  emailServiceApi : {} , emailUserAgent : {} ",
+          senderServerName,
+          emailServiceApi,
+          emailUserAgent);
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);
