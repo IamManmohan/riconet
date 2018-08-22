@@ -30,8 +30,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketCreationEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCreationEmailBody(metadata);
@@ -42,8 +47,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketAssigneeChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketAssigneeChangeEmailBody(metadata);
@@ -54,9 +64,14 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketStatusChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketStatusChangeEmailBody(metadata);
     log.info(
@@ -66,8 +81,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketEscalationChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketEscalationChangeEmailBody(metadata);
@@ -78,8 +98,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketCcNewPersonAdditionEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
     Optional<String> to =
@@ -92,8 +117,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketSeverityChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketSeverityChangeEmailBody(metadata);
@@ -104,8 +134,13 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketCommentCreationEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEntityName());
+    log.info("Identified Event : {} ", notificationDTO.getEventName());
     Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
     Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCommentCreationEmailBody(metadata);

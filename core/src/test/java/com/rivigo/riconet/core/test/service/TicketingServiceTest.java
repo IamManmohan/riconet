@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,10 +19,11 @@ public class TicketingServiceTest {
 
   private TicketingServiceImpl ticketingService;
 
-  @Mock private RestTemplate restTemplate;
+  private RestTemplate restTemplate;
 
   @Before
   public void setUp() {
+    restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
@@ -45,42 +45,41 @@ public class TicketingServiceTest {
   @Test
   public void sendTicketAssigneeChangeEmailTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_ASSIGNEE_CHANGE);
+        NotificationDTOModel.getNotificationDTOTICKET_ASSIGNEE_CHANGE();
     ticketingService.sendTicketAssigneeChangeEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketStatusChangeEmailTest() {
-    NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_STATUS_CHANGE);
+    NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDTOTICKET_STATUS_CHANGE();
     ticketingService.sendTicketStatusChangeEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketEscalationChangeEmailTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_ESCALATION_CHANGE);
+        NotificationDTOModel.getNotificationDTOTICKET_ESCALATION_CHANGE();
     ticketingService.sendTicketEscalationChangeEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketSeverityChangeEmailTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_SEVERITY_CHANGE);
+        NotificationDTOModel.getNotificationDTOTICKET_SEVERITY_CHANGE();
     ticketingService.sendTicketSeverityChangeEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCcNewPersonAdditionEmailTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_CC_NEW_PERSON_ADDITION);
+        NotificationDTOModel.getNotificationDTOForTICKET_CC_NEW_PERSON_ADDITION();
     ticketingService.sendTicketCcNewPersonAdditionEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCommentCreationEmailTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_COMMENT_CREATION);
+        NotificationDTOModel.getNotificationDTOTICKET_COMMENT_CREATION();
     ticketingService.sendTicketCommentCreationEmail(notificationDTO);
   }
 }

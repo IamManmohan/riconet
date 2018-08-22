@@ -66,7 +66,7 @@ public class TicketingEmailTemplateHelper {
 
   public static Optional<String> getValueFromMap(
       Map<String, String> map, TicketingFieldName fieldName) {
-    if (!map.containsKey(fieldName.toString())) {
+    if (null == map || !map.containsKey(fieldName.toString())) {
       return Optional.empty();
     }
     return Optional.of(map.get(fieldName.toString()));

@@ -33,7 +33,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   @Value("${email.notification.service.api}")
   private String emailServiceApi;
 
-  @Value("${email.notification.service.user.agent}")
+  @Value("${notification.client.code}")
   private String emailUserAgent;
 
   private RestTemplate restTemplate;
@@ -81,9 +81,8 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);
-      log.info("Mail sent to recipients: {} , subject: {} , body: {} ", recipients, subject, body);
+      log.info("Mail sent from : {} to recipients: {} , subject: {} , body: {} ", request.getTo(), recipients, subject, body);
       log.info("Email response is {} ", responseObject);
-
     } catch (Exception e) {
       log.error(
           " Error while sending mail to recipients: {} with subject: {} and body: {} ",
