@@ -76,7 +76,6 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
-      headers.set("X-User-Agent", emailUserAgent);
       HttpEntity<SendEmailRequest> entity = new HttpEntity<>(request, headers);
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
