@@ -88,15 +88,19 @@ public class TicketingEmailTemplateHelper {
   }
 
   public static String getTicketCommentCreationEmailBody(Map<String, String> metadata) {
-    return new StringBuilder()
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder = stringBuilder
         .append(metadata.get(TicketingFieldName.CREATOR_EMAIL.toString()))
         .append(" has commented.<br>")
-        .append(metadata.get(TicketingFieldName.COMMENT_TEXT.toString()))
-        .append("<br> <a href=\"")
-        .append(metadata.get(TicketingFieldName.S3URL.toString()))
-        .append("\">Link to Attachment</a>")
-        .append("<br><br>Regards,<br>Rivigo Tickets<br>")
-        .toString();
+        .append(metadata.get(TicketingFieldName.COMMENT_TEXT.toString()));
+    if( metadata.containsKey(TicketingFieldName.S3URL.toString())) {
+      stringBuilder = stringBuilder
+          .append("<br> <a href=\"")
+          .append(metadata.get(TicketingFieldName.S3URL.toString()))
+          .append("\">Link to Attachment</a>");
+    }
+    stringBuilder = stringBuilder.append("<br><br>Regards,<br>Rivigo Tickets<br>");
+    return stringBuilder.toString();
   }
 
   public static String getTicketSeverityChangeEmailBody(Map<String, String> metadata) {
