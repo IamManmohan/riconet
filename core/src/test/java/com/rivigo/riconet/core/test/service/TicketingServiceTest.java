@@ -32,7 +32,7 @@ public class TicketingServiceTest {
         emailSenderService,
         "emailServiceApi",
         "http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send");
-    ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "zoom-ticketing-dev");
+    ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "riconet-qa");
   }
 
   @Test

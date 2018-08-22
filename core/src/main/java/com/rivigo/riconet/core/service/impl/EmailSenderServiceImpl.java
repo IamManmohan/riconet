@@ -76,13 +76,14 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
+      headers.set("X-User-Agent", emailUserAgent);
       HttpEntity<SendEmailRequest> entity = new HttpEntity<>(request, headers);
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);
       log.info(
           "Mail sent from : {} to recipients: {} , subject: {} , body: {} ",
-          request.getTo(),
+          request.getFrom(),
           recipients,
           subject,
           body);
