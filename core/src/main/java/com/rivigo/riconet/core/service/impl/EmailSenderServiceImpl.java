@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -37,12 +36,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   @Value("${notification.client.code}")
   private String emailUserAgent;
 
-  private final RestTemplate restTemplate;
+  private RestTemplate restTemplate;
 
   @Autowired
-  public EmailSenderServiceImpl(
-      @Qualifier("restTemplateForEmailSender") RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
+  public EmailSenderServiceImpl(RestTemplate restTemplate) {
+    //    this.restTemplate = restTemplate;
+    this.restTemplate = new RestTemplate();
   }
 
   @Override

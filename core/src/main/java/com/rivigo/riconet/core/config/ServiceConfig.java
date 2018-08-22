@@ -96,11 +96,11 @@ public class ServiceConfig {
     return restTemplate;
   }
 
-  @Bean
-  @Qualifier("restTemplateForEmailSender")
-  public static RestTemplate restTemplate() {
-    return new RestTemplate();
-  }
+  //  @Bean
+  //  @Primary
+  //  RestTemplate restTemplate() {
+  //    return new RestTemplate();
+  //  }
 
   @Bean(name = {"myProperties"})
   public static PropertiesFactoryBean mapper(
