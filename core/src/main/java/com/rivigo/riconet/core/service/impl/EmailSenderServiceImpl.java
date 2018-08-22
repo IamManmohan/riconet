@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,13 +34,6 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
   @Value("${notification.client.code}")
   private String emailUserAgent;
-
-  private RestTemplate restTemplate;
-
-  @Autowired
-  public EmailSenderServiceImpl(@Qualifier("restTemplate") RestTemplate restTemplate) {
-    this.restTemplate = restTemplate;
-  }
 
   @Override
   public void sendEmail(List<String> recipients, String subject, String body) {
@@ -85,7 +76,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
           senderServerName,
           emailServiceApi,
           emailUserAgent);
-      //      RestTemplate restTemplate = new RestTemplate();
+      RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);

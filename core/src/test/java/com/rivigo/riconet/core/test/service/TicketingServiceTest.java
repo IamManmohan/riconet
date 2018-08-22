@@ -24,7 +24,7 @@ public class TicketingServiceTest {
   @Before
   public void setUp() {
     restTemplate = new RestTemplate();
-    EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
+    EmailSenderService emailSenderService = new EmailSenderServiceImpl();
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
         emailSenderService, "senderServerName", "testing@devops.rivigo.com");
