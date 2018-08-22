@@ -80,7 +80,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       ResponseEntity<NotificationResponseDTO> responseObject =
           restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);
-      log.info("Mail sent from : {} to recipients: {} , subject: {} , body: {} ", request.getTo(), recipients, subject, body);
+      log.info(
+          "Mail sent from : {} to recipients: {} , subject: {} , body: {} ",
+          request.getTo(),
+          recipients,
+          subject,
+          body);
       log.info("Email response is {} ", responseObject);
     } catch (Exception e) {
       log.error(
