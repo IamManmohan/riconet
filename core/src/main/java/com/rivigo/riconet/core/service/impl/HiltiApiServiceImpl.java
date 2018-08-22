@@ -158,7 +158,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
             .build();
       default:
         log.error("Unrecognized intransit event {}", notificationDTO);
-        throw new ZoomException("Unrecognized intransit event {}", notificationDTO);
+        throw new ZoomException("Unrecognized intransit event " + notificationDTO);
     }
   }
 
@@ -193,7 +193,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
             .build();
       default:
         log.error("Unrecognized delivery event {}", notificationDTO);
-        throw new ZoomException("Unrecognized delivery event {}", notificationDTO);
+        throw new ZoomException("Unrecognized delivery event " + notificationDTO);
     }
   }
 
@@ -211,7 +211,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         break;
       default:
         log.error("Unrecognized event {}", notificationDTO);
-        throw new ZoomException("Unrecognized event {}", notificationDTO);
+        throw new ZoomException("Unrecognized event {}" + notificationDTO);
     }
     fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
     fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
@@ -249,7 +249,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         break;
       default:
         log.error("Invalid event captured. Unable to process {}", notificationDTO);
-        throw new ZoomException("Invalid event captured. Unable to process {}", notificationDTO);
+        throw new ZoomException("Invalid event captured. Unable to process " + notificationDTO);
     }
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.toString());
     if (Strings.isNullOrEmpty(cnote)) {
@@ -258,7 +258,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
               .findConsignmentById(notificationDTO.getEntityId())
               .map(ConsignmentReadOnly::getCnote)
               .orElseThrow(
-                  () -> new ZoomException("Unable to get consignment from {}", notificationDTO));
+                  () -> new ZoomException("Unable to get consignment from " + notificationDTO));
     }
     return Collections.singletonList(
         HiltiRequestDto.builder()
@@ -270,7 +270,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
   }
 
   public boolean addEventsToQueue(List<HiltiRequestDto> requestDtos) {
-    log.info("Adding events to queue to send to Fareye {}", requestDtos);
+    log.info("Adding events to queue to send to Hilti {}", requestDtos);
     return eventBuffer.addAll(requestDtos);
   }
 
