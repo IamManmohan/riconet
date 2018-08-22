@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,36 @@ public class TicketingEmailTemplateHelper {
     getValueFromMap(metadata, TicketingFieldName.TICKET_TYPE)
         .ifPresent(v -> subject.append(" | ").append(v));
     return subject.toString();
+  }
+
+  public static Optional<List<String>> getCommentEmailRecipientList(Map<String, String> metadata) {
+    Optional<List<String>> toRecipients = getRecipientList(metadata);
+    if (!toRecipients.isPresent()) {
+      log.info(
+          "toRecipients not exist for sending comment creation email." + " \n metadata : {}",
+          metadata);
+      return toRecipients;
+    }
+
+    Optional<String> commentCreatorEmail =
+        TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.CREATOR_EMAIL);
+    if (!commentCreatorEmail.isPresent()) {
+      log.info("commentCreatorEmail: {} not exist. toRecipients : {}, metadata : {}", metadata);
+      return toRecipients;
+    }
+    // removing commentator email to avoid cycle of sending emails
+    List<String> filteredEmails =
+        toRecipients
+            .get()
+            .stream()
+            .filter(to -> !to.equals(commentCreatorEmail.get()))
+            .collect(Collectors.toList());
+    log.info(
+        " filtered email list for sending comment creation email : {}, commentator email: {} , toRecipient emails: {} ",
+        filteredEmails,
+        commentCreatorEmail.get(),
+        toRecipients.get());
+    return Optional.of(filteredEmails);
   }
 
   public static Optional<List<String>> getRecipientList(Map<String, String> metadata) {

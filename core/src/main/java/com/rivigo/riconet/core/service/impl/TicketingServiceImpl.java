@@ -141,7 +141,9 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
+    Optional<List<String>> toRecipients =
+        TicketingEmailTemplateHelper.getCommentEmailRecipientList(metadata);
+
     String subject = TicketingEmailTemplateHelper.getSubject(metadata);
     String body = TicketingEmailTemplateHelper.getTicketCommentCreationEmailBody(metadata);
     log.info(
