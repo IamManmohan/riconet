@@ -17,6 +17,7 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -96,11 +97,11 @@ public class ServiceConfig {
     return restTemplate;
   }
 
-  //  @Bean
-  //  @Primary
-  //  RestTemplate restTemplate() {
-  //    return new RestTemplate();
-  //  }
+  @Bean("restTemplate")
+  @Primary
+  RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 
   @Bean(name = {"myProperties"})
   public static PropertiesFactoryBean mapper(
