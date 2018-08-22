@@ -6,5 +6,6 @@ public class ClientConstants {
     throw new IllegalStateException("Utility class");
   }
 
-  public static final String HILTI_CLIENT_ID = "9300";
+  public static final String HILTI_CLIENT_ID = "619";
+  public static final String HILTI_CLIENT_ID_DEP = "2187";
 }

@@ -38,6 +38,7 @@ public class CnActionConsumer extends EventConsumer {
       throw new ZoomException("Client Id not found in the event {}", notificationDTO);
     switch (clientId) {
       case ClientConstants.HILTI_CLIENT_ID:
+      case ClientConstants.HILTI_CLIENT_ID_DEP:
         hiltiApiService.addEventsToQueue(hiltiApiService.getRequestDtosByType(notificationDTO));
         break;
       default:
