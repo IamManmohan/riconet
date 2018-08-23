@@ -147,7 +147,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     }
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("ticketId", Collections.singletonList(ticketId.toString()));
+    valuesMap.put(TICKET_ID, Collections.singletonList(ticketId.toString()));
     String url = UrlConstant.ZOOM_TICKETING_GET_COMMENTS;
     try {
       responseJson =

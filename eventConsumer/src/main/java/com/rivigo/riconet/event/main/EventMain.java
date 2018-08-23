@@ -5,6 +5,7 @@ import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
+import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
@@ -34,15 +35,19 @@ public class EventMain {
 
   private static final String LATEST = "latest";
 
+  private final CnActionConsumer cnActionConsumer;
+
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
-      FinanceEventsConsumer financeEventsConsumer) {
+      FinanceEventsConsumer financeEventsConsumer,
+      CnActionConsumer cnActionConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
+    this.cnActionConsumer = cnActionConsumer;
   }
 
   public static void main(String[] args) {
@@ -84,6 +89,8 @@ public class EventMain {
       ConsumerSettings<String, String> consignmentBlockerConsumerSettings) {
     log.info("Loading zoom event trigger consumer with settings {}", consumerSettings);
     zoomEventTriggerConsumer.load(materializer, consumerSettings);
+    log.info("Loading event trigger for cn status change with settings {}", consumerSettings);
+    cnActionConsumer.load(materializer, consumerSettings);
     log.info(
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);

@@ -135,6 +135,11 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
         throw new ZoomException(
             "Unable to connect to server: {%s}", responseEntity.getStatusCode());
       }
+      if (responseEntity.getStatusCode().is4xxClientError()) {
+        throw new ZoomException(
+            "Invalid request received:{%s}. Response: {%s}", entity, responseEntity.getStatusCode());
+      }
+
       return responseEntity.getBody();
 
     } catch (HttpClientErrorException | HttpServerErrorException e) {
