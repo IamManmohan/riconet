@@ -653,6 +653,7 @@ public class QcServiceImpl implements QcService {
     valuesMap.put("toLocationName", toLocation.getName());
     valuesMap.put("currentLocationCode", currentLocation.getCode());
     valuesMap.put("currentLocationName", currentLocation.getName());
+    valuesMap.put("cnote", consignment.getCnote());
     valuesMap.put("imageZipUrl", imageZipUrl);
     valuesMap.put("uuid", uuid);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
