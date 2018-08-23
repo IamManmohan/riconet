@@ -32,16 +32,15 @@ public class EventTriggerService {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
       case CN_DELIVERY:
+      case CN_DELETED:
         String entityId =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.closeTicket(
-            entityId, TicketEntityType.CN.name(), EventName.CN_DELIVERY);
+        ticketingClientService.closeTicket(entityId, TicketEntityType.CN.name(), eventName);
         break;
       case PICKUP_COMPLETION:
+      case PICKUP_CANCELLATION:
         ticketingClientService.closeTicket(
-            notificationDTO.getEntityId().toString(),
-            TicketEntityType.PRQ.name(),
-            EventName.PICKUP_COMPLETION);
+            notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), eventName);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
