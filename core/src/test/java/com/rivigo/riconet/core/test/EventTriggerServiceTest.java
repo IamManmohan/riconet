@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.test;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -171,7 +172,7 @@ public class EventTriggerServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTO.builder().eventName(EventName.QC_TICKET_ACTION).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(5l);
+    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any());
   }
 
   @Test
@@ -186,6 +187,6 @@ public class EventTriggerServiceTest {
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1)).consumeQcBlockerTicketCreationEvent("1234567890");
+    verify(qcService, times(1)).consumeQcBlockerTicketCreationEvent(5l, "1234567890");
   }
 }

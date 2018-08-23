@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketEntityType;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,13 +87,12 @@ public class EventTriggerService {
       case QC_TICKET_ACTION:
         qcService.consumeQcBlockerTicketClosedEvent(
             notificationDTO.getEntityId(),
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())));
+            getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
+                .orElse(null));
         break;
       case CN_QC_BLOCKER_TICKET_CREATION:
-        qcService.consumeQcBlockerTicketCreationEvent(notificationDTO.getEntityId(),
+        qcService.consumeQcBlockerTicketCreationEvent(
+            notificationDTO.getEntityId(),
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
       default:
@@ -109,20 +109,23 @@ public class EventTriggerService {
     return ConsignmentBasicDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
         .consignmentId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())
+                .orElse(null))
         .locationId(
-            Long.parseLong(
-                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.LOCATION_ID.name()).orElse(null))
         .fromId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())
+                .orElse(null))
         .status(status)
         .build();
+  }
+
+  public Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
+    try {
+      return Optional.of(Long.parseLong(notificationDTO.getMetadata().get(fieldName)));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
   }
 
   private ConsignmentCompletionEventDTO getConsignmentCompletionDTO(

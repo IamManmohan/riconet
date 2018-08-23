@@ -44,9 +44,11 @@ import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.ruleengine.RuleEngineRule;
 import com.rivigo.zoom.common.repository.mysql.ruleengine.RuleEngineRuleRepository;
+import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
@@ -96,6 +98,8 @@ public class QcServiceTest {
   @Mock private UserMasterService userMasterService;
 
   @Mock private EmailService emailService;
+
+  @Mock private AdministrativeEntityRepository administrativeEntityRepository;
 
   @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
@@ -243,6 +247,10 @@ public class QcServiceTest {
     data.setCnote("1234567890");
     data.setLocationId(15l);
     eventDTO.setMetadata(objectMapper.convertValue(data, Map.class));
+
+    AdministrativeEntity aem = new AdministrativeEntity();
+    aem.setCode("DEL");
+
     // closed ticket is not edited
     TicketDTO ticket1 =
         TicketDTO.builder()
@@ -276,6 +284,8 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getGroupId(
             data.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU))
         .thenReturn(GroupDTO.builder().id(39l).build());
+    when(administrativeEntityRepository.findParentCluster(any())).thenReturn(aem);
+
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket2);
@@ -296,6 +306,10 @@ public class QcServiceTest {
     data.setCnote("1234567890");
     data.setLocationId(15l);
     eventDTO.setMetadata(objectMapper.convertValue(data, Map.class));
+
+    AdministrativeEntity aem = new AdministrativeEntity();
+    aem.setCode("DEL");
+
     // measurment task will be closed
     TicketDTO ticket1 =
         TicketDTO.builder()
@@ -315,6 +329,8 @@ public class QcServiceTest {
     Location location = new Location();
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
+    when(administrativeEntityRepository.findParentCluster(any())).thenReturn(aem);
+
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket2);
@@ -484,7 +500,7 @@ public class QcServiceTest {
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID + 1)
                 .status(TicketStatus.CLOSED)
                 .build());
-    qcService.consumeQcBlockerTicketClosedEvent(5l);
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
     verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(5l);
   }
 
@@ -496,7 +512,7 @@ public class QcServiceTest {
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
                 .status(TicketStatus.CLOSED)
                 .build());
-    qcService.consumeQcBlockerTicketClosedEvent(5l);
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
     verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
   }
 
@@ -528,7 +544,7 @@ public class QcServiceTest {
 
   @Test
   public void consumeQcBlockerTicketClosedEventNullTest() {
-    qcService.consumeQcBlockerTicketClosedEvent(null);
+    qcService.consumeQcBlockerTicketClosedEvent(null, 10l);
     verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(any());
   }
 
@@ -561,7 +577,7 @@ public class QcServiceTest {
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());
-    qcService.consumeQcBlockerTicketCreationEvent("1234567890");
+    qcService.consumeQcBlockerTicketCreationEvent(5l, "1234567890");
     verify(emailService, times(1))
         .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
   }

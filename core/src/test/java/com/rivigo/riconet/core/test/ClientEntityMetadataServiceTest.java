@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.service.impl.ClientEntityMetadataServiceImpl;
 import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.Client;
+import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
@@ -62,7 +63,11 @@ public class ClientEntityMetadataServiceTest {
     clientEntityMetadataService.getClientClusterMetadata(consignment);
     verify(clientEntityMetadataRepository, times(1))
         .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-            ClientEntityType.CLUSTER, 20l, 30l, null, OperationalStatus.ACTIVE);
+            ClientEntityType.CLUSTER,
+            20l,
+            30l,
+            ClientEntityMetadata.getDefaultLongValue(),
+            OperationalStatus.ACTIVE);
   }
 
   @Test
@@ -79,7 +84,7 @@ public class ClientEntityMetadataServiceTest {
         .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
             ClientEntityType.CLUSTER,
             20l,
-            null,
+            ClientEntityMetadata.getDefaultLongValue(),
             ConsignmentConstant.RIVIGO_ORGANIZATION_ID + 1,
             OperationalStatus.ACTIVE);
   }
