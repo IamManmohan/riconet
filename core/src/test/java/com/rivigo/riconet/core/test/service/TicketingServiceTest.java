@@ -9,7 +9,6 @@ import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author ramesh
@@ -19,11 +18,14 @@ public class TicketingServiceTest {
 
   private TicketingServiceImpl ticketingService;
 
-  private RestTemplate restTemplate;
+  /*
+   * There is no assert statement in any of test case in this class.
+   * Assertion logic : check if these test cases are sending emails to designation emails
+   * TODO : Will add mocking of restTemplate also
+   * */
 
   @Before
   public void setUp() {
-    restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl();
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
@@ -39,47 +41,47 @@ public class TicketingServiceTest {
   public void sendTicketCreationEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
-    ticketingService.sendTicketCreationEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketAssigneeChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_ASSIGNEE_CHANGE();
-    ticketingService.sendTicketAssigneeChangeEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketStatusChangeEmailTest() {
     NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDTOTICKET_STATUS_CHANGE();
-    ticketingService.sendTicketStatusChangeEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketEscalationChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_ESCALATION_CHANGE();
-    ticketingService.sendTicketEscalationChangeEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketSeverityChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_SEVERITY_CHANGE();
-    ticketingService.sendTicketSeverityChangeEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCcNewPersonAdditionEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOForTICKET_CC_NEW_PERSON_ADDITION();
-    ticketingService.sendTicketCcNewPersonAdditionEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCommentCreationEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_COMMENT_CREATION();
-    ticketingService.sendTicketCommentCreationEmail(notificationDTO);
+    ticketingService.sendTicketingEmail(notificationDTO);
   }
 }

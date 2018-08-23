@@ -1,11 +1,10 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.TicketingFieldName;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,125 +28,78 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
   @Override
-  public void sendTicketCreationEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
+  public void sendTicketingEmail(NotificationDTO notificationDTO) {
+    EventName eventName = notificationDTO.getEventName();
+    log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
     if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
+      log.info(
+          "No metadata found for sending email of Event: {} EventUID: {} ",
+          eventName,
+          notificationDTO.getEventUID());
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketCreationEmailBody(metadata);
+    Optional<List<String>> toRecipients = getRecipients(eventName, metadata);
+    String subject = getSubject(eventName, metadata);
+    String body = getBody(eventName, metadata);
     log.info(
         "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
 
-  @Override
-  public void sendTicketAssigneeChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
+  private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
+    switch (eventName) {
+      case TICKET_COMMENT_CREATION:
+        return TicketingEmailTemplateHelper.getCommentEmailRecipientList(metadata);
+      case TICKET_CREATION:
+      case TICKET_ASSIGNEE_CHANGE:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+      case TICKET_SEVERITY_CHANGE:
+        return TicketingEmailTemplateHelper.getRecipientList(metadata);
+      default:
+        log.info(" No Recipient function found for event : {}", eventName);
     }
-    log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketAssigneeChangeEmailBody(metadata);
-    log.info(
-        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
-    toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
+    return Optional.empty();
   }
 
-  @Override
-  public void sendTicketStatusChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
+  private String getSubject(EventName eventName, Map<String, String> metadata) {
+    switch (eventName) {
+      case TICKET_COMMENT_CREATION:
+      case TICKET_CREATION:
+      case TICKET_ASSIGNEE_CHANGE:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+      case TICKET_SEVERITY_CHANGE:
+        return TicketingEmailTemplateHelper.getSubject(metadata);
+      default:
+        log.info(" No Subject function found for event : {}", eventName);
     }
-    log.info("Event Metadata : {} ", metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketStatusChangeEmailBody(metadata);
-    log.info(
-        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
-    toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
+    return "";
   }
 
-  @Override
-  public void sendTicketEscalationChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
+  private String getBody(EventName eventName, Map<String, String> metadata) {
+    switch (eventName) {
+      case TICKET_COMMENT_CREATION:
+        return TicketingEmailTemplateHelper.getTicketCommentCreationEmailBody(metadata);
+      case TICKET_CREATION:
+        return TicketingEmailTemplateHelper.getTicketCreationEmailBody(metadata);
+      case TICKET_ASSIGNEE_CHANGE:
+        return TicketingEmailTemplateHelper.getTicketAssigneeChangeEmailBody(metadata);
+      case TICKET_STATUS_CHANGE:
+        return TicketingEmailTemplateHelper.getTicketStatusChangeEmailBody(metadata);
+      case TICKET_ESCALATION_CHANGE:
+        return TicketingEmailTemplateHelper.getTicketEscalationChangeEmailBody(metadata);
+      case TICKET_CC_NEW_PERSON_ADDITION:
+        return TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
+      case TICKET_SEVERITY_CHANGE:
+        return TicketingEmailTemplateHelper.getTicketSeverityChangeEmailBody(metadata);
+      default:
+        log.info(" No subject function found for event : {}", eventName);
     }
-    log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketEscalationChangeEmailBody(metadata);
-    log.info(
-        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
-    toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
-  }
-
-  @Override
-  public void sendTicketCcNewPersonAdditionEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
-    }
-    log.info("Event Metadata : {} ", metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketCcNewPersonAdditionEmailBody(metadata);
-    Optional<String> to =
-        TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.NEWLY_CCED_EMAIL);
-    log.info("Sending Ticketing Email. To : {} Subject : {}  Body : {} ", to, subject, body);
-    to.ifPresent(
-        recipient ->
-            emailSenderService.sendEmail(Collections.singletonList(recipient), subject, body));
-  }
-
-  @Override
-  public void sendTicketSeverityChangeEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
-    }
-    log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = TicketingEmailTemplateHelper.getRecipientList(metadata);
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketSeverityChangeEmailBody(metadata);
-    log.info(
-        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
-    toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
-  }
-
-  @Override
-  public void sendTicketCommentCreationEmail(NotificationDTO notificationDTO) {
-    log.info("Identified Event : {} ", notificationDTO.getEventName());
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
-      log.info("No metadata found for sending email of Event: {} ", notificationDTO.getEventName());
-      return;
-    }
-    log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients =
-        TicketingEmailTemplateHelper.getCommentEmailRecipientList(metadata);
-
-    String subject = TicketingEmailTemplateHelper.getSubject(metadata);
-    String body = TicketingEmailTemplateHelper.getTicketCommentCreationEmailBody(metadata);
-    log.info(
-        "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
-    toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
+    return "";
   }
 }

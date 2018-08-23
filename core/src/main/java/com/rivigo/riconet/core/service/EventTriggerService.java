@@ -76,25 +76,13 @@ public class EventTriggerService {
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       case TICKET_CREATION:
-        ticketingService.sendTicketCreationEmail(notificationDTO);
-        break;
       case TICKET_ASSIGNEE_CHANGE:
-        ticketingService.sendTicketAssigneeChangeEmail(notificationDTO);
-        break;
       case TICKET_STATUS_CHANGE:
-        ticketingService.sendTicketStatusChangeEmail(notificationDTO);
-        break;
       case TICKET_ESCALATION_CHANGE:
-        ticketingService.sendTicketEscalationChangeEmail(notificationDTO);
-        break;
       case TICKET_CC_NEW_PERSON_ADDITION:
-        ticketingService.sendTicketCcNewPersonAdditionEmail(notificationDTO);
-        break;
       case TICKET_SEVERITY_CHANGE:
-        ticketingService.sendTicketSeverityChangeEmail(notificationDTO);
-        break;
       case TICKET_COMMENT_CREATION:
-        ticketingService.sendTicketCommentCreationEmail(notificationDTO);
+        ticketingService.sendTicketingEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

@@ -8,17 +8,5 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
  */
 public interface TicketingService {
 
-  void sendTicketCreationEmail(NotificationDTO notificationDTO);
-
-  void sendTicketAssigneeChangeEmail(NotificationDTO notificationDTO);
-
-  void sendTicketStatusChangeEmail(NotificationDTO notificationDTO);
-
-  void sendTicketEscalationChangeEmail(NotificationDTO notificationDTO);
-
-  void sendTicketCcNewPersonAdditionEmail(NotificationDTO notificationDTO);
-
-  void sendTicketSeverityChangeEmail(NotificationDTO notificationDTO);
-
-  void sendTicketCommentCreationEmail(NotificationDTO notificationDTO);
+  void sendTicketingEmail(NotificationDTO notificationDTO);
 }
