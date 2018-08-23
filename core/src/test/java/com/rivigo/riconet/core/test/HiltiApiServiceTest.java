@@ -177,6 +177,6 @@ public class HiltiApiServiceTest extends TesterBase {
     addIntransitArrivedAtDestinationEvent();
     addDeliveryOFDEvent();
     addDeliveryDeliveredEvent();
-    sleep(100000);
+    sleep(1000);
   }
 }
