@@ -642,7 +642,7 @@ public class QcServiceImpl implements QcService {
     String bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
 
     Location fromLocation = locationService.getLocationById(consignment.getFromId());
-    Location toLocation = locationService.getLocationById(consignment.getFromId());
+    Location toLocation = locationService.getLocationById(consignment.getToId());
     Location currentLocation = locationService.getLocationById(consignment.getLocationId());
 
     Map<String, String> valuesMap = new HashMap<>();
@@ -654,6 +654,8 @@ public class QcServiceImpl implements QcService {
     valuesMap.put("currentLocationCode", currentLocation.getCode());
     valuesMap.put("currentLocationName", currentLocation.getName());
     valuesMap.put("cnote", consignment.getCnote());
+    valuesMap.put("consigneeAddress",consignment.getConsigneeAddress());
+    valuesMap.put("consignorAddress",consignment.getConsignorAddress());
     valuesMap.put("imageZipUrl", imageZipUrl);
     valuesMap.put("uuid", uuid);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
