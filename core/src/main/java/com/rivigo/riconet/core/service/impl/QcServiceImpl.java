@@ -555,12 +555,19 @@ public class QcServiceImpl implements QcService {
   }
 
   @Override
-  public void consumeDepsCreationEvent(String cnote) {
-    String primaryCnote = cnote.split("-")[0];
-    Consignment consignment = consignmentService.getConsignmentByCnote(primaryCnote);
-
-    if (consignment == null) {
-      throw new ZoomException("No consignment exists with cnote %s ", primaryCnote);
+  public void consumeDepsCreationEvent(String cnote, Long consignmentId) {
+    Consignment consignment;
+    if (cnote != null) {
+      String primaryCnote = cnote.split("-")[0];
+      consignment = consignmentService.getConsignmentByCnote(primaryCnote);
+      if (consignment == null) {
+        throw new ZoomException("No consignment exists with cnote %s ", primaryCnote);
+      }
+    } else {
+      consignment = consignmentService.getConsignmentById(consignmentId);
+      if (consignment == null) {
+        throw new ZoomException("No consignment exists with id %s ", consignmentId);
+      }
     }
 
     ConsignmentBlockerRequestDTO qcBlocker =
@@ -578,7 +585,8 @@ public class QcServiceImpl implements QcService {
         consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
     List<TicketDTO> tickets =
-        zoomTicketingAPIClientService.getTicketsByCnoteAndType(primaryCnote, getQcTicketTypes());
+        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            consignment.getCnote(), getQcTicketTypes());
     tickets.forEach(
         ticketDTO -> {
           if (!TicketStatus.CLOSED.equals(ticketDTO.getStatus())) {
@@ -654,8 +662,8 @@ public class QcServiceImpl implements QcService {
     valuesMap.put("currentLocationCode", currentLocation.getCode());
     valuesMap.put("currentLocationName", currentLocation.getName());
     valuesMap.put("cnote", consignment.getCnote());
-    valuesMap.put("consigneeAddress",consignment.getConsigneeAddress());
-    valuesMap.put("consignorAddress",consignment.getConsignorAddress());
+    valuesMap.put("consigneeAddress", consignment.getConsigneeAddress());
+    valuesMap.put("consignorAddress", consignment.getConsignorAddress());
     valuesMap.put("imageZipUrl", imageZipUrl);
     valuesMap.put("uuid", uuid);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
