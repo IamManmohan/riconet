@@ -28,7 +28,7 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
   @Override
-  public void sendTicketingEmail(NotificationDTO notificationDTO) {
+  public void sendTicketingEventsEmail(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
@@ -40,9 +40,9 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    Optional<List<String>> toRecipients = getRecipients(eventName, metadata);
-    String subject = getSubject(eventName, metadata);
-    String body = getBody(eventName, metadata);
+    Optional<List<String>> toRecipients = this.getRecipients(eventName, metadata);
+    String subject = this.getSubject(eventName, metadata);
+    String body = this.getBody(eventName, metadata);
     log.info(
         "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
@@ -50,17 +50,18 @@ public class TicketingServiceImpl implements TicketingService {
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
-      case TICKET_COMMENT_CREATION:
-        return TicketingEmailTemplateHelper.getCommentEmailRecipientList(metadata);
       case TICKET_CREATION:
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
-      case TICKET_CC_NEW_PERSON_ADDITION:
       case TICKET_SEVERITY_CHANGE:
         return TicketingEmailTemplateHelper.getRecipientList(metadata);
+      case TICKET_COMMENT_CREATION:
+        return TicketingEmailTemplateHelper.getCommentEmailRecipientList(metadata);
+      case TICKET_CC_NEW_PERSON_ADDITION:
+        return TicketingEmailTemplateHelper.getNewlyCcedEmailRecipientList(metadata);
       default:
-        log.info(" No Recipient function found for event : {}", eventName);
+        log.info(" No Recipient getter function found for event : {}", eventName);
     }
     return Optional.empty();
   }
@@ -76,7 +77,7 @@ public class TicketingServiceImpl implements TicketingService {
       case TICKET_SEVERITY_CHANGE:
         return TicketingEmailTemplateHelper.getSubject(metadata);
       default:
-        log.info(" No Subject function found for event : {}", eventName);
+        log.info(" No Subject getter function found for event : {}", eventName);
     }
     return "";
   }
@@ -98,7 +99,7 @@ public class TicketingServiceImpl implements TicketingService {
       case TICKET_SEVERITY_CHANGE:
         return TicketingEmailTemplateHelper.getTicketSeverityChangeEmailBody(metadata);
       default:
-        log.info(" No subject function found for event : {}", eventName);
+        log.info(" No body getter function found for event : {}", eventName);
     }
     return "";
   }

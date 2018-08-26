@@ -41,47 +41,47 @@ public class TicketingServiceTest {
   public void sendTicketCreationEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketAssigneeChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_ASSIGNEE_CHANGE();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketStatusChangeEmailTest() {
     NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDTOTICKET_STATUS_CHANGE();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketEscalationChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_ESCALATION_CHANGE();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketSeverityChangeEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_SEVERITY_CHANGE();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCcNewPersonAdditionEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOForTICKET_CC_NEW_PERSON_ADDITION();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
   @Test
   public void sendTicketCommentCreationEmailTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTOTICKET_COMMENT_CREATION();
-    ticketingService.sendTicketingEmail(notificationDTO);
+    ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 }
