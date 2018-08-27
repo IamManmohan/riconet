@@ -32,8 +32,7 @@ public class CnActionConsumer extends EventConsumer {
 
   private void eventFactory(NotificationDTO notificationDTO) {
 
-    String clientId =
-        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CLIENT_ID.name());
+    String clientId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CLIENT_ID.name());
 
     if (Strings.isNullOrEmpty(clientId))
       throw new ZoomException("Client Id not found in the event {}", notificationDTO);

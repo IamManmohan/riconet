@@ -137,8 +137,7 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
       }
       if (responseEntity.getStatusCode().is4xxClientError()) {
         throw new ZoomException(
-            "Invalid request received:{%s}. Response: {%s}",
-            entity, responseEntity.getStatusCode());
+            "Invalid request received:{%s}. Response: {%s}", entity, responseEntity.getStatusCode());
       }
 
       return responseEntity.getBody();
