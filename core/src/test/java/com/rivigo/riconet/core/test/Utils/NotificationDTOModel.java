@@ -212,7 +212,7 @@ public class NotificationDTOModel {
     metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
     metadata.put("LAST_UPDATED_BY_EMAIL", "ramesh.chandra@rivigo.com");
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_STATUS_CHANGE)
+        .eventName(EventName.TICKET_SEVERITY_CHANGE)
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -228,20 +228,20 @@ public class NotificationDTOModel {
     metadata.put(
         " COMMENT_TEXT",
         "<p>Hi Everyone,<br>\r\nThis is just a lat night commit.</p>\r\n<p>Thanks</p>");
-    metadata.put(" TICKET_ID", "248212");
-    metadata.put(" ID", "753256");
-    metadata.put(" CREATED_BY_ID", "5888");
-    metadata.put(" CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put("TICKET_ID", "248212");
+    metadata.put("ID", "753256");
+    metadata.put("CREATED_BY_ID", "5888");
+    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
     metadata.put(
-        " CC_USER_EMAIL_LIST",
+        "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
-    metadata.put(" SLA", " 109 days 14 hours 15 minutes  Overdue");
-    metadata.put(" TICKET_TYPE", "Damage");
-    metadata.put(" ASSIGNEE_EMAIL_LIST", "rameshc10695@gmail.com");
-    metadata.put(" ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL", "rameshc10695@gmail.com");
-    metadata.put(" OWNER_EMAIL_LIST", "rameshc10695@gmail.com");
-    metadata.put(" OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
-    metadata.put(" COMMENTOR_EMAIL", "ramesh.chandra@rivigo.com");
+    metadata.put("SLA", " 109 days 14 hours 15 minutes  Overdue");
+    metadata.put("TICKET_TYPE", "Damage");
+    metadata.put("ASSIGNEE_EMAIL_LIST", "rameshc10695@gmail.com");
+    metadata.put("ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL", "rameshc10695@gmail.com");
+    metadata.put("OWNER_EMAIL_LIST", "rameshc10695@gmail.com");
+    metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
+    metadata.put("COMMENTOR_EMAIL", "ramesh.chandra@rivigo.com");
 
     return NotificationDTO.builder()
         .eventName(EventName.TICKET_COMMENT_CREATION)
