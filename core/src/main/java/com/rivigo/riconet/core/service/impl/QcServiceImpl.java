@@ -673,7 +673,7 @@ public class QcServiceImpl implements QcService {
         getToRecepients(consignment),
         getCcRecepients(consignment),
         Collections.emptyList(),
-        subject,
+        sub.replace(subject),
         sub.replace(bodyTemplate),
         null);
   }
