@@ -6,5 +6,5 @@ package com.rivigo.riconet.core.test.Utils;
  */
 public class TestConstants {
 
-  public  static final String CREATOR_EMAIL = "rameshc10695@gmail.com";
+  public static final String CREATOR_EMAIL = "rameshc10695@gmail.com";
 }

@@ -29,12 +29,11 @@ public class TicketingServiceTest {
    * to designation emails(configure TestConstants.CREATOR_EMAIL) with removing mock of restTemplate
    * */
 
-
   @Mock private RestTemplate restTemplate;
 
   @Before
   public void setUp() {
-//    RestTemplate restTemplate = new RestTemplate();
+    //    RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
@@ -62,8 +61,8 @@ public class TicketingServiceTest {
 
   @Test
   public void sendTicketStatusChangeEmailTest() {
-    NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDtoForTICKET_STATUS_CHANGE(
-        );
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDtoForTICKET_STATUS_CHANGE();
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
 
