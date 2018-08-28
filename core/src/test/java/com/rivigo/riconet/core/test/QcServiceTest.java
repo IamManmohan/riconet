@@ -524,7 +524,7 @@ public class QcServiceTest {
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
     when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(new Consignment());
-    qcService.consumeDepsCreationEvent("1234567890-1");
+    qcService.consumeDepsCreationEvent("1234567890-1", null);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
     Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
   }
@@ -537,7 +537,7 @@ public class QcServiceTest {
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
     when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(new Consignment());
-    qcService.consumeDepsCreationEvent("1234567890-1");
+    qcService.consumeDepsCreationEvent("1234567890-1", null);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
     Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
   }

@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.enums.TicketEntityType;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,8 @@ public class EventTriggerService {
   @Autowired private ChequeBounceService chequeBounceService;
 
   @Autowired private PickupService pickupService;
+
+  @Autowired private TicketingService ticketingService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
@@ -87,6 +88,15 @@ public class EventTriggerService {
         qcService.consumeQcBlockerTicketCreationEvent(
             notificationDTO.getEntityId(),
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case TICKET_CREATION:
+      case TICKET_ASSIGNEE_CHANGE:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+      case TICKET_SEVERITY_CHANGE:
+      case TICKET_COMMENT_CREATION:
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
