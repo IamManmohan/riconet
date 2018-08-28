@@ -13,6 +13,12 @@ repositories {
 
 apply plugin: "com.diffplug.gradle.spotless"
 
+dependencies {
+    compile('com.rivigo:notification-client:1.3-SNAPSHOT') {
+        exclude group: 'org.hibernate', module: 'hibernate-c3p0'
+        exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
+    }
+}
 spotless {
     java {
         googleJavaFormat('1.5')

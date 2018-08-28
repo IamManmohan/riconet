@@ -27,6 +27,8 @@ public class EventTriggerService {
 
   @Autowired private PickupService pickupService;
 
+  @Autowired private TicketingService ticketingService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
@@ -72,6 +74,15 @@ public class EventTriggerService {
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+        break;
+      case TICKET_CREATION:
+      case TICKET_ASSIGNEE_CHANGE:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+      case TICKET_SEVERITY_CHANGE:
+      case TICKET_COMMENT_CREATION:
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
