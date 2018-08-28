@@ -107,4 +107,9 @@ public class ServiceConfig {
     bean.setLocation(new ClassPathResource(classPath + "/authresource.properties"));
     return bean;
   }
+
+  @Bean
+  RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
 }

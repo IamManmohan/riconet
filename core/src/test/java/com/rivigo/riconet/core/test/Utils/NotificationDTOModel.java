@@ -16,7 +16,7 @@ public class NotificationDTOModel {
   public static NotificationDTO getNotificationDTO(EventName eventName) {
 
     Map<String, String> metadata = new HashMap<>();
-    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(TicketingFieldName.ASSIGNEE_EMAIL_LIST.toString(), "rameshc10695@gmail.com");
     metadata.put(TicketingFieldName.CC_USER_EMAIL_LIST.toString(), "rameshc10695@gmail.com");
     metadata.put(TicketingFieldName.OWNER_EMAIL_LIST.toString(), "rameshc10695@gmail.com");
@@ -64,14 +64,14 @@ public class NotificationDTOModel {
     return NotificationDTO.builder().eventName(eventName).metadata(metadata).build();
   }
 
-  public static NotificationDTO getNotificationDTOForTICKET_CC_NEW_PERSON_ADDITION() {
+  public static NotificationDTO getNotificationDtoForTICKET_CC_NEW_PERSON_ADDITION() {
 
     Map<String, String> metadata = new HashMap<>();
     metadata.put("TICKET_ID", "248212");
     metadata.put("NEWLY_CCED_USER_ID", "15146");
     metadata.put("ID", "20");
     metadata.put("CREATED_BY_ID", "5888");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
@@ -99,14 +99,14 @@ public class NotificationDTOModel {
         .build();
   }
 
-  public static NotificationDTO getNotificationDTOTICKET_ESCALATION_CHANGE() {
+  public static NotificationDTO getNotificationDtoForTICKET_ESCALATION_CHANGE() {
 
     Map<String, String> metadata = new HashMap<>();
     metadata.put("ESCALATION_LEVEL", "LEVEL_THREE");
     metadata.put("TICKET_ID", "248212");
     metadata.put("ESCALATED_TO_ID", "18778");
     metadata.put("ID", "4");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
@@ -129,14 +129,14 @@ public class NotificationDTOModel {
         .build();
   }
 
-  public static NotificationDTO getNotificationDTOTICKET_STATUS_CHANGE() {
+  public static NotificationDTO getNotificationDtoForTICKET_STATUS_CHANGE() {
     Map<String, String> metadata = new HashMap<>();
     metadata.put("LAST_UPDATED_BY_ID", "5888");
     metadata.put("OLD_STATUS", "REOPENED");
     metadata.put("STATUS", "CLOSED");
     metadata.put("TICKET_ID", "248212");
     metadata.put("ID", "248212");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
@@ -159,7 +159,7 @@ public class NotificationDTOModel {
         .build();
   }
 
-  public static NotificationDTO getNotificationDTOTICKET_ASSIGNEE_CHANGE() {
+  public static NotificationDTO getNotificationDtoForTICKET_ASSIGNEE_CHANGE() {
 
     Map<String, String> metadata = new HashMap<>();
     metadata.put("LAST_UPDATED_BY_ID", "5888");
@@ -169,7 +169,7 @@ public class NotificationDTOModel {
     metadata.put("TICKET_ID", "248212");
     metadata.put("OLD_ASSIGNEE_TYPE", "USER");
     metadata.put("ID", "248212");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
@@ -193,14 +193,14 @@ public class NotificationDTOModel {
         .build();
   }
 
-  public static NotificationDTO getNotificationDTOTICKET_SEVERITY_CHANGE() {
+  public static NotificationDTO getNotificationDtoForTICKET_SEVERITY_CHANGE() {
     Map<String, String> metadata = new HashMap<>();
     metadata.put("LAST_UPDATED_BY_ID", "5888");
     metadata.put("OLD_SEVERITY", "ONE");
     metadata.put("SEVERITY", "TWO");
     metadata.put("TICKET_ID", "248212");
     metadata.put("ID", "248212");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
@@ -223,7 +223,7 @@ public class NotificationDTOModel {
         .build();
   }
 
-  public static NotificationDTO getNotificationDTOTICKET_COMMENT_CREATION() {
+  public static NotificationDTO getNotificationDtoForTICKET_COMMENT_CREATION() {
     Map<String, String> metadata = new HashMap<>();
     metadata.put(
         " COMMENT_TEXT",
@@ -231,7 +231,7 @@ public class NotificationDTOModel {
     metadata.put("TICKET_ID", "248212");
     metadata.put("ID", "753256");
     metadata.put("CREATED_BY_ID", "5888");
-    metadata.put("CREATOR_EMAIL", "rameshc10695@gmail.com");
+    metadata.put(TicketingFieldName.CREATOR_EMAIL.toString(), TestConstants.CREATOR_EMAIL);
     metadata.put(
         "CC_USER_EMAIL_LIST",
         "mayank.pandey@rivigo.com,nikhil.rawat@rivigo.com,rameshc10695@gmail.com");
