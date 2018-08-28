@@ -111,6 +111,7 @@ public class ServiceConfig {
 
   @Primary
   @Bean
+  @Qualifier("restTemplate")
   RestTemplate restTemplate() {
     return new RestTemplate();
   }

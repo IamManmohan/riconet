@@ -5,12 +5,11 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
+import com.rivigo.riconet.core.test.TesterBase;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
  * @author ramesh
  * @date 20-Aug-2018
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TicketingServiceTest {
+public class TicketingServiceTest extends TesterBase {
 
   private TicketingServiceImpl ticketingService;
 
@@ -29,7 +27,7 @@ public class TicketingServiceTest {
    * to designation emails(configure TestConstants.CREATOR_EMAIL) with removing mock of restTemplate
    * */
 
-  @Mock private RestTemplate restTemplate;
+  @Autowired private RestTemplate restTemplate;
 
   @Before
   public void setUp() {

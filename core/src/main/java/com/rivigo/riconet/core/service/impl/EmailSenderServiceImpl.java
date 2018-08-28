@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,7 +40,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   private final RestTemplate restTemplate;
 
   @Autowired
-  public EmailSenderServiceImpl(RestTemplate restTemplate) {
+  public EmailSenderServiceImpl(@Qualifier("restTemplate") RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 
