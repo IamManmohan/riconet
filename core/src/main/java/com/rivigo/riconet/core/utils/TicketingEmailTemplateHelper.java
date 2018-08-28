@@ -131,7 +131,7 @@ public class TicketingEmailTemplateHelper {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder =
         stringBuilder
-            .append(metadata.get(TicketingFieldName.CREATOR_EMAIL.toString()))
+            .append(metadata.get(TicketingFieldName.COMMENTOR_EMAIL.toString()))
             .append(" has commented.<br>")
             .append(metadata.get(TicketingFieldName.COMMENT_TEXT.toString()));
     if (metadata.containsKey(TicketingFieldName.S3URL.toString())) {
