@@ -82,7 +82,7 @@ public class EventTriggerService {
       case TICKET_CC_NEW_PERSON_ADDITION:
       case TICKET_SEVERITY_CHANGE:
       case TICKET_COMMENT_CREATION:
-        ticketingService.sendTicketingEmail(notificationDTO);
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

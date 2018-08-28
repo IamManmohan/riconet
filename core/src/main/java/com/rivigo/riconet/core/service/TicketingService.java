@@ -8,5 +8,5 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
  */
 public interface TicketingService {
 
-  void sendTicketingEmail(NotificationDTO notificationDTO);
+  void sendTicketingEventsEmail(NotificationDTO notificationDTO);
 }

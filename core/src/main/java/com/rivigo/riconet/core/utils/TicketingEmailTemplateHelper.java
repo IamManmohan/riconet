@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.utils;
 
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,17 +30,25 @@ public class TicketingEmailTemplateHelper {
     return subject.toString();
   }
 
+  public static Optional<List<String>> getNewlyCcedEmailRecipientList(
+      Map<String, String> metadata) {
+    Optional<String> newlyCcedEmail =
+        TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.NEWLY_CCED_EMAIL);
+    if (!newlyCcedEmail.isPresent()) {
+      log.info("TICKET_CC_NEW_PERSON_ADDITION-> recipients not exist" + "\nmetadata: {}", metadata);
+      return Optional.empty();
+    }
+    return Optional.of(Collections.singletonList(newlyCcedEmail.get()));
+  }
+
   public static Optional<List<String>> getCommentEmailRecipientList(Map<String, String> metadata) {
     Optional<List<String>> toRecipients = getRecipientList(metadata);
     if (!toRecipients.isPresent()) {
-      log.info(
-          "toRecipients not exist for sending comment creation email." + " \n metadata : {}",
-          metadata);
+      log.info("TICKET_COMMENT_CREATION-> recipients not exist" + " \n metadata : {}", metadata);
       return toRecipients;
     }
-
     Optional<String> commentCreatorEmail =
-        TicketingEmailTemplateHelper.getValueFromMap(metadata, TicketingFieldName.CREATOR_EMAIL);
+        getValueFromMap(metadata, TicketingFieldName.CREATOR_EMAIL);
     if (!commentCreatorEmail.isPresent()) {
       log.info("commentCreatorEmail: {} not exist. toRecipients : {}, metadata : {}", metadata);
       return toRecipients;
