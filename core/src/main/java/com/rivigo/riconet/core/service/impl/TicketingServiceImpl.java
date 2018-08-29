@@ -22,6 +22,9 @@ public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
+  @Value("${zoom.url}")
+  private String backendBaseUrl;
+
   @Autowired
   public TicketingServiceImpl(EmailSenderService emailSenderService) {
     this.emailSenderService = emailSenderService;
@@ -80,6 +83,33 @@ public class TicketingServiceImpl implements TicketingService {
         log.info(" No Subject getter function found for event : {}", eventName);
     }
     return "";
+  }
+
+  private void setPriorityMapping(EventName eventName, Map<String, String> metadata) {
+    switch (eventName) {
+      case TICKET_CREATION:
+        List<long> ticketIds = Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
+            .map(long::parseLong)
+            .collect(Collectors.toList());
+            if(ticketIds.contains(metadata.get(TicketingFieldName.TICKET_TYPE.toString())))
+            {
+              String url = UrlConstant.PRIORITY_URL_ENDPOINT;
+              try {
+                responseJson =
+                    apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
+              } catch (IOException e) {
+                log.error(
+                    "Error while marking consignment qcCheck needed with consignmentId: {}",
+                    consignmentId,
+                    e);
+                throw new ZoomException(
+                    "Error while marking consignment qcCheck needed  with consignmentId: " + consignmentId);
+              }
+
+            }
+      default:
+        log.info(" No Subject getter function found for event : {}", eventName);
+    }
   }
 
   private String getBody(EventName eventName, Map<String, String> metadata) {
