@@ -5,6 +5,7 @@ import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,18 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       List<String> recipients, String subject, String body, MultipartFile file, String type) {
     SendEmailRequest request = new SendEmailRequest();
     request.setFrom(senderServerName);
+
+    if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+      log.info("sending mail to actual recipient on production env : {} ", recipients);
+    } else {
+      recipients =
+          Arrays.asList(
+              "mayank.pandey@rivigo.com",
+              "deepanshu.nagpal@rivigo.com",
+              "ramesh.chandra@rivigo.com");
+      log.info("sending mail on staging env to default users : {} ", recipients);
+    }
+
     request.setTo(recipients);
     request.setSubject(subject);
     request.setBody(body);
@@ -74,6 +87,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   private void send(
       SendEmailRequest request, List<String> recipients, String subject, String body) {
     try {
+
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("X-User-Agent", emailUserAgent);
