@@ -619,6 +619,19 @@ public class QcServiceImpl implements QcService {
       log.info("Event is ignored as it's typeId is {} ", typeId);
       return;
     }
+    Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
+    if(CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())){
+      TicketDTO qcBlockerTicket = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+      closeTicket(qcBlockerTicket,ZoomTicketingConstant.QC_BLOCKER_AUTO_CLOSURE_MESSAGE);
+      zoomBackendAPIClientService.handleConsignmentBlocker(ConsignmentBlockerRequestDTO.builder()
+          .consignmentId(consignment.getId())
+          .requestType(ConsignmentBlockerRequestType.UNBLOCK)
+          .isActive(Boolean.TRUE)
+          .reason(ReasonConstant.QC_BLOCKER_REASON)
+          .subReason(ReasonConstant.QC_BLOCKER_SUB_REASON)
+          .build());
+      return;
+    }
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService.getTicketsByCnoteAndType(
             cnote,
@@ -638,7 +651,6 @@ public class QcServiceImpl implements QcService {
     if (urlOptional.isPresent()) {
       imageZipUrl = urlOptional.get().getAttachmentURL();
     }
-    Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
     QcBlockerActionParams qcBlockerActionParams =
         QcBlockerActionParams.builder()
             .consignmentId(consignment.getId())

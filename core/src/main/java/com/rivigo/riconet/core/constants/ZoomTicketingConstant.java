@@ -47,4 +47,7 @@ public class ZoomTicketingConstant {
 
   public static final String QC_BLOCKER_CLOSURE_MESSAGE =
       "Ticket got auto-closed after action is taken";
+
+  public static final String QC_BLOCKER_AUTO_CLOSURE_MESSAGE =
+      "Ticket Got Closed, as there was no Communication Email ID available for the client";
 }
