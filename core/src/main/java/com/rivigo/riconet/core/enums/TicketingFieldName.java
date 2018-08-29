@@ -7,6 +7,7 @@ package com.rivigo.riconet.core.enums;
 public enum TicketingFieldName {
   ID,
   TICKET_ID,
+  ENTITY_ID,
   OLD_ASSIGNEE_ID,
   ASSIGNEE_ID,
   OLD_ASSIGNEE_TYPE,

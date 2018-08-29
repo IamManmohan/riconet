@@ -23,4 +23,6 @@ public interface ZoomBackendAPIClientService {
   OrganizationDTO updateOrganization(OrganizationDTO orgDTO);
 
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
+
+  void setPriorityMapping(String cnote);
 }

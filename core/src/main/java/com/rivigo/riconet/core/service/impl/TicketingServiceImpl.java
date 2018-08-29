@@ -1,15 +1,25 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.amazonaws.services.dynamodbv2.xspec.L;
+import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.TicketingFieldName;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.TicketingService;
+import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
+import com.rivigo.zoom.common.model.Consignment;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,6 +31,12 @@ import org.springframework.stereotype.Service;
 public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
+
+  @Autowired
+  private  ZoomBackendAPIClientService   zoomBackendAPIClientService;
+
+  @Autowired
+  private ZoomPropertyService zoomPropertyService;
 
   @Value("${zoom.url}")
   private String backendBaseUrl;
@@ -85,32 +101,7 @@ public class TicketingServiceImpl implements TicketingService {
     return "";
   }
 
-  private void setPriorityMapping(EventName eventName, Map<String, String> metadata) {
-    switch (eventName) {
-      case TICKET_CREATION:
-        List<long> ticketIds = Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-            .map(long::parseLong)
-            .collect(Collectors.toList());
-            if(ticketIds.contains(metadata.get(TicketingFieldName.TICKET_TYPE.toString())))
-            {
-              String url = UrlConstant.PRIORITY_URL_ENDPOINT;
-              try {
-                responseJson =
-                    apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-              } catch (IOException e) {
-                log.error(
-                    "Error while marking consignment qcCheck needed with consignmentId: {}",
-                    consignmentId,
-                    e);
-                throw new ZoomException(
-                    "Error while marking consignment qcCheck needed  with consignmentId: " + consignmentId);
-              }
 
-            }
-      default:
-        log.info(" No Subject getter function found for event : {}", eventName);
-    }
-  }
 
   private String getBody(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
@@ -132,5 +123,27 @@ public class TicketingServiceImpl implements TicketingService {
         log.info(" No body getter function found for event : {}", eventName);
     }
     return "";
+  }
+
+  @Override
+  public void setPriorityMapping(NotificationDTO notificationDTO) {
+    EventName eventName = notificationDTO.getEventName();
+    log.info("Identified Event : {} ", eventName);
+    Map<String, String> metadata = notificationDTO.getMetadata();
+    if (null == metadata) {
+      log.info(
+          "No metadata found for updating priority mapping of Event: {} EventUID: {} ",
+          eventName,
+          notificationDTO.getEventUID());
+      return;
+    }
+    log.info("Event Metadata : {} ", metadata);
+        List<Long> ticketIds = Stream
+            .of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
+        if (ticketIds.contains(Long.parseLong(metadata.get(TicketingFieldName.TICKET_TYPE.toString()))))
+          zoomBackendAPIClientService.setPriorityMapping(metadata.get(TicketingFieldName.ENTITY_ID.toString()));
+
   }
 }
