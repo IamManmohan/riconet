@@ -84,12 +84,13 @@ public class EventTriggerService {
             getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
                 .orElse(null));
         break;
-      case CN_QC_BLOCKER_TICKET_CREATION:
+      case TICKET_CREATION:
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         qcService.consumeQcBlockerTicketCreationEvent(
             notificationDTO.getEntityId(),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
+            getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         break;
-      case TICKET_CREATION:
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
