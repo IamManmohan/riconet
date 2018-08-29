@@ -32,7 +32,7 @@ public class TicketingServiceTest extends TesterBase {
   @Before
   public void setUp() {
     //    RestTemplate restTemplate = new RestTemplate();
-    EmailSenderService emailSenderService = new EmailSenderServiceImpl(restTemplate);
+    EmailSenderService emailSenderService = new EmailSenderServiceImpl();
     ticketingService = new TicketingServiceImpl(emailSenderService);
     ReflectionTestUtils.setField(
         emailSenderService, "senderServerName", "testing@devops.rivigo.com");
