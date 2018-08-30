@@ -23,6 +23,7 @@ import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
@@ -48,7 +49,6 @@ import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.ruleengine.RuleEngineRule;
 import com.rivigo.zoom.common.repository.mysql.ruleengine.RuleEngineRuleRepository;
-import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class QcServiceTest {
 
   @Mock private EmailService emailService;
 
-  @Mock private AdministrativeEntityRepository administrativeEntityRepository;
+  @Mock private AdministrativeEntityService administrativeEntityService;
 
   @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
@@ -284,7 +284,7 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getGroupId(
             data.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU))
         .thenReturn(GroupDTO.builder().id(39l).build());
-    when(administrativeEntityRepository.findParentCluster(any())).thenReturn(aem);
+    when(administrativeEntityService.findParentCluster(any())).thenReturn(aem);
 
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket1);
@@ -329,7 +329,7 @@ public class QcServiceTest {
     Location location = new Location();
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
-    when(administrativeEntityRepository.findParentCluster(any())).thenReturn(aem);
+    when(administrativeEntityService.findParentCluster(any())).thenReturn(aem);
 
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket1);
@@ -577,7 +577,7 @@ public class QcServiceTest {
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());
-    qcService.consumeQcBlockerTicketCreationEvent(5l, "1234567890");
+    qcService.consumeQcBlockerTicketCreationEvent(5l, "1234567890",ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
     verify(emailService, times(1))
         .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
   }

@@ -20,11 +20,13 @@ import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
+import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.UserMasterService;
@@ -51,8 +53,6 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
-import com.rivigo.zoom.common.repository.mysql.PinCodeRepository;
-import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
@@ -94,9 +94,9 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private ClientEntityMetadataServiceImpl clientEntityMetadataService;
 
-  @Autowired private PinCodeRepository pinCodeRepository;
+  @Autowired private PincodeService pincodeService;
 
-  @Autowired private AdministrativeEntityRepository administrativeEntityRepository;
+  @Autowired private AdministrativeEntityService administrativeEntityService;
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
@@ -154,9 +154,9 @@ public class QcServiceImpl implements QcService {
       return;
     }
     AdministrativeEntity currentCluster =
-        administrativeEntityRepository.findParentCluster(unloadingData.getLocationId());
+        administrativeEntityService.findParentCluster(unloadingData.getLocationId());
     AdministrativeEntity fromCluster =
-        administrativeEntityRepository.findParentCluster(unloadingData.getFromId());
+        administrativeEntityService.findParentCluster(unloadingData.getFromId());
     if (!fromCluster.getCode().equals(currentCluster.getCode())) {
       closeQcTickets(
           ticketList,
@@ -213,7 +213,7 @@ public class QcServiceImpl implements QcService {
   public Boolean isMeasurementQcRequired(ConsignmentCompletionEventDTO completionData) {
 
     if (completionData.getClientClusterMetadataDTO() == null) return Boolean.FALSE;
-    if (!completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded())
+    if (completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded() != Boolean.TRUE)
       return Boolean.FALSE;
 
     if (completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
@@ -236,7 +236,7 @@ public class QcServiceImpl implements QcService {
     ClientEntityMetadata clusterMetadata =
         clientEntityMetadataService.getClientClusterMetadata(consignment);
 
-    PinCode pincode = pinCodeRepository.findByCode(consignment.getFromPinCode());
+    PinCode pincode = pincodeService.findByCode(consignment.getFromPinCode());
     ClientEntityMetadata pincodeMetadata =
         clientEntityMetadataService.getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
             ClientEntityType.PINCODE,

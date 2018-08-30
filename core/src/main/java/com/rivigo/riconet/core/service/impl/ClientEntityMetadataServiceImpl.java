@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientEntityMetadataService;
 import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
@@ -8,7 +9,6 @@ import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
-import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
 
   @Autowired private ClientEntityMetadataRepository clientEntityMetadataRepository;
 
-  @Autowired private AdministrativeEntityRepository administrativeEntityRepository;
+  @Autowired private AdministrativeEntityService administrativeEntityService;
 
   public ClientEntityMetadata getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
       ClientEntityType entityType,
@@ -34,7 +34,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
 
   public ClientEntityMetadata getClientClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
-        administrativeEntityRepository.findParentCluster(consignment.getFromId());
+        administrativeEntityService.findParentCluster(consignment.getFromId());
 
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(

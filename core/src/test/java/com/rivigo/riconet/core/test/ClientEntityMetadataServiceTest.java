@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.impl.ClientEntityMetadataServiceImpl;
 import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
@@ -13,7 +14,6 @@ import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
-import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,7 +30,7 @@ public class ClientEntityMetadataServiceTest {
 
   @Mock private ClientEntityMetadataRepository clientEntityMetadataRepository;
 
-  @Mock private AdministrativeEntityRepository administrativeEntityRepository;
+  @Mock private AdministrativeEntityService administrativeEntityService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -58,7 +58,7 @@ public class ClientEntityMetadataServiceTest {
     consignment.setClient(client);
     AdministrativeEntity administrativeEntity = new AdministrativeEntity();
     administrativeEntity.setId(20l);
-    when(administrativeEntityRepository.findParentCluster(consignment.getFromId()))
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
     clientEntityMetadataService.getClientClusterMetadata(consignment);
     verify(clientEntityMetadataRepository, times(1))
@@ -77,7 +77,7 @@ public class ClientEntityMetadataServiceTest {
     consignment.setFromId(10l);
     AdministrativeEntity administrativeEntity = new AdministrativeEntity();
     administrativeEntity.setId(20l);
-    when(administrativeEntityRepository.findParentCluster(consignment.getFromId()))
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
     clientEntityMetadataService.getClientClusterMetadata(consignment);
     verify(clientEntityMetadataRepository, times(1))

@@ -60,47 +60,72 @@ public class EventMain {
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
-    String groupId = config.getString("group.id");
-    final ConsumerSettings<String, String> defaultConsumerSettings =
+
+    String zoomEventTriggerConsumerGroupId = config.getString("zoomEventTriggerConsumer.group.id");
+    final ConsumerSettings<String, String> zoomEventTriggerConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
-            .withGroupId(groupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, LATEST);
-    groupId = config.getString("consignmentblocker.group.id");
-    log.info("group id for consignment blocker consumer {}", groupId);
+            .withGroupId(zoomEventTriggerConsumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+    String cnActionConsumerGroupId = config.getString("cnActionConsumer.group.id");
+    final ConsumerSettings<String, String> cnActionConsumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(cnActionConsumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+    String consignmentblockerGroupId = config.getString("consignmentblocker.group.id");
     final ConsumerSettings<String, String> consignmentBlockerConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
-            .withGroupId(groupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, LATEST);
-    consumer.load(materializer, defaultConsumerSettings, consignmentBlockerConsumerSettings);
+            .withGroupId(consignmentblockerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+    String financeEventsConsumerGroupId = config.getString("financeEventsConsumer.group.id");
+    final ConsumerSettings<String, String> financeEventsConsumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(financeEventsConsumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
     String bfPickupChargesGroupId = config.getString("bfPickupCharges.group.id");
     final ConsumerSettings<String, String> bfPickupChargesConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(bfPickupChargesGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, LATEST);
-    consumer.loadBfPickupCharges(materializer, bfPickupChargesConsumerSettings);
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+    consumer.load(
+        materializer,
+        zoomEventTriggerConsumerSettings,
+        cnActionConsumerSettings,
+        consignmentBlockerConsumerSettings,
+        financeEventsConsumerSettings,
+        bfPickupChargesConsumerSettings);
   }
 
-  public void load(
+  private void load(
       ActorMaterializer materializer,
-      ConsumerSettings<String, String> consumerSettings,
-      ConsumerSettings<String, String> consignmentBlockerConsumerSettings) {
-    log.info("Loading zoom event trigger consumer with settings {}", consumerSettings);
-    zoomEventTriggerConsumer.load(materializer, consumerSettings);
-    log.info("Loading event trigger for cn status change with settings {}", consumerSettings);
-    cnActionConsumer.load(materializer, consumerSettings);
+      ConsumerSettings<String, String> zoomEventTriggerConsumerSettings,
+      ConsumerSettings<String, String> cnActionConsumerSettings,
+      ConsumerSettings<String, String> consignmentBlockerConsumerSettings,
+      ConsumerSettings<String, String> financeEventsConsumerSettings,
+      ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings) {
+    log.info(
+        "Loading zoom event trigger consumer with settings {}", zoomEventTriggerConsumerSettings);
+    zoomEventTriggerConsumer.load(materializer, zoomEventTriggerConsumerSettings);
+    log.info(
+        "Loading event trigger for cn status change with settings {}", cnActionConsumerSettings);
+    cnActionConsumer.load(materializer, cnActionConsumerSettings);
     log.info(
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
-    log.info("Loading Finance event consumer with settings {}", consignmentBlockerConsumerSettings);
-    financeEventsConsumer.load(materializer, consumerSettings);
-  }
-
-  public void loadBfPickupCharges(
-      ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
-    bfPickupChargesActionConsumer.load(materializer, consumerSettings);
+    log.info("Loading Finance event consumer with settings {}", financeEventsConsumerSettings);
+    financeEventsConsumer.load(materializer, financeEventsConsumerSettings);
+    log.info(
+        "Loading bfPickup event consumer with settings {}", bfPickupChargesActionConsumerSettings);
+    bfPickupChargesActionConsumer.load(materializer, bfPickupChargesActionConsumerSettings);
   }
 }
