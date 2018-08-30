@@ -186,21 +186,6 @@ public class EventTriggerServiceTest {
   }
 
   @Test
-  public void cnQcBlockerTicketCreationTest() {
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("CNOTE", "1234567890");
-
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder()
-            .eventName(EventName.CN_QC_BLOCKER_TICKET_CREATION)
-            .entityId(5l)
-            .metadata(metadata)
-            .build();
-    eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1)).consumeQcBlockerTicketCreationEvent(5l, "1234567890");
-  }
-
-  @Test
   public void ticketingEventEmailTest() {
 
     NotificationDTO notificationDTO;

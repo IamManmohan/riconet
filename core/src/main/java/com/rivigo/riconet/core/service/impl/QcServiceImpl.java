@@ -620,16 +620,17 @@ public class QcServiceImpl implements QcService {
       return;
     }
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
-    if(CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())){
+    if (CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())) {
       TicketDTO qcBlockerTicket = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
-      closeTicket(qcBlockerTicket,ZoomTicketingConstant.QC_BLOCKER_AUTO_CLOSURE_MESSAGE);
-      zoomBackendAPIClientService.handleConsignmentBlocker(ConsignmentBlockerRequestDTO.builder()
-          .consignmentId(consignment.getId())
-          .requestType(ConsignmentBlockerRequestType.UNBLOCK)
-          .isActive(Boolean.TRUE)
-          .reason(ReasonConstant.QC_BLOCKER_REASON)
-          .subReason(ReasonConstant.QC_BLOCKER_SUB_REASON)
-          .build());
+      closeTicket(qcBlockerTicket, ZoomTicketingConstant.QC_BLOCKER_AUTO_CLOSURE_MESSAGE);
+      zoomBackendAPIClientService.handleConsignmentBlocker(
+          ConsignmentBlockerRequestDTO.builder()
+              .consignmentId(consignment.getId())
+              .requestType(ConsignmentBlockerRequestType.UNBLOCK)
+              .isActive(Boolean.TRUE)
+              .reason(ReasonConstant.QC_BLOCKER_REASON)
+              .subReason(ReasonConstant.QC_BLOCKER_SUB_REASON)
+              .build());
       return;
     }
     List<TicketDTO> ticketList =

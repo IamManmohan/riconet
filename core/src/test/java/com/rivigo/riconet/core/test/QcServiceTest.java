@@ -523,7 +523,9 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
-    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(new Consignment());
+    Consignment consignment = new Consignment();
+    consignment.setCnote("1234567890");
+    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(consignment);
     qcService.consumeDepsCreationEvent("1234567890-1", null);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
     Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
@@ -536,7 +538,9 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
-    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(new Consignment());
+    Consignment consignment = new Consignment();
+    consignment.setCnote("1234567890");
+    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(consignment);
     qcService.consumeDepsCreationEvent("1234567890-1", null);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
     Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
@@ -570,14 +574,18 @@ public class QcServiceTest {
             "1234567890",
             Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
         .thenReturn(Collections.singletonList(new TicketDTO()));
+    Client client = new Client();
+    client.setClientNotificationList(Collections.singleton("dummy@rivigo.com"));
+
     Consignment consignment = new Consignment();
     consignment.setId(100l);
-    consignment.setClient(new Client());
+    consignment.setClient(client);
     consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());
-    qcService.consumeQcBlockerTicketCreationEvent(5l, "1234567890",ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
+    qcService.consumeQcBlockerTicketCreationEvent(
+        5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
     verify(emailService, times(1))
         .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
   }
