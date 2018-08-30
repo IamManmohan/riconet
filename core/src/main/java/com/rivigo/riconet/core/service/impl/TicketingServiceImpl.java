@@ -29,11 +29,9 @@ public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
-  @Autowired
-  private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  @Autowired
-  private ZoomPropertyService zoomPropertyService;
+  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Value("${zoom.url}")
   private String backendBaseUrl;
@@ -98,7 +96,6 @@ public class TicketingServiceImpl implements TicketingService {
     return "";
   }
 
-
   private String getBody(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
       case TICKET_COMMENT_CREATION:
@@ -134,19 +131,19 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    List<Long> ticketTypeIds = Stream
-        .of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-        .map(Long::parseLong)
-        .collect(Collectors.toList());
+    List<Long> ticketTypeIds =
+        Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
     if (ticketTypeIds == null || ticketTypeIds.isEmpty()) {
       log.info("No ticket type found for which CN's are to be set as priority");
       return;
     }
 
-    if (ticketTypeIds
-        .contains(Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString())))) {
-      zoomBackendAPIClientService
-          .setPriorityMapping(metadata.get(TicketingFieldName.ENTITY_ID.toString()));
+    if (ticketTypeIds.contains(
+        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString())))) {
+      zoomBackendAPIClientService.setPriorityMapping(
+          metadata.get(TicketingFieldName.ENTITY_ID.toString()));
     }
   }
 }

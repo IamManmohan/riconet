@@ -6,17 +6,12 @@ import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
-import com.rivigo.riconet.core.enums.TicketingFieldName;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,25 +31,21 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
-
   @Override
   public void setPriorityMapping(String cnote) {
 
-      String url = UrlConstant.PRIORITY_URL_ENDPOINT;
-      JsonNode responseJson;
-      MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-      valuesMap.put("cnote", Collections.singletonList(cnote));
-      try {
-        responseJson =
-            apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-      } catch (IOException e) {
-        log.error(
-            "Error while updating priority mapping needed with consignmentId: {}",
-            cnote,
-            e);
-        throw new ZoomException(
-            "Error while updating priority mapping needed  with consignmentId: " + cnote);
-      }
+    String url = UrlConstant.PRIORITY_URL_ENDPOINT;
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put("cnote", Collections.singletonList(cnote));
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating priority mapping needed with consignmentId: {}", cnote, e);
+      throw new ZoomException(
+          "Error while updating priority mapping needed  with consignmentId: " + cnote);
+    }
 
     apiClientService.parseJsonNode(responseJson, null);
   }
