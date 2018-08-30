@@ -87,8 +87,8 @@ public class EventTriggerService {
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(
             notificationDTO.getEntityId(),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
-            getLong(notificationDTO, ZoomCommunicationFieldNames.ENTITY_ID.name()).orElse(null));
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
+            getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
