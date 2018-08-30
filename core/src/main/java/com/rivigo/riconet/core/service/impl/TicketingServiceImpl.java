@@ -138,11 +138,11 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-        List<Long> ticketIds = Stream
+        List<Long> ticketTypeIds = Stream
             .of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
             .map(Long::parseLong)
             .collect(Collectors.toList());
-        if (ticketIds.contains(Long.parseLong(metadata.get(TicketingFieldName.TICKET_TYPE.toString()))))
+        if (ticketTypeIds.contains(Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString()))))
           zoomBackendAPIClientService.setPriorityMapping(metadata.get(TicketingFieldName.ENTITY_ID.toString()));
 
   }

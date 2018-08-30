@@ -8,6 +8,7 @@ public enum TicketingFieldName {
   ID,
   TICKET_ID,
   ENTITY_ID,
+  TYPE_ID,
   OLD_ASSIGNEE_ID,
   ASSIGNEE_ID,
   OLD_ASSIGNEE_TYPE,
