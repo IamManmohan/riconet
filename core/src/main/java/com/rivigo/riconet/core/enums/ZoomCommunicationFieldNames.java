@@ -23,6 +23,7 @@ public enum ZoomCommunicationFieldNames {
   FROM_LOCATION_ID,
   LAST_UPDATED_BY_ID,
   PICK_UP_ID,
+  ENTITY_ID,
   TYPE_ID;
 
   public enum Reason {
