@@ -1,7 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.amazonaws.services.dynamodbv2.xspec.L;
-import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
@@ -11,7 +9,6 @@ import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
-import com.rivigo.zoom.common.model.Consignment;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +30,7 @@ public class TicketingServiceImpl implements TicketingService {
   private final EmailSenderService emailSenderService;
 
   @Autowired
-  private  ZoomBackendAPIClientService   zoomBackendAPIClientService;
+  private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired
   private ZoomPropertyService zoomPropertyService;
@@ -102,7 +99,6 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
 
-
   private String getBody(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
       case TICKET_COMMENT_CREATION:
@@ -138,12 +134,19 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-        List<Long> ticketTypeIds = Stream
-            .of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-            .map(Long::parseLong)
-            .collect(Collectors.toList());
-        if (ticketTypeIds.contains(Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString()))))
-          zoomBackendAPIClientService.setPriorityMapping(metadata.get(TicketingFieldName.ENTITY_ID.toString()));
+    List<Long> ticketTypeIds = Stream
+        .of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
+        .map(Long::parseLong)
+        .collect(Collectors.toList());
+    if (ticketTypeIds == null || ticketTypeIds.isEmpty()) {
+      log.info("No ticket type found for which CN's are to be set as priority");
+      return;
+    }
 
+    if (ticketTypeIds
+        .contains(Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString())))) {
+      zoomBackendAPIClientService
+          .setPriorityMapping(metadata.get(TicketingFieldName.ENTITY_ID.toString()));
+    }
   }
 }
