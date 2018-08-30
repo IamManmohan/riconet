@@ -615,7 +615,7 @@ public class QcServiceImpl implements QcService {
 
   @Override
   public void consumeQcBlockerTicketCreationEvent(Long ticketId, String cnote, Long typeId) {
-    if (typeId == null && typeId != ZoomTicketingConstant.QC_BLOCKER_TYPE_ID) {
+    if (typeId == null || !typeId.equals(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)) {
       log.info("Event is ignored as it's typeId is {} ", typeId);
       return;
     }
