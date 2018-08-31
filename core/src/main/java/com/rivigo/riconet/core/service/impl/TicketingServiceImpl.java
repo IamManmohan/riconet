@@ -124,7 +124,7 @@ public class TicketingServiceImpl implements TicketingService {
     EventName eventName = notificationDTO.getEventName();
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
+    if (metadata.isEmpty()) {
       log.info(
           "No metadata found for updating priority mapping of Event: {} EventUID: {} ",
           eventName,
