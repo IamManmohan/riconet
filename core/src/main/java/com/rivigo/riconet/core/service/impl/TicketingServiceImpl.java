@@ -1,14 +1,17 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
+import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
+import com.rivigo.zoom.common.enums.TicketStatus;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +34,8 @@ public class TicketingServiceImpl implements TicketingService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private QcService qcService;
 
   @Autowired
   public TicketingServiceImpl(EmailSenderService emailSenderService) {
@@ -129,19 +134,27 @@ public class TicketingServiceImpl implements TicketingService {
     log.info("Event Metadata : {} ", metadata);
     log.info("value : {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
 
-    List<Long> ticketTypeIds =
+    List<String> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-            .map(Long::parseLong)
             .collect(Collectors.toList());
-    if (ticketTypeIds == null || ticketTypeIds.isEmpty()) {
+    List<String> closableTicketTypes =
+        Stream.of(zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE).split(","))
+            .collect(Collectors.toList());
+    if (ticketTypes== null || ticketTypes.isEmpty()) {
       log.info("No ticket type found for which CN's are to be set as priority");
       return;
     }
 
-    if (ticketTypeIds.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
+    if (ticketTypes.contains(
+        metadata.get(TicketingFieldName.TICKET_TYPE.name()))) {
       zoomBackendAPIClientService.setPriorityMapping(
           metadata.get(TicketingFieldName.ENTITY_ID.name()));
+    }
+    if (closableTicketTypes.contains(
+        metadata.get(TicketingFieldName.TICKET_TYPE.name()))) {
+      TicketDTO dto= new TicketDTO();
+      dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
+      qcService.closeTicket(dto,"Ticket is auto-closable after creation");
     }
   }
 }
