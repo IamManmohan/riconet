@@ -11,6 +11,7 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -147,7 +148,7 @@ public class TicketingServiceImpl implements TicketingService {
     if (ticketTypes.contains(
         metadata.get(TicketingFieldName.TICKET_TYPE.name()))) {
       zoomBackendAPIClientService.setPriorityMapping(
-          metadata.get(TicketingFieldName.ENTITY_ID.name()));
+          metadata.get(TicketingFieldName.ENTITY_ID.name()),PriorityReasonType.TICKET);
     }
     if (closableTicketTypes.contains(
         metadata.get(TicketingFieldName.TICKET_TYPE.name()))) {
