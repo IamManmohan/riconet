@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,9 +31,6 @@ public class TicketingServiceImpl implements TicketingService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
-
-  @Value("${zoom.url}")
-  private String backendBaseUrl;
 
   @Autowired
   public TicketingServiceImpl(EmailSenderService emailSenderService) {
@@ -133,10 +129,6 @@ public class TicketingServiceImpl implements TicketingService {
     log.info("Event Metadata : {} ", metadata);
     log.info("value : {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
 
-    log.info(
-        "split {}",
-        zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","));
-
     List<Long> ticketTypeIds =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
             .map(Long::parseLong)
@@ -147,9 +139,9 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     if (ticketTypeIds.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.toString())))) {
+        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
       zoomBackendAPIClientService.setPriorityMapping(
-          metadata.get(TicketingFieldName.ENTITY_ID.toString()));
+          metadata.get(TicketingFieldName.ENTITY_ID.name()));
     }
   }
 }
