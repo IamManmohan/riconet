@@ -39,4 +39,6 @@ public class ZoomTicketingConstant {
 
   public static final String QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE =
       "The task got auto closed because of change of CN from credit to retail";
+
+  public static final String TICKETING_ZOOM_PROPERTY_KEY = "TICKETING_STAGING_EMAIL_LIST";
 }

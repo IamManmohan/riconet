@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKETING_ZOOM_PROPERTY_KEY;
+
 import com.rivigo.notification.common.dto.AttachmentDto;
 import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
@@ -65,13 +67,14 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       log.info("sending mail to actual recipient on production env : {} ", recipients);
     } else {
       ZoomProperty zoomProperty =
-          zoomPropertyService.getByPropertyName("TICKETING_STAGING_EMAIL_LIST");
-      if (null == zoomProperty || StringUtils.isEmpty(zoomProperty.getVariableName())) {
+          zoomPropertyService.getByPropertyName(TICKETING_ZOOM_PROPERTY_KEY);
+      if (null == zoomProperty || StringUtils.isEmpty(zoomProperty.getVariableValue())) {
         log.info("Not sending any mail as not recipient found");
+        return;
       } else {
-        recipients = Arrays.asList(zoomProperty.getVariableName().split(","));
+        recipients = Arrays.asList(zoomProperty.getVariableValue().split(","));
+        log.info("sending mail on staging env to default users : {} ", recipients);
       }
-      log.info("sending mail on staging env to default users : {} ", recipients);
     }
 
     request.setTo(recipients);
