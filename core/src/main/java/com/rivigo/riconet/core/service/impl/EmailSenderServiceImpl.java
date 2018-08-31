@@ -4,6 +4,7 @@ import com.rivigo.notification.common.dto.AttachmentDto;
 import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import com.rivigo.riconet.core.service.EmailSenderService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,9 +40,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
   private final RestTemplate restTemplate;
 
+  private final ZoomPropertyService zoomPropertyService;
+
   @Autowired
-  public EmailSenderServiceImpl() {
+  public EmailSenderServiceImpl(ZoomPropertyService zoomPropertyService) {
     this.restTemplate = new RestTemplate();
+    this.zoomPropertyService = zoomPropertyService;
   }
 
   @Override
@@ -60,9 +64,10 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     } else {
       recipients =
           Arrays.asList(
-              "mayank.pandey@rivigo.com",
-              "deepanshu.nagpal@rivigo.com",
-              "ramesh.chandra@rivigo.com");
+              zoomPropertyService
+                  .getByPropertyName("TICKETING_STAGING_EMAIL_LIST")
+                  .getVariableName()
+                  .split(","));
       log.info("sending mail on staging env to default users : {} ", recipients);
     }
 
