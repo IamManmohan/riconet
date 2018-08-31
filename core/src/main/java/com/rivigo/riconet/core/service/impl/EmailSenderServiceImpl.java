@@ -5,6 +5,7 @@ import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.model.ZoomProperty;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,12 +64,13 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
       log.info("sending mail to actual recipient on production env : {} ", recipients);
     } else {
-      recipients =
-          Arrays.asList(
-              zoomPropertyService
-                  .getByPropertyName("TICKETING_STAGING_EMAIL_LIST")
-                  .getVariableName()
-                  .split(","));
+      ZoomProperty zoomProperty =
+          zoomPropertyService.getByPropertyName("TICKETING_STAGING_EMAIL_LIST");
+      if (null == zoomProperty || StringUtils.isEmpty(zoomProperty.getVariableName())) {
+        log.info("Not sending any mail as not recipient found");
+      } else {
+        recipients = Arrays.asList(zoomProperty.getVariableName().split(","));
+      }
       log.info("sending mail on staging env to default users : {} ", recipients);
     }
 
