@@ -147,7 +147,7 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     if (ticketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TICKET_TYPE.name())))) {
+        Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())))) {
       zoomBackendAPIClientService.setPriorityMapping(
           metadata.get(TicketingFieldName.ENTITY_ID.name()),PriorityReasonType.TICKET);
     }
