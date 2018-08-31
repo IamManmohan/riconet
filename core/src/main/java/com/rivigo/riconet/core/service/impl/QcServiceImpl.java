@@ -112,7 +112,7 @@ public class QcServiceImpl implements QcService {
         });
   }
 
-  public void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
+  private void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
     if (TicketStatus.NEW.equals(ticketDTO.getStatus())) {
       ticketDTO.setStatus(TicketStatus.IN_PROGRESS);
       zoomTicketingAPIClientService.editTicket(ticketDTO);

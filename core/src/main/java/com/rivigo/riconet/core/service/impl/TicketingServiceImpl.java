@@ -6,12 +6,11 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
-import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
-import com.rivigo.zoom.common.enums.TicketStatus;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +34,7 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
-  @Autowired private QcService qcService;
+  @Autowired private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Autowired
   public TicketingServiceImpl(EmailSenderService emailSenderService) {
@@ -154,7 +153,9 @@ public class TicketingServiceImpl implements TicketingService {
         metadata.get(TicketingFieldName.TICKET_TYPE.name()))) {
       TicketDTO dto= new TicketDTO();
       dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
-      qcService.closeTicket(dto,"Ticket is auto-closable after creation");
+      dto.setReasonOfClosure("Ticket is auto-closable after creation");
+      dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
+      zoomTicketingAPIClientService.editTicket(dto);
     }
   }
 }
