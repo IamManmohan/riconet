@@ -132,7 +132,7 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    log.info("value : {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
+    log.info("PriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
     log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TYPE_ID.name()));
     List<Long> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
@@ -149,15 +149,16 @@ public class TicketingServiceImpl implements TicketingService {
     if (ticketTypes.contains(
         Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
       zoomBackendAPIClientService.setPriorityMapping(
-          metadata.get(TicketingFieldName.ENTITY_ID.name()),PriorityReasonType.TICKET);
-    }
-    if (closableTicketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
-      TicketDTO dto= new TicketDTO();
-      dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
-      dto.setReasonOfClosure("Ticket is auto-closable after creation");
-      dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
-      zoomTicketingAPIClientService.editTicket(dto);
+          metadata.get(TicketingFieldName.ENTITY_ID.name()), PriorityReasonType.TICKET);
+      log.info("AutoClosablePriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE));
+      if (closableTicketTypes.contains(
+          Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
+        TicketDTO dto = new TicketDTO();
+        dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
+        dto.setReasonOfClosure("Ticket is auto-closable after creation");
+        dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
+        zoomTicketingAPIClientService.editTicket(dto);
+      }
     }
   }
 }
