@@ -133,7 +133,7 @@ public class TicketingServiceImpl implements TicketingService {
     }
     log.info("Event Metadata : {} ", metadata);
     log.info("value : {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
-    log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TICKET_ID.name()));
+    log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TYPE_ID.name()));
     List<Long> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
             .map(Long::parseLong)
@@ -147,12 +147,12 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     if (ticketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())))) {
+        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
       zoomBackendAPIClientService.setPriorityMapping(
           metadata.get(TicketingFieldName.ENTITY_ID.name()),PriorityReasonType.TICKET);
     }
     if (closableTicketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TICKET_TYPE.name())))) {
+        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
       TicketDTO dto= new TicketDTO();
       dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
       dto.setReasonOfClosure("Ticket is auto-closable after creation");
