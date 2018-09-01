@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
+import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +36,14 @@ public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
-  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  @Autowired
+  private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  @Autowired private ZoomPropertyService zoomPropertyService;
+  @Autowired
+  private ZoomPropertyService zoomPropertyService;
 
-  @Autowired private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+  @Autowired
+  private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Autowired
   public TicketingServiceImpl(EmailSenderService emailSenderService) {
@@ -148,31 +152,52 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
-    log.info("PriorityTicketTypesId: {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
-    List<Long> ticketTypes =
-        Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-            .map(Long::parseLong)
-            .collect(Collectors.toList());
-    List<Long> closableTicketTypes =
-        Stream.of(zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE).split(",")).map(Long::parseLong)
-            .collect(Collectors.toList());
-    if (CollectionUtils.isEmpty(ticketTypes)) {
-      log.info("No ticket type found for which CN's are to be set as priority");
-      return;
-    }
+    String ticketTypeId = metadata.get(TicketingFieldName.TYPE_ID.name());
+    Long typeId;
+    if (ticketTypeId != null && EntityType.CONSIGNMENT.toString()
+        .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
+      try {
+        typeId = Long.parseLong(ticketTypeId);
 
-    if (ticketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
-      zoomBackendAPIClientService.setPriorityMapping(
-          metadata.get(TicketingFieldName.ENTITY_ID.name()), PriorityReasonType.TICKET);
-      log.info("AutoClosablePriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE));
-      if (closableTicketTypes.contains(
-          Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
-        TicketDTO dto = new TicketDTO();
-        dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
-        dto.setStatus(TicketStatus.NEW);
-        closeTicket(dto,ZoomTicketingConstant.PRIORITY_AUTO_CLOSURE_MESSAGE);
+        List<Long> ticketTypes = zoomPropertyService
+            .getLongList(ZoomPropertyName.PRIORITY_TICKET_TYPE);
+        log.info("PriorityTicketTypesId: {}", ticketTypes);
+        if (CollectionUtils.isEmpty(ticketTypes)) {
+          log.info("No ticket type found for which CN's are to be set as priority");
+          return;
+        }
+
+        if (ticketTypes.contains(typeId)) {
+
+          String cnote = metadata.get(TicketingFieldName.ENTITY_ID.name());
+          if (cnote == null || cnote.isEmpty()) {
+            log.info("Invalid entity id for ticket {}", notificationDTO.getEntityId());
+          }
+
+          log.info("setPriorityMapping() called for entity {} :START", cnote);
+          zoomBackendAPIClientService.setPriorityMapping(cnote
+              , PriorityReasonType.TICKET);
+          log.info("setPriorityMapping() called for entity {} :END,SUCCESS", cnote);
+
+          List<Long> closableTicketTypes = zoomPropertyService
+              .getLongList(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
+          log.info("AutoClosablePriorityTicketTypes: {}", closableTicketTypes);
+          if (closableTicketTypes.contains(typeId)) {
+            TicketDTO dto = new TicketDTO();
+            dto.setId(notificationDTO.getEntityId());
+            dto.setStatus(TicketStatus.NEW);
+            closeTicket(dto, ZoomTicketingConstant.PRIORITY_AUTO_CLOSURE_MESSAGE);
+          }
+
+
+        }
+
+
+      } catch (NumberFormatException e) {
+        log.info("Invaild ticket type id {} for ticket {} ", ticketTypeId,
+            notificationDTO.getEntityId());
       }
     }
+
   }
 }

@@ -44,9 +44,9 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       responseJson =
           apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
     } catch (IOException e) {
-      log.error("Error while updating priority mapping needed with consignmentId: {}", cnote, e);
+      log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
       throw new ZoomException(
-          "Error while updating priority mapping needed  with consignmentId: " + cnote);
+          "Error while updating priority mapping needed  with cnote: " + cnote);
     }
 
     apiClientService.parseJsonNode(responseJson, null);

@@ -1,10 +1,13 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
@@ -113,5 +116,23 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
     }
 
     return defaultVal;
+  }
+
+  @Override
+  public List<Long> getLongList(ZoomPropertyName propertyName)
+  {
+    ZoomProperty property = getByPropertyName(propertyName.name());
+    if (property == null||property.getVariableValue()==null) return null;
+    if(!property.getVariableValue().isEmpty())
+    {
+      try {
+        return Stream.of(property.getVariableValue()
+            .split(ZoomTicketingConstant.ZOOM_PROPERTIES_PRIORITY_SEPORATOR))
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
+      }catch (Exception ex) {
+        log.error("Exception while getting list(long) for " + propertyName.name(), ex);
+      }}
+    return null;
   }
 }

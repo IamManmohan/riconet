@@ -41,4 +41,6 @@ public class ZoomTicketingConstant {
       "The task got auto closed because of change of CN from credit to retail";
 
   public static final String PRIORITY_AUTO_CLOSURE_MESSAGE="The Ticket got auto closed after changing the consignment priority";
+
+  public static final String ZOOM_PROPERTIES_PRIORITY_SEPORATOR=",";
 }
