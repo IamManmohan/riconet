@@ -135,6 +135,7 @@ public class TicketingServiceImpl implements TicketingService {
     log.info("Event Metadata : {} ", metadata);
     log.info("PriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
     log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TYPE_ID.name()));
+    log.info("TicketType : {}",metadata.get(TicketingFieldName.TICKET_TYPE));
     List<Long> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
             .map(Long::parseLong)
