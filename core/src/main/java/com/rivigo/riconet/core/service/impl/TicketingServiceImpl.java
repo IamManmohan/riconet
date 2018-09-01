@@ -159,6 +159,7 @@ public class TicketingServiceImpl implements TicketingService {
         dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
         dto.setReasonOfClosure("Ticket is auto-closable after creation");
         dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
+        dto=zoomTicketingAPIClientService.editTicket(dto);
         zoomTicketingAPIClientService.editTicket(dto);
       }
     }
