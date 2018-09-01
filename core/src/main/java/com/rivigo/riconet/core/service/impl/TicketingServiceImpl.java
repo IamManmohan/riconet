@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.security.krb5.internal.Ticket;
 
 /**
  * @author ramesh
@@ -133,13 +134,12 @@ public class TicketingServiceImpl implements TicketingService {
     }
     log.info("Event Metadata : {} ", metadata);
     log.info("PriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
-    log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TYPE_ID.name()));
-    List<Long> ticketTypes =
+    log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TICKET_TYPE_NAME.name()));
+    List<String> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
-            .map(Long::parseLong)
             .collect(Collectors.toList());
-    List<Long> closableTicketTypes =
-        Stream.of(zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE).split(",")).map(Long::parseLong)
+    List<String> closableTicketTypes =
+        Stream.of(zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE).split(","))
             .collect(Collectors.toList());
     if (ticketTypes== null || ticketTypes.isEmpty()) {
       log.info("No ticket type found for which CN's are to be set as priority");
@@ -147,17 +147,18 @@ public class TicketingServiceImpl implements TicketingService {
     }
 
     if (ticketTypes.contains(
-        Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
+        (metadata.get(TicketingFieldName.TICKET_TYPE_NAME.name())))) {
       zoomBackendAPIClientService.setPriorityMapping(
           metadata.get(TicketingFieldName.ENTITY_ID.name()), PriorityReasonType.TICKET);
       log.info("AutoClosablePriorityTicketTypes: {}", zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE));
       if (closableTicketTypes.contains(
-          Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
+         metadata.get(TicketingFieldName.TICKET_TYPE_NAME.name()))) {
         TicketDTO dto = new TicketDTO();
         dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
         dto.setReasonOfClosure("Ticket is auto-closable after creation");
         dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
-        zoomTicketingAPIClientService.editTicket(dto);
+        dto=zoomTicketingAPIClientService.editTicket(dto);
+        log.info("ticket status {}",dto.getStatus());
       }
     }
   }
