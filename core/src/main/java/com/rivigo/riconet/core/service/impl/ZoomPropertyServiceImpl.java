@@ -119,7 +119,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
   }
 
   @Override
-  public List<Long> getLongList(ZoomPropertyName propertyName)
+  public List<Long> getLongValues(ZoomPropertyName propertyName)
   {
     ZoomProperty property = getByPropertyName(propertyName.name());
     if (property == null||property.getVariableValue()==null) return null;

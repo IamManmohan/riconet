@@ -18,8 +18,6 @@ import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -159,7 +157,7 @@ public class TicketingServiceImpl implements TicketingService {
       try {
         typeId = Long.parseLong(ticketTypeId);
         List<Long> ticketTypes = zoomPropertyService
-            .getLongList(ZoomPropertyName.PRIORITY_TICKET_TYPE);
+            .getLongValues(ZoomPropertyName.PRIORITY_TICKET_TYPE);
         log.info("PriorityTicketTypesId: {}", ticketTypes);
         if (CollectionUtils.isEmpty(ticketTypes)) {
           log.info("No ticket type found for which CN's are to be set as priority");
@@ -175,7 +173,7 @@ public class TicketingServiceImpl implements TicketingService {
               , PriorityReasonType.TICKET);
           log.info("setPriorityMapping() called for entity {} :END,SUCCESS", cnote);
           List<Long> closableTicketTypes = zoomPropertyService
-              .getLongList(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
+              .getLongValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
           log.info("AutoClosablePriorityTicketTypes: {}", closableTicketTypes);
           if (closableTicketTypes.contains(typeId)) {
             TicketDTO dto = new TicketDTO();
