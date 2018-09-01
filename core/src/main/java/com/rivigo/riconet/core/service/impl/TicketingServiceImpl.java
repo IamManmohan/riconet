@@ -166,7 +166,7 @@ public class TicketingServiceImpl implements TicketingService {
         if (ticketTypes.contains(typeId)) {
           String cnote = metadata.get(TicketingFieldName.ENTITY_ID.name());
           if (cnote == null || cnote.isEmpty()) {
-            log.info("Invalid entity id for ticket {}", notificationDTO.getEntityId());
+            log.error("Invalid entity id for ticket {}", notificationDTO.getEntityId());
           }
           log.info("setPriorityMapping() called for entity {} :START", cnote);
           zoomBackendAPIClientService.setPriorityMapping(cnote
@@ -183,7 +183,7 @@ public class TicketingServiceImpl implements TicketingService {
           }
         }
       } catch (NumberFormatException e) {
-        log.info("Invaild ticket type id {} for ticket {} ", ticketTypeId,
+        log.error("Invaild ticket type id {} for ticket {} ", ticketTypeId,
             notificationDTO.getEntityId());
       }
     }
