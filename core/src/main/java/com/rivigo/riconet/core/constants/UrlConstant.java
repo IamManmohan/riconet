@@ -32,5 +32,5 @@ public class UrlConstant {
 
   public static final String ZOOM_BILLING_CN_DETAILS = "/cnbook/chargedweight/cnote/{cnote}";
 
-  public static final String PRIORITY_URL_ENDPOINT = "/operations/consignments/priority";
+  public static final String PRIORITY_URL = "/operations/consignments/priority";
 }

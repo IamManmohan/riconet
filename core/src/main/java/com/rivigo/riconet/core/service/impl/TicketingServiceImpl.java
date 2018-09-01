@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 
 /**
@@ -148,8 +149,6 @@ public class TicketingServiceImpl implements TicketingService {
     }
     log.info("Event Metadata : {} ", metadata);
     log.info("PriorityTicketTypesId: {}", zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE));
-    log.info("TicketTypeID : {}",metadata.get(TicketingFieldName.TYPE_ID.name()));
-    log.info("TicketType : {}",metadata.get(TicketingFieldName.TICKET_TYPE.name()));
     List<Long> ticketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.PRIORITY_TICKET_TYPE).split(","))
             .map(Long::parseLong)
@@ -157,7 +156,7 @@ public class TicketingServiceImpl implements TicketingService {
     List<Long> closableTicketTypes =
         Stream.of(zoomPropertyService.getString(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE).split(",")).map(Long::parseLong)
             .collect(Collectors.toList());
-    if (ticketTypes== null || ticketTypes.isEmpty()) {
+    if (CollectionUtils.isEmpty(ticketTypes)) {
       log.info("No ticket type found for which CN's are to be set as priority");
       return;
     }
@@ -171,7 +170,7 @@ public class TicketingServiceImpl implements TicketingService {
           Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
         TicketDTO dto = new TicketDTO();
         dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
-        dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.NEW);
+        dto.setStatus(TicketStatus.NEW);
         closeTicket(dto,ZoomTicketingConstant.PRIORITY_AUTO_CLOSURE_MESSAGE);
       }
     }

@@ -35,7 +35,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Override
   public void setPriorityMapping(String cnote,PriorityReasonType reason) {
 
-    String url = UrlConstant.PRIORITY_URL_ENDPOINT;
+    String url = UrlConstant.PRIORITY_URL;
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
     valuesMap.put("cnote", Collections.singletonList(cnote));
