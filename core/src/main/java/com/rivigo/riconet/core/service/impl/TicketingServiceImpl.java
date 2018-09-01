@@ -158,7 +158,6 @@ public class TicketingServiceImpl implements TicketingService {
         .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
       try {
         typeId = Long.parseLong(ticketTypeId);
-
         List<Long> ticketTypes = zoomPropertyService
             .getLongList(ZoomPropertyName.PRIORITY_TICKET_TYPE);
         log.info("PriorityTicketTypesId: {}", ticketTypes);
@@ -166,19 +165,15 @@ public class TicketingServiceImpl implements TicketingService {
           log.info("No ticket type found for which CN's are to be set as priority");
           return;
         }
-
         if (ticketTypes.contains(typeId)) {
-
           String cnote = metadata.get(TicketingFieldName.ENTITY_ID.name());
           if (cnote == null || cnote.isEmpty()) {
             log.info("Invalid entity id for ticket {}", notificationDTO.getEntityId());
           }
-
           log.info("setPriorityMapping() called for entity {} :START", cnote);
           zoomBackendAPIClientService.setPriorityMapping(cnote
               , PriorityReasonType.TICKET);
           log.info("setPriorityMapping() called for entity {} :END,SUCCESS", cnote);
-
           List<Long> closableTicketTypes = zoomPropertyService
               .getLongList(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
           log.info("AutoClosablePriorityTicketTypes: {}", closableTicketTypes);
@@ -188,16 +183,11 @@ public class TicketingServiceImpl implements TicketingService {
             dto.setStatus(TicketStatus.NEW);
             closeTicket(dto, ZoomTicketingConstant.PRIORITY_AUTO_CLOSURE_MESSAGE);
           }
-
-
         }
-
-
       } catch (NumberFormatException e) {
         log.info("Invaild ticket type id {} for ticket {} ", ticketTypeId,
             notificationDTO.getEntityId());
       }
     }
-
   }
 }
