@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 
 /**
  * @author ramesh
@@ -11,4 +12,6 @@ public interface TicketingService {
   void sendTicketingEventsEmail(NotificationDTO notificationDTO);
 
   void setPriorityMapping(NotificationDTO notificationDTO);
+
+  void closeTicket(TicketDTO ticketDTO, String reasonOfClosure);
 }

@@ -1,10 +1,12 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -20,7 +22,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.security.krb5.internal.Ticket;
+
 
 /**
  * @author ramesh
@@ -63,6 +65,18 @@ public class TicketingServiceImpl implements TicketingService {
         "Sending Ticketing Email. To : {} Subject : {}  Body : {} ", toRecipients, subject, body);
     toRecipients.ifPresent(to -> emailSenderService.sendEmail(to, subject, body));
   }
+
+  @Override
+  public void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
+    if (TicketStatus.NEW.equals(ticketDTO.getStatus())) {
+      ticketDTO.setStatus(TicketStatus.IN_PROGRESS);
+      zoomTicketingAPIClientService.editTicket(ticketDTO);
+    }
+    ticketDTO.setReasonOfClosure(reasonOfClosure);
+    ticketDTO.setStatus(TicketStatus.CLOSED);
+    zoomTicketingAPIClientService.editTicket(ticketDTO);
+  }
+
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
@@ -157,10 +171,8 @@ public class TicketingServiceImpl implements TicketingService {
           Long.parseLong(metadata.get(TicketingFieldName.TYPE_ID.name())))) {
         TicketDTO dto = new TicketDTO();
         dto.setId(Long.parseLong(metadata.get(TicketingFieldName.TICKET_ID.name())));
-        dto.setReasonOfClosure("Ticket is auto-closable after creation");
-        dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.CLOSED);
-        dto=zoomTicketingAPIClientService.editTicket(dto);
-        zoomTicketingAPIClientService.editTicket(dto);
+        dto.setStatus(com.rivigo.riconet.core.enums.zoomticketing.TicketStatus.NEW);
+        closeTicket(dto,ZoomTicketingConstant.PRIORITY_AUTO_CLOSURE_MESSAGE);
       }
     }
   }
