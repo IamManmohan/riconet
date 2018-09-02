@@ -63,7 +63,7 @@ public class TicketingServiceTest extends TesterBase {
 
     zoomProperty = new ZoomProperty();
     zoomProperty.setVariableName(TICKETING_ZOOM_PROPERTY_KEY);
-    zoomProperty.setVariableValue("dnagpal755@gmail.com");
+    zoomProperty.setVariableValue("rameshc10695@gmail.com");
   }
 
   @Test
