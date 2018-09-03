@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.TicketingService;
@@ -34,18 +35,21 @@ public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
-  @Autowired
-  private ZoomBackendAPIClientService zoomBackendAPIClientService;
+
+  private final ZoomBackendAPIClientService zoomBackendAPIClientService;
+
+
+  private final ZoomPropertyService zoomPropertyService;
+
+
+  private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Autowired
-  private ZoomPropertyService zoomPropertyService;
-
-  @Autowired
-  private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
-
-  @Autowired
-  public TicketingServiceImpl(EmailSenderService emailSenderService) {
+  public TicketingServiceImpl(EmailSenderService emailSenderService,ZoomBackendAPIClientService zoomBackendAPIClientService,ZoomPropertyService zoomPropertyService,ZoomTicketingAPIClientService zoomTicketingAPIClientService) {
     this.emailSenderService = emailSenderService;
+    this.zoomBackendAPIClientService=zoomBackendAPIClientService;
+    this.zoomPropertyService=zoomPropertyService;
+    this.zoomTicketingAPIClientService=zoomTicketingAPIClientService;
   }
 
   @Override
@@ -152,7 +156,7 @@ public class TicketingServiceImpl implements TicketingService {
     log.info("Event Metadata : {} ", metadata);
     String ticketTypeId = metadata.get(TicketingFieldName.TYPE_ID.name());
     Long typeId;
-    if (ticketTypeId != null && EntityType.CONSIGNMENT.toString()
+    if (ticketTypeId != null && TicketEntityType.CN.toString()
         .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
       try {
         typeId = Long.parseLong(ticketTypeId);
