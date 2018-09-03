@@ -58,7 +58,6 @@ public class TicketingServiceTest extends TesterBase {
     //    RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl();
     ZoomBackendAPIClientService zoomBackendAPIClientService =new ZoomBackendAPIClientServiceImpl();
-    //ZoomPropertyService zoomPropertyService= new ZoomPropertyServiceImpl();
     ZoomTicketingAPIClientService zoomTicketingAPIClientService=new ZoomTicketingAPIClientServiceImpl();
     ticketingService = new TicketingServiceImpl(emailSenderService,zoomBackendAPIClientService,zoomPropertyService,zoomTicketingAPIClientService);
     ReflectionTestUtils.setField(
