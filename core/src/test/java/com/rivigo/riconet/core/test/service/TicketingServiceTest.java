@@ -10,8 +10,6 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
-import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
-import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.TesterBase;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import java.util.ArrayList;
@@ -22,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -48,13 +45,14 @@ public class TicketingServiceTest extends TesterBase {
 
   @Autowired private RestTemplate restTemplate;
   @Mock private  ZoomPropertyService zoomPropertyService;
+  @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+
 
   @Before
   public void setUp() {
     //    RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl();
-    ZoomBackendAPIClientService zoomBackendAPIClientService =new ZoomBackendAPIClientServiceImpl();
-    ZoomTicketingAPIClientService zoomTicketingAPIClientService=new ZoomTicketingAPIClientServiceImpl();
     ticketingService = new TicketingServiceImpl(emailSenderService,zoomBackendAPIClientService,zoomPropertyService,zoomTicketingAPIClientService);
     ReflectionTestUtils.setField(
         emailSenderService, "senderServerName", "testing@devops.rivigo.com");
@@ -63,7 +61,6 @@ public class TicketingServiceTest extends TesterBase {
         "emailServiceApi",
         "http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send");
     ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "riconet-qa");
-    MockitoAnnotations.initMocks(this);
   }
 
   @Test
@@ -124,17 +121,14 @@ public class TicketingServiceTest extends TesterBase {
 
     notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "19");
     ticketingService.setPriorityMapping(notificationDTO);
+
     List<Long>  priorityTicket= new ArrayList<>();
     priorityTicket.add(19l);
     priorityTicket.add(77l);
     Mockito.when(zoomPropertyService.getLongValues(
         ZoomPropertyName.PRIORITY_TICKET_TYPE)).thenReturn(priorityTicket);
-
-
-
     Mockito.when(zoomPropertyService.getLongValues(
         ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE)).thenReturn(Collections.singletonList(77l));
-
     notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(),"CN");
     notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "77");
     ticketingService.setPriorityMapping(notificationDTO);
