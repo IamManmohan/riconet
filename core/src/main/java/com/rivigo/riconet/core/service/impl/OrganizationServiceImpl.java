@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
@@ -16,23 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
-
 @Slf4j
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-  @Autowired
-  private OrganizationRepository organizationRepository;
+  @Autowired private OrganizationRepository organizationRepository;
 
-  @Autowired
-  private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  @Autowired
-  private UserMasterService userMasterService;
+  @Autowired private UserMasterService userMasterService;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   @Override
   public Organization getById(Long orgId) {
@@ -62,11 +58,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     organizationDTO.setCode(dto.getClientCode());
     organizationDTO.setName(dto.getName());
     organizationDTO.setType(OrganizationType.BF);
-    if(dto.getActive()) {
+    if (dto.getActive()) {
       organizationDTO.setStatus(OperationalStatus.ACTIVE);
-    }else{
+    } else {
       organizationDTO.setStatus(OperationalStatus.INACTIVE);
-
     }
     organizationDTO.setInsuranceApplicable(dto.getInsuranceRequired());
     organizationDTO.setFodApplicable(dto.getFodApplicable());
@@ -75,13 +70,13 @@ public class OrganizationServiceImpl implements OrganizationService {
     User samUser = userMasterService.getByEmail(dto.getSamUserEmail());
     if (samUser != null) {
       organizationDTO.setSamUserId(samUser.getId());
-    }else {
+    } else {
       organizationDTO.setSamUserId(CLIENT_DEFAULT_SAM_ID);
     }
     User samLead = userMasterService.getByEmail(dto.getSamLeadEmail());
     if (samLead != null) {
       organizationDTO.setSamLeadId(samLead.getId());
-    }else {
+    } else {
       organizationDTO.setSamLeadId(CLIENT_DEFAULT_SAM_ID);
     }
     organizationDTO.setDisableRetailBooking(Boolean.FALSE);

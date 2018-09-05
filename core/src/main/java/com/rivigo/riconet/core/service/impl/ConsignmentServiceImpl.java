@@ -2,10 +2,13 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
+import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.LocationTag;
@@ -41,6 +44,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
+
+  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
@@ -129,5 +134,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public Consignment getConsignmentByCnote(String cnote) {
     return consignmentRepo.findByCnote(cnote);
+  }
+
+  @Override
+  public void triggerAssetCnUnload(
+      NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO) {
+    List<String> conditions = notificationDTO.getConditions();
+    if (!conditions.contains(Condition.ASSET_CN.name())) {
+      return;
+    }
+    if (!consignmentBasicDTO.getLocationId().equals(consignmentBasicDTO.getToLocationId())) {
+      return;
+    }
+    zoomBackendAPIClientService.unloadAssetCN(consignmentBasicDTO.getConsignmentId());
   }
 }

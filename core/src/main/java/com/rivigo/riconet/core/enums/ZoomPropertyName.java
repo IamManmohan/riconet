@@ -203,5 +203,9 @@ public enum ZoomPropertyName {
   ,
   MINIMUM_NUMBER_OF_CN_REQUIRED,
   MINIMUM_PICKUP_CHARGES_FOR_BF,
-  REQUIRED_CLIENT_TYPE
+  REQUIRED_CLIENT_TYPE,
+
+  /** Assets Regexes * */
+  // TODO: seperate prop for each asset
+  ASSET_REGEX
 }

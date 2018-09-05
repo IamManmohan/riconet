@@ -48,6 +48,7 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
+        consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
         qcService.consumeUnloadingEvent(unloadingData);
         consignmentService.triggerBfCpdCalcualtion(unloadingData);
         break;
@@ -59,7 +60,8 @@ public class EventTriggerService {
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
         try {
           TimeUnit.SECONDS.sleep(2);
-          //Fixme: Chirag: This is to ensure that qc is called after cn is created in billing service
+          // Fixme: Chirag: This is to ensure that qc is called after cn is created in billing
+          // service
           // We need charged weight from billing service as we don't have reliable volume data
         } catch (InterruptedException e) {
           log.warn(e.getMessage());
@@ -94,6 +96,11 @@ public class EventTriggerService {
         .locationId(
             Long.parseLong(
                 notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+        .toLocationId(
+            Long.parseLong(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.TO_LOCATION_ID.name())))
         .status(status)
         .build();
   }

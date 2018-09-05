@@ -11,7 +11,6 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,6 +67,16 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
+  public void unloadAssetCN(Long cnId) {
+    String url = UrlConstant.ZOOM_BACKEND_ASSET_ONBOARDING.replace("{cnId}", cnId.toString());
+    try {
+      apiClientService.getEntity(null, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while triggering asset on-boarding with consignmentId: {}", cnId, e);
+    }
+  }
+
+  @Override
   public void recalculateCpdOfBf(Long consignmentId) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
@@ -96,8 +105,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while creating Client {} , {}", clientDTO, e);
       throw new ZoomException("Error while creating Client {}" + clientDTO);
     }
-    TypeReference<ClientDTO> mapType =
-            new TypeReference<ClientDTO>() {};
+    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
     return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
@@ -113,8 +121,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating Client {} , {}", clientDTO, e);
       throw new ZoomException("Error while updating Client {}" + clientDTO);
     }
-    TypeReference<ClientDTO> mapType =
-            new TypeReference<ClientDTO>() {};
+    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
     return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
@@ -124,14 +131,12 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     String url = UrlConstant.ZOOM_BACKEND_CLIENT_SERVICE + "/" + id.toString();
     log.info("Deleting client with id {}", id);
     try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.DELETE, url, null, backendBaseUrl);
+      responseJson = apiClientService.getEntity(null, HttpMethod.DELETE, url, null, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while deleting Client with Id {} , {}", id, e);
       throw new ZoomException("Error while deleting Client with Id {}" + id);
     }
-    TypeReference<ClientDTO> mapType =
-            new TypeReference<ClientDTO>() {};
+    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
     return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
@@ -152,11 +157,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while updating Invoice for cnote :" + cnote);
     }
     TypeReference<ConsignmentUploadedFilesDTO> mapType =
-            new TypeReference<ConsignmentUploadedFilesDTO>() {};
-    try{
+        new TypeReference<ConsignmentUploadedFilesDTO>() {};
+    try {
       return (ConsignmentUploadedFilesDTO) apiClientService.parseJsonNode(responseJson, mapType);
-    }catch(Exception e){
-      log.error("Error converting json in dto , {}",e);
+    } catch (Exception e) {
+      log.error("Error converting json in dto , {}", e);
       return null;
     }
   }
@@ -172,8 +177,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while creating Organization {} , {}", orgDTO, e);
       throw new ZoomException("Error while creating Organization {}" + orgDTO);
     }
-    TypeReference<OrganizationDTO> mapType =
-            new TypeReference<OrganizationDTO>() {};
+    TypeReference<OrganizationDTO> mapType = new TypeReference<OrganizationDTO>() {};
     return (OrganizationDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
@@ -188,8 +192,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating Organization {} , {}", orgDTO, e);
       throw new ZoomException("Error while updating Organization {}" + orgDTO);
     }
-    TypeReference<OrganizationDTO> mapType =
-            new TypeReference<OrganizationDTO>() {};
+    TypeReference<OrganizationDTO> mapType = new TypeReference<OrganizationDTO>() {};
     return (OrganizationDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }
