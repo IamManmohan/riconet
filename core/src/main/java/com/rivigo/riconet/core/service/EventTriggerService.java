@@ -27,20 +27,21 @@ public class EventTriggerService {
 
   @Autowired private PickupService pickupService;
 
+  @Autowired private TicketingService ticketingService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
       case CN_DELIVERY:
+      case CN_DELETED:
         String entityId =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.closeTicket(
-            entityId, TicketEntityType.CN.name(), EventName.CN_DELIVERY);
+        ticketingClientService.closeTicket(entityId, TicketEntityType.CN.name(), eventName);
         break;
       case PICKUP_COMPLETION:
+      case PICKUP_CANCELLATION:
         ticketingClientService.closeTicket(
-            notificationDTO.getEntityId().toString(),
-            TicketEntityType.PRQ.name(),
-            EventName.PICKUP_COMPLETION);
+            notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), eventName);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
@@ -77,6 +78,15 @@ public class EventTriggerService {
         break;
       case UNLOADING_IN_LOADING:
         //TODO: notification service
+        break;
+      case TICKET_CREATION:
+      case TICKET_ASSIGNEE_CHANGE:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+      case TICKET_SEVERITY_CHANGE:
+      case TICKET_COMMENT_CREATION:
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

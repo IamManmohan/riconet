@@ -12,7 +12,9 @@ public class ConsignmentConstant {
   public static final int SHOW_STOCK_CHECK_DAYS = 7;
   public static final long GLOBAL_ORGANIZATION = 9999;
   public static final long RIVIGO_ORGANIZATION_ID = 1;
-  public static final Long CLIENT_DEFAULT_SAM_ID = 50059L; // anmol.batra@rivigo.com
+
+  public static final Long CLIENT_DEFAULT_SAM_ID = 2570L; // ankit.kumar2@rivigo.com
+
   public static final long MAX_DF_ORGANIZATION_ID = 10001;
   public static final String RETAIL_CLIENT_CODE = "ZRETL";
 

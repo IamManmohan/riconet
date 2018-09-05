@@ -30,7 +30,7 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_CONSIGNMENT_INVOICE = "/master/consignmentInvoice";
 
-  public static final String ZOOM_BILLING_CN_DETAILS = "/cnbook/{cnote}/details";
-
   public static final String ZOOM_BACKEND_ASSET_ONBOARDING = "/asset/onBoard/{cnId}";
+
+  public static final String ZOOM_BILLING_CN_DETAILS = "/cnbook/chargedweight/cnote/{cnote}";
 }
