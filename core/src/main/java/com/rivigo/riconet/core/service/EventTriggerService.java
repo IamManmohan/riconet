@@ -75,6 +75,9 @@ public class EventTriggerService {
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
+      case UNLOADING_IN_LOADING:
+        //TODO: notification service
+        break;
       default:
         log.info("Event does not trigger anything {}", eventName);
     }
