@@ -119,7 +119,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
   }
 
   @Override
-  public List<Long> getLongValues(ZoomPropertyName propertyName) {
+  public List<String> getStringValues(ZoomPropertyName propertyName) {
     ZoomProperty property = getByPropertyName(propertyName.name());
     if (property == null || property.getVariableValue() == null) return null;
     if (!property.getVariableValue().isEmpty()) {
@@ -128,7 +128,6 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
                 property
                     .getVariableValue()
                     .split(ZoomTicketingConstant.ZOOM_PROPERTIES_PRIORITY_SEPORATOR))
-            .map(Long::parseLong)
             .collect(Collectors.toList());
       } catch (Exception ex) {
         log.error("Exception while getting list(long) for " + propertyName.name(), ex);
