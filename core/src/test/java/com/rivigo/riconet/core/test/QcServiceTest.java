@@ -25,6 +25,7 @@ import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -85,6 +86,8 @@ public class QcServiceTest {
   @Mock private SmsService smsService;
 
   @Mock private ZoomBillingAPIClientService zoomBillingAPIClientService;
+
+  @Mock private TicketingService ticketingService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -161,6 +164,7 @@ public class QcServiceTest {
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
     qcService.consumeLoadingEvent(data);
+
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket2);
     Assert.assertEquals(TicketStatus.CLOSED, ticket2.getStatus());

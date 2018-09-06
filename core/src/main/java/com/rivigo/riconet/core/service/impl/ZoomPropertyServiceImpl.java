@@ -5,6 +5,7 @@ import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -120,8 +121,10 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
 
   @Override
   public List<String> getStringValues(ZoomPropertyName propertyName) {
+    if(propertyName==null)
+      return Collections.emptyList();
     ZoomProperty property = getByPropertyName(propertyName.name());
-    if (property == null || property.getVariableValue() == null) return null;
+    if (property == null || property.getVariableValue() == null) return Collections.emptyList();
     if (!property.getVariableValue().isEmpty()) {
       try {
         return Stream.of(
@@ -133,6 +136,6 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
         log.error("Exception while getting list(long) for " + propertyName.name(), ex);
       }
     }
-    return null;
+    return Collections.emptyList();
   }
 }
