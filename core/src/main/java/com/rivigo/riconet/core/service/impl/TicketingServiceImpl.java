@@ -159,7 +159,7 @@ public class TicketingServiceImpl implements TicketingService {
             .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
       List<String> ticketTypes =
           zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE);
-      log.info("PriorityTicketTypesId: {}", ticketTypes);
+      log.info("PriorityTicketTypes: {}", ticketTypes);
       if (CollectionUtils.isEmpty(ticketTypes)) {
         log.info("No ticket type found for which CN's are to be set as priority");
         return;
