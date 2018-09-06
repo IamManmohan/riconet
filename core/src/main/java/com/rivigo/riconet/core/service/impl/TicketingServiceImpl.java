@@ -171,6 +171,7 @@ public class TicketingServiceImpl implements TicketingService {
           String cnote = metadata.get(TicketingFieldName.ENTITY_ID.name());
           if (cnote == null || cnote.isEmpty()) {
             log.error("Invalid entity id for ticket {}", notificationDTO.getEntityId());
+            return;
           }
           log.info("setPriorityMapping() called for entity {} :START", cnote);
           zoomBackendAPIClientService.setPriorityMapping(cnote
