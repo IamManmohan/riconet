@@ -124,19 +124,15 @@ public class TicketingServiceTest extends TesterBase {
             .status(TicketStatus.NEW)
             .id(2l)
             .build();
-    ticketingService.closeTicket(ticket3,"test");
+    ticketingService.closeTicket(ticket3, "test");
   }
-
 
   @Test
   public void setPriorityMappingTest() {
-    NotificationDTO notificationDTO =
-        new NotificationDTO();
+    NotificationDTO notificationDTO = new NotificationDTO();
     ticketingService.setPriorityMapping(notificationDTO);
 
-
-    notificationDTO=
-        NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
     ticketingService.setPriorityMapping(notificationDTO);
 
     notificationDTO
@@ -147,17 +143,14 @@ public class TicketingServiceTest extends TesterBase {
     Mockito.when(zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
         .thenReturn(null);
     Mockito.when(
-        zoomPropertyService.getStringValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
+            zoomPropertyService.getStringValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
         .thenReturn(Collections.singletonList("Priority Shipment Special Request"));
     notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(), "CN");
     notificationDTO
         .getMetadata()
         .put(TicketingFieldName.TICKET_TYPE.toString(), "Priority Shipment Special Request");
-    notificationDTO
-        .getMetadata()
-        .put(TicketingFieldName.ENTITY_ID.toString(), "1234567890");
+    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_ID.toString(), "1234567890");
     ticketingService.setPriorityMapping(notificationDTO);
-
 
     List<String> priorityTicket = new ArrayList<>();
     priorityTicket.add("Delayed Delivery");
@@ -166,11 +159,8 @@ public class TicketingServiceTest extends TesterBase {
         .thenReturn(priorityTicket);
     ticketingService.setPriorityMapping(notificationDTO);
 
-    notificationDTO
-        .getMetadata()
-        .put(TicketingFieldName.ENTITY_ID.toString(), "null");
+    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_ID.toString(), "null");
     ticketingService.setPriorityMapping(notificationDTO);
-
 
     notificationDTO.setEntityId(null);
     ticketingService.setPriorityMapping(notificationDTO);

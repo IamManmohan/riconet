@@ -121,8 +121,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
 
   @Override
   public List<String> getStringValues(ZoomPropertyName propertyName) {
-    if(propertyName==null)
-      return Collections.emptyList();
+    if (propertyName == null) return Collections.emptyList();
     ZoomProperty property = getByPropertyName(propertyName.name());
     if (property == null || property.getVariableValue() == null) return Collections.emptyList();
     if (!property.getVariableValue().isEmpty()) {

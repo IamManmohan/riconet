@@ -57,11 +57,11 @@ public class ZoomBackendAPIClientServiceTest {
 
   @Test
   public void setPriorityMappingTest() throws IOException {
-    String cnote="1234567890";
-    PriorityReasonType reasonType=PriorityReasonType.TICKET;
+    String cnote = "1234567890";
+    PriorityReasonType reasonType = PriorityReasonType.TICKET;
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.setPriorityMapping(cnote,reasonType);
+    zoomBackendAPIClientServiceImpl.setPriorityMapping(cnote, reasonType);
   }
 
   @Test

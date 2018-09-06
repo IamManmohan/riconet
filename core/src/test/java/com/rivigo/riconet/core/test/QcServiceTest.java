@@ -25,11 +25,9 @@ import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
-import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
@@ -67,7 +65,8 @@ public class QcServiceTest {
 
   @InjectMocks private QcServiceImpl qcService;
 
-  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService=Mockito.mock(ZoomTicketingAPIClientServiceImpl.class);
+  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService =
+      Mockito.mock(ZoomTicketingAPIClientServiceImpl.class);
 
   @Spy private ObjectMapper objectMapper;
 
@@ -91,7 +90,8 @@ public class QcServiceTest {
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
-  private TicketingServiceImpl ticketingService=new TicketingServiceImpl(null,null,null,zoomTicketingAPIClientService);
+  private TicketingServiceImpl ticketingService =
+      new TicketingServiceImpl(null, null, null, zoomTicketingAPIClientService);
 
   @Before
   public void initMocks() {

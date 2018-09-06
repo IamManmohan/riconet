@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.test;
 
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
-import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.ZoomPropertyServiceImpl;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
@@ -16,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -31,10 +29,10 @@ public class ZoomPropertyServiceTest {
   @Before
   public void setUp() {
     //    RestTemplate restTemplate = new RestTemplate();
-    zoomPropertyService=new ZoomPropertyServiceImpl();
-    ReflectionTestUtils.setField(zoomPropertyService, "zoomPropertiesRepository", zoomPropertiesRepository);
+    zoomPropertyService = new ZoomPropertyServiceImpl();
+    ReflectionTestUtils.setField(
+        zoomPropertyService, "zoomPropertiesRepository", zoomPropertiesRepository);
   }
-
 
   public void nullChecks() {
     zoomPropertyService.getByPropertyName("");
@@ -103,32 +101,36 @@ public class ZoomPropertyServiceTest {
   }
 
   @Test
-  public void getStringValuesTest()
-  {
-    Assert.assertEquals(Collections.emptyList(),zoomPropertyService.getStringValues(null));
-
+  public void getStringValuesTest() {
+    Assert.assertEquals(Collections.emptyList(), zoomPropertyService.getStringValues(null));
   }
-  @Test
-  public void getStringValues1Test()
-  {
 
-    ZoomProperty zoomProperty2=new ZoomProperty();
+  @Test
+  public void getStringValues1Test() {
+
+    ZoomProperty zoomProperty2 = new ZoomProperty();
     zoomProperty2.setVariableValue("Delayed Delivery,Priority Shipment Special Request");
     List<String> priorityTicket = new ArrayList<>();
     priorityTicket.add("Delayed Delivery");
     priorityTicket.add("Priority Shipment Special Request");
-    Mockito.when(zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1)).thenReturn(Collections.singletonList(zoomProperty2));
-    Assert.assertEquals(priorityTicket,zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE ));
-
+    Mockito.when(
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1))
+        .thenReturn(Collections.singletonList(zoomProperty2));
+    Assert.assertEquals(
+        priorityTicket, zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE));
   }
 
   @Test
-  public void getStringValues2Test()
-  {
-    ZoomProperty zoomProperty=new ZoomProperty();
+  public void getStringValues2Test() {
+    ZoomProperty zoomProperty = new ZoomProperty();
     zoomProperty.setVariableValue(null);
-    Mockito.when(zoomPropertiesRepository.findByVariableNameAndIsActive(ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1)).thenReturn(Collections.singletonList(zoomProperty));
-    Assert.assertEquals(Collections.emptyList(),zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE ));
-
+    Mockito.when(
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1))
+        .thenReturn(Collections.singletonList(zoomProperty));
+    Assert.assertEquals(
+        Collections.emptyList(),
+        zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE));
   }
 }

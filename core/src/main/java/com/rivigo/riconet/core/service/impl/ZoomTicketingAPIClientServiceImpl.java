@@ -86,8 +86,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
           ticketDTO.getId(),
           ticketDTO.getEntityId(),
           e);
-      throw new ZoomException(
-          "Error while editing tickets");
+      throw new ZoomException("Error while editing tickets");
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
 
