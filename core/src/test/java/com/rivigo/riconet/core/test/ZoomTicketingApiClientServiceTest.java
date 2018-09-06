@@ -116,7 +116,7 @@ public class ZoomTicketingApiClientServiceTest {
     TicketDTO ticketDTO = getTicketDTO();
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while editing tickets with id 1 entity 1234567890");
+    expectedException.expectMessage("Error while editing tickets");
     zoomTicketingAPIClientService.editTicket(ticketDTO);
   }
 
