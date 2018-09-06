@@ -119,19 +119,23 @@ public class TicketingServiceTest extends TesterBase {
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
     ticketingService.setPriorityMapping(notificationDTO);
 
-    notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "19");
+    notificationDTO
+        .getMetadata()
+        .put(TicketingFieldName.TICKET_TYPE.toString(), "Delayed Delivery");
     ticketingService.setPriorityMapping(notificationDTO);
 
-    List<Long> priorityTicket = new ArrayList<>();
-    priorityTicket.add(19l);
-    priorityTicket.add(77l);
-    Mockito.when(zoomPropertyService.getLongValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
+    List<String> priorityTicket = new ArrayList<>();
+    priorityTicket.add("Delayed Delivery");
+    priorityTicket.add("Priority Shipment Special Request");
+    Mockito.when(zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
         .thenReturn(priorityTicket);
     Mockito.when(
-            zoomPropertyService.getLongValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
-        .thenReturn(Collections.singletonList(77l));
+            zoomPropertyService.getStringValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
+        .thenReturn(Collections.singletonList("Priority Shipment Special Request"));
     notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(), "CN");
-    notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "77");
+    notificationDTO
+        .getMetadata()
+        .put(TicketingFieldName.TICKET_TYPE.toString(), "Priority Shipment Special Request");
     ticketingService.setPriorityMapping(notificationDTO);
 
     notificationDTO.setEntityId(null);
