@@ -1,9 +1,12 @@
 package com.rivigo.riconet.core.test.service;
 
+import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -114,6 +117,17 @@ public class TicketingServiceTest extends TesterBase {
   }
 
   @Test
+  public void closeTicketTest() {
+    TicketDTO ticket3 =
+        TicketDTO.builder()
+            .typeId(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID)
+            .status(TicketStatus.NEW)
+            .id(2l)
+            .build();
+    ticketingService.closeTicket(ticket3,"test");
+  }
+
+  @Test
   public void setPriorityMappingTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
@@ -136,6 +150,9 @@ public class TicketingServiceTest extends TesterBase {
     notificationDTO
         .getMetadata()
         .put(TicketingFieldName.TICKET_TYPE.toString(), "Priority Shipment Special Request");
+    notificationDTO
+        .getMetadata()
+        .put(TicketingFieldName.ENTITY_ID.toString(), "1234567890");
     ticketingService.setPriorityMapping(notificationDTO);
 
     notificationDTO.setEntityId(null);
