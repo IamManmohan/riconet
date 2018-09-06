@@ -28,12 +28,9 @@ import org.springframework.web.client.RestTemplate;
 /**
  * @author ramesh
  * @date 20-Aug-2018
- *
  */
-
 @RunWith(MockitoJUnitRunner.class)
 public class TicketingServiceTest extends TesterBase {
-
 
   private TicketingServiceImpl ticketingService;
 
@@ -44,16 +41,20 @@ public class TicketingServiceTest extends TesterBase {
    * */
 
   @Autowired private RestTemplate restTemplate;
-  @Mock private  ZoomPropertyService zoomPropertyService;
+  @Mock private ZoomPropertyService zoomPropertyService;
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
   @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
-
 
   @Before
   public void setUp() {
     //    RestTemplate restTemplate = new RestTemplate();
     EmailSenderService emailSenderService = new EmailSenderServiceImpl();
-    ticketingService = new TicketingServiceImpl(emailSenderService,zoomBackendAPIClientService,zoomPropertyService,zoomTicketingAPIClientService);
+    ticketingService =
+        new TicketingServiceImpl(
+            emailSenderService,
+            zoomBackendAPIClientService,
+            zoomPropertyService,
+            zoomTicketingAPIClientService);
     ReflectionTestUtils.setField(
         emailSenderService, "senderServerName", "testing@devops.rivigo.com");
     ReflectionTestUtils.setField(
@@ -113,8 +114,7 @@ public class TicketingServiceTest extends TesterBase {
   }
 
   @Test
-  public void setPriorityMappingTest()
-  {
+  public void setPriorityMappingTest() {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
     ticketingService.setPriorityMapping(notificationDTO);
@@ -122,14 +122,15 @@ public class TicketingServiceTest extends TesterBase {
     notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "19");
     ticketingService.setPriorityMapping(notificationDTO);
 
-    List<Long>  priorityTicket= new ArrayList<>();
+    List<Long> priorityTicket = new ArrayList<>();
     priorityTicket.add(19l);
     priorityTicket.add(77l);
-    Mockito.when(zoomPropertyService.getLongValues(
-        ZoomPropertyName.PRIORITY_TICKET_TYPE)).thenReturn(priorityTicket);
-    Mockito.when(zoomPropertyService.getLongValues(
-        ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE)).thenReturn(Collections.singletonList(77l));
-    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(),"CN");
+    Mockito.when(zoomPropertyService.getLongValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
+        .thenReturn(priorityTicket);
+    Mockito.when(
+            zoomPropertyService.getLongValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
+        .thenReturn(Collections.singletonList(77l));
+    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(), "CN");
     notificationDTO.getMetadata().put(TicketingFieldName.TYPE_ID.toString(), "77");
     ticketingService.setPriorityMapping(notificationDTO);
 
@@ -138,8 +139,5 @@ public class TicketingServiceTest extends TesterBase {
 
     notificationDTO.setEventName(null);
     ticketingService.setPriorityMapping(notificationDTO);
-
-
-
   }
 }

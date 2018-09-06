@@ -14,7 +14,6 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
-import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 
 /**
  * @author ramesh
@@ -35,21 +33,22 @@ public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
-
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-
   private final ZoomPropertyService zoomPropertyService;
-
 
   private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Autowired
-  public TicketingServiceImpl(EmailSenderService emailSenderService,ZoomBackendAPIClientService zoomBackendAPIClientService,ZoomPropertyService zoomPropertyService,ZoomTicketingAPIClientService zoomTicketingAPIClientService) {
+  public TicketingServiceImpl(
+      EmailSenderService emailSenderService,
+      ZoomBackendAPIClientService zoomBackendAPIClientService,
+      ZoomPropertyService zoomPropertyService,
+      ZoomTicketingAPIClientService zoomTicketingAPIClientService) {
     this.emailSenderService = emailSenderService;
-    this.zoomBackendAPIClientService=zoomBackendAPIClientService;
-    this.zoomPropertyService=zoomPropertyService;
-    this.zoomTicketingAPIClientService=zoomTicketingAPIClientService;
+    this.zoomBackendAPIClientService = zoomBackendAPIClientService;
+    this.zoomPropertyService = zoomPropertyService;
+    this.zoomTicketingAPIClientService = zoomTicketingAPIClientService;
   }
 
   @Override
@@ -83,7 +82,6 @@ public class TicketingServiceImpl implements TicketingService {
     ticketDTO.setStatus(TicketStatus.CLOSED);
     zoomTicketingAPIClientService.editTicket(ticketDTO);
   }
-
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
@@ -156,12 +154,14 @@ public class TicketingServiceImpl implements TicketingService {
     log.info("Event Metadata : {} ", metadata);
     String ticketTypeId = metadata.get(TicketingFieldName.TYPE_ID.name());
     Long typeId;
-    if (ticketTypeId != null && TicketEntityType.CN.toString()
-        .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
+    if (ticketTypeId != null
+        && TicketEntityType.CN
+            .toString()
+            .equals(metadata.get(TicketingFieldName.ENTITY_TYPE.name()))) {
       try {
         typeId = Long.parseLong(ticketTypeId);
-        List<Long> ticketTypes = zoomPropertyService
-            .getLongValues(ZoomPropertyName.PRIORITY_TICKET_TYPE);
+        List<Long> ticketTypes =
+            zoomPropertyService.getLongValues(ZoomPropertyName.PRIORITY_TICKET_TYPE);
         log.info("PriorityTicketTypesId: {}", ticketTypes);
         if (CollectionUtils.isEmpty(ticketTypes)) {
           log.info("No ticket type found for which CN's are to be set as priority");
@@ -174,11 +174,10 @@ public class TicketingServiceImpl implements TicketingService {
             return;
           }
           log.info("setPriorityMapping() called for entity {} :START", cnote);
-          zoomBackendAPIClientService.setPriorityMapping(cnote
-              , PriorityReasonType.TICKET);
+          zoomBackendAPIClientService.setPriorityMapping(cnote, PriorityReasonType.TICKET);
           log.info("setPriorityMapping() called for entity {} :END,SUCCESS", cnote);
-          List<Long> closableTicketTypes = zoomPropertyService
-              .getLongValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
+          List<Long> closableTicketTypes =
+              zoomPropertyService.getLongValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE);
           log.info("AutoClosablePriorityTicketTypes: {}", closableTicketTypes);
           if (closableTicketTypes.contains(typeId)) {
             TicketDTO dto = new TicketDTO();
@@ -188,7 +187,9 @@ public class TicketingServiceImpl implements TicketingService {
           }
         }
       } catch (NumberFormatException e) {
-        log.error("Invaild ticket type id {} for ticket {} ", ticketTypeId,
+        log.error(
+            "Invaild ticket type id {} for ticket {} ",
+            ticketTypeId,
             notificationDTO.getEntityId());
       }
     }

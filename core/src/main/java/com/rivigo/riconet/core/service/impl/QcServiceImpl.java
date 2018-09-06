@@ -13,7 +13,6 @@ import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
-import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -110,7 +109,8 @@ public class QcServiceImpl implements QcService {
             ticketDTO.setAssigneeType(AssigneeType.NONE);
             zoomTicketingAPIClientService.editTicket(ticketDTO);
           } else {
-            ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
+            ticketingService.closeTicket(
+                ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
           }
         });
   }
@@ -143,7 +143,8 @@ public class QcServiceImpl implements QcService {
     }
     ticketList.forEach(
         ticketDTO ->
-           ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
+            ticketingService.closeTicket(
+                ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP));
     zoomBackendAPIClientService.updateQcCheck(unloadingData.getConsignmentId(), false);
   }
 
@@ -283,7 +284,8 @@ public class QcServiceImpl implements QcService {
       log.info("recheck qc task being created");
       dto = zoomTicketingAPIClientService.createTicket(dto);
       if (autoClose) {
-        ticketingService.closeTicket(dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
+        ticketingService.closeTicket(
+            dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
       }
     }
     if (measurementQcNeeded) {
@@ -292,7 +294,8 @@ public class QcServiceImpl implements QcService {
       dto.setSubject(ZoomTicketingConstant.QC_MEASUREMENT_TASK_CREATION_MESSAGE);
       dto = zoomTicketingAPIClientService.createTicket(dto);
       if (autoClose) {
-        ticketingService.closeTicket(dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
+        ticketingService.closeTicket(
+            dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
       }
     }
   }

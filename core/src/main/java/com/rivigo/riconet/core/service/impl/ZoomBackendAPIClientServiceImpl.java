@@ -33,7 +33,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
-  public void setPriorityMapping(String cnote,PriorityReasonType reason) {
+  public void setPriorityMapping(String cnote, PriorityReasonType reason) {
 
     String url = UrlConstant.PRIORITY_URL;
     JsonNode responseJson;
@@ -45,8 +45,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
-      throw new ZoomException(
-          "Error while updating priority mapping needed  with cnote: " + cnote);
+      throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
     }
 
     apiClientService.parseJsonNode(responseJson, null);

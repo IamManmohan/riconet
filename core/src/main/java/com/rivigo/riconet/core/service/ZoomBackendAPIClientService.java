@@ -25,5 +25,5 @@ public interface ZoomBackendAPIClientService {
 
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
 
-  void setPriorityMapping(String cnote,PriorityReasonType reason);
+  void setPriorityMapping(String cnote, PriorityReasonType reason);
 }
