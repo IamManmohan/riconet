@@ -41,7 +41,11 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     InvoiceDocumentPreparedDTO invoiceDocumentPreparedDTO = getInvoicePreparedDTO(dto);
     Consignment consignment =
         consignmentService.getConsignmentByCnote(invoiceDocumentPreparedDTO.getCnote());
-    if (!consignment.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID)) {
+    if(consignment==null){
+      log.error("Consignment doesn't exist");
+      return;
+    }
+    if (!(RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId())) {
       return;
     }
     String shortUrl = urlShortnerService.shortenUrl(invoiceDocumentPreparedDTO.getEncodedUrl());
