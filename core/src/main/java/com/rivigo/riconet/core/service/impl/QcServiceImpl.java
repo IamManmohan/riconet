@@ -129,7 +129,8 @@ public class QcServiceImpl implements QcService {
     ticketList.forEach(
             ticketDTO -> {
               if (ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
-                      || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+                      || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID
+                      || !com.rivigo.zoom.common.enums.LocationType.PROCESSING_CENTER.equals(location.getLocationType())) {
                 ticketDTO.setAssigneeId(null);
                 ticketDTO.setAssigneeType(AssigneeType.NONE);
                 zoomTicketingAPIClientService.editTicket(ticketDTO);
