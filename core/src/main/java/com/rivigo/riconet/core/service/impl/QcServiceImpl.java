@@ -157,7 +157,8 @@ public class QcServiceImpl implements QcService {
         administrativeEntityService.findParentCluster(unloadingData.getLocationId());
     AdministrativeEntity fromCluster =
         administrativeEntityService.findParentCluster(unloadingData.getFromId());
-    if (!fromCluster.getCode().equals(currentCluster.getCode())) {
+    Long toLocationId = consignmentService.getConsignmentByCnote(unloadingData.getCnote()).getToId();
+    if ((!fromCluster.getCode().equals(currentCluster.getCode()))||(unloadingData.getLocationId().equals(toLocationId))) {
       closeQcTickets(
           ticketList,
           unloadingData.getConsignmentId(),
