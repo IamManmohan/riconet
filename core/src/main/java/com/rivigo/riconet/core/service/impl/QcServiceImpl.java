@@ -125,12 +125,24 @@ public class QcServiceImpl implements QcService {
     if (CollectionUtils.isEmpty(ticketList)) {
       return;
     }
+    Location location = locationService.getLocationById(loadingData.getLocationId());
     ticketList.forEach(
-        ticketDTO -> {
-          ticketDTO.setAssigneeId(null);
-          ticketDTO.setAssigneeType(AssigneeType.NONE);
-          zoomTicketingAPIClientService.editTicket(ticketDTO);
-        });
+            ticketDTO -> {
+              if (ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
+                      || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+                ticketDTO.setAssigneeId(null);
+                ticketDTO.setAssigneeType(AssigneeType.NONE);
+                zoomTicketingAPIClientService.editTicket(ticketDTO);
+              } else {
+                closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
+              }
+            });
+//    ticketList.forEach(
+//        ticketDTO -> {
+//          ticketDTO.setAssigneeId(null);
+//          ticketDTO.setAssigneeType(AssigneeType.NONE);
+//          zoomTicketingAPIClientService.editTicket(ticketDTO);
+//        });
   }
 
   private void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
