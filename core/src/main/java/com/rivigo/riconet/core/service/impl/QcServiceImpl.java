@@ -126,11 +126,13 @@ public class QcServiceImpl implements QcService {
       return;
     }
     Location location = locationService.getLocationById(loadingData.getLocationId());
+    Long toLocationId = consignmentService.getConsignmentByCnote(loadingData.getCnote()).getToId();
     ticketList.forEach(
             ticketDTO -> {
-              if (ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
+              if ((ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
                       || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID
-                      || !com.rivigo.zoom.common.enums.LocationType.PROCESSING_CENTER.equals(location.getLocationType())) {
+                      || !com.rivigo.zoom.common.enums.LocationType.PROCESSING_CENTER.equals(location.getLocationType())
+              ) && !location.getId().equals(toLocationId)) {
                 ticketDTO.setAssigneeId(null);
                 ticketDTO.setAssigneeType(AssigneeType.NONE);
                 zoomTicketingAPIClientService.editTicket(ticketDTO);
