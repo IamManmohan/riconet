@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 
 public interface ZoomBackendAPIClientService {
 
@@ -23,4 +24,6 @@ public interface ZoomBackendAPIClientService {
   OrganizationDTO updateOrganization(OrganizationDTO orgDTO);
 
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
+
+  void setPriorityMapping(String cnote, PriorityReasonType reason);
 }

@@ -8,6 +8,8 @@ import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
@@ -27,6 +29,27 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   private String backendBaseUrl;
 
   @Autowired private ApiClientService apiClientService;
+
+  @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Override
+  public void setPriorityMapping(String cnote, PriorityReasonType reason) {
+
+    String url = UrlConstant.PRIORITY_URL;
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put("cnote", Collections.singletonList(cnote));
+    valuesMap.put("reason", Collections.singletonList(reason.toString()));
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
+      throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
+    }
+
+    apiClientService.parseJsonNode(responseJson, null);
+  }
 
   @Override
   public void updateQcCheck(Long consignmentId, Boolean qcCheck) {
