@@ -22,6 +22,7 @@ import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -42,11 +43,13 @@ import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.QcType;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PinCode;
 import com.rivigo.zoom.common.model.User;
@@ -58,6 +61,7 @@ import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +91,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private QCRuleEngine qcRuleEngine;
 
   @Autowired private ConsignmentService consignmentService;
+
+  @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
@@ -126,7 +132,10 @@ public class QcServiceImpl implements QcService {
       return;
     }
     Location location = locationService.getLocationById(loadingData.getLocationId());
-    Long toLocationId = consignmentService.getConsignmentByCnote(loadingData.getCnote()).getToId();
+    Long toLocationId= consignmentScheduleService.getActivePlan(loadingData.getConsignmentId()).stream()
+            .filter(cs -> cs.getLocationType() == LocationTypeV2.LOCATION).max(Comparator.comparing(ConsignmentSchedule::getSequence))
+            .map(ConsignmentSchedule::getLocationId).orElse(null);
+    log.debug("Consignment is to be delivered from {}" , toLocationId);
     ticketList.forEach(
             ticketDTO -> {
               if ((ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
@@ -172,7 +181,10 @@ public class QcServiceImpl implements QcService {
         administrativeEntityService.findParentCluster(unloadingData.getLocationId());
     AdministrativeEntity fromCluster =
         administrativeEntityService.findParentCluster(unloadingData.getFromId());
-    Long toLocationId = consignmentService.getConsignmentByCnote(unloadingData.getCnote()).getToId();
+    Long toLocationId= consignmentScheduleService.getActivePlan(unloadingData.getConsignmentId()).stream()
+            .filter(cs -> cs.getLocationType() == LocationTypeV2.LOCATION).max(Comparator.comparing(ConsignmentSchedule::getSequence))
+            .map(ConsignmentSchedule::getLocationId).orElse(null);
+    log.debug("Consignment is to be delivered from {}" , toLocationId);
     if ((!fromCluster.getCode().equals(currentCluster.getCode()))||(unloadingData.getLocationId().equals(toLocationId))) {
       closeQcTickets(
           ticketList,
