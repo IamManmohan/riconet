@@ -359,10 +359,10 @@ public class QcServiceImpl implements QcService {
       handleQcConsignmentBlocker(
           consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
     }
-    if (measurementQcNeeded) {
-      handleQcConsignmentBlocker(
-          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
-    }
+//    if (measurementQcNeeded) {
+//      handleQcConsignmentBlocker(
+//          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
+//    }
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
   }
 
