@@ -149,12 +149,6 @@ public class QcServiceImpl implements QcService {
                 closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
               }
             });
-//    ticketList.forEach(
-//        ticketDTO -> {
-//          ticketDTO.setAssigneeId(null);
-//          ticketDTO.setAssigneeType(AssigneeType.NONE);
-//          zoomTicketingAPIClientService.editTicket(ticketDTO);
-//        });
   }
 
   private void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
@@ -181,11 +175,7 @@ public class QcServiceImpl implements QcService {
         administrativeEntityService.findParentCluster(unloadingData.getLocationId());
     AdministrativeEntity fromCluster =
         administrativeEntityService.findParentCluster(unloadingData.getFromId());
-    Long toLocationId= consignmentScheduleService.getActivePlan(unloadingData.getConsignmentId()).stream()
-            .filter(cs -> cs.getLocationType() == LocationTypeV2.LOCATION).max(Comparator.comparing(ConsignmentSchedule::getSequence))
-            .map(ConsignmentSchedule::getLocationId).orElse(null);
-    log.debug("Consignment is to be delivered from {}" , toLocationId);
-    if ((!fromCluster.getCode().equals(currentCluster.getCode()))||(unloadingData.getLocationId().equals(toLocationId))) {
+    if ((!fromCluster.getCode().equals(currentCluster.getCode()))) {
       closeQcTickets(
           ticketList,
           unloadingData.getConsignmentId(),
