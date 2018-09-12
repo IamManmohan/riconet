@@ -35,7 +35,7 @@ public class EventMain {
 
   private final CnActionConsumer cnActionConsumer;
 
-  private static final String CONSUMER_OFFSET_CONFIG = "none";
+  private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
