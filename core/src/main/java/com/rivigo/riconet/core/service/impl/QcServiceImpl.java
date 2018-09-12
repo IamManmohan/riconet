@@ -147,6 +147,7 @@ public class QcServiceImpl implements QcService {
                 zoomTicketingAPIClientService.editTicket(ticketDTO);
               } else {
                 closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
+                zoomBackendAPIClientService.updateQcCheck(loadingData.getConsignmentId(), false);
               }
             });
   }
