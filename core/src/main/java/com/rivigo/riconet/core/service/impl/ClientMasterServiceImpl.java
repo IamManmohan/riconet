@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.riconet.core.dto.client.ClientVasDetailDTO;
 import com.rivigo.riconet.core.dto.client.IndustryTypeDTO;
 import com.rivigo.riconet.core.enums.ZoomServiceType;
 import com.rivigo.riconet.core.service.ClientMasterService;
@@ -203,5 +204,12 @@ public class ClientMasterServiceImpl implements ClientMasterService {
               }
             });
     return billingEntityDTOList;
+  }
+
+  private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, ClientDTO client){
+
+    ClientVasDetailDTO clientVasDetailDTO = new ClientVasDetailDTO();
+    clientVasDetailDTO.setClientId(client.getId());
+    cl
   }
 }
