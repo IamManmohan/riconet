@@ -81,9 +81,12 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
       responseJson =
           apiClientService.getEntity(ticketDTO, HttpMethod.PUT, url, null, ticketingBaseUrl);
     } catch (IOException e) {
-      log.error("Error while editing qc tickets with cnote {}", ticketDTO.getEntityId(), e);
-      throw new ZoomException(
-          "Error while editing qc tickets with cnote " + ticketDTO.getEntityId());
+      log.error(
+          "Error while editing tickets with id {} entity {}",
+          ticketDTO.getId(),
+          ticketDTO.getEntityId(),
+          e);
+      throw new ZoomException("Error while editing tickets");
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
 

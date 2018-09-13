@@ -66,7 +66,7 @@ public abstract class ConsumerModel {
   }
 
   @Async
-  private CompletionStage<Done> save(ConsumerRecord<String, String> record) {
+  public CompletionStage<Done> save(ConsumerRecord<String, String> record) {
     if (record.topic().equals(getTopic())) {
       executorService.submit(
           () -> {

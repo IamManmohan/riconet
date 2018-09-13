@@ -78,6 +78,9 @@ public class EventTriggerService {
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       case TICKET_CREATION:
+        ticketingService.setPriorityMapping(notificationDTO);
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
+        break;
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
