@@ -50,8 +50,6 @@ public class EventMain {
     this.cnActionConsumer = cnActionConsumer;
   }
 
-
-
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
     final ActorMaterializer materializer = ActorMaterializer.create(system);
