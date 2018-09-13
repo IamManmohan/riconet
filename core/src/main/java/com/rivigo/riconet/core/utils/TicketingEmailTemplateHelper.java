@@ -179,7 +179,7 @@ public class TicketingEmailTemplateHelper {
       body = body.append(" has assigned to ").append(newAssignee);
     } else {
       body =
-          body.append(" has changed the Assignee from ")
+          body.append(" has changed the assignee from ")
               .append(oldAssignee)
               .append(" to ")
               .append(newAssignee);
