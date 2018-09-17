@@ -4,6 +4,7 @@ import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 
 public interface ZoomBackendAPIClientService {
 
@@ -28,4 +29,6 @@ public interface ZoomBackendAPIClientService {
   void handleQcBlockerClosure(Long ticketId);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
+
+  void setPriorityMapping(String cnote, PriorityReasonType reason);
 }

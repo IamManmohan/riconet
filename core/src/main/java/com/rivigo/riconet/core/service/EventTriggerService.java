@@ -89,6 +89,7 @@ public class EventTriggerService {
             notificationDTO.getEntityId(),
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
             getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
+        ticketingService.setPriorityMapping(notificationDTO);
         ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:

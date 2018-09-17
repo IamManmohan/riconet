@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import org.junit.Assert;
@@ -54,6 +55,15 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntity(jsonNode);
     zoomBackendAPIClientServiceImpl.updateQcCheck(consignmentId, qcCheck);
     validateReturnedData(jsonNode, HttpMethod.PUT, true);
+  }
+
+  @Test
+  public void setPriorityMappingTest() throws IOException {
+    String cnote = "1234567890";
+    PriorityReasonType reasonType = PriorityReasonType.TICKET;
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.setPriorityMapping(cnote, reasonType);
   }
 
   @Test
