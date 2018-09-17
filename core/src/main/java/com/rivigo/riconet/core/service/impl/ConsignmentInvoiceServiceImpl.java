@@ -13,9 +13,8 @@ import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
-import java.io.IOException;
-
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +42,10 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     InvoiceDocumentPreparedDTO invoiceDocumentPreparedDTO = getInvoicePreparedDTO(dto);
     Consignment consignment =
         consignmentService.getConsignmentByCnote(invoiceDocumentPreparedDTO.getCnote());
-    if(consignment==null){
+    if (consignment == null) {
       log.error("Consignment doesn't exist {}", invoiceDocumentPreparedDTO);
-      throw new ZoomException("Consignment doesn't exist for cnote" + invoiceDocumentPreparedDTO.getCnote());
+      throw new ZoomException(
+          "Consignment doesn't exist for cnote" + invoiceDocumentPreparedDTO.getCnote());
     }
     if (!(RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId())) {
       return;
