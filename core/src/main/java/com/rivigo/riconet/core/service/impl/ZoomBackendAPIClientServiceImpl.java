@@ -213,12 +213,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO){
+  public ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
     log.info("Adding vas details {}", clientCodDodDTO);
     try {
-      responseJson = apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+      responseJson =
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while adding vas details {} , {}", clientCodDodDTO, e);
       throw new ZoomException("Error while adding vas details {}" + clientCodDodDTO);
@@ -228,12 +229,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO){
+  public ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
     log.info("Updating vas detailsn {}", clientCodDodDTO);
     try {
-      responseJson = apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+      responseJson =
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while updating vas details {} , {}", clientCodDodDTO, e);
       throw new ZoomException("Error while updating Organization {}" + clientCodDodDTO);

@@ -10,7 +10,6 @@ import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
-import com.rivigo.riconet.core.dto.client.ClientVasDetailDTO;
 import com.rivigo.riconet.core.dto.client.IndustryTypeDTO;
 import com.rivigo.riconet.core.enums.ZoomServiceType;
 import com.rivigo.riconet.core.service.ClientMasterService;
@@ -212,14 +211,15 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     return billingEntityDTOList;
   }
 
-  private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId){
+  private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId) {
 
     ClientVasDetail clientVasDetail = clientVasDetailsService.getClientVasDetails(clientId);
     ClientCodDodDTO clientVasDetailDTO = new ClientCodDodDTO();
     clientVasDetailDTO.setClientId(clientId);
     clientVasDetailDTO.setClientVasType(ClientVasType.COD_DOD);
-    ClientCreateUpdateDTO.CodDodDetailsDTO codDodDetailsDTO = clientCreateUpdateDTO.getCodDodDetailsDTO();
-    if(codDodDetailsDTO!=null) {
+    ClientCreateUpdateDTO.CodDodDetailsDTO codDodDetailsDTO =
+        clientCreateUpdateDTO.getCodDodDetailsDTO();
+    if (codDodDetailsDTO != null) {
       clientVasDetailDTO.setFinanceActivated(codDodDetailsDTO.getCodDodApplicable());
       clientVasDetailDTO.setDistrict(codDodDetailsDTO.getDistrict());
       clientVasDetailDTO.setInFavourOf(codDodDetailsDTO.getInFavorOf());
@@ -227,17 +227,14 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       clientVasDetailDTO.setPincode(codDodDetailsDTO.getPincode());
       clientVasDetailDTO.setState(codDodDetailsDTO.getState());
       clientVasDetailDTO.setMobileNumber(codDodDetailsDTO.getPhoneNumber());
-      private String billingLine1;
-      private String billingLine2;
-    }else{
+    } else {
       clientVasDetailDTO.setFinanceActivated(Boolean.FALSE);
     }
-    if(clientVasDetail!=null){
+    if (clientVasDetail != null) {
       clientVasDetailDTO.setId(clientVasDetail.getId());
 
       return;
-    }
-    else{
+    } else {
       zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);
     }
   }

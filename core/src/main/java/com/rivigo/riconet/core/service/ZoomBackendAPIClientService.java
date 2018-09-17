@@ -4,7 +4,6 @@ import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
-import com.rivigo.zoom.billing.dto.CodDodDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 
 public interface ZoomBackendAPIClientService {
@@ -32,5 +31,4 @@ public interface ZoomBackendAPIClientService {
   ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO);
 
   ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO);
-
 }
