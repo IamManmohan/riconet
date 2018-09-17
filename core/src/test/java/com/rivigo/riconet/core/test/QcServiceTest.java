@@ -25,6 +25,7 @@ import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -40,11 +41,13 @@ import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.enums.ruleengine.RuleType;
 import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
@@ -104,6 +107,8 @@ public class QcServiceTest {
   @Mock private AdministrativeEntityService administrativeEntityService;
 
   @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
+
+  @Mock private ConsignmentScheduleService consignmentScheduleService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -179,9 +184,19 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
+    List<ConsignmentSchedule> consignmentSchedules = new ArrayList<>();
+    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
+    consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
+    consignmentSchedule.setSequence(2);
+    consignmentSchedule.setLocationId(1L);
+    consignmentSchedules.add(consignmentSchedule);
+
+    when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
+        .thenReturn(consignmentSchedules);
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2, ticket3, ticket4, ticket5));
     Location location = new Location();
+    location.setId(2L);
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
     qcService.consumeLoadingEvent(data);
@@ -220,9 +235,20 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
+
+    List<ConsignmentSchedule> consignmentSchedules = new ArrayList<>();
+    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
+    consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
+    consignmentSchedule.setSequence(2);
+    consignmentSchedule.setLocationId(1L);
+    consignmentSchedules.add(consignmentSchedule);
+
+    when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
+        .thenReturn(consignmentSchedules);
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2));
     Location location = new Location();
+    location.setId(2L);
     location.setOrganizationId(1000l);
     when(locationService.getLocationById(any())).thenReturn(location);
     qcService.consumeLoadingEvent(data);
