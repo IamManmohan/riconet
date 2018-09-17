@@ -33,8 +33,9 @@ import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
+import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
+import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
@@ -73,7 +74,8 @@ public class QcServiceTest {
 
   @InjectMocks private QcServiceImpl qcService;
 
-  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService =
+      Mockito.mock(ZoomTicketingAPIClientServiceImpl.class);
 
   @Spy private ObjectMapper objectMapper;
 
@@ -105,6 +107,9 @@ public class QcServiceTest {
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
+  private TicketingServiceImpl ticketingService =
+      new TicketingServiceImpl(null, null, null, zoomTicketingAPIClientService);
+
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
@@ -112,6 +117,8 @@ public class QcServiceTest {
         qcRuleEngine, "ruleEngineRuleRepository", ruleEngineRuleRepository);
     Mockito.when(zoomBillingAPIClientService.getChargedWeightForConsignment(anyString()))
         .thenReturn(10.0);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        qcService, "ticketingService", ticketingService);
   }
 
   @Test

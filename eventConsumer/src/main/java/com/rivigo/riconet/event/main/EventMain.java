@@ -37,6 +37,8 @@ public class EventMain {
 
   private final CnActionConsumer cnActionConsumer;
 
+  private static final String CONSUMER_OFFSET_CONFIG = "latest";
+
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
@@ -66,35 +68,35 @@ public class EventMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(zoomEventTriggerConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
     String cnActionConsumerGroupId = config.getString("cnActionConsumer.group.id");
     final ConsumerSettings<String, String> cnActionConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(cnActionConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
     String consignmentblockerGroupId = config.getString("consignmentblocker.group.id");
     final ConsumerSettings<String, String> consignmentBlockerConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consignmentblockerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
     String financeEventsConsumerGroupId = config.getString("financeEventsConsumer.group.id");
     final ConsumerSettings<String, String> financeEventsConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(financeEventsConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
     String bfPickupChargesGroupId = config.getString("bfPickupCharges.group.id");
     final ConsumerSettings<String, String> bfPickupChargesConsumerSettings =
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(bfPickupChargesGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
     consumer.load(
         materializer,

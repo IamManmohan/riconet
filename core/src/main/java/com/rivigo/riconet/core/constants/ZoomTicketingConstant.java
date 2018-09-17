@@ -50,4 +50,9 @@ public class ZoomTicketingConstant {
 
   public static final String QC_BLOCKER_AUTO_CLOSURE_MESSAGE =
       "Ticket Got Closed, as there was no Communication Email ID available for the client";
+
+  public static final String PRIORITY_AUTO_CLOSURE_MESSAGE =
+      "The Ticket got auto closed after changing the consignment priority";
+
+  public static final String ZOOM_PROPERTIES_PRIORITY_SEPORATOR = ",";
 }

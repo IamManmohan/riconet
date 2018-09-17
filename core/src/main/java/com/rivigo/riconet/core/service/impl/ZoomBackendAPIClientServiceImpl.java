@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
@@ -9,9 +10,13 @@ import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +33,27 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   private String backendBaseUrl;
 
   @Autowired private ApiClientService apiClientService;
+
+  @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Override
+  public void setPriorityMapping(String cnote, PriorityReasonType reason) {
+
+    String url = UrlConstant.PRIORITY_URL;
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put("cnote", Collections.singletonList(cnote));
+    valuesMap.put("reason", Collections.singletonList(reason.toString()));
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
+      throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
+    }
+
+    apiClientService.parseJsonNode(responseJson, null);
+  }
 
   @Override
   public void updateQcCheck(Long consignmentId, Boolean qcCheck) {
@@ -151,15 +177,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Override
   public ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote) {
     JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("shortUrl", Collections.singletonList(shortUrl));
-    valuesMap.put("cnote", Collections.singletonList(cnote));
-    valuesMap.put("url", Collections.singletonList(invoiceUrl));
+    Map<String, String> data = new HashMap<>();
+    data.put(ConsignmentConstant.SHORT_URL, shortUrl);
+    data.put(ConsignmentConstant.CNOTE, cnote);
+    data.put(ConsignmentConstant.URL, invoiceUrl);
     String url = UrlConstant.ZOOM_BACKEND_CONSIGNMENT_INVOICE;
     log.info("Updating invoice {} for cnote {}", shortUrl, cnote);
     try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.POST, url, valuesMap, backendBaseUrl);
+      responseJson = apiClientService.getEntity(data, HttpMethod.POST, url, null, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while updating Invoice {} for Cnote {} , {}", shortUrl, cnote, e);
       throw new ZoomException("Error while updating Invoice for cnote :" + cnote);

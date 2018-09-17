@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.ZoomProperty;
+import java.util.List;
 
 public interface ZoomPropertyService {
 
@@ -16,4 +17,6 @@ public interface ZoomPropertyService {
   int getInteger(ZoomPropertyName propertyName, int defaultVal);
 
   double getDouble(ZoomPropertyName propertyName, double defaultVal);
+
+  List<String> getStringValues(ZoomPropertyName propertyName);
 }

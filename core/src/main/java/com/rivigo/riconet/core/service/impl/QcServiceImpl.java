@@ -31,6 +31,7 @@ import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.UserMasterService;
+import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -117,6 +118,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private OrganizationService organizationService;
 
   @Autowired private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
+
+  @Autowired private TicketingService ticketingService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -390,7 +393,8 @@ public class QcServiceImpl implements QcService {
       log.info("recheck qc task being created");
       dto = zoomTicketingAPIClientService.createTicket(dto);
       if (autoClose) {
-        closeTicket(dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
+        ticketingService.closeTicket(
+            dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
       }
     }
     if (measurementQcNeeded) {
@@ -399,7 +403,8 @@ public class QcServiceImpl implements QcService {
       dto.setSubject(ZoomTicketingConstant.QC_MEASUREMENT_TASK_CREATION_MESSAGE);
       dto = zoomTicketingAPIClientService.createTicket(dto);
       if (autoClose) {
-        closeTicket(dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
+        ticketingService.closeTicket(
+            dto, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_NO_QC_GROUP);
       }
     }
   }
@@ -548,7 +553,7 @@ public class QcServiceImpl implements QcService {
     }
     ticketList.forEach(
         ticketDTO ->
-            closeTicket(
+            ticketingService.closeTicket(
                 ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_CNOTE_TYPE_CHANGE));
     handleQcConsignmentBlocker(
         consignment.getConsignmentId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.RE_CHECK);
