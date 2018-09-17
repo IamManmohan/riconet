@@ -8,18 +8,22 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
+import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.client.ClientVasDetailDTO;
 import com.rivigo.riconet.core.dto.client.IndustryTypeDTO;
 import com.rivigo.riconet.core.enums.ZoomServiceType;
 import com.rivigo.riconet.core.service.ClientMasterService;
+import com.rivigo.riconet.core.service.ClientVasDetailsService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.common.enums.ClientVasType;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.BillingEntity;
 import com.rivigo.zoom.common.model.Client;
+import com.rivigo.zoom.common.model.ClientVasDetail;
 import com.rivigo.zoom.common.model.IndustryType;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.repository.mysql.BillingEntityRepository;
@@ -50,6 +54,8 @@ public class ClientMasterServiceImpl implements ClientMasterService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private BillingEntityRepository billingEntityRepository;
+
+  @Autowired private ClientVasDetailsService clientVasDetailsService;
 
   @Override
   public Client getClientById(Long id) {
@@ -206,10 +212,33 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     return billingEntityDTOList;
   }
 
-  private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, ClientDTO client){
+  private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId){
 
-    ClientVasDetailDTO clientVasDetailDTO = new ClientVasDetailDTO();
-    clientVasDetailDTO.setClientId(client.getId());
-    cl
+    ClientVasDetail clientVasDetail = clientVasDetailsService.getClientVasDetails(clientId);
+    ClientCodDodDTO clientVasDetailDTO = new ClientCodDodDTO();
+    clientVasDetailDTO.setClientId(clientId);
+    clientVasDetailDTO.setClientVasType(ClientVasType.COD_DOD);
+    ClientCreateUpdateDTO.CodDodDetailsDTO codDodDetailsDTO = clientCreateUpdateDTO.getCodDodDetailsDTO();
+    if(codDodDetailsDTO!=null) {
+      clientVasDetailDTO.setFinanceActivated(codDodDetailsDTO.getCodDodApplicable());
+      clientVasDetailDTO.setDistrict(codDodDetailsDTO.getDistrict());
+      clientVasDetailDTO.setInFavourOf(codDodDetailsDTO.getInFavorOf());
+      clientVasDetailDTO.setLandmark(codDodDetailsDTO.getLandmark());
+      clientVasDetailDTO.setPincode(codDodDetailsDTO.getPincode());
+      clientVasDetailDTO.setState(codDodDetailsDTO.getState());
+      clientVasDetailDTO.setMobileNumber(codDodDetailsDTO.getPhoneNumber());
+      private String billingLine1;
+      private String billingLine2;
+    }else{
+      clientVasDetailDTO.setFinanceActivated(Boolean.FALSE);
+    }
+    if(clientVasDetail!=null){
+      clientVasDetailDTO.setId(clientVasDetail.getId());
+
+      return;
+    }
+    else{
+      zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);
+    }
   }
 }

@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
+import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -209,5 +210,35 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     TypeReference<OrganizationDTO> mapType = new TypeReference<OrganizationDTO>() {};
     return (OrganizationDTO) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO){
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
+    log.info("Adding vas details {}", clientCodDodDTO);
+    try {
+      responseJson = apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while adding vas details {} , {}", clientCodDodDTO, e);
+      throw new ZoomException("Error while adding vas details {}" + clientCodDodDTO);
+    }
+    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
+    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO){
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
+    log.info("Updating vas detailsn {}", clientCodDodDTO);
+    try {
+      responseJson = apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating vas details {} , {}", clientCodDodDTO, e);
+      throw new ZoomException("Error while updating Organization {}" + clientCodDodDTO);
+    }
+    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
+    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }
