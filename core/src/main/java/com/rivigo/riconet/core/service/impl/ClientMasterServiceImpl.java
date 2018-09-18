@@ -96,7 +96,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
                 billingEntityDTOList.add(billingEntityDTO);
               });
       clientDTO.setBillingEntities(billingEntityDTOList);
-      clientDTO =zoomBackendAPIClientService.addClient(clientDTO);
+      clientDTO = zoomBackendAPIClientService.addClient(clientDTO);
     } else {
       clientDTO.setId(existingClient.getId());
       clientDTO.setLaneRateBypass(existingClient.getLaneRateBypass());
@@ -106,7 +106,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
               clientCreateUpdateDTO.getBillingEntities(), existingClient.getId()));
       clientDTO = zoomBackendAPIClientService.updateClient(clientDTO);
     }
-    if(clientDTO!=null) {
+    if (clientDTO != null) {
       createUpdateVasDetails(clientCreateUpdateDTO, clientDTO.getId());
     }
   }
