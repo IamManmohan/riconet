@@ -231,7 +231,9 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       clientVasDetailDTO.setPincode(codDodDetailsDTO.getPincode());
       clientVasDetailDTO.setState(codDodDetailsDTO.getState());
       clientVasDetailDTO.setMobileNumber(codDodDetailsDTO.getPhoneNumber());
+      clientVasDetailDTO.setStatus(OperationalStatus.ACTIVE.name());
     } else {
+      clientVasDetailDTO.setStatus(OperationalStatus.INACTIVE.name());
       clientVasDetailDTO.setFinanceActivated(Boolean.FALSE);
     }
     if (clientVasDetail != null) {
