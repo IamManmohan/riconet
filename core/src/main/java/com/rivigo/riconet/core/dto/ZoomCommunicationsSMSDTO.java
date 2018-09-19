@@ -15,6 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ZoomCommunicationsSMSDTO {
+
   private Boolean confidential = Boolean.TRUE;
 
   private String message;

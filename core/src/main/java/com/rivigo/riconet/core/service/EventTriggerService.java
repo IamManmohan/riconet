@@ -7,7 +7,7 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketEntityType;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,14 +58,6 @@ public class EventTriggerService {
         break;
       case CN_COMPLETION_ALL_INSTANCES:
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
-        try {
-          TimeUnit.SECONDS.sleep(2);
-          // Fixme: Chirag: This is to ensure that qc is called after cn is created in billing
-          // service
-          // We need charged weight from billing service as we don't have reliable volume data
-        } catch (InterruptedException e) {
-          log.warn(e.getMessage());
-        }
         qcService.consumeCompletionEvent(completionData);
         break;
       case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
@@ -75,7 +67,28 @@ public class EventTriggerService {
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
+      case CN_CNOTE_CHANGE:
+        qcService.consumeCnoteChangeEvent(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name()),
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case CN_DEPS_CREATION:
+      case CN_DEPS_CREATION_FROM_CONSIGNMENT_HISTORY:
+        qcService.consumeDepsCreationEvent(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
+            notificationDTO.getEntityId());
+        break;
+      case QC_TICKET_ACTION:
+        qcService.consumeQcBlockerTicketClosedEvent(
+            notificationDTO.getEntityId(),
+            getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
+                .orElse(null));
+        break;
       case TICKET_CREATION:
+        qcService.consumeQcBlockerTicketCreationEvent(
+            notificationDTO.getEntityId(),
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
+            getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
         ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
@@ -101,15 +114,23 @@ public class EventTriggerService {
     return ConsignmentBasicDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
         .consignmentId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())
+                .orElse(null))
         .locationId(
-            Long.parseLong(
-                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.LOCATION_ID.name()).orElse(null))
+        .fromId(
+            getLong(notificationDTO, ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())
+                .orElse(null))
         .status(status)
         .build();
+  }
+
+  public Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
+    try {
+      return Optional.of(Long.parseLong(notificationDTO.getMetadata().get(fieldName)));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
   }
 
   private ConsignmentCompletionEventDTO getConsignmentCompletionDTO(

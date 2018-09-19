@@ -18,4 +18,5 @@ public class ConsignmentBasicDTO {
   private Long consignmentId;
   private Long locationId;
   private ConsignmentStatus status;
+  private Long fromId;
 }
