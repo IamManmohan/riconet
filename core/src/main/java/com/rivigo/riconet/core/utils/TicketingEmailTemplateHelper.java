@@ -169,23 +169,17 @@ public class TicketingEmailTemplateHelper {
 
   public static String getTicketAssigneeChangeEmailBody(Map<String, String> metadata) {
     StringBuilder body =
-        new StringBuilder()
-            .append(metadata.get(TicketingFieldName.LAST_UPDATED_BY_EMAIL.toString()));
+        new StringBuilder().append(metadata.get(TicketingFieldName.LAST_UPDATED_BY_EMAIL.name()));
     String oldAssignee =
-        metadata.get(TicketingFieldName.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString());
+        metadata.get(TicketingFieldName.OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.name());
     String newAssignee =
-        metadata.get(TicketingFieldName.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.toString());
+        metadata.get(TicketingFieldName.ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL.name());
     if (StringUtils.isEmpty(oldAssignee)) {
-      body = body.append(" has assigned to ").append(newAssignee);
+      body = body.append(" has assigned ticket to ");
     } else {
-      body =
-          body.append(" has changed the assignee from ")
-              .append(oldAssignee)
-              .append(" to ")
-              .append(newAssignee);
+      body = body.append(" has changed the assignee from ").append(oldAssignee).append(" to ");
     }
-    body = body.append(".<br><br>Regards,<br>Rivigo Tickets<br>");
-    return body.toString();
+    return body.append(newAssignee).append(".<br><br>Regards,<br>Rivigo Tickets<br>").toString();
   }
 
   public static String getTicketEscalationChangeEmailBody(Map<String, String> metadata) {

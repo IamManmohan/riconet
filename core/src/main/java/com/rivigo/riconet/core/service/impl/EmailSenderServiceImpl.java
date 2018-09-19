@@ -1,10 +1,15 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKETING_ZOOM_PROPERTY_KEY;
+
 import com.rivigo.notification.common.dto.AttachmentDto;
 import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import com.rivigo.riconet.core.service.EmailSenderService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.model.ZoomProperty;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,9 +44,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
   private final RestTemplate restTemplate;
 
+  private final ZoomPropertyService zoomPropertyService;
+
   @Autowired
-  public EmailSenderServiceImpl() {
+  public EmailSenderServiceImpl(ZoomPropertyService zoomPropertyService) {
     this.restTemplate = new RestTemplate();
+    this.zoomPropertyService = zoomPropertyService;
   }
 
   @Override
@@ -53,6 +62,21 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       List<String> recipients, String subject, String body, MultipartFile file, String type) {
     SendEmailRequest request = new SendEmailRequest();
     request.setFrom(senderServerName);
+
+    if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+      log.info("sending mail to actual recipient on production env : {} ", recipients);
+    } else {
+      ZoomProperty zoomProperty =
+          zoomPropertyService.getByPropertyName(TICKETING_ZOOM_PROPERTY_KEY);
+      if (null == zoomProperty || StringUtils.isEmpty(zoomProperty.getVariableValue())) {
+        log.info("Not sending any mail as not recipient found");
+        return;
+      } else {
+        recipients = Arrays.asList(zoomProperty.getVariableValue().split(","));
+        log.info("sending mail on staging env to default users : {} ", recipients);
+      }
+    }
+
     request.setTo(recipients);
     request.setSubject(subject);
     request.setBody(body);
@@ -74,6 +98,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   private void send(
       SendEmailRequest request, List<String> recipients, String subject, String body) {
     try {
+
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("X-User-Agent", emailUserAgent);

@@ -180,7 +180,7 @@ public class NotificationDTOModel {
     metadata.put("OWNER_EMAIL_LIST", "rameshc10695@gmail.com");
     metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
     metadata.put("LAST_UPDATED_BY_EMAIL", "ramesh.chandra@rivigo.com");
-    metadata.put("OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL", "\"mayank.pandey@rivigo.com\"");
+    metadata.put("OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL", "mayank.pandey@rivigo.com");
     return NotificationDTO.builder()
         .eventName(EventName.TICKET_ASSIGNEE_CHANGE)
         .entityId(248212L)
