@@ -38,11 +38,11 @@ public class EventTriggerService {
       case CN_PAYMENT_HANDOVER_COMPLETED:
         String entityId =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.closeTicket(entityId, TicketEntityType.CN.name(), eventName);
+        ticketingClientService.autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName);
         break;
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
-        ticketingClientService.closeTicket(
+        ticketingClientService.autoCloseTicket(
             notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), eventName);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
