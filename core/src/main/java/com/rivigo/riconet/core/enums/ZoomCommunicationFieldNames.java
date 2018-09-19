@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.enums;
 
 public enum ZoomCommunicationFieldNames {
   CNOTE,
+  OLD_CNOTE,
   CLIENT_ID,
   LOCATION_ID,
   CONSIGNMENT_ID,
@@ -19,7 +20,11 @@ public enum ZoomCommunicationFieldNames {
   CONSIGNER_ADDRESS,
   CONSIGNEE_ADDRESS,
   ORGANIZATION_ID,
-  PICK_UP_ID;
+  FROM_LOCATION_ID,
+  LAST_UPDATED_BY_ID,
+  PICK_UP_ID,
+  ENTITY_ID,
+  TYPE_ID;
 
   public enum Reason {
     REASON,

@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.RetailService;
 import com.rivigo.riconet.core.service.SmsService;
@@ -33,7 +34,6 @@ import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mongo.RetailNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
-import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -72,7 +72,7 @@ public class RetailServiceImpl implements RetailService {
 
   @Autowired private UserMasterService userMasterService;
 
-  @Autowired private AdministrativeEntityRepository administrativeEntityRepository;
+  @Autowired private AdministrativeEntityService administrativeEntityService;
 
   @Autowired private PaymentDetailV2Repository paymentDetailV2Repository;
 
@@ -148,9 +148,9 @@ public class RetailServiceImpl implements RetailService {
     String dateStr = TimeUtilsZoom.IST_DATE_TIME_FORMATTER.print(notification.getEdd());
     notification.setEddString(dateStr);
     notification.setFromOuCluster(
-        administrativeEntityRepository.findParentCluster(notification.getFromOuId()).getName());
+        administrativeEntityService.findParentCluster(notification.getFromOuId()).getName());
     notification.setToOuCluster(
-        administrativeEntityRepository.findParentCluster(notification.getToOuId()).getName());
+        administrativeEntityService.findParentCluster(notification.getToOuId()).getName());
     SmsDTO consignorSmsDTO = new SmsDTO();
     consignorSmsDTO.setMobileNumber(notification.getConsignorPhone());
     consignorSmsDTO.setSmsString(designSms(notification, consignorSmsTemplate));

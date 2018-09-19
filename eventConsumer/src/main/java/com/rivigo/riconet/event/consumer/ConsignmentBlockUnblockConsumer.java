@@ -2,7 +2,6 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
@@ -21,16 +20,11 @@ public class ConsignmentBlockUnblockConsumer extends EventConsumer {
 
   private final ConsignmentBlockUnblockService consignmentBlockUnblockService;
 
-  private final TopicNameConfig topicNameConfig;
-
   @Autowired
   public ConsignmentBlockUnblockConsumer(
-      ObjectMapper objectMapper,
-      ConsignmentBlockUnblockService consignmentBlockUnblockService,
-      TopicNameConfig topicNameConfig) {
+      ObjectMapper objectMapper, ConsignmentBlockUnblockService consignmentBlockUnblockService) {
     this.objectMapper = objectMapper;
     this.consignmentBlockUnblockService = consignmentBlockUnblockService;
-    this.topicNameConfig = topicNameConfig;
     this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
