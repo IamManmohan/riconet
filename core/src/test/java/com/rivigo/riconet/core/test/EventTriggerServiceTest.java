@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.test;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -151,6 +152,37 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+  }
+
+  @Test
+  public void cnCnoteChangeTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    metadata.put("OLD_CNOTE", "9234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_CNOTE_CHANGE).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeCnoteChangeEvent("9234567890", "1234567890");
+  }
+
+  @Test
+  public void cnDepsCreationTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_DEPS_CREATION).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeDepsCreationEvent("1234567890", null);
+  }
+
+  @Test
+  public void cnQcBlockerTicketClosedTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.QC_TICKET_ACTION).entityId(5l).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any());
   }
 
   @Test

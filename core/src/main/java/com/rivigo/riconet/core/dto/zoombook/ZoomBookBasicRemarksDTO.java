@@ -8,7 +8,7 @@ import lombok.Setter;
 public class ZoomBookBasicRemarksDTO {
 
   // For each transaction made to zoomBook ,
-  //   if (view transaction dialog )in finace UI has a formatter to read the remarks for that
+  //   if view transaction dialog in finace UI has a formatter to read the remarks for that
   // specific transactionType
   //      UI will use the same
   //   else UI will show the comments

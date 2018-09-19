@@ -4,9 +4,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
+import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -105,6 +107,55 @@ public class ZoomBackendAPIClientServiceTest {
     expectedException.expectMessage(
         "Error while triggering policy generation with consignmentId:  1234");
     zoomBackendAPIClientServiceImpl.triggerPolicyGeneration(consignmentId);
+  }
+
+  @Test
+  public void handleQcBlockerClosureTest() throws IOException {
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
+    validateReturnedData(jsonNode, HttpMethod.PUT, false);
+  }
+
+  @Test
+  public void handleQcBlockerClosureExceptionTest() throws IOException {
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage(
+        "Error while handling QcBlocker ticket closure with ticketId: 5");
+    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
+  }
+
+  @Test
+  public void handleConsignmentBlockerTest() throws IOException {
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.handleConsignmentBlocker(
+        ConsignmentBlockerRequestDTO.builder()
+            .isActive(true)
+            .reason("reason")
+            .subReason("subreason")
+            .consignmentId(5l)
+            .requestType(ConsignmentBlockerRequestType.BLOCK)
+            .build());
+    validateReturnedData(jsonNode, HttpMethod.POST, false);
+  }
+
+  @Test
+  public void handleConsignmentBlockerExceptionTest() throws IOException {
+    mockApiClientServiceGetEntityException();
+    ConsignmentBlockerRequestDTO blocker =
+        ConsignmentBlockerRequestDTO.builder()
+            .isActive(true)
+            .reason("reason")
+            .subReason("subreason")
+            .consignmentId(5l)
+            .requestType(ConsignmentBlockerRequestType.BLOCK)
+            .build();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage(
+        "Error while handling consignmentBlocker " + blocker.toString());
+    zoomBackendAPIClientServiceImpl.handleConsignmentBlocker(blocker);
   }
 
   private void validateReturnedData(
