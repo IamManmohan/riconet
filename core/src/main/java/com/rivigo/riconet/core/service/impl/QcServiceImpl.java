@@ -1,11 +1,11 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
 import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ReasonConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
@@ -147,7 +147,7 @@ public class QcServiceImpl implements QcService {
     ticketList.forEach(
         ticketDTO -> {
           if ((ZoomTicketingConstant.QC_RECHECK_TYPE_ID.equals(ticketDTO.getTypeId())
-                  || location.getOrganizationId() != ConsignmentConstant.RIVIGO_ORGANIZATION_ID
+                  || location.getOrganizationId() != RIVIGO_ORGANIZATION_ID
                   || !com.rivigo.zoom.common.enums.LocationType.PROCESSING_CENTER.equals(
                       location.getLocationType()))
               && !location.getId().equals(toLocationId)) {
@@ -205,7 +205,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     Location location = locationService.getLocationById(unloadingData.getLocationId());
-    if (!location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)) {
+    if (!location.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID)) {
       return;
     }
     closeQcTickets(
@@ -226,6 +226,9 @@ public class QcServiceImpl implements QcService {
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+    if (RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
+      return false;
+    }
 
     Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
     if (bindings.isEmpty()) {
@@ -342,9 +345,7 @@ public class QcServiceImpl implements QcService {
               consignment.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
       Location location = locationService.getLocationById(consignment.getLocationId());
       groupId = group == null ? null : group.getId();
-      autoClose =
-          (group == null)
-              && location.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+      autoClose = (group == null) && location.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID);
     }
     log.info(
         "cnote: {}  locationId: {}  groupId: {}",
@@ -726,7 +727,7 @@ public class QcServiceImpl implements QcService {
   }
 
   public Collection<String> getToRecepients(Consignment consignment) {
-    if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+    if (consignment.getOrganizationId() == RIVIGO_ORGANIZATION_ID) {
       return consignment.getClient().getClientNotificationList();
     }
     Organization organization = organizationService.getById(consignment.getOrganizationId());
