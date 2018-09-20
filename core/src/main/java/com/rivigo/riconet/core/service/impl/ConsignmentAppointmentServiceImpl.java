@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentAppointmentService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -290,7 +291,8 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
     if (templateString != null && isEmailEnabled && subjectTemplate != null) {
       String body = designEmailTemplate(notification, templateString);
       String subject = designEmailTemplate(notification, subjectTemplate);
-      emailService.sendAppointmentEmail(
+      emailService.sendEmail(
+          EmailConstant.APPOINTMENT_EMAIL_ID,
           notification.getEmailIdList(),
           notification.getCcList(),
           notification.getBccList(),
@@ -334,7 +336,8 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
         wb.dispose();
         byte[] contents = output.toByteArray();
         FileUtils.writeByteArrayToFile(file, contents);
-        emailService.sendAppointmentEmail(
+        emailService.sendEmail(
+            EmailConstant.APPOINTMENT_EMAIL_ID,
             notificationList.get(0).getEmailIdList(),
             notificationList.get(0).getCcList(),
             notificationList.get(0).getBccList(),
@@ -359,7 +362,7 @@ public class ConsignmentAppointmentServiceImpl implements ConsignmentAppointment
       appointmentNotification.getCcList().addAll(getCcList(loc));
       appointmentNotification.getCcList().addAll(defaultCcList);
     }
-    emailService.filterEmails(appointmentNotification, bccList);
+    appointmentNotification.getBccList().addAll(bccList);
   }
 
   private UserBasicDTO getUserDto(User user) {

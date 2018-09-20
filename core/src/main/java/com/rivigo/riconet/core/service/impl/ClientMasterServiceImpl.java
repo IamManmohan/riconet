@@ -238,7 +238,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     }
     if (clientVasDetail != null) {
       clientVasDetailDTO.setId(clientVasDetail.getId());
-
+      zoomBackendAPIClientService.updateVasDetails(clientVasDetailDTO);
       return;
     } else {
       zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);

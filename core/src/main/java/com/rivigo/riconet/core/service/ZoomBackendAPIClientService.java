@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
@@ -25,6 +26,10 @@ public interface ZoomBackendAPIClientService {
   OrganizationDTO updateOrganization(OrganizationDTO orgDTO);
 
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
+
+  void handleQcBlockerClosure(Long ticketId);
+
+  Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 
   void setPriorityMapping(String cnote, PriorityReasonType reason);
 

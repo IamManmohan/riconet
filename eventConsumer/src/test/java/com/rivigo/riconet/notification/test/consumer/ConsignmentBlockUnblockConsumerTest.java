@@ -2,7 +2,6 @@ package com.rivigo.riconet.notification.test.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -23,16 +22,13 @@ public class ConsignmentBlockUnblockConsumerTest {
 
   private ApiClientService apiClientService = Mockito.mock(ApiClientService.class);
 
-  private TopicNameConfig topicNameConfig = Mockito.mock(TopicNameConfig.class);
-
   @InjectMocks
   private ConsignmentBlockUnblockService consignmentBlockUnblockService =
       new ConsignmentBlockUnblockServiceImpl(apiClientService);
 
   @InjectMocks
   private ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer =
-      new ConsignmentBlockUnblockConsumer(
-          objectMapper, consignmentBlockUnblockService, topicNameConfig);
+      new ConsignmentBlockUnblockConsumer(objectMapper, consignmentBlockUnblockService);
 
   private static final Long ENTITY_ID = 1L;
 

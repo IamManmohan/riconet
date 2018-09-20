@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.test;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ErrorConstant;
 import com.rivigo.riconet.core.constants.ReasonConstant;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
@@ -51,5 +52,14 @@ public class UtilityTest {
         (Constructor<ErrorConstant>) ErrorConstant.class.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     errorConstant = constructor.newInstance();
+  }
+
+  @Test(expected = Exception.class)
+  public void emailConstant()
+      throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    Constructor<EmailConstant> constructor =
+        (Constructor<EmailConstant>) EmailConstant.class.getDeclaredConstructors()[0];
+    constructor.setAccessible(true);
+    constructor.newInstance();
   }
 }

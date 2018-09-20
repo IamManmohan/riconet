@@ -13,27 +13,23 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
-import com.rivigo.riconet.core.test.TesterBase;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * @author ramesh
  * @date 20-Aug-2018
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TicketingServiceTest extends TesterBase {
+public class TicketingServiceTest {
 
   private TicketingServiceImpl ticketingService;
 
@@ -43,14 +39,13 @@ public class TicketingServiceTest extends TesterBase {
    * to designation emails(configure TestConstants.CREATOR_EMAIL) with removing mock of restTemplate
    * */
 
-  @Autowired private RestTemplate restTemplate;
   @Mock private ZoomPropertyService zoomPropertyService;
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
   @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Before
   public void setUp() {
-    //    RestTemplate restTemplate = new RestTemplate();
+    MockitoAnnotations.initMocks(this);
     EmailSenderService emailSenderService = new EmailSenderServiceImpl();
     ticketingService =
         new TicketingServiceImpl(
@@ -141,7 +136,7 @@ public class TicketingServiceTest extends TesterBase {
     ticketingService.setPriorityMapping(notificationDTO);
 
     Mockito.when(zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
-        .thenReturn(null);
+        .thenReturn(Arrays.asList(""));
     Mockito.when(
             zoomPropertyService.getStringValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
         .thenReturn(Collections.singletonList("Priority Shipment Special Request"));
