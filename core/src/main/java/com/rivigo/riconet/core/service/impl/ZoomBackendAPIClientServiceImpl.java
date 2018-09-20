@@ -248,20 +248,20 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
   @Override
   public ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO) {
-      JsonNode responseJson;
-      String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
-      log.info("Updating vas detailsn {}", clientCodDodDTO);
-      try {
-          responseJson =
-                  apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
-      } catch (IOException e) {
-          log.error("Error while updating vas details {} , {}", clientCodDodDTO, e);
-          throw new ZoomException("Error while updating Organization {}" + clientCodDodDTO);
-      }
-      TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {
-      };
-      return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
+    log.info("Updating vas detailsn {}", clientCodDodDTO);
+    try {
+      responseJson =
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating vas details {} , {}", clientCodDodDTO, e);
+      throw new ZoomException("Error while updating Organization {}" + clientCodDodDTO);
+    }
+    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
+    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
+
   public Boolean handleConsignmentBlocker(
       ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO) {
     JsonNode responseJson;
