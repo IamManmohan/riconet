@@ -221,16 +221,18 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     ClientCodDodDTO clientVasDetailDTO = new ClientCodDodDTO();
     clientVasDetailDTO.setClientId(clientId);
     clientVasDetailDTO.setClientVasType(ClientVasType.COD_DOD);
-    ClientCreateUpdateDTO.CodDodDetailsDTO codDodDetailsDTO =
-        clientCreateUpdateDTO.getCodDodDetailsDTO();
-    if (codDodDetailsDTO != null) {
-      clientVasDetailDTO.setFinanceActivated(codDodDetailsDTO.getCodDodApplicable());
-      clientVasDetailDTO.setDistrict(codDodDetailsDTO.getDistrict());
-      clientVasDetailDTO.setInFavourOf(codDodDetailsDTO.getInFavorOf());
-      clientVasDetailDTO.setLandmark(codDodDetailsDTO.getLandmark());
-      clientVasDetailDTO.setPincode(codDodDetailsDTO.getPincode());
-      clientVasDetailDTO.setState(codDodDetailsDTO.getState());
-      clientVasDetailDTO.setMobileNumber(codDodDetailsDTO.getPhoneNumber());
+    log.info(
+        "Saving cod dod details for {}", clientCreateUpdateDTO.getCodDodDetailsDTO().toString());
+    if (clientCreateUpdateDTO.getCodDodDetailsDTO().getCodDodApplicable()) {
+      clientVasDetailDTO.setFinanceActivated(
+          clientCreateUpdateDTO.getCodDodDetailsDTO().getCodDodApplicable());
+      clientVasDetailDTO.setDistrict(clientCreateUpdateDTO.getCodDodDetailsDTO().getDistrict());
+      clientVasDetailDTO.setInFavourOf(clientCreateUpdateDTO.getCodDodDetailsDTO().getInFavorOf());
+      clientVasDetailDTO.setLandmark(clientCreateUpdateDTO.getCodDodDetailsDTO().getLandmark());
+      clientVasDetailDTO.setPincode(clientCreateUpdateDTO.getCodDodDetailsDTO().getPincode());
+      clientVasDetailDTO.setState(clientCreateUpdateDTO.getCodDodDetailsDTO().getState());
+      clientVasDetailDTO.setMobileNumber(
+          clientCreateUpdateDTO.getCodDodDetailsDTO().getPhoneNumber());
       clientVasDetailDTO.setStatus(OperationalStatus.ACTIVE.name());
     } else {
       clientVasDetailDTO.setStatus(OperationalStatus.INACTIVE.name());
