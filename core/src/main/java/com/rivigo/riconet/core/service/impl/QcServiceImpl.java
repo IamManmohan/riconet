@@ -201,9 +201,9 @@ public class QcServiceImpl implements QcService {
           ticketDTO.setAssigneeId(group == null ? null : group.getId());
           ticketDTO.setAssigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP);
           zoomTicketingAPIClientService.editTicket(ticketDTO);
-          if(ticketDTO.getTypeId().equals(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)) {
+          if (ticketDTO.getTypeId().equals(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)) {
             placeValidationBlockerForBFCNsAtFirstRivigoLocation(
-                    unloadingData.getConsignmentId(), unloadingData.getLocationId());
+                unloadingData.getConsignmentId(), unloadingData.getLocationId());
           }
         });
     if (group != null) {
