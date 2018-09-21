@@ -720,7 +720,6 @@ public class QcServiceTest {
     consignment.setWeight(10.0);
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
-    // consignment.setOrganizationId(1L);
 
     return consignment;
   }
