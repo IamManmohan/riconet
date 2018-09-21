@@ -29,6 +29,8 @@ public class EventTriggerService {
 
   @Autowired private TicketingService ticketingService;
 
+  @Autowired private AppNotificationService appNotificationService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
@@ -69,7 +71,7 @@ public class EventTriggerService {
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       case UNLOADING_IN_LOADING:
-        // TODO: notification service
+        appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
         break;
       case CN_CNOTE_CHANGE:
         qcService.consumeCnoteChangeEvent(
