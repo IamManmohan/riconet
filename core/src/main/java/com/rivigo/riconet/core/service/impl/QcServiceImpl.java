@@ -742,9 +742,7 @@ public class QcServiceImpl implements QcService {
 
   private void placeValidationBlockerForBFCNsAtFirstRivigoLocation(
       Long consignmentId, Long locationId) {
-    List<LocationTag> nonRivigoLocationTag =
-        Arrays.asList(
-            LocationTag.BF, LocationTag.DF, LocationTag.FROM_PINCODE, LocationTag.TO_PINCODE);
+    List<LocationTag> nonRivigoLocationTag = Arrays.asList(LocationTag.BF, LocationTag.DF);
     Long firstLocationId =
         consignmentScheduleService
             .getActivePlan(consignmentId)
