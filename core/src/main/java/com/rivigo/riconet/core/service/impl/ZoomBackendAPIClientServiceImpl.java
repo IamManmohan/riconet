@@ -253,7 +253,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     log.info("Updating vas detailsn {}", clientCodDodDTO);
     try {
       responseJson =
-          apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.PUT, url, null, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while updating vas details {} , {}", clientCodDodDTO, e);
       throw new ZoomException("Error while updating Organization {}" + clientCodDodDTO);
