@@ -230,7 +230,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       clientVasDetailDTO.setState(clientCreateUpdateDTO.getState());
       clientVasDetailDTO.setMobileNumber(clientCreateUpdateDTO.getMobileNumber());
       clientVasDetailDTO.setStatus(OperationalStatus.ACTIVE.name());
-      clientVasDetail.setFinanceActivated(Boolean.TRUE);
+      clientVasDetailDTO.setFinanceActivated(Boolean.TRUE);
     } else {
       clientVasDetailDTO.setStatus(OperationalStatus.INACTIVE.name());
       clientVasDetailDTO.setFinanceActivated(Boolean.FALSE);
