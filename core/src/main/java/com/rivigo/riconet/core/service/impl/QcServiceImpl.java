@@ -355,7 +355,7 @@ public class QcServiceImpl implements QcService {
     if (autoClose) {
       return;
     }
-    if (reCheckQcNeeded && RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
+    if (reCheckQcNeeded && RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId()) {
       handleQcConsignmentBlocker(
           consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
     }
