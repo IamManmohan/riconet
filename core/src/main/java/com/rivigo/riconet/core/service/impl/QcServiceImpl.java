@@ -44,6 +44,7 @@ import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.QcType;
@@ -200,6 +201,8 @@ public class QcServiceImpl implements QcService {
           ticketDTO.setAssigneeId(group == null ? null : group.getId());
           ticketDTO.setAssigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP);
           zoomTicketingAPIClientService.editTicket(ticketDTO);
+          placeValidationBlockerForBFCNsAtFirstRivigoLocation(
+              unloadingData.getConsignmentId(), unloadingData.getLocationId());
         });
     if (group != null) {
       return;
@@ -226,10 +229,6 @@ public class QcServiceImpl implements QcService {
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
-    if (RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
-      return false;
-    }
-
     Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
     if (bindings.isEmpty()) {
       return false;
@@ -356,14 +355,10 @@ public class QcServiceImpl implements QcService {
     if (autoClose) {
       return;
     }
-    if (reCheckQcNeeded) {
+    if (reCheckQcNeeded && RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
       handleQcConsignmentBlocker(
           consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
     }
-    //    if (measurementQcNeeded) {
-    //      handleQcConsignmentBlocker(
-    //          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.MEASUREMENT);
-    //    }
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
   }
 
@@ -741,5 +736,27 @@ public class QcServiceImpl implements QcService {
           "Sam user is missing for client {} ", consignment.getClient().getId());
     }
     return Collections.singleton(sam.getEmail());
+  }
+
+  private void placeValidationBlockerForBFCNsAtFirstRivigoLocation(
+      Long consignmentId, Long locationId) {
+    List<LocationTag> nonRivigoLocationTag =
+        Arrays.asList(
+            LocationTag.BF, LocationTag.DF, LocationTag.FROM_PINCODE, LocationTag.TO_PINCODE);
+    Long firstLocationId =
+        consignmentScheduleService
+            .getActivePlan(consignmentId)
+            .stream()
+            .filter(
+                cs ->
+                    cs.getLocationType() == LocationTypeV2.LOCATION
+                        && !nonRivigoLocationTag.contains(cs.getLocationTag()))
+            .min(Comparator.comparing(ConsignmentSchedule::getSequence))
+            .map(ConsignmentSchedule::getLocationId)
+            .orElse(null);
+    if (locationId.equals(firstLocationId)) {
+      handleQcConsignmentBlocker(
+          consignmentId, ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
+    }
   }
 }
