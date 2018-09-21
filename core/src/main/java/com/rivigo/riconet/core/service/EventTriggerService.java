@@ -77,7 +77,7 @@ public class EventTriggerService {
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
       case UNLOADING_IN_LOADING:
-        //TODO: notification service
+        // TODO: notification service
         break;
       case TICKET_CREATION:
       case TICKET_ASSIGNEE_CHANGE:

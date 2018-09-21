@@ -20,7 +20,8 @@ public enum ZoomCommunicationFieldNames {
   CONSIGNER_ADDRESS,
   CONSIGNEE_ADDRESS,
   ORGANIZATION_ID,
-  PICK_UP_ID;
+  PICK_UP_ID,
+  USER_ID;
 
   public enum Reason {
     REASON,
