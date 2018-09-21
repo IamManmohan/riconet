@@ -19,4 +19,8 @@ public class ConsignmentConstant {
   public static final String RETAIL_CLIENT_CODE = "ZRETL";
 
   public static final String BUSINESS = "Business";
+
+  public static final String CNOTE = "cnote";
+  public static final String SHORT_URL = "shortUrl";
+  public static final String URL = "url";
 }

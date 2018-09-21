@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.ApiClientService;
@@ -32,6 +33,8 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   private String ticketingBaseUrl;
 
   @Autowired private ApiClientService apiClientService;
+
+  private static final String TICKET_ID = "ticketId";
 
   @Override
   public List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId) {
@@ -81,9 +84,12 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
       responseJson =
           apiClientService.getEntity(ticketDTO, HttpMethod.PUT, url, null, ticketingBaseUrl);
     } catch (IOException e) {
-      log.error("Error while editing qc tickets with cnote {}", ticketDTO.getEntityId(), e);
-      throw new ZoomException(
-          "Error while editing qc tickets with cnote " + ticketDTO.getEntityId());
+      log.error(
+          "Error while editing tickets with id {} entity {}",
+          ticketDTO.getId(),
+          ticketDTO.getEntityId(),
+          e);
+      throw new ZoomException("Error while editing tickets");
     }
     TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
 
@@ -93,7 +99,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   public void makeComment(Long ticketId, String comment) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("ticketId", Collections.singletonList(ticketId.toString()));
+    valuesMap.put(TICKET_ID, Collections.singletonList(ticketId.toString()));
     valuesMap.put("text", Collections.singletonList(comment));
     String url = UrlConstant.ZOOM_TICKETING_POST_COMMENT;
     try {
@@ -135,5 +141,49 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     }
     TypeReference<GroupDTO> mapType = new TypeReference<GroupDTO>() {};
     return ((GroupDTO) apiClientService.parseJsonNode(responseJson, mapType));
+  }
+
+  @Override
+  public List<TicketCommentDTO> getComments(Long ticketId) {
+    if (StringUtils.isEmpty(ticketId)) {
+      throw new ZoomException("Please provide a valid cnote");
+    }
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put(TICKET_ID, Collections.singletonList(ticketId.toString()));
+    String url = UrlConstant.ZOOM_TICKETING_GET_COMMENTS;
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting comments of ticket: {}", ticketId, e);
+      throw new ZoomException("Error while getting comments of ticket: %s", ticketId);
+    }
+
+    TypeReference<List<TicketCommentDTO>> mapType = new TypeReference<List<TicketCommentDTO>>() {};
+
+    return (List<TicketCommentDTO>) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public TicketDTO getTicketByTicketId(Long ticketId) {
+    if (null == ticketId) {
+      throw new ZoomException("null ticketId cannot be processed");
+    }
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_TICKETING_TICKET_DETAIL;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    valuesMap.put(TICKET_ID, Collections.singletonList(String.valueOf(ticketId)));
+
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting ticket with ID {}", ticketId, e);
+      throw new ZoomException("Error while getting ticket with ID: %s", ticketId);
+    }
+    TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
+
+    return (TicketDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }

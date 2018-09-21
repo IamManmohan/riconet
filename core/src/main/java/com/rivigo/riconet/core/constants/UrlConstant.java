@@ -15,7 +15,10 @@ public class UrlConstant {
   public static final String ZOOM_TICKETING_POST_COMMENT = "/comment";
 
   public static final String ZOOM_BACKEND_UPDATE_QC_CHECK =
-      "/operations/consignments/updateQcCheck";
+      "/operations/consignments/qc/updateQcCheck";
+
+  public static final String ZOOM_BACKEND_HANDLE_QC_BLOCKER =
+      "/operations/consignments/qc/handleQcBlocker";
 
   public static final String ZOOM_BACKEND_BF_CPD_CALCULATION =
       "/operations/consignments/bfCpdCalculation";
@@ -32,5 +35,13 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_ASSET_ONBOARDING = "/asset/onBoard/{cnId}";
 
+  public static final String ZOOM_BACKEND_CONSIGNMENT_BLOCKER = "/consignmentBlocker";
+
   public static final String ZOOM_BILLING_CN_DETAILS = "/cnbook/chargedweight/cnote/{cnote}";
+
+  public static final String ZOOM_TICKETING_GET_COMMENTS = "/comment";
+
+  public static final String ZOOM_TICKETING_TICKET_DETAIL = "/ticket/detail";
+
+  public static final String PRIORITY_URL = "/operations/consignments/priority";
 }
