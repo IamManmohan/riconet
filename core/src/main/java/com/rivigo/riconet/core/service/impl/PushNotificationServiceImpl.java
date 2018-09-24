@@ -83,6 +83,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 // set headers
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(HttpHeaders.AUTHORIZATION, "key=" + firebaseServerKey);
     HttpEntity<String> entity1 = new HttpEntity<String>(body.toString(), headers);
 
 // send request and parse result
