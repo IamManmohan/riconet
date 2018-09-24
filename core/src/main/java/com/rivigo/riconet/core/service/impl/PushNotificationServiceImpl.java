@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import java.io.IOException;
 import java.net.URI;
@@ -45,6 +46,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
       throws JsonProcessingException {
     if (dto != null) {
       log.info("Calling API {} for  requestJson {}", uri, dto.toString());
+      objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
       return new HttpEntity<>(dto, headers);
     } else {
       log.info("Calling API {}", uri);
