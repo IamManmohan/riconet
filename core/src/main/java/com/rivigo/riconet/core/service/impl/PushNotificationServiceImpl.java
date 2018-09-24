@@ -48,7 +48,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     if (dto != null) {
       log.info("Calling API {} for  requestJson {}", uri, dto.toString());
       objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-      return new HttpEntity<>(dto, headers);
+      return new HttpEntity<>(dto.toString(), headers);
     } else {
       log.info("Calling API {}", uri);
       return new HttpEntity<>(headers);
@@ -58,7 +58,8 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   @Override
   public void send(String message, String firebaseToken) throws IOException {
 
-    //    RestTemplate restTemplate = new RestTemplate();
+    //TODO : see why autowired restemplate is giving bad request
+    RestTemplate restTemplate = new RestTemplate();
 
     JSONObject body = new JSONObject();
     body.put("to", firebaseToken);
@@ -81,6 +82,6 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     log.info("Entity is {} --- {}", entity, entity.toString());
     log.info("url is {}", uri.toString());
     ResponseEntity<JSONObject> firebaseResponse =
-        riconetRestTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
   }
 }
