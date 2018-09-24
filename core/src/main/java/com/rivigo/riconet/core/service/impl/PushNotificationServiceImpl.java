@@ -56,6 +56,8 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   @Override
   public void send(String message, String firebaseToken) throws IOException {
 
+    RestTemplate restTemplate = new RestTemplate();
+
     JSONObject body = new JSONObject();
     body.put("to", firebaseToken);
     body.put("priority", "high");
@@ -77,7 +79,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     log.info("Entity is {} --- {}", entity, entity.toString());
     log.info("url is {}", uri.toString());
     ResponseEntity<JSONObject> firebaseResponse =
-        riconetRestTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
 
 
   }
