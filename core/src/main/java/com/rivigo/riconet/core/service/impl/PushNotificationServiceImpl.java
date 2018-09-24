@@ -44,8 +44,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri)
       throws JsonProcessingException {
     if (dto != null) {
-      String requestJson = dto.toString();
-      log.info("Calling API {} for  requestJson {}", uri, requestJson);
+      log.info("Calling API {} for  requestJson {}", uri, dto.toString());
       return new HttpEntity<>(dto, headers);
     } else {
       log.info("Calling API {}", uri);
