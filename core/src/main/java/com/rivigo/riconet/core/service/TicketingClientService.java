@@ -48,7 +48,6 @@ public class TicketingClientService {
     queryParams.set(ENTITY_TYPE, entityType);
     queryParams.set(EVENT_NAME, eventName.name());
     makeRequest(url, queryParams);
-    log.info("Autoclose tickets called");
   }
 
   private void makeRequest(String requestUrl, MultiValueMap<String, String> queryParams) {
