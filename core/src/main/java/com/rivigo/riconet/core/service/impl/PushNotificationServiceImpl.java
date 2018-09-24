@@ -1,5 +1,8 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PRIORITY;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -56,32 +59,19 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   }
 
   @Override
-  public void send(String message, String firebaseToken) throws IOException {
+  public void send(JSONObject jsonObject, String firebaseToken, String priority)
+      throws IOException {
 
-    //TODO : see why autowired restemplate is giving bad request
+    // TODO : see why autowired restemplate is giving bad request
     RestTemplate restTemplate = new RestTemplate();
 
-    JSONObject body = new JSONObject();
-    body.put("to", firebaseToken);
-    body.put("priority", "high");
-
-    JSONObject notification = new JSONObject();
-    notification.put("title", "Unloading In Loading");
-    notification.put("body", "hey! unloading in loading is happening!");
-
-    //    JSONObject data = new JSONObject();
-    //    data.put("Key-1", "JSA Data 1");
-    //    data.put("Key-2", "JSA Data 2");
-
-    body.put("notification", notification);
-    // body.put("data", data);
-
+    jsonObject.put(PRIORITY, priority);
+    jsonObject.put(TO, firebaseToken);
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
-    HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), body, uri);
-    log.info("Entity is {} --- {}", entity, entity.toString());
-    log.info("url is {}", uri.toString());
+    HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), jsonObject, uri);
     ResponseEntity<JSONObject> firebaseResponse =
         restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    log.info("Response is {}", jsonObject);
   }
 }
