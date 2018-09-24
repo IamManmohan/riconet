@@ -36,7 +36,6 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 
   private HttpHeaders getHeaders(String token) {
     HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.add(HttpHeaders.AUTHORIZATION, "key=" + token);
     headers.setContentType(MediaType.APPLICATION_JSON);
     return headers;
@@ -75,6 +74,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
     HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), body, uri);
+    log.info("Entity is {} --- {}", entity, entity.toString());
     ResponseEntity<JSONObject> firebaseResponse =
         riconetRestTemplate.exchange(uri.toString(), HttpMethod.POST, entity, JSONObject.class);
   }
