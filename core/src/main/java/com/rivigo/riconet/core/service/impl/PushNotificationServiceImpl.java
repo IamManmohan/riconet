@@ -47,7 +47,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     if (dto != null) {
       log.info("Calling API {} for  requestJson {}", uri, dto.toString());
       objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-      return new HttpEntity<>(dto, headers);
+      return new HttpEntity<>(dto.toString(), headers);
     } else {
       log.info("Calling API {}", uri);
       return new HttpEntity<>(headers);
