@@ -27,7 +27,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   private String firebaseUrl = "https://fcm.googleapis.com/fcm/send";
 
   //    @Value("${firebase.server,key}")
-  //    private String firebaseServerKey;
+  private String firebaseServerKey = "AIzaSyBarykZAGZMAVZw5UUKJa9Ozx_mrF1QjHs";
 
   @Autowired private RestTemplate riconetRestTemplate;
 
@@ -73,7 +73,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
-    HttpEntity entity = getHttpEntity(getHeaders(firebaseToken), body, uri);
+    HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), body, uri);
     ResponseEntity<String> firebaseResponse =
         riconetRestTemplate.exchange(uri.toString(), HttpMethod.POST, entity, String.class);
   }
