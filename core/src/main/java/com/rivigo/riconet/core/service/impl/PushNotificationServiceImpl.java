@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,7 +30,9 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   //    @Value("${firebase.server.key}")
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
-  @Autowired private RestTemplate riconetRestTemplate;
+  @Autowired
+  @Qualifier("riconetRestTemplate")
+  private RestTemplate riconetRestTemplate;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -56,7 +58,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   @Override
   public void send(String message, String firebaseToken) throws IOException {
 
-    RestTemplate restTemplate = new RestTemplate();
+    //    RestTemplate restTemplate = new RestTemplate();
 
     JSONObject body = new JSONObject();
     body.put("to", firebaseToken);
@@ -66,12 +68,12 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     notification.put("title", "Unloading In Loading");
     notification.put("body", "hey! unloading in loading is happening!");
 
-//    JSONObject data = new JSONObject();
-//    data.put("Key-1", "JSA Data 1");
-//    data.put("Key-2", "JSA Data 2");
+    //    JSONObject data = new JSONObject();
+    //    data.put("Key-1", "JSA Data 1");
+    //    data.put("Key-2", "JSA Data 2");
 
     body.put("notification", notification);
-   // body.put("data", data);
+    // body.put("data", data);
 
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
@@ -79,8 +81,6 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     log.info("Entity is {} --- {}", entity, entity.toString());
     log.info("url is {}", uri.toString());
     ResponseEntity<JSONObject> firebaseResponse =
-        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
-
-
+        riconetRestTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
   }
 }
