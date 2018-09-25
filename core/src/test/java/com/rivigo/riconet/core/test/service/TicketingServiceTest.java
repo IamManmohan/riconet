@@ -1,7 +1,5 @@
 package com.rivigo.riconet.core.test.service;
 
-import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKETING_ZOOM_PROPERTY_KEY;
-
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
@@ -78,7 +76,7 @@ public class TicketingServiceTest {
     ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "riconet-qa");
 
     zoomProperty = new ZoomProperty();
-    zoomProperty.setVariableName(TICKETING_ZOOM_PROPERTY_KEY);
+    zoomProperty.setVariableName(ZoomPropertyName.DEFAULT_EMAIL_IDS.name());
   }
 
   @Test
@@ -86,7 +84,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -96,7 +95,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_ASSIGNEE_CHANGE();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -106,7 +106,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_STATUS_CHANGE();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -116,7 +117,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_ESCALATION_CHANGE();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -126,7 +128,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_SEVERITY_CHANGE();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -136,7 +139,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_CC_NEW_PERSON_ADDITION();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
@@ -146,7 +150,8 @@ public class TicketingServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDtoForTICKET_COMMENT_CREATION();
     Mockito.when(
-            zoomPropertiesRepository.findByVariableNameAndIsActive(TICKETING_ZOOM_PROPERTY_KEY, 1))
+            zoomPropertiesRepository.findByVariableNameAndIsActive(
+                ZoomPropertyName.DEFAULT_EMAIL_IDS.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     ticketingService.sendTicketingEventsEmail(notificationDTO);
   }
