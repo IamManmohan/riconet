@@ -79,7 +79,6 @@ public class TicketingServiceTest {
 
     zoomProperty = new ZoomProperty();
     zoomProperty.setVariableName(TICKETING_ZOOM_PROPERTY_KEY);
-    zoomProperty.setVariableValue("rameshc10695@gmail.com");
   }
 
   @Test
