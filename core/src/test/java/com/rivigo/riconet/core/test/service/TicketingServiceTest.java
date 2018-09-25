@@ -74,7 +74,7 @@ public class TicketingServiceTest {
     ReflectionTestUtils.setField(
         emailSenderService,
         "emailServiceApi",
-        "http://rivigonotifications-stg.ap-southeast-1.elasticbeanstalk.com//api/v1/email/send");
+        "http://notification-dummy-url.com/api/v1/email/send");
     ReflectionTestUtils.setField(emailSenderService, "emailUserAgent", "riconet-qa");
 
     zoomProperty = new ZoomProperty();
