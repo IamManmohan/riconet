@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
+import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -230,6 +231,37 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
+  public ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO) {
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
+    log.info("Adding vas details {}", clientCodDodDTO.toString());
+    try {
+      responseJson =
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while adding vas details {} ", clientCodDodDTO.toString(), e);
+      throw new ZoomException("Error while adding vas details " + clientCodDodDTO.toString());
+    }
+    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
+    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO) {
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_VAS_DETAILS_SERVICE;
+    log.info("Updating vas details {}", clientCodDodDTO.toString());
+    try {
+      responseJson =
+          apiClientService.getEntity(clientCodDodDTO, HttpMethod.PUT, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while updating vas details {} ", clientCodDodDTO, e);
+      throw new ZoomException("Error while updating Vas Details" + clientCodDodDTO.toString());
+    }
+    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
+    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
   public Boolean handleConsignmentBlocker(
       ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO) {
     JsonNode responseJson;
@@ -240,7 +272,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               consignmentBlockerRequestDTO, HttpMethod.POST, url, null, backendBaseUrl);
     } catch (IOException e) {
-      log.error("Error while handling consignmentBlocker {} , {}", consignmentBlockerRequestDTO, e);
+      log.error("Error while handling consignmentBlocker {}", consignmentBlockerRequestDTO, e);
       throw new ZoomException(
           "Error while handling consignmentBlocker %s", consignmentBlockerRequestDTO);
     }
