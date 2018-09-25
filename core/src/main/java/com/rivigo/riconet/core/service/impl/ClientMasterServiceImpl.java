@@ -72,6 +72,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     if (ZoomServiceType.ZOOM_FRANCHISE.name().equals(clientCreateUpdateDTO.getServiceType())) {
       log.info("Updating Organization {}", dtoString);
       organizationService.createUpdateOrganization(clientCreateUpdateDTO);
+      return;
     }
     log.info("Updating Client {}", dtoString);
     Client existingClient =
