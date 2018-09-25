@@ -1,10 +1,9 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKETING_ZOOM_PROPERTY_KEY;
-
 import com.rivigo.notification.common.dto.AttachmentDto;
 import com.rivigo.notification.common.request.SendEmailRequest;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.ZoomProperty;
@@ -15,6 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -63,11 +63,12 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     SendEmailRequest request = new SendEmailRequest();
     request.setFrom(senderServerName);
 
-    if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+    if ("production"
+        .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
       log.info("sending mail to actual recipient on production env : {} ", recipients);
     } else {
       ZoomProperty zoomProperty =
-          zoomPropertyService.getByPropertyName(TICKETING_ZOOM_PROPERTY_KEY);
+          zoomPropertyService.getByPropertyName(ZoomPropertyName.DEFAULT_EMAIL_IDS.name());
       if (null == zoomProperty || StringUtils.isEmpty(zoomProperty.getVariableValue())) {
         log.info("Not sending any mail as not recipient found");
         return;
