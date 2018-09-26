@@ -42,4 +42,6 @@ public class UrlConstant {
   public static final String ZOOM_TICKETING_TICKET_DETAIL = "/ticket/detail";
 
   public static final String PRIORITY_URL = "/operations/consignments/priority";
+
+  public static final String ZOOM_BACKEND_VAS_DETAILS_SERVICE = "/master/vasDetails";
 }
