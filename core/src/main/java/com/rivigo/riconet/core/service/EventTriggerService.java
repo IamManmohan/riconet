@@ -73,6 +73,15 @@ public class EventTriggerService {
       case UNLOADING_IN_LOADING:
         appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
         break;
+      case CN_TOTAL_BOXES_CHANGE:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
+      case CN_LOADING_PLAN_UNPLAN:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
+      case CN_UNLOADING_PLAN_UNPLAN:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
       case CN_CNOTE_CHANGE:
         qcService.consumeCnoteChangeEvent(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name()),

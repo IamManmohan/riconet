@@ -6,4 +6,6 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 public interface AppNotificationService {
 
   void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO);
+
+  void sendLoadingUnloadingNotification(NotificationDTO notificationDTO);
 }
