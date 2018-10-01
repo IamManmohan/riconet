@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleServic
       Collection<Long> consignmentIds) {
     List<ConsignmentSchedule> schedules =
         consignmentScheduleRepository.findByConsignmentIdInAndIsActive(
-            new ArrayList<>(consignmentIds), 1);
+                new HashSet<>(consignmentIds), 1);
     Collections.sort(schedules);
     Map<Long, List<ConsignmentSchedule>> retMap = new HashMap<>();
     for (ConsignmentSchedule schedule : schedules) {
