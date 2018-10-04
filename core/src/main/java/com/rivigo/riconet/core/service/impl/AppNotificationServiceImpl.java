@@ -5,6 +5,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -46,6 +47,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, UNLOADING_IN_LOADING.name());
     data.put(TASK_ID, taskId);
     data.put(PARENT_TASK_ID, parentTaskId);
+    data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, userId);
@@ -66,6 +68,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject data = new JSONObject();
     data.put(NOTIFICATION_TYPE, taskType.name());
     data.put(TASK_ID, taskId);
+    data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, userId);

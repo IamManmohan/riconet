@@ -26,7 +26,7 @@ public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleServic
       Collection<Long> consignmentIds) {
     List<ConsignmentSchedule> schedules =
         consignmentScheduleRepository.findByConsignmentIdInAndIsActive(
-                new HashSet<>(consignmentIds), 1);
+            new HashSet<>(consignmentIds), 1);
     Collections.sort(schedules);
     Map<Long, List<ConsignmentSchedule>> retMap = new HashMap<>();
     for (ConsignmentSchedule schedule : schedules) {
