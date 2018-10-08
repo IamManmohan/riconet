@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class TicketingClientService {
 
-  private static final String CLOSE_URL_ENDPOINT = "/ticket/autoclose";
+  private static final String AUTO_CLOSE_URL_ENDPOINT = "/ticket/autoclose";
   private static final String CLIENT_KEY = "clientKey";
   private static final String ENTITY_ID = "entityId";
   private static final String ENTITY_TYPE = "entityType";
@@ -36,8 +36,13 @@ public class TicketingClientService {
 
   private RestTemplate restTemplate = new RestTemplate();
 
-  public void closeTicket(String entityId, String entityType, EventName eventName) {
-    String url = zoomTicketingUrl + CLOSE_URL_ENDPOINT;
+  public void autoCloseTicket(String entityId, String entityType, EventName eventName) {
+    log.info(
+        "Autoclosing tickets with entityId: {}, entityType: {}, eventName: {}",
+        entityId,
+        entityType,
+        eventName);
+    String url = zoomTicketingUrl + AUTO_CLOSE_URL_ENDPOINT;
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
     queryParams.set(ENTITY_ID, entityId);
     queryParams.set(ENTITY_TYPE, entityType);

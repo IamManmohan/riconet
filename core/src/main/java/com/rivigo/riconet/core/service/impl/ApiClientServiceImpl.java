@@ -79,7 +79,13 @@ public class ApiClientServiceImpl implements ApiClientService {
                 + e.getMessage());
       }
     }
-    throw new ZoomException(responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString());
+    String errorMessage = responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString();
+    log.error(
+        "API Response Status : {}  Error Message : {} , response : {} ",
+        status,
+        errorMessage,
+        responseJson);
+    throw new ZoomException(errorMessage);
   }
 
   private HttpHeaders getHeaders(String token, String uri) {
