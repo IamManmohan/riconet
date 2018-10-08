@@ -62,6 +62,9 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   public void send(JSONObject jsonObject, String firebaseToken, String priority)
       throws IOException {
 
+    if (firebaseToken == null) {
+      return;
+    }
     // TODO : see why autowired restemplate is giving bad request
     RestTemplate restTemplate = new RestTemplate();
 
