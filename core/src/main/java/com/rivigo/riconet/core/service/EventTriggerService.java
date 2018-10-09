@@ -33,7 +33,6 @@ public class EventTriggerService {
     EventName eventName = notificationDTO.getEventName();
     switch (eventName) {
       case CN_DELIVERY:
-      case CN_DELETED:
       case CN_STALE:
       case CN_DELETION_TICKETING:
       case CN_TRIP_DISPATCHED:
