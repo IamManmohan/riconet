@@ -31,16 +31,18 @@ public class EventTriggerService {
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
+    String entityId;
     switch (eventName) {
       case CN_DELIVERY:
       case CN_STALE:
-      case CN_DELETED:
       case CN_TRIP_DISPATCHED:
       case CN_PAYMENT_HANDOVER_COMPLETED:
-        String entityId =
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName);
         break;
+      case CN_DELETED:
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
+        ticketingClientService.autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName);
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
         ticketingClientService.autoCloseTicket(
