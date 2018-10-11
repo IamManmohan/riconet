@@ -743,8 +743,11 @@ public class QcServiceImpl implements QcService {
 
   private void placeValidationBlockerForBFCNsAtFirstRivigoLocation(
       Long consignmentId, Long locationId) {
-    Consignment consignment = consignmentService.getConsignmentById(consignmentId);
-    if (RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId()) {
+    Long orgId = consignmentService.getOrganizationIdFromCnId(consignmentId);
+    if (orgId == null) {
+      return;
+    }
+    if (RIVIGO_ORGANIZATION_ID == orgId) {
       return;
     }
     List<LocationTag> nonRivigoLocationTag = Arrays.asList(LocationTag.BF, LocationTag.DF);

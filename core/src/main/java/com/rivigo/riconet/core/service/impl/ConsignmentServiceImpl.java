@@ -130,4 +130,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   public Consignment getConsignmentByCnote(String cnote) {
     return consignmentRepo.findByCnote(cnote);
   }
+
+  @Override
+  public Long getOrganizationIdFromCnId(Long cnId) {
+    BigInteger orgId = consignmentRepo.getOrganizationId(cnId);
+    if (orgId != null) {
+      return orgId.longValue();
+    }
+    return null;
+  }
 }
