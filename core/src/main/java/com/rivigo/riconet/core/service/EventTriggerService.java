@@ -54,6 +54,7 @@ public class EventTriggerService {
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
+        break;
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
         ticketingClientService.autoCloseTicket(
