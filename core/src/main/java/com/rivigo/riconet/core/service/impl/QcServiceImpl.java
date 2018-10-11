@@ -747,7 +747,7 @@ public class QcServiceImpl implements QcService {
     if (orgId == null) {
       return;
     }
-    if (RIVIGO_ORGANIZATION_ID == orgId) {
+    if (orgId.equals(RIVIGO_ORGANIZATION_ID)) {
       return;
     }
     List<LocationTag> nonRivigoLocationTag = Arrays.asList(LocationTag.BF, LocationTag.DF);
