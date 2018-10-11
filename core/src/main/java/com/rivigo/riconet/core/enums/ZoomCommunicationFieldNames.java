@@ -24,6 +24,7 @@ public enum ZoomCommunicationFieldNames {
   LAST_UPDATED_BY_ID,
   PICK_UP_ID,
   ENTITY_ID,
+  STALE_CATEGORY,
   TYPE_ID;
 
   public enum Reason {
