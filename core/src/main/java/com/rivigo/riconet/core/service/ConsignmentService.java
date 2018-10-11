@@ -31,4 +31,6 @@ public interface ConsignmentService {
   void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO);
 
   Boolean isPrimaryConsignment(String cNote);
+
+  Long getOrganizationIdFromCnId(Long cnId);
 }
