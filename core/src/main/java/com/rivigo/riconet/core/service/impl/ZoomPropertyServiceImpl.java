@@ -137,4 +137,18 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
     }
     return Collections.emptyList();
   }
+
+  @Override
+  public Long getLong(ZoomPropertyName propertyName, Long defaultVal) {
+    ZoomProperty property = getByPropertyName(propertyName.name());
+    if (property == null) return defaultVal;
+
+    try {
+      return Long.valueOf(property.getVariableValue());
+    } catch (Exception ex) {
+      log.error("Exception while getting long value for " + propertyName.name(), ex);
+    }
+
+    return defaultVal;
+  }
 }
