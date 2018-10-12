@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,10 +28,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class PushNotificationServiceImpl implements PushNotificationService {
 
-  // @Value("${firebase.url}")
+  @Value("${firebase.url}")
   private String firebaseUrl = "https://fcm.googleapis.com/fcm/send";
 
-  //    @Value("${firebase.server.key}")
+  @Value("${firebase.server.key}")
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
   @Autowired
