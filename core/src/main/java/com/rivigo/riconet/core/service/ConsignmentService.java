@@ -35,4 +35,6 @@ public interface ConsignmentService {
 
   void triggerAssetCnUnload(
       NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO);
+
+  Long getOrganizationIdFromCnId(Long cnId);
 }

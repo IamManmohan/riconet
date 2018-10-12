@@ -148,4 +148,13 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
     zoomBackendAPIClientService.unloadAssetCN(consignmentBasicDTO.getConsignmentId());
   }
+
+  @Override
+  public Long getOrganizationIdFromCnId(Long cnId) {
+    BigInteger orgId = consignmentRepo.getOrganizationId(cnId);
+    if (orgId != null) {
+      return orgId.longValue();
+    }
+    return null;
+  }
 }

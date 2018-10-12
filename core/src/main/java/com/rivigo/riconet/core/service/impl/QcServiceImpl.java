@@ -201,7 +201,8 @@ public class QcServiceImpl implements QcService {
           ticketDTO.setAssigneeId(group == null ? null : group.getId());
           ticketDTO.setAssigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP);
           zoomTicketingAPIClientService.editTicket(ticketDTO);
-          if (ticketDTO.getTypeId().equals(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)) {
+          if (ticketDTO.getTypeId().equals(ZoomTicketingConstant.QC_RECHECK_TYPE_ID)
+              && !TicketStatus.CLOSED.equals(ticketDTO.getStatus())) {
             placeValidationBlockerForBFCNsAtFirstRivigoLocation(
                 unloadingData.getConsignmentId(), unloadingData.getLocationId());
           }
@@ -742,6 +743,13 @@ public class QcServiceImpl implements QcService {
 
   private void placeValidationBlockerForBFCNsAtFirstRivigoLocation(
       Long consignmentId, Long locationId) {
+    Long orgId = consignmentService.getOrganizationIdFromCnId(consignmentId);
+    if (orgId == null) {
+      return;
+    }
+    if (orgId.equals(RIVIGO_ORGANIZATION_ID)) {
+      return;
+    }
     List<LocationTag> nonRivigoLocationTag = Arrays.asList(LocationTag.BF, LocationTag.DF);
     Long firstLocationId =
         consignmentScheduleService
