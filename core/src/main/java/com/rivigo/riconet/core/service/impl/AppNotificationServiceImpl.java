@@ -6,12 +6,14 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFIC
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAUL_APP_USER_ID;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
@@ -31,6 +33,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private DeviceAppVersionMapperRepository deviceAppVersionMapperRepository;
 
   @Autowired private PushNotificationService pushNotificationService;
+
+  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
   public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
@@ -75,6 +79,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId) {
+    if (!"production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+      userId = zoomPropertyService.getLong(DEFAUL_APP_USER_ID,57L);
+    }
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         deviceAppVersionMapperRepository.findByUserId(userId);
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
