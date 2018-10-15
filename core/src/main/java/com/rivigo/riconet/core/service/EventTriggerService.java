@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -31,19 +32,35 @@ public class EventTriggerService {
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
+    String entityId;
     switch (eventName) {
       case CN_DELIVERY:
-      case CN_DELETED:
       case CN_TRIP_DISPATCHED:
       case CN_PAYMENT_HANDOVER_COMPLETED:
-        String entityId =
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        ticketingClientService.autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName);
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        ticketingClientService.autoCloseTicket(
+            entityId, TicketEntityType.CN.name(), eventName.name());
+        break;
+      case CN_STALE:
+        String staleCategory =
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STALE_CATEGORY.name());
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        String staleCategoryEventName =
+            eventName + ZoomTicketingConstant.UNDERSCORE + staleCategory;
+        ticketingClientService.autoCloseTicket(
+            entityId, TicketEntityType.CN.name(), staleCategoryEventName);
+        break;
+      case CN_DELETED:
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
+        ticketingClientService.autoCloseTicket(
+            entityId, TicketEntityType.CN.name(), eventName.name());
         break;
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
         ticketingClientService.autoCloseTicket(
-            notificationDTO.getEntityId().toString(), TicketEntityType.PRQ.name(), eventName);
+            notificationDTO.getEntityId().toString(),
+            TicketEntityType.PRQ.name(),
+            eventName.name());
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
