@@ -53,7 +53,7 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
-        consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
+        // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
         qcService.consumeUnloadingEvent(unloadingData);
         consignmentService.triggerBfCpdCalcualtion(unloadingData);
         break;
