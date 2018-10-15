@@ -109,7 +109,6 @@ public class EmailSenderServiceImpl implements EmailSenderService {
           senderServerName,
           emailServiceApi,
           emailUserAgent);
-      //      RestTemplate restTemplate = new RestTemplate();
       ResponseEntity<NotificationResponseDTO> responseObject =
           this.restTemplate.exchange(
               emailServiceApi, HttpMethod.POST, entity, NotificationResponseDTO.class);

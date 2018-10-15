@@ -3,6 +3,10 @@ package com.rivigo.riconet.core.constants;
 /** Created by ashfakh on 24/09/18. */
 public class PushNotificationConstant {
 
+  private PushNotificationConstant() {
+    throw new IllegalStateException("Utility class");
+  }
+
   public static final String PRIORITY = "priority";
   public static final String TO = "to";
   public static final String DATA = "data";

@@ -3,7 +3,6 @@ package com.rivigo.riconet.core.service.impl;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PRIORITY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -47,8 +45,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     return headers;
   }
 
-  private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri)
-      throws JsonProcessingException {
+  private HttpEntity getHttpEntity(HttpHeaders headers, Object dto, URI uri) {
     if (dto != null) {
       log.info("Calling API {} for  requestJson {}", uri, dto.toString());
       objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
@@ -74,8 +71,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
     HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), jsonObject, uri);
-    ResponseEntity<JSONObject> firebaseResponse =
-        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
     log.info("Response is {}", jsonObject);
   }
 }

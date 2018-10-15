@@ -80,7 +80,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   private void sendNotification(JSONObject notificationPayload, Long userId) {
     if (!"production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
-      userId = zoomPropertyService.getLong(DEFAUL_APP_USER_ID,57L);
+      userId = zoomPropertyService.getLong(DEFAUL_APP_USER_ID, 57L);
     }
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         deviceAppVersionMapperRepository.findByUserId(userId);

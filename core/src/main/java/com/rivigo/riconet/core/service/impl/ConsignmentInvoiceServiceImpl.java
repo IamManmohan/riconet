@@ -40,6 +40,9 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
   @Override
   public void saveInvoiceDetails(String dto) {
     InvoiceDocumentPreparedDTO invoiceDocumentPreparedDTO = getInvoicePreparedDTO(dto);
+    if (invoiceDocumentPreparedDTO == null) {
+      return;
+    }
     Consignment consignment =
         consignmentService.getConsignmentByCnote(invoiceDocumentPreparedDTO.getCnote());
     if (consignment == null) {
@@ -47,7 +50,7 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
       throw new ZoomException(
           "Consignment doesn't exist for cnote" + invoiceDocumentPreparedDTO.getCnote());
     }
-    if (!(RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId())) {
+    if (RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
       return;
     }
     String shortUrl = urlShortnerService.shortenUrl(invoiceDocumentPreparedDTO.getEncodedUrl());

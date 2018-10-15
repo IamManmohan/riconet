@@ -69,6 +69,9 @@ public class ClientMasterServiceImpl implements ClientMasterService {
   @Override
   public void createUpdateClient(String dtoString) {
     ClientCreateUpdateDTO clientCreateUpdateDTO = getClientCreateUpdateDTO(dtoString);
+    if (clientCreateUpdateDTO == null) {
+      return;
+    }
     if (ZoomServiceType.ZOOM_FRANCHISE.name().equals(clientCreateUpdateDTO.getServiceType())) {
       log.info("Updating Organization {}", dtoString);
       organizationService.createUpdateOrganization(clientCreateUpdateDTO);
@@ -83,7 +86,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     }
     log.info("Existing client {}", existingClient);
     ClientDTO clientDTO = getClientDTOFromCreateUpdateDTO(clientCreateUpdateDTO);
-    ClientDTO updatedClient = new ClientDTO();
+    ClientDTO updatedClient;
     if (existingClient == null) {
       List<BillingEntityDTO> billingEntityDTOList = new ArrayList<>();
       clientCreateUpdateDTO
@@ -107,13 +110,13 @@ public class ClientMasterServiceImpl implements ClientMasterService {
               clientCreateUpdateDTO.getBillingEntities(), existingClient.getId()));
       updatedClient = zoomBackendAPIClientService.updateClient(clientDTO);
     }
-    if (clientDTO != null) {
+    if (updatedClient != null) {
       createUpdateVasDetails(clientCreateUpdateDTO, updatedClient.getId());
     }
   }
 
   private ClientCreateUpdateDTO getClientCreateUpdateDTO(String dtoString) {
-    ClientCreateUpdateDTO clientCreateUpdateDTO = null;
+    ClientCreateUpdateDTO clientCreateUpdateDTO;
     try {
       clientCreateUpdateDTO = objectMapper.readValue(dtoString, ClientCreateUpdateDTO.class);
     } catch (IOException ex) {
@@ -239,7 +242,6 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     if (clientVasDetail != null) {
       clientVasDetailDTO.setId(clientVasDetail.getId());
       zoomBackendAPIClientService.updateVasDetails(clientVasDetailDTO);
-      return;
     } else {
       zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);
     }
