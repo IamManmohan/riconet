@@ -33,8 +33,6 @@ public class EventMain {
 
   private final FinanceEventsConsumer financeEventsConsumer;
 
-  private static final String LATEST = "latest";
-
   private final CnActionConsumer cnActionConsumer;
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
