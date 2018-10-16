@@ -151,13 +151,10 @@ public class EventTriggerService {
             getLong(notificationDTO, ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())
                 .orElse(null))
         .locationId(
-            Long.parseLong(
-                notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.LOCATION_ID.name()).orElse(null))
         .toLocationId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.TO_LOCATION_ID.name())))
+            getLong(notificationDTO, ZoomCommunicationFieldNames.TO_LOCATION_ID.name())
+                .orElse(null))
         .fromId(
             getLong(notificationDTO, ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())
                 .orElse(null))

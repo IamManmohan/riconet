@@ -6,7 +6,6 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
-import java.io.IOException;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
