@@ -28,6 +28,8 @@ public enum ZoomCommunicationFieldNames {
   ENTITY_ID,
   PARENT_TASK_ID,
   TASK_TYPE,
+
+  STALE_CATEGORY,
   TYPE_ID;
 
   public enum Reason {

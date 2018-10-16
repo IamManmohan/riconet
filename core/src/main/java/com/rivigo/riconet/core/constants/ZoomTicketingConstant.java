@@ -55,4 +55,6 @@ public class ZoomTicketingConstant {
       "The Ticket got auto closed after changing the consignment priority";
 
   public static final String ZOOM_PROPERTIES_PRIORITY_SEPORATOR = ",";
+
+  public static final String UNDERSCORE = "_";
 }
