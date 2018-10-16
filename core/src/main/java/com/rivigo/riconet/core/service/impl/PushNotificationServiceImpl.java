@@ -57,8 +57,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   }
 
   @Override
-  public void send(JSONObject jsonObject, String firebaseToken, String priority)
-      throws IOException {
+  public void send(JSONObject jsonObject, String firebaseToken, String priority) {
 
     if (firebaseToken == null) {
       return;

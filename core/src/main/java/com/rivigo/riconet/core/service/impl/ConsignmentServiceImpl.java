@@ -140,10 +140,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   public void triggerAssetCnUnload(
       NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO) {
     List<String> conditions = notificationDTO.getConditions();
-    if (!conditions.contains(Condition.ASSET_CN.name())) {
-      return;
-    }
-    if (!consignmentBasicDTO.getLocationId().equals(consignmentBasicDTO.getToLocationId())) {
+    if (!conditions.contains(Condition.ASSET_CN.name())
+        && !consignmentBasicDTO.getLocationId().equals(consignmentBasicDTO.getToLocationId())) {
       return;
     }
     zoomBackendAPIClientService.unloadAssetCN(consignmentBasicDTO.getConsignmentId());
