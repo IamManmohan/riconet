@@ -62,14 +62,14 @@ public class PushNotificationServiceImpl implements PushNotificationService {
       return;
     }
     // TODO : see why autowired restemplate is giving bad request
-    // RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = new RestTemplate();
 
     jsonObject.put(PRIORITY, priority);
     jsonObject.put(TO, firebaseToken);
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
     HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), jsonObject, uri);
-    riconetRestTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
     log.info("Response is {}", jsonObject);
   }
 }
