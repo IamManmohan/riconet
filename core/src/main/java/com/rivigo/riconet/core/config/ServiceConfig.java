@@ -11,8 +11,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import com.rivigo.zoom.common.interceptor.XUserAgentInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -93,8 +91,7 @@ public class ServiceConfig {
     mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
     List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
     converters.add(mappingJackson2HttpMessageConverter);
-    restTemplate.setMessageConverters(
-        converters);
+    restTemplate.setMessageConverters(converters);
     restTemplate.setInterceptors(
         Collections.singletonList(
             (httpRequest, bytes, clientHttpRequestExecution) -> {
@@ -103,7 +100,6 @@ public class ServiceConfig {
               return clientHttpRequestExecution.execute(httpRequest, bytes);
             }));
     return restTemplate;
-
   }
 
   @Bean(name = {"myProperties"})

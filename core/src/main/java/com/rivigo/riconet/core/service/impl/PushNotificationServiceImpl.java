@@ -62,7 +62,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
       return;
     }
     // TODO : see why autowired restemplate is giving bad request
-    //RestTemplate restTemplate = new RestTemplate();
+    // RestTemplate restTemplate = new RestTemplate();
 
     jsonObject.put(PRIORITY, priority);
     jsonObject.put(TO, firebaseToken);
