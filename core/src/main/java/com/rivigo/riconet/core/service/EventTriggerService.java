@@ -124,7 +124,7 @@ public class EventTriggerService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
             getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
-        ticketingService.sendTicketingEventsEmail(notificationDTO);
+//        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:
@@ -132,7 +132,7 @@ public class EventTriggerService {
       case TICKET_CC_NEW_PERSON_ADDITION:
       case TICKET_SEVERITY_CHANGE:
       case TICKET_COMMENT_CREATION:
-        ticketingService.sendTicketingEventsEmail(notificationDTO);
+//        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
