@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.rivigo.zoom.common.interceptor.XUserAgentInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -87,9 +91,10 @@ public class ServiceConfig {
     MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
         new MappingJackson2HttpMessageConverter();
     mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
-
+    List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+    converters.add(mappingJackson2HttpMessageConverter);
     restTemplate.setMessageConverters(
-        Collections.singletonList(mappingJackson2HttpMessageConverter));
+        converters);
     restTemplate.setInterceptors(
         Collections.singletonList(
             (httpRequest, bytes, clientHttpRequestExecution) -> {
@@ -98,6 +103,7 @@ public class ServiceConfig {
               return clientHttpRequestExecution.execute(httpRequest, bytes);
             }));
     return restTemplate;
+
   }
 
   @Bean(name = {"myProperties"})
