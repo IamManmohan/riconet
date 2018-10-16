@@ -49,6 +49,5 @@ public class FinanceEventsConsumer extends ConsumerModel {
     }
     log.debug("Event Payload {}", eventPayload);
     financeEventService.processFinanceEvents(eventPayload);
-    return;
   }
 }

@@ -24,6 +24,10 @@ public class ClientVasDetailsServiceImpl implements ClientVasDetailsService {
         clientVasDetailRepository.findByClientIdAndClientVasTypeAndIsActive(
             clientId, ClientVasType.COD_DOD, Boolean.TRUE);
     return !CollectionUtils.isEmpty(clientVasDetails)
+            && clientVasDetails
+                .stream()
+                .max(Comparator.comparing(ClientVasDetail::getCreatedAt))
+                .isPresent()
         ? clientVasDetails.stream().max(Comparator.comparing(ClientVasDetail::getCreatedAt)).get()
         : null;
   }
