@@ -69,6 +69,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     metadata.put("STATUS", "LOADED");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
@@ -90,6 +91,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
@@ -123,6 +125,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
             .eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL)
@@ -142,6 +145,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
             .eventName(EventName.CN_DELIVERY_LOADED)

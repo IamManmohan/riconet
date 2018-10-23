@@ -19,4 +19,6 @@ public interface ZoomPropertyService {
   double getDouble(ZoomPropertyName propertyName, double defaultVal);
 
   List<String> getStringValues(ZoomPropertyName propertyName);
+
+  Long getLong(ZoomPropertyName propertyName, Long defaultVal);
 }

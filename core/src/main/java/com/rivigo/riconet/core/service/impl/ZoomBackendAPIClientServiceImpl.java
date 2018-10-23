@@ -112,6 +112,16 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
+  public void unloadAssetCN(Long cnId) {
+    String url = UrlConstant.ZOOM_BACKEND_ASSET_ONBOARDING.replace("{cnId}", cnId.toString());
+    try {
+      apiClientService.getEntity(null, HttpMethod.POST, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while triggering asset on-boarding with consignmentId: {}", cnId, e);
+    }
+  }
+
+  @Override
   public void recalculateCpdOfBf(Long consignmentId) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();

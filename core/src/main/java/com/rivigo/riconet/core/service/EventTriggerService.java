@@ -30,6 +30,8 @@ public class EventTriggerService {
 
   @Autowired private TicketingService ticketingService;
 
+  @Autowired private AppNotificationService appNotificationService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     String entityId;
@@ -68,6 +70,7 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
+        // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
         qcService.consumeUnloadingEvent(unloadingData);
         consignmentService.triggerBfCpdCalcualtion(unloadingData);
         break;
@@ -85,6 +88,18 @@ public class EventTriggerService {
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
+        break;
+      case UNLOADING_IN_LOADING:
+        appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
+        break;
+      case CN_TOTAL_BOXES_CHANGE:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
+      case CN_LOADING_PLAN_UNPLAN:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
+      case CN_UNLOADING_PLAN_UNPLAN:
+        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
       case CN_CNOTE_CHANGE:
         qcService.consumeCnoteChangeEvent(
@@ -137,6 +152,9 @@ public class EventTriggerService {
                 .orElse(null))
         .locationId(
             getLong(notificationDTO, ZoomCommunicationFieldNames.LOCATION_ID.name()).orElse(null))
+        .toLocationId(
+            getLong(notificationDTO, ZoomCommunicationFieldNames.TO_LOCATION_ID.name())
+                .orElse(null))
         .fromId(
             getLong(notificationDTO, ZoomCommunicationFieldNames.FROM_LOCATION_ID.name())
                 .orElse(null))
