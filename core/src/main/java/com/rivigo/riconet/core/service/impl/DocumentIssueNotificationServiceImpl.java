@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
@@ -210,7 +211,6 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
   }
 
   private void updateStakeHolders(DocumentIssueNotification notification) {
-    Set<String> bccList = emailService.getEmails(EmailDlName.DOCUMENT_ISSUE_NOTIFICATION);
 
     Set<String> defaultCcList = emailService.getEmails(EmailDlName.DOCUMENT_ISSUE_NOTIFICATION_CC);
 
@@ -221,7 +221,6 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
       notification.getEmailIdList().add(notification.getReportee().getEmail());
       notification.getCcList().addAll(getCcList(notification.getReporteeLocation().getId()));
     }
-    emailService.filterEmails(notification, bccList);
   }
 
   private void updateResponsiblePersonAndLocation(
@@ -338,7 +337,8 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     if (templateString != null && isEmailEnabled) {
       String body = designEmailTemplate(notification, templateString);
       String subject = designEmailTemplate(notification, subjectTemplate);
-      emailService.sendDocumentIssueEmail(
+      emailService.sendEmail(
+          EmailConstant.DOCUMENT_EMAIL_ID,
           notification.getEmailIdList(),
           notification.getCcList(),
           notification.getBccList(),

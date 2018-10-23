@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.test;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -13,6 +14,9 @@ import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
+import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
+import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
+import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,11 +31,18 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class EventTriggerServiceTest {
 
   @InjectMocks private EventTriggerService eventTriggerService;
+
+  @Mock private TicketingServiceImpl ticketingService;
+
+  private EmailSenderServiceImpl emailSenderService;
+
+  @Mock private RestTemplate restTemplate;
 
   @Mock private TicketingClientService ticketingClientService;
 
@@ -58,6 +69,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     metadata.put("STATUS", "LOADED");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
@@ -79,6 +91,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
@@ -112,6 +125,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
             .eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL)
@@ -131,6 +145,7 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     metadata.put("LOCATION_ID", "12");
+    metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
             .eventName(EventName.CN_DELIVERY_LOADED)
@@ -141,5 +156,63 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+  }
+
+  @Test
+  public void cnCnoteChangeTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    metadata.put("OLD_CNOTE", "9234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_CNOTE_CHANGE).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeCnoteChangeEvent("9234567890", "1234567890");
+  }
+
+  @Test
+  public void cnDepsCreationTest() {
+
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", "1234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.CN_DEPS_CREATION).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeDepsCreationEvent("1234567890", null);
+  }
+
+  @Test
+  public void cnQcBlockerTicketClosedTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.QC_TICKET_ACTION).entityId(5l).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any());
+  }
+
+  @Test
+  public void ticketingEventEmailTest() {
+
+    NotificationDTO notificationDTO;
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_ASSIGNEE_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_STATUS_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_ESCALATION_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.TICKET_CC_NEW_PERSON_ADDITION);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_SEVERITY_CHANGE);
+    eventTriggerService.processNotification(notificationDTO);
+
+    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_COMMENT_CREATION);
+    eventTriggerService.processNotification(notificationDTO);
   }
 }

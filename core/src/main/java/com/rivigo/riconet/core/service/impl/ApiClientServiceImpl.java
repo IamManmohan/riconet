@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.cms.constants.ServiceType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -43,6 +45,13 @@ public class ApiClientServiceImpl implements ApiClientService {
   @Value("${rivigo.sso.password}")
   private String ssoPassword;
 
+  @Value("${billing.base.url}")
+  private String billingBaseUrl;
+
+  @Autowired
+  @Qualifier("riconetRestTemplate")
+  private RestTemplate riconetRestTemplate;
+
   @Autowired private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
 
   @Override
@@ -59,25 +68,36 @@ public class ApiClientServiceImpl implements ApiClientService {
             responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(), mapType);
       } catch (IOException e) {
         log.error(
-            "Error while parsing ticketing response,  {} at epoch {} :",
+            "Error while parsing API response,  {} at epoch {} :",
             responseJson.get(ZoomTicketingConstant.RESPONSE_KEY).toString(),
             DateTime.now().getMillis(),
             e);
         throw new ZoomException(
-            "Error while parsing ticketing response: errorCode-"
+            "Error while parsing API response: errorCode-"
                 + DateTime.now().getMillis()
                 + " :"
                 + e.getMessage());
       }
     }
-    throw new ZoomException(responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString());
+    String errorMessage = responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString();
+    log.error(
+        "API Response Status : {}  Error Message : {} , response : {} ",
+        status,
+        errorMessage,
+        responseJson);
+    throw new ZoomException(errorMessage);
   }
 
-  private HttpHeaders getHeaders(String token) {
+  private HttpHeaders getHeaders(String token, String uri) {
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     headers.setContentType(MediaType.APPLICATION_JSON);
+    if (uri.contains(billingBaseUrl)) {
+      // The value of Business must be any zoom business type, irrespective of cn business type
+      // Identifying business is un-necessary overhead
+      headers.add("Business", ServiceType.ZOOM_CORPORATE.name());
+    }
     return headers;
   }
 
@@ -85,10 +105,10 @@ public class ApiClientServiceImpl implements ApiClientService {
       throws JsonProcessingException {
     if (dto != null) {
       String requestJson = objectMapper.writeValueAsString(dto);
-      log.info("Calling Ticketing API {} for  requestJson {}", uri, requestJson);
-      return new HttpEntity<Object>(requestJson, headers);
+      log.info("Calling API {} for  requestJson {}", uri, requestJson);
+      return new HttpEntity<>(dto, headers);
     } else {
-      log.info("Calling Ticketing API {}", uri);
+      log.info("Calling API {}", uri);
       return new HttpEntity<>(headers);
     }
   }
@@ -113,30 +133,35 @@ public class ApiClientServiceImpl implements ApiClientService {
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
       accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
-    HttpEntity<Object> entity = getHttpEntity(getHeaders(token), dto, uri);
-    RestTemplate restTemplate = new RestTemplate();
+    HttpEntity entity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
 
     try {
+      log.info(
+          "uri: {}, httpMethod: {}, entity: {}",
+          uri,
+          httpMethod,
+          objectMapper.writeValueAsString(entity));
       ResponseEntity<JsonNode> response =
-          restTemplate.exchange(uri, httpMethod, entity, JsonNode.class);
+          riconetRestTemplate.exchange(uri.toString(), httpMethod, entity, JsonNode.class);
+      log.info("response: {}", response);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
         log.info("Existing token expired. New token is being generated ");
         token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
         accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
-        HttpEntity<Object> retryEntity = getHttpEntity(getHeaders(token), dto, uri);
+        HttpEntity retryEntity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
         try {
           ResponseEntity<JsonNode> response =
-              restTemplate.exchange(uri, httpMethod, retryEntity, JsonNode.class);
+              riconetRestTemplate.exchange(uri.toString(), httpMethod, retryEntity, JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
-          log.error("Invalid response from ticketing  while calling {}", DateTime.now(), e2);
-          throw new ZoomException("Invalid response from ticketing " + e2.getMessage());
+          log.error("Invalid response from API  while calling {}", DateTime.now(), e2);
+          throw new ZoomException("Invalid response from API " + e2.getMessage());
         }
       }
-      log.error("Invalid response from ticketing  while calling {}", DateTime.now(), e);
-      throw new ZoomException("Invalid response from ticketing " + e.getMessage());
+      log.error("Invalid response from API  while calling {}", DateTime.now(), e);
+      throw new ZoomException("Invalid response from API " + e.getMessage());
     }
   }
 }

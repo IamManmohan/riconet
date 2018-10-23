@@ -1,12 +1,14 @@
 package com.rivigo.riconet.core.dto.zoomticketing;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rivigo.riconet.core.enums.SeverityLevel;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.EscalationLevel;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketPriority;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,4 +57,6 @@ public class TicketDTO {
   private String slaName;
   private Long createdAt;
   private Long escalateAt;
+  private SeverityLevel severity;
+  private List<TicketActionDTO> ticketActionDTOList;
 }

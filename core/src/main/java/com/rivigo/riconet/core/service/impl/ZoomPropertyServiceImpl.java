@@ -1,10 +1,14 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
@@ -110,6 +114,39 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
       return Double.valueOf(property.getVariableValue());
     } catch (Exception ex) {
       log.error("Exception while getting double value for " + propertyName.name(), ex);
+    }
+
+    return defaultVal;
+  }
+
+  @Override
+  public List<String> getStringValues(ZoomPropertyName propertyName) {
+    if (propertyName == null) return Collections.emptyList();
+    ZoomProperty property = getByPropertyName(propertyName.name());
+    if (property == null || property.getVariableValue() == null) return Collections.emptyList();
+    if (!property.getVariableValue().isEmpty()) {
+      try {
+        return Stream.of(
+                property
+                    .getVariableValue()
+                    .split(ZoomTicketingConstant.ZOOM_PROPERTIES_PRIORITY_SEPORATOR))
+            .collect(Collectors.toList());
+      } catch (Exception ex) {
+        log.error("Exception while getting list(long) for " + propertyName.name(), ex);
+      }
+    }
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Long getLong(ZoomPropertyName propertyName, Long defaultVal) {
+    ZoomProperty property = getByPropertyName(propertyName.name());
+    if (property == null) return defaultVal;
+
+    try {
+      return Long.valueOf(property.getVariableValue());
+    } catch (Exception ex) {
+      log.error("Exception while getting long value for " + propertyName.name(), ex);
     }
 
     return defaultVal;

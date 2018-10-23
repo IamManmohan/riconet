@@ -195,7 +195,6 @@ public class PickupServiceImpl implements PickupService {
     pickupNotification.setUserId(pickup.getUserId());
     pickupNotification.setPickupDate(pickup.getPickupDate().getMillis());
     pickupNotification.setPickupTimeSlot(pickup.getPickupTimeSlot());
-    pickupNotification.setClientCode(pickup.getClientCode());
     pickupNotification.setNotificationType(type);
     pickupNotification.setLocationId(pickup.getLocationId());
     pickupNotification.setPincode(pickup.getPincode());
@@ -207,7 +206,7 @@ public class PickupServiceImpl implements PickupService {
         PickupStatus.REACHED_AT_CLIENT_WAREHOUSE.equals(pickup.getPickupStatus())
             ? pickup.getLastUpdatedAt().getMillis()
             : null);
-    Client client = clientMasterService.getClientByCode(pickup.getClientCode());
+    Client client = clientMasterService.getClientById(pickup.getClientId());
     if (client == null) {
       throw new ZoomException("No client with this Id exists");
     }
@@ -215,6 +214,7 @@ public class PickupServiceImpl implements PickupService {
     pickupNotification.setLocationName(loc.getName());
     pickupNotification.setLocationCode(loc.getCode());
     pickupNotification.setClientName(client.getName());
+    pickupNotification.setClientCode(client.getClientCode());
     fillRecipients(pickupNotification);
     return pickupNotification;
   }
@@ -348,7 +348,8 @@ public class PickupServiceImpl implements PickupService {
       return;
     }
     String smsString = designSms(pickupNotification, smsTemplate);
-    log.info(smsTemplate);
+    log.info("smsTemplate: {}", smsTemplate);
+    log.info("smsString: {}", smsString);
     pickupNotification.setSmsString(smsString);
     pickupNotification
         .getRecipients()
@@ -358,6 +359,11 @@ public class PickupServiceImpl implements PickupService {
   }
 
   private String designSms(PickupNotification pickupNotification, String template) {
+    try {
+      log.info("pickupNotification: {}", objectMapper.writeValueAsString(pickupNotification));
+    } catch (JsonProcessingException e) {
+      log.warn(e.getMessage());
+    }
     Map<String, String> valuesMap = new HashMap<>();
     DateTimeFormatter formatter1 =
         DateTimeFormat.forPattern("dd-MM-yyyy ").withZone(DateTimeZone.forID("Asia/Kolkata"));
@@ -423,12 +429,12 @@ public class PickupServiceImpl implements PickupService {
               notificationDTO.getEntityId());
           return;
         }
-        Client client = clientMasterService.getClientByCode(pickup.getClientCode());
+        Client client = clientMasterService.getClientById(pickup.getClientId());
         if (client == null) {
           log.debug(
               "PICKUP_COMPLETION event is ignored as for pickupId {}, clientCode {} as client doesn't exist",
               notificationDTO.getEntityId(),
-              pickup.getClientCode());
+              pickup.getClientId());
           return;
         }
         deductPickupCharges(pickup, client.getOrganizationId());

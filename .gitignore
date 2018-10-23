@@ -180,3 +180,6 @@ Temporary Items
 /org/
 run
 .scannerwork/
+riconet.iml
+gradle/
+gradlew

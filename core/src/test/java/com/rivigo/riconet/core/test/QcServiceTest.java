@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -9,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
@@ -20,25 +23,37 @@ import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ConsignmentCodDodService;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
+import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
+import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.enums.ruleengine.RuleType;
+import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.ruleengine.RuleEngineRule;
 import com.rivigo.zoom.common.repository.mysql.ruleengine.RuleEngineRuleRepository;
+import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +77,8 @@ public class QcServiceTest {
 
   @InjectMocks private QcServiceImpl qcService;
 
-  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+  private ZoomTicketingAPIClientServiceImpl zoomTicketingAPIClientService =
+      Mockito.mock(ZoomTicketingAPIClientServiceImpl.class);
 
   @Spy private ObjectMapper objectMapper;
 
@@ -82,13 +98,32 @@ public class QcServiceTest {
 
   @Mock private SmsService smsService;
 
+  @Mock private ZoomBillingAPIClientService zoomBillingAPIClientService;
+
+  @Mock private UserMasterService userMasterService;
+
+  @Mock private EmailService emailService;
+
+  @Mock private AdministrativeEntityService administrativeEntityService;
+
+  @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
+
+  @Mock private ConsignmentScheduleService consignmentScheduleService;
+
   @Rule public ExpectedException expectedException = ExpectedException.none();
+
+  private TicketingServiceImpl ticketingService =
+      new TicketingServiceImpl(null, null, null, zoomTicketingAPIClientService);
 
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcRuleEngine, "ruleEngineRuleRepository", ruleEngineRuleRepository);
+    Mockito.when(zoomBillingAPIClientService.getChargedWeightForConsignment(anyString()))
+        .thenReturn(10.0);
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        qcService, "ticketingService", ticketingService);
   }
 
   @Test
@@ -149,17 +184,27 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
+    List<ConsignmentSchedule> consignmentSchedules = new ArrayList<>();
+    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
+    consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
+    consignmentSchedule.setSequence(2);
+    consignmentSchedule.setLocationId(1L);
+    consignmentSchedules.add(consignmentSchedule);
+
+    when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
+        .thenReturn(consignmentSchedules);
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2, ticket3, ticket4, ticket5));
     Location location = new Location();
+    location.setId(2L);
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
     qcService.consumeLoadingEvent(data);
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket2);
-    Assert.assertEquals(TicketStatus.CLOSED, ticket2.getStatus());
-    verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket3);
-    Assert.assertEquals(TicketStatus.CLOSED, ticket3.getStatus());
+    Assert.assertEquals(TicketStatus.IN_PROGRESS, ticket2.getStatus());
+    verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket3);
+    Assert.assertEquals(TicketStatus.NEW, ticket3.getStatus());
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket4);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket5);
     Assert.assertEquals(TicketStatus.IN_PROGRESS, ticket5.getStatus());
@@ -190,9 +235,20 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
+
+    List<ConsignmentSchedule> consignmentSchedules = new ArrayList<>();
+    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
+    consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
+    consignmentSchedule.setSequence(2);
+    consignmentSchedule.setLocationId(1L);
+    consignmentSchedules.add(consignmentSchedule);
+
+    when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
+        .thenReturn(consignmentSchedules);
     when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2));
     Location location = new Location();
+    location.setId(2L);
     location.setOrganizationId(1000l);
     when(locationService.getLocationById(any())).thenReturn(location);
     qcService.consumeLoadingEvent(data);
@@ -224,6 +280,10 @@ public class QcServiceTest {
     data.setCnote("1234567890");
     data.setLocationId(15l);
     eventDTO.setMetadata(objectMapper.convertValue(data, Map.class));
+
+    AdministrativeEntity aem = new AdministrativeEntity();
+    aem.setCode("DEL");
+
     // closed ticket is not edited
     TicketDTO ticket1 =
         TicketDTO.builder()
@@ -257,6 +317,8 @@ public class QcServiceTest {
     when(zoomTicketingAPIClientService.getGroupId(
             data.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU))
         .thenReturn(GroupDTO.builder().id(39l).build());
+    when(administrativeEntityService.findParentCluster(any())).thenReturn(aem);
+
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(0)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(ticket2);
@@ -277,6 +339,10 @@ public class QcServiceTest {
     data.setCnote("1234567890");
     data.setLocationId(15l);
     eventDTO.setMetadata(objectMapper.convertValue(data, Map.class));
+
+    AdministrativeEntity aem = new AdministrativeEntity();
+    aem.setCode("DEL");
+
     // measurment task will be closed
     TicketDTO ticket1 =
         TicketDTO.builder()
@@ -296,6 +362,8 @@ public class QcServiceTest {
     Location location = new Location();
     location.setOrganizationId(1l);
     when(locationService.getLocationById(any())).thenReturn(location);
+    when(administrativeEntityService.findParentCluster(any())).thenReturn(aem);
+
     qcService.consumeUnloadingEvent(data);
     verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket1);
     verify(zoomTicketingAPIClientService, times(2)).editTicket(ticket2);
@@ -428,6 +496,95 @@ public class QcServiceTest {
     assertEquals(result, true);
   }
 
+  @Test
+  public void isMeasurementQcRequiredTest() {
+    ConsignmentCompletionEventDTO completionEventDTO = new ConsignmentCompletionEventDTO();
+    Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
+
+    completionEventDTO.setClientClusterMetadataDTO(new ClientClusterMetadataDTO());
+    completionEventDTO.getClientClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.FALSE);
+    Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
+
+    completionEventDTO.getClientClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.TRUE);
+    Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
+
+    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(0.0);
+    Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
+
+    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(100.0);
+    Assert.assertTrue(qcService.isMeasurementQcRequired(completionEventDTO));
+  }
+
+  @Test
+  public void consumeCnoteChangeEventTest() {
+    TicketDTO ticketDTO = new TicketDTO();
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq("1234567890"), any()))
+        .thenReturn(Collections.singletonList(ticketDTO));
+    qcService.consumeCnoteChangeEvent("1234567890", "9234567890");
+    verify(zoomTicketingAPIClientService, times(1)).editTicket(any());
+    Assert.assertEquals(ticketDTO.getEntityId(), "9234567890");
+  }
+
+  @Test
+  public void qcActionNonBlockerTest() {
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+        .thenReturn(
+            TicketDTO.builder()
+                .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID + 1)
+                .status(TicketStatus.CLOSED)
+                .build());
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
+    verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(5l);
+  }
+
+  @Test
+  public void qcBlockerActionTest() {
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+        .thenReturn(
+            TicketDTO.builder()
+                .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
+                .status(TicketStatus.CLOSED)
+                .build());
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
+    verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
+  }
+
+  @Test
+  public void consumeDepsCreationEventChildCnoteTest() {
+    TicketDTO ticketDTO1 = TicketDTO.builder().status(TicketStatus.IN_PROGRESS).build();
+    TicketDTO ticketDTO2 = TicketDTO.builder().status(TicketStatus.CLOSED).build();
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            "1234567890", qcService.getQcTicketTypes()))
+        .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
+    Consignment consignment = new Consignment();
+    consignment.setCnote("1234567890");
+    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(consignment);
+    qcService.consumeDepsCreationEvent("1234567890-1", null);
+    verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
+    Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
+  }
+
+  @Test
+  public void consumeDepsCreationEventTest() {
+    TicketDTO ticketDTO1 = TicketDTO.builder().status(TicketStatus.IN_PROGRESS).build();
+    TicketDTO ticketDTO2 = TicketDTO.builder().status(TicketStatus.CLOSED).build();
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            "1234567890", qcService.getQcTicketTypes()))
+        .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
+    Consignment consignment = new Consignment();
+    consignment.setCnote("1234567890");
+    when(consignmentService.getConsignmentByCnote("1234567890")).thenReturn(consignment);
+    qcService.consumeDepsCreationEvent("1234567890-1", null);
+    verify(zoomTicketingAPIClientService, times(1)).editTicket(ticketDTO1);
+    Assert.assertEquals(ticketDTO1.getStatus(), TicketStatus.CLOSED);
+  }
+
+  @Test
+  public void consumeQcBlockerTicketClosedEventNullTest() {
+    qcService.consumeQcBlockerTicketClosedEvent(null, 10l);
+    verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(any());
+  }
+
   private void mockingParamsForCheckFunction() {
     Mockito.when(ruleEngineRuleRepository.findByRuleTypeAndIsActive(RuleType.BASIC_RULE, true))
         .thenReturn(getBasicRuleList());
@@ -442,6 +599,28 @@ public class QcServiceTest {
             zoomPropertyService.getString(
                 ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name()))
         .thenReturn(CnoteType.NORMAL.name());
+  }
+
+  @Test
+  public void consumeQcBlockerTicketCreationEventTest() {
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            "1234567890",
+            Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
+        .thenReturn(Collections.singletonList(new TicketDTO()));
+    Client client = new Client();
+    client.setClientNotificationList(Collections.singleton("dummy@rivigo.com"));
+
+    Consignment consignment = new Consignment();
+    consignment.setId(100l);
+    consignment.setClient(client);
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
+    when(locationService.getLocationById(any())).thenReturn(new Location());
+    when(userMasterService.getById(any())).thenReturn(new User());
+    qcService.consumeQcBlockerTicketCreationEvent(
+        5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
+    verify(emailService, times(1))
+        .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
   }
 
   private List<RuleEngineRule> getBasicRuleList() {
@@ -539,7 +718,6 @@ public class QcServiceTest {
   private Consignment getConsignmentDTO() {
     Consignment consignment = new Consignment();
     consignment.setWeight(10.0);
-    consignment.setChargedWeight(10.0);
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
 

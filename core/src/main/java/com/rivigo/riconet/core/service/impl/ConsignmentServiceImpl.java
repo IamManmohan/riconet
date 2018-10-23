@@ -2,10 +2,13 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
+import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.LocationTag;
@@ -20,6 +23,7 @@ import com.rivigo.zoom.common.repository.mysql.ConsignmentRepository;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,6 +45,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  @Autowired private ZoomPropertyService zoomPropertyService;
+
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
       List<Long> cnIds, List<String> statusList) {
@@ -55,7 +61,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   public ConsignmentHistory getLastScanByCnId(Long cnId, List<String> statusList) {
     List<ConsignmentHistory> historyList =
         historyRepo.findTop1ByConsignmentIdInAndStatusInGroupByConsignmentId(
-            Arrays.asList(cnId), statusList);
+            Collections.singletonList(cnId), statusList);
     return historyList.isEmpty() ? null : historyList.get(0);
   }
 
@@ -67,8 +73,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public List<Consignment> findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
       List<Long> consignmentIdList, List<ConsignmentStatus> statusList) {
-    return consignmentRepo.findByIdInAndStatusNotInAndDeliveryHandoverIsNull(
-        consignmentIdList, statusList);
+    return consignmentRepo.findByIdInAndStatusNotIn(consignmentIdList, statusList);
   }
 
   @Override
@@ -124,5 +129,30 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public Boolean isPrimaryConsignment(String cNote) {
     return (cNote != null) && !cNote.contains(ConsignmentConstant.SECONDARY_CNOTE_SEPARATOR);
+  }
+
+  @Override
+  public Consignment getConsignmentByCnote(String cnote) {
+    return consignmentRepo.findByCnote(cnote);
+  }
+
+  @Override
+  public void triggerAssetCnUnload(
+      NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO) {
+    List<String> conditions = notificationDTO.getConditions();
+    if (!conditions.contains(Condition.ASSET_CN.name())
+        && !consignmentBasicDTO.getLocationId().equals(consignmentBasicDTO.getToLocationId())) {
+      return;
+    }
+    zoomBackendAPIClientService.unloadAssetCN(consignmentBasicDTO.getConsignmentId());
+  }
+
+  @Override
+  public Long getOrganizationIdFromCnId(Long cnId) {
+    BigInteger orgId = consignmentRepo.getOrganizationId(cnId);
+    if (orgId != null) {
+      return orgId.longValue();
+    }
+    return null;
   }
 }

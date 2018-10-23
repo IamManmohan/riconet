@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
+import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
@@ -26,7 +27,14 @@ public interface ConsignmentService {
 
   Consignment getConsignmentById(Long consignmentId);
 
+  Consignment getConsignmentByCnote(String cnote);
+
   void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO);
 
   Boolean isPrimaryConsignment(String cNote);
+
+  void triggerAssetCnUnload(
+      NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO);
+
+  Long getOrganizationIdFromCnId(Long cnId);
 }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.utils;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -18,4 +19,12 @@ public class TimeUtilsZoom {
   public static final DateTimeZone IST = DateTimeZone.forID("Asia/Kolkata");
   public static final DateTimeFormatter IST_DATE_TIME_FORMATTER =
       DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST);
+
+  public static String getTime(DateTime dateTime) {
+    return DateTimeFormat.forPattern("HH:mm:ss").withZone(IST).print(dateTime);
+  }
+
+  public static String getDate(DateTime dateTime) {
+    return DateTimeFormat.forPattern("dd-MM-yyyy").withZone(IST).print(dateTime);
+  }
 }

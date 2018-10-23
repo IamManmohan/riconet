@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.OrganizationType;
 import com.rivigo.zoom.common.model.Organization;
@@ -13,4 +14,6 @@ public interface OrganizationService {
 
   List<Organization> getByOrganizationTypeAndOperationalStatus(
       OrganizationType rivigo, OperationalStatus status);
+
+  void createUpdateOrganization(ClientCreateUpdateDTO dto);
 }

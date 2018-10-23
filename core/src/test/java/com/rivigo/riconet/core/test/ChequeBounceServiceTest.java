@@ -67,7 +67,7 @@ public class ChequeBounceServiceTest {
     Assert.assertEquals((Object) resultDTO.getId(), 1L);
     ticketDTO.setId(2L);
     NotificationDTO notificationDTO = getNotificationDTO();
-    notificationDTO.getMetadata().put("PAYMENT_MODE", "COD");
+    notificationDTO.getMetadata().put("PAYMENT_MODE", "TO_PAY");
     resultDTO = chequeBounceService.consumeChequeBounceEvent(notificationDTO);
     Assert.assertEquals((Object) resultDTO.getId(), 2L);
   }
@@ -121,7 +121,7 @@ public class ChequeBounceServiceTest {
     metadata.put("AMOUNT", "1060.0");
     metadata.put("ORIGIN_FIELD_USER_PHONE", "9818276992");
     metadata.put("CNOTE_TYPE", "RETAIL");
-    metadata.put("PAYMENT_MODE", "PREPAID");
+    metadata.put("PAYMENT_MODE", "PAID");
     metadata.put("TOTAL_AMOUNT", "1060");
     metadata.put("PAYMENT_TYPE", "Cheque");
     metadata.put("CREATED_BY", "dummyuser@rivigo.com");

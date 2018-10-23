@@ -50,7 +50,7 @@ public class EventTest {
             + "\"INSTRUMENT_DATE\":\"1525910400000\",\"CONSIGNEE_ADDRESS\":\"OKHLA BATIA \n"
             + "HOUSE DELHI\",\"DEPOSIT_DATE\":\"1525910400000\",\"ORIGIN_FIELD_USER_EMAIL\":null,"
             + "\"DESTINATION_FIELD_USER_NAME\":\"SOHAL BHAI\",\"CLEARANCE_DATE_STRING\":\"\n"
-            + "10/05/2018\",\"CNOTE_TYPE\":\"RETAIL\",\"PAYMENT_MODE\":\"PREPAID\","
+            + "10/05/2018\",\"CNOTE_TYPE\":\"RETAIL\",\"PAYMENT_MODE\":\"PAID\","
             + "\"TOTAL_AMOUNT\":\"1646\",\"PAYMENT_TYPE\":\"Cheque\","
             + "\"CLIENT_CONSIGNMENT_TYPE\":\"RETAIL\"},\"s\n"
             + "ubscribers\":null,\"conditions\":[\"COLLECTION_CHEQUE_BOUNCE_PAID_CN\","
