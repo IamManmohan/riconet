@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,6 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -84,19 +87,6 @@ public class ServiceConfig {
   @Qualifier("riconetRestTemplate")
   RestTemplate riconetRestTemplate() {
     RestTemplate restTemplate = new RestTemplate();
-    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
-        new MappingJackson2HttpMessageConverter();
-    mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
-
-    restTemplate.setMessageConverters(
-        Collections.singletonList(mappingJackson2HttpMessageConverter));
-    restTemplate.setInterceptors(
-        Collections.singletonList(
-            (httpRequest, bytes, clientHttpRequestExecution) -> {
-              log.error("httpRequest: {}", objectMapper().writeValueAsString(httpRequest));
-              log.error("bytes: {}", IOUtils.toString(bytes, StandardCharsets.UTF_8.name()));
-              return clientHttpRequestExecution.execute(httpRequest, bytes);
-            }));
     return restTemplate;
   }
 
