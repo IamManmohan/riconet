@@ -87,13 +87,6 @@ public class ServiceConfig {
   @Qualifier("riconetRestTemplate")
   RestTemplate riconetRestTemplate() {
     RestTemplate restTemplate = new RestTemplate();
-    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
-        new MappingJackson2HttpMessageConverter();
-    mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper());
-
-    List<HttpMessageConverter<?>> messageConverters = new ArrayList<>(restTemplate.getMessageConverters());
-    messageConverters.add(mappingJackson2HttpMessageConverter);
-    restTemplate.setMessageConverters(messageConverters);
     restTemplate.setInterceptors(
         Collections.singletonList(
             (httpRequest, bytes, clientHttpRequestExecution) -> {
