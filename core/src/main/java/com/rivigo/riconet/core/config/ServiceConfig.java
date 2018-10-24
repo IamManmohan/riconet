@@ -87,13 +87,6 @@ public class ServiceConfig {
   @Qualifier("riconetRestTemplate")
   RestTemplate riconetRestTemplate() {
     RestTemplate restTemplate = new RestTemplate();
-    restTemplate.setInterceptors(
-        Collections.singletonList(
-            (httpRequest, bytes, clientHttpRequestExecution) -> {
-              log.error("httpRequest: {}", objectMapper().writeValueAsString(httpRequest));
-              log.error("bytes: {}", IOUtils.toString(bytes, StandardCharsets.UTF_8.name()));
-              return clientHttpRequestExecution.execute(httpRequest, bytes);
-            }));
     return restTemplate;
   }
 
