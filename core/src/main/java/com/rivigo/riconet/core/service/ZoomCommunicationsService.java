@@ -66,7 +66,7 @@ public class ZoomCommunicationsService {
         zoomCommunicationsSMSDTO.getMessage(),
         zoomCommunicationsSMSDTO.getPhoneNumber());
 
-    log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
+    log.debug("DND start time {} and end time {}, isDndExempted: {}", dndStartTime, dndEndTime, isDndExempted);
     int millisOfDay =
         DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
     if (!isDndExempted && (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
