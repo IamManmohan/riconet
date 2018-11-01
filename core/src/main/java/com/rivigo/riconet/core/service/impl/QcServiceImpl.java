@@ -460,7 +460,7 @@ public class QcServiceImpl implements QcService {
 
   private Map<String, Object> getVariablesMapToApplyQCRules(
       ConsignmentCompletionEventDTO completionData, Consignment consignment) {
-
+    log.info("hello");
     Map<String, Object> bindings = new HashMap<>();
 
     Double minimumNumberOfCnRequired =
