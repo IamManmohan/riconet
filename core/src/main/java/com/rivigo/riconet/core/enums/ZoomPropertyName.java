@@ -211,6 +211,7 @@ public enum ZoomPropertyName {
   MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC,
   MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC,
   MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC,
+  WEIGHT_TOTAL_BOXES_DIFF_QC,
 
   /** Assets Regexes * */
   // TODO: seperate prop for each asset
