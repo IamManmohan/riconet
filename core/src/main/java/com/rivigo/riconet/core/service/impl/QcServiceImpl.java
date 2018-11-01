@@ -520,10 +520,10 @@ public class QcServiceImpl implements QcService {
       log.info("Volume param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
-    if (consignment.getVolume() != null && consignment.getActualWeight() != null) {
+    if (consignment.getVolume() != null && consignment.getWeight() != null) {
       bindings.put(
           RuleEngineVariableNameConstant.VOLUME_TO_WEIGHT_RATIO,
-          (consignment.getVolume() / consignment.getActualWeight()));
+          (consignment.getVolume() / consignment.getWeight()));
     } else {
       log.info("Volume or weight param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
