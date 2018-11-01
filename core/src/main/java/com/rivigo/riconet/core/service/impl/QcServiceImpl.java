@@ -479,7 +479,7 @@ public class QcServiceImpl implements QcService {
         zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
     bindings.put(
         ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
-        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.0001));
+        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.1));
     bindings.put(
         ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
         zoomPropertyService.getDouble(
