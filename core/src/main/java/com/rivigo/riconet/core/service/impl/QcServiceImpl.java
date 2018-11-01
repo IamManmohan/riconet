@@ -494,8 +494,8 @@ public class QcServiceImpl implements QcService {
             ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC, 2.0));
     bindings.put(
         ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
-        zoomPropertyService.getInteger(
-            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 2));
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 2.0));
     if (completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getCount() != null) {
       bindings.put(
@@ -506,7 +506,7 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
     if (consignment.getTotalBoxes() != null) {
-      bindings.put(RuleEngineVariableNameConstant.TOTAL_BOXES, consignment.getTotalBoxes());
+      bindings.put(RuleEngineVariableNameConstant.TOTAL_BOXES, (double)consignment.getTotalBoxes());
     } else {
       log.info("Total boxes param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
