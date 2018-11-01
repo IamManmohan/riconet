@@ -512,10 +512,11 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
     if (consignment.getTotalBoxes() != null && consignment.getWeight() != null) {
+
+      double x=Math.abs(consignment.getWeight() - consignment.getTotalBoxes());
       bindings.put(
           RuleEngineVariableNameConstant.WEIGHT_TOTAL_BOXES_DIFF,
-          Math.abs(consignment.getWeight() - consignment.getTotalBoxes()));
-      double x=Math.abs(consignment.getWeight() - consignment.getTotalBoxes());
+         x);
       log.info("bro the diff is {}",x);
     } else {
       log.info("Total boxes param is null...returning bindings as emptyMap");
