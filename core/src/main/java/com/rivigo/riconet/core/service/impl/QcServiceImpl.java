@@ -469,10 +469,30 @@ public class QcServiceImpl implements QcService {
     String requiredClientType =
         zoomPropertyService.getString(
             ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
+
     bindings.put(
         RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
     bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
     bindings.put(RuleEngineVariableNameConstant.CLIENT_TYPE, consignment.getCnoteType().name());
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC, 4.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC, 15.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC, 2.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
+        zoomPropertyService.getInteger(
+            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 2));
     if (completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getCount() != null) {
       bindings.put(
@@ -482,7 +502,32 @@ public class QcServiceImpl implements QcService {
       log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
-
+    if (consignment.getTotalBoxes() != null) {
+      bindings.put(RuleEngineVariableNameConstant.TOTAL_BOXES, consignment.getTotalBoxes());
+    } else {
+      log.info("Total boxes param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    if (consignment.getTotalBoxes() != null) {
+      bindings.put(RuleEngineVariableNameConstant.TOTAL_BOXES, consignment.getTotalBoxes());
+    } else {
+      log.info("Total boxes param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    if (consignment.getVolume() != null) {
+      bindings.put(RuleEngineVariableNameConstant.VOLUME, consignment.getVolume());
+    } else {
+      log.info("Volume param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    if (consignment.getVolume() != null && consignment.getActualWeight() != null) {
+      bindings.put(
+          RuleEngineVariableNameConstant.VOLUME_TO_WEIGHT_RATIO,
+          (consignment.getVolume() / consignment.getActualWeight()));
+    } else {
+      log.info("Volume or weight param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
     if (consignment.getWeight() != null
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinWeight() != null
