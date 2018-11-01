@@ -502,7 +502,7 @@ public class QcServiceImpl implements QcService {
           RuleEngineVariableNameConstant.NUMBER_OF_CN,
           completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
     } else {
-      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
+      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap {} and yeh bhi le {}",completionData.getClientPincodeMetadataDTO(),completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
       return Collections.emptyMap();
     }
     if (consignment.getTotalBoxes() != null) {
