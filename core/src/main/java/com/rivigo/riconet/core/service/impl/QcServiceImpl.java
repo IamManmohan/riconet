@@ -460,7 +460,6 @@ public class QcServiceImpl implements QcService {
 
   private Map<String, Object> getVariablesMapToApplyQCRules(
       ConsignmentCompletionEventDTO completionData, Consignment consignment) {
-    log.info("hello");
     Map<String, Object> bindings = new HashMap<>();
 
     Double minimumNumberOfCnRequired =
@@ -479,7 +478,7 @@ public class QcServiceImpl implements QcService {
         zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
     bindings.put(
         ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
-        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.1));
+        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.001));
     bindings.put(
         ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
         zoomPropertyService.getDouble(
@@ -502,22 +501,20 @@ public class QcServiceImpl implements QcService {
           RuleEngineVariableNameConstant.NUMBER_OF_CN,
           completionData.getClientPincodeMetadataDTO().getCount().doubleValue());
     } else {
-      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap and yeh bhi le {}",completionData.getClientPincodeMetadataDTO());
+      log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
     if (consignment.getTotalBoxes() != null) {
-      bindings.put(RuleEngineVariableNameConstant.TOTAL_BOXES, (double)consignment.getTotalBoxes());
+      bindings.put(
+          RuleEngineVariableNameConstant.TOTAL_BOXES, (double) consignment.getTotalBoxes());
     } else {
       log.info("Total boxes param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
     if (consignment.getTotalBoxes() != null && consignment.getWeight() != null) {
-
-      double x=Math.abs(consignment.getWeight() - consignment.getTotalBoxes());
       bindings.put(
           RuleEngineVariableNameConstant.WEIGHT_TOTAL_BOXES_DIFF,
-         x);
-      log.info("bro the diff is {}",x);
+          Math.abs(consignment.getWeight() - consignment.getTotalBoxes()));
     } else {
       log.info("Total boxes param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
