@@ -4,6 +4,7 @@ package com.rivigo.riconet.ruleengine.operators;
 
 import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
+import java.util.List;
 import java.util.Map;
 
 public class Equals extends Operation {
@@ -22,6 +23,26 @@ public class Equals extends Operation {
     BaseType<?> rightBT = this.rightOperand.interpret(bindings);
 
     BaseType<?> leftBT = this.leftOperand.interpret(bindings);
+
+    if (leftBT.getType() == List.class) {
+      if (((List) leftBT.getValue()).get(0) instanceof Integer) {
+        return new BaseType<>(
+            ((List<Integer>) leftBT.getValue())
+                .stream()
+                .anyMatch(v -> new BaseType<>(v, Integer.class).isEquals(rightBT)),
+            Boolean.class);
+      }
+    }
+
+    if (leftBT.getType() == List.class) {
+      if (((List) leftBT.getValue()).get(0) instanceof Double) {
+        return new BaseType<>(
+            ((List<Double>) leftBT.getValue())
+                .stream()
+                .anyMatch(v -> new BaseType<>(v, Double.class).isEquals(rightBT)),
+            Boolean.class);
+      }
+    }
 
     Boolean result = leftBT.isEquals(rightBT);
 

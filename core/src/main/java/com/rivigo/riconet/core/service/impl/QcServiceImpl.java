@@ -480,6 +480,9 @@ public class QcServiceImpl implements QcService {
         ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
         zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.001));
     bindings.put(
+        ZoomPropertyName.QC_DIMENSION_VALUE.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.QC_DIMENSION_VALUE, 1.0));
+    bindings.put(
         ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
         zoomPropertyService.getDouble(
             ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC, 4.0));
@@ -590,6 +593,16 @@ public class QcServiceImpl implements QcService {
     } else {
       log.info("one of the INVOICE_VALUE param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
+    }
+
+    if (consignment.getVolumeDetails() != null) {
+      List<Double> length =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getLength())
+              .collect(Collectors.toList());
+      bindings.put("length", length);
     }
 
     return bindings;
