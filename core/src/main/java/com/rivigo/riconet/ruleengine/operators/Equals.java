@@ -32,9 +32,6 @@ public class Equals extends Operation {
                 .anyMatch(v -> new BaseType<>(v, Integer.class).isEquals(rightBT)),
             Boolean.class);
       }
-    }
-
-    if (leftBT.getType() == List.class) {
       if (((List) leftBT.getValue()).get(0) instanceof Double) {
         return new BaseType<>(
             ((List<Double>) leftBT.getValue())
@@ -42,7 +39,22 @@ public class Equals extends Operation {
                 .anyMatch(v -> new BaseType<>(v, Double.class).isEquals(rightBT)),
             Boolean.class);
       }
+      if (((List) leftBT.getValue()).get(0) instanceof Boolean) {
+        return new BaseType<>(
+            ((List<Boolean>) leftBT.getValue())
+                .stream()
+                .anyMatch(v -> new BaseType<>(v, Boolean.class).isEquals(rightBT)),
+            Boolean.class);
+      }
+      if (((List) leftBT.getValue()).get(0) instanceof String) {
+        return new BaseType<>(
+            ((List<String>) leftBT.getValue())
+                .stream()
+                .anyMatch(v -> new BaseType<>(v, String.class).isEquals(rightBT)),
+            Boolean.class);
+      }
     }
+
 
     Boolean result = leftBT.isEquals(rightBT);
 

@@ -497,7 +497,7 @@ public class QcServiceImpl implements QcService {
     bindings.put(
         ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
         zoomPropertyService.getDouble(
-            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 2.0));
+            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 5.0));
     if (completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getCount() != null) {
       bindings.put(
@@ -603,6 +603,24 @@ public class QcServiceImpl implements QcService {
               .map(volumeDetails -> volumeDetails.getLength())
               .collect(Collectors.toList());
       bindings.put("length", length);
+      List<Double> breadth =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getLength())
+              .collect(Collectors.toList());
+      bindings.put("breadth", breadth);
+      List<Double> height =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getLength())
+              .collect(Collectors.toList());
+      bindings.put("height", height);
+    }
+    else {
+      log.info("Volume details param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
     }
 
     return bindings;
