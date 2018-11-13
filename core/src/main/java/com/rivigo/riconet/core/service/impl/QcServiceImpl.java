@@ -461,43 +461,8 @@ public class QcServiceImpl implements QcService {
   private Map<String, Object> getVariablesMapToApplyQCRules(
       ConsignmentCompletionEventDTO completionData, Consignment consignment) {
     Map<String, Object> bindings = new HashMap<>();
-
-    Double minimumNumberOfCnRequired =
-        zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
-
-    String requiredClientType =
-        zoomPropertyService.getString(
-            ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
-
-    bindings.put(
-        RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
-    bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
+    populateQcConstants(bindings);
     bindings.put(RuleEngineVariableNameConstant.CLIENT_TYPE, consignment.getCnoteType().name());
-    bindings.put(
-        ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC.name(),
-        zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
-    bindings.put(
-        ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
-        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.001));
-    bindings.put(
-        ZoomPropertyName.QC_DIMENSION_VALUE.name(),
-        zoomPropertyService.getDouble(ZoomPropertyName.QC_DIMENSION_VALUE, 1.0));
-    bindings.put(
-        ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
-        zoomPropertyService.getDouble(
-            ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC, 4.0));
-    bindings.put(
-        ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC.name(),
-        zoomPropertyService.getDouble(
-            ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC, 15.0));
-    bindings.put(
-        ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC.name(),
-        zoomPropertyService.getDouble(
-            ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC, 2.0));
-    bindings.put(
-        ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
-        zoomPropertyService.getDouble(
-            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 5.0));
     if (completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getCount() != null) {
       bindings.put(
@@ -602,21 +567,21 @@ public class QcServiceImpl implements QcService {
               .stream()
               .map(volumeDetails -> volumeDetails.getLength())
               .collect(Collectors.toList());
-      bindings.put("length", length);
+      bindings.put("LENGTH", length);
       List<Double> breadth =
           consignment
               .getVolumeDetails()
               .stream()
-              .map(volumeDetails -> volumeDetails.getLength())
+              .map(volumeDetails -> volumeDetails.getBreadth())
               .collect(Collectors.toList());
-      bindings.put("breadth", breadth);
+      bindings.put("BREADTH", breadth);
       List<Double> height =
           consignment
               .getVolumeDetails()
               .stream()
-              .map(volumeDetails -> volumeDetails.getLength())
+              .map(volumeDetails -> volumeDetails.getHeight())
               .collect(Collectors.toList());
-      bindings.put("height", height);
+      bindings.put("HEIGHT", height);
     }
     else {
       log.info("Volume details param is null...returning bindings as emptyMap");
@@ -624,6 +589,45 @@ public class QcServiceImpl implements QcService {
     }
 
     return bindings;
+  }
+
+  private  void populateQcConstants(Map<String, Object> bindings)
+  {
+    Double minimumNumberOfCnRequired =
+        zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
+
+    String requiredClientType =
+        zoomPropertyService.getString(
+            ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
+
+    bindings.put(
+        RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
+    bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
+    bindings.put(
+        ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.001));
+    bindings.put(
+        ZoomPropertyName.QC_DIMENSION_VALUE.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.QC_DIMENSION_VALUE, 1.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC, 4.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC, 15.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC, 2.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 5.0));
   }
 
   @Override
