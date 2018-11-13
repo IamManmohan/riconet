@@ -2,7 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-stimport static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
