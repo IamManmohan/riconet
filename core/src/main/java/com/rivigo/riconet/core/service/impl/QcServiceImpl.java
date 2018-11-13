@@ -499,24 +499,21 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
 
-    Double chargedWeight =
-        zoomBillingAPIClientService.getChargedWeightForConsignment(consignment.getCnote());
-
-    if (chargedWeight != null
+    if (consignment.getVolume() != null
         && consignment.getWeight() != null
         && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
-        && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
-        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
+        && completionData.getClientPincodeMetadataDTO().getMinVolumePerWeight() != null
+        && completionData.getClientPincodeMetadataDTO().getMaxVolumePerWeight() != null) {
       bindings.put(
-          RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
-          chargedWeight / consignment.getWeight());
+          RuleEngineVariableNameConstant.VOLUME_PER_WEIGHT,
+          consignment.getVolume() / consignment.getWeight());
       bindings.put(
-          RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
-          completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());
+          RuleEngineVariableNameConstant.MIN_VOLUME_PER_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMinVolumePerWeight());
       bindings.put(
-          RuleEngineVariableNameConstant.MAX_CHARGED_WEIGHT_PER_WEIGHT,
-          completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight());
+          RuleEngineVariableNameConstant.MAX_VOLUME_PER_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMaxVolumePerWeight());
     } else {
       log.info("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();

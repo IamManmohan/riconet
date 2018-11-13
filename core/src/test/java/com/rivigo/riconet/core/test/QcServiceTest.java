@@ -454,7 +454,7 @@ public class QcServiceTest {
 
     ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
     Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinChargedWeightPerWeight(11.0);
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinVolumePerWeight(11.0);
     mockingParamsForCheckFunction();
     boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
     assertEquals(result, true);
@@ -466,7 +466,7 @@ public class QcServiceTest {
 
     ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
     Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxChargedWeightPerWeight(10.0);
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxVolumePerWeight(10.0);
     mockingParamsForCheckFunction();
     boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
     assertEquals(result, true);
@@ -628,8 +628,8 @@ public class QcServiceTest {
     String rule1 = "ACTUAL_WEIGHT MAX_WEIGHT < ";
     String rule2 = "ACTUAL_WEIGHT MIN_WEIGHT > ";
 
-    String rule3 = "CHARGED_WEIGHT_PER_WEIGHT MAX_CHARGED_WEIGHT_PER_WEIGHT < ";
-    String rule4 = "CHARGED_WEIGHT_PER_WEIGHT MIN_CHARGED_WEIGHT_PER_WEIGHT > ";
+    String rule3 = "VOLUME_PER_WEIGHT MAX_VOLUME_PER_WEIGHT < ";
+    String rule4 = "VOLUME_PER_WEIGHT MIN_VOLUME_PER_WEIGHT > ";
 
     String rule5 = "INVOICE_VALUE_PER_WEIGHT MAX_INVOICE_VALUE_PER_WEIGHT < ";
     String rule6 = "INVOICE_VALUE_PER_WEIGHT MIN_INVOICE_VALUE_PER_WEIGHT > ";
@@ -703,8 +703,8 @@ public class QcServiceTest {
     clientPincodeMetadataDTO.setCount((long) 31);
     clientPincodeMetadataDTO.setMinWeight(8.0);
     clientPincodeMetadataDTO.setMaxWeight(12.0);
-    clientPincodeMetadataDTO.setMinChargedWeightPerWeight(8.0);
-    clientPincodeMetadataDTO.setMaxChargedWeightPerWeight(12.0);
+    clientPincodeMetadataDTO.setMinVolumePerWeight(8.0);
+    clientPincodeMetadataDTO.setMaxVolumePerWeight(12.0);
     clientPincodeMetadataDTO.setMinInvoicePerWeight(80.0);
     clientPincodeMetadataDTO.setMaxInvoicePerWeight(120.0);
 
@@ -720,6 +720,7 @@ public class QcServiceTest {
     consignment.setWeight(10.0);
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
+    consignment.setVolume(10.0);
 
     return consignment;
   }
