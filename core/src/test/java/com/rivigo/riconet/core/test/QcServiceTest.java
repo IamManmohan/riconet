@@ -2,8 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+stimport static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,7 +31,6 @@ import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
@@ -98,8 +96,6 @@ public class QcServiceTest {
 
   @Mock private SmsService smsService;
 
-  @Mock private ZoomBillingAPIClientService zoomBillingAPIClientService;
-
   @Mock private UserMasterService userMasterService;
 
   @Mock private EmailService emailService;
@@ -120,8 +116,6 @@ public class QcServiceTest {
     MockitoAnnotations.initMocks(this);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcRuleEngine, "ruleEngineRuleRepository", ruleEngineRuleRepository);
-    Mockito.when(zoomBillingAPIClientService.getChargedWeightForConsignment(anyString()))
-        .thenReturn(10.0);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcService, "ticketingService", ticketingService);
   }

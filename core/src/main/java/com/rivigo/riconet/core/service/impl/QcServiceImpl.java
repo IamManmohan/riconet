@@ -33,7 +33,6 @@ import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
@@ -109,8 +108,6 @@ public class QcServiceImpl implements QcService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private LocationService locationService;
-
-  @Autowired private ZoomBillingAPIClientService zoomBillingAPIClientService;
 
   @Autowired private EmailService emailService;
 
