@@ -50,7 +50,7 @@ import java.util.Map;
               Boolean.class);
         }
       }
-      return new BaseType<>(Boolean.FALSE,Boolean.class);
+      return new BaseType(Boolean.FALSE,Boolean.class);
     }
   }
 
