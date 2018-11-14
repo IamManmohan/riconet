@@ -5,9 +5,7 @@ package com.rivigo.riconet.ruleengine.operators;
 import com.rivigo.riconet.ruleengine.BaseType;
 import com.rivigo.riconet.ruleengine.Operation;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class Equals extends Operation {
 
   public Equals() {
