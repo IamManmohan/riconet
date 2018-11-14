@@ -46,7 +46,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.BooleanUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -145,9 +144,12 @@ public class HiltiApiServiceImpl implements HiltiApiService {
       case CN_RECEIVED_AT_OU:
         return IntransitArrivedDto.builder()
             .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
-            .atDestination(
-                BooleanUtils.toStringYesNo(
-                    consignment.getLocationId() == consignment.getToLocationId()))
+            .atDestination("no")
+            .build();
+      case CN_DELIVERY_LOADED:
+        return IntransitArrivedDto.builder()
+            .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
+            .atDestination("yes")
             .build();
       case CN_LOADED:
         return IntransitDispatchedDto.builder()
@@ -201,6 +203,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     BaseHiltiFieldData fieldData;
     switch (notificationDTO.getEventName()) {
       case CN_RECEIVED_AT_OU:
+      case CN_DELIVERY_LOADED:
       case CN_LOADED:
         fieldData = getIntransitFieldData(notificationDTO);
         break;
@@ -228,6 +231,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
       case PICKUP_COMPLETION:
         return getPickupRequestDtos(notificationDTO);
       case CN_RECEIVED_AT_OU:
+      case CN_DELIVERY_LOADED:
         jobType = HiltiJobType.INTRANSIT;
         statusCode = HiltiStatusCode.ARRIVED;
         break;
