@@ -216,5 +216,8 @@ public enum ZoomPropertyName {
   DEFAULT_EMAIL_IDS,
   QC_BLOCKER_TICKET_EXPIRY_HOURS,
 
-  DEFAUL_APP_USER_ID
+  DEFAUL_APP_USER_ID,
+
+  // Online Payments
+  DND_EXEMPTED_SMS_EVENTS
 }
