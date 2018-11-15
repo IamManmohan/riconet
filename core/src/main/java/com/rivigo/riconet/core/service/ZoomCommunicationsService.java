@@ -47,18 +47,23 @@ public class ZoomCommunicationsService {
     }
 
     boolean isDndExempted = false;
-    // To Note: Not all events may have been added to EventName so deserialization for those will fail
+    // To Note: Not all events may have been added to EventName so deserialization for those will
+    // fail
     // and exemption will not work by adding new events only to zoom property.
     // Best solution: Single common list be maintained in a communications commons
     try {
-      NotificationDTO notificationDTO = objectMapper.readValue(
-          zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
-      List<String> dndExemptedEvents = zoomPropertyService.getStringValues(
-          ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
+      NotificationDTO notificationDTO =
+          objectMapper.readValue(
+              zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
+      List<String> dndExemptedEvents =
+          zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
       isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName().toString());
       log.debug("NotificationDTO {}", notificationDTO);
     } catch (IOException ex) {
-      log.error("Error occured while processing NotificationDTO for {} ", zoomCommunicationsSMSDTO.getEventUID(), ex);
+      log.error(
+          "Error occured while processing NotificationDTO for {} ",
+          zoomCommunicationsSMSDTO.getEventUID(),
+          ex);
     }
 
     log.info(
@@ -66,7 +71,11 @@ public class ZoomCommunicationsService {
         zoomCommunicationsSMSDTO.getMessage(),
         zoomCommunicationsSMSDTO.getPhoneNumber());
 
-    log.debug("DND start time {} and end time {}, isDndExempted: {}", dndStartTime, dndEndTime, isDndExempted);
+    log.debug(
+        "DND start time {} and end time {}, isDndExempted: {}",
+        dndStartTime,
+        dndEndTime,
+        isDndExempted);
     int millisOfDay =
         DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
     if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
