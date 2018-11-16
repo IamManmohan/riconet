@@ -479,12 +479,12 @@ public class QcServiceImpl implements QcService {
       log.info("Total boxes param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
-    if (consignment.getTotalBoxes() != null && consignment.getWeight() != null) {
+    if (consignment.getWeight() != null) {
       bindings.put(
           RuleEngineVariableNameConstant.WEIGHT_TOTAL_BOXES_DIFF,
           Math.abs(consignment.getWeight() - consignment.getTotalBoxes()));
     } else {
-      log.info("Total boxes param is null...returning bindings as emptyMap");
+      log.info("Weight param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
     if (consignment.getVolume() != null) {
@@ -493,14 +493,9 @@ public class QcServiceImpl implements QcService {
       log.info("Volume param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
-    if (consignment.getVolume() != null && consignment.getWeight() != null) {
-      bindings.put(
-          RuleEngineVariableNameConstant.VOLUME_TO_WEIGHT_RATIO,
-          (consignment.getVolume() / consignment.getWeight()));
-    } else {
-      log.info("Volume or weight param is null...returning bindings as emptyMap");
-      return Collections.emptyMap();
-    }
+    bindings.put(
+        RuleEngineVariableNameConstant.VOLUME_TO_WEIGHT_RATIO,
+        (consignment.getVolume() / consignment.getWeight()));
     if (consignment.getWeight() != null
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinWeight() != null
@@ -582,8 +577,7 @@ public class QcServiceImpl implements QcService {
               .map(volumeDetails -> volumeDetails.getHeight())
               .collect(Collectors.toList());
       bindings.put("HEIGHT", height);
-    }
-    else {
+    } else {
       log.info("Volume details param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
@@ -591,8 +585,7 @@ public class QcServiceImpl implements QcService {
     return bindings;
   }
 
-  private  void populateQcConstants(Map<String, Object> bindings)
-  {
+  private void populateQcConstants(Map<String, Object> bindings) {
     Double minimumNumberOfCnRequired =
         zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
 
