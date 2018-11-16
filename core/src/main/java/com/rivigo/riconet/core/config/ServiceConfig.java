@@ -15,6 +15,7 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.geo.GeoJsonModule;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -56,6 +57,7 @@ public class ServiceConfig {
   }
 
   @Bean
+  @Primary
   public ExecutorService getExecutorService() {
     return new ThreadPoolExecutor(
         CORE_POOL_SIZE,
