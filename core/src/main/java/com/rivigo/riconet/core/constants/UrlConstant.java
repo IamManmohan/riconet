@@ -37,7 +37,7 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_CONSIGNMENT_BLOCKER = "/consignmentBlocker";
 
-  public static final String ZOOM_BILLING_CN_DETAILS = "/cnbook/chargedweight/cnote/{cnote}";
+  public static final String ZOOM_BILLING_CN_DETAILS = "/external/chargedweight/cnote/{cnote}";
 
   public static final String ZOOM_TICKETING_GET_COMMENTS = "/comment";
 
