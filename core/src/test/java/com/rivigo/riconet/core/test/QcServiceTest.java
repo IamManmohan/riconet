@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -32,7 +31,6 @@ import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
@@ -98,8 +96,6 @@ public class QcServiceTest {
 
   @Mock private SmsService smsService;
 
-  @Mock private ZoomBillingAPIClientService zoomBillingAPIClientService;
-
   @Mock private UserMasterService userMasterService;
 
   @Mock private EmailService emailService;
@@ -120,8 +116,6 @@ public class QcServiceTest {
     MockitoAnnotations.initMocks(this);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcRuleEngine, "ruleEngineRuleRepository", ruleEngineRuleRepository);
-    Mockito.when(zoomBillingAPIClientService.getChargedWeightForConsignment(anyString()))
-        .thenReturn(10.0);
     org.springframework.test.util.ReflectionTestUtils.setField(
         qcService, "ticketingService", ticketingService);
   }
@@ -454,7 +448,7 @@ public class QcServiceTest {
 
     ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
     Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinChargedWeightPerWeight(11.0);
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinVolumePerWeight(11.0);
     mockingParamsForCheckFunction();
     boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
     assertEquals(result, true);
@@ -466,7 +460,7 @@ public class QcServiceTest {
 
     ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
     Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxChargedWeightPerWeight(10.0);
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxVolumePerWeight(10.0);
     mockingParamsForCheckFunction();
     boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
     assertEquals(result, true);
@@ -628,8 +622,8 @@ public class QcServiceTest {
     String rule1 = "ACTUAL_WEIGHT MAX_WEIGHT < ";
     String rule2 = "ACTUAL_WEIGHT MIN_WEIGHT > ";
 
-    String rule3 = "CHARGED_WEIGHT_PER_WEIGHT MAX_CHARGED_WEIGHT_PER_WEIGHT < ";
-    String rule4 = "CHARGED_WEIGHT_PER_WEIGHT MIN_CHARGED_WEIGHT_PER_WEIGHT > ";
+    String rule3 = "VOLUME_PER_WEIGHT MAX_VOLUME_PER_WEIGHT < ";
+    String rule4 = "VOLUME_PER_WEIGHT MIN_VOLUME_PER_WEIGHT > ";
 
     String rule5 = "INVOICE_VALUE_PER_WEIGHT MAX_INVOICE_VALUE_PER_WEIGHT < ";
     String rule6 = "INVOICE_VALUE_PER_WEIGHT MIN_INVOICE_VALUE_PER_WEIGHT > ";
@@ -703,8 +697,8 @@ public class QcServiceTest {
     clientPincodeMetadataDTO.setCount((long) 31);
     clientPincodeMetadataDTO.setMinWeight(8.0);
     clientPincodeMetadataDTO.setMaxWeight(12.0);
-    clientPincodeMetadataDTO.setMinChargedWeightPerWeight(8.0);
-    clientPincodeMetadataDTO.setMaxChargedWeightPerWeight(12.0);
+    clientPincodeMetadataDTO.setMinVolumePerWeight(8.0);
+    clientPincodeMetadataDTO.setMaxVolumePerWeight(12.0);
     clientPincodeMetadataDTO.setMinInvoicePerWeight(80.0);
     clientPincodeMetadataDTO.setMaxInvoicePerWeight(120.0);
 
@@ -720,6 +714,7 @@ public class QcServiceTest {
     consignment.setWeight(10.0);
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
+    consignment.setVolume(10.0);
 
     return consignment;
   }
