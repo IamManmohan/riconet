@@ -10,9 +10,9 @@ public class RuleEngineVariableNameConstant {
   public static final String ACTUAL_WEIGHT = "ACTUAL_WEIGHT";
   public static final String MIN_WEIGHT = "MIN_WEIGHT";
   public static final String MAX_WEIGHT = "MAX_WEIGHT";
-  public static final String CHARGED_WEIGHT_PER_WEIGHT = "CHARGED_WEIGHT_PER_WEIGHT";
-  public static final String MIN_CHARGED_WEIGHT_PER_WEIGHT = "MIN_CHARGED_WEIGHT_PER_WEIGHT";
-  public static final String MAX_CHARGED_WEIGHT_PER_WEIGHT = "MAX_CHARGED_WEIGHT_PER_WEIGHT";
+  public static final String VOLUME_PER_WEIGHT = "VOLUME_PER_WEIGHT";
+  public static final String MIN_VOLUME_PER_WEIGHT = "MIN_VOLUME_PER_WEIGHT";
+  public static final String MAX_VOLUME_PER_WEIGHT = "MAX_VOLUME_PER_WEIGHT";
   public static final String INVOICE_VALUE_PER_WEIGHT = "INVOICE_VALUE_PER_WEIGHT";
   public static final String MIN_INVOICE_VALUE_PER_WEIGHT = "MIN_INVOICE_VALUE_PER_WEIGHT";
   public static final String MAX_INVOICE_VALUE_PER_WEIGHT = "MAX_INVOICE_VALUE_PER_WEIGHT";
