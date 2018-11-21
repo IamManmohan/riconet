@@ -19,6 +19,7 @@ public class Equals extends Operation {
 
   @Override
   public BaseType<Boolean> interpret(Map<String, ?> bindings) {
+
     BaseType<?> rightBT = this.rightOperand.interpret(bindings);
 
     BaseType<?> leftBT = this.leftOperand.interpret(bindings);

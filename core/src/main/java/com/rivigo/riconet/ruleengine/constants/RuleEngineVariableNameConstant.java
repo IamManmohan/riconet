@@ -20,4 +20,8 @@ public class RuleEngineVariableNameConstant {
   public static final String MINIMUM_NUMBER_OF_CN_REQUIRED = "MINIMUM_NUMBER_OF_CN_REQUIRED";
   public static final String CLIENT_TYPE = "CLIENT_TYPE";
   public static final String REQUIRED_CLIENT_TYPE = "REQUIRED_CLIENT_TYPE";
+  public static final String TOTAL_BOXES = "TOTAL_BOXES";
+  public static final String VOLUME = "VOLUME";
+  public static final String VOLUME_TO_WEIGHT_RATIO = "VOLUME_TO_WEIGHT_RATIO";
+  public static final String WEIGHT_TOTAL_BOXES_DIFF = "WEIGHT_TOTAL_BOXES_DIFF";
 }
