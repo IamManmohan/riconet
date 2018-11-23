@@ -46,10 +46,6 @@ public class HandoverServiceImpl implements HandoverService {
       log.info("Ticket is not write-off ticket");
       return;
     }
-    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      log.info("Auto closing write-off ticket");
-      ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
-    }
     WriteOffRequestAction writeOffRequestAction;
     if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
       writeOffRequestAction = WriteOffRequestAction.APPROVE;
@@ -59,5 +55,9 @@ public class HandoverServiceImpl implements HandoverService {
     log.info("Initiating write off, reuest status : {}", writeOffRequestAction);
     zoomBackendAPIClientService.handleApproveRejectRequest(
         cnote, writeOffRequestAction);
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Auto closing write-off ticket");
+      ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
+    }
   }
 }
