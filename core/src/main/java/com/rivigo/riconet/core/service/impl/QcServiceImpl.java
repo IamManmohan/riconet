@@ -710,7 +710,7 @@ public class QcServiceImpl implements QcService {
     if (ticketDTO == null) {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
-    if (ZoomTicketingConstant.QC_BLOCKER_TYPE_ID.equals(ticketDTO.getTypeId())) {
+    if (!ZoomTicketingConstant.QC_BLOCKER_TYPE_ID.equals(ticketDTO.getTypeId())) {
       return;
     }
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
