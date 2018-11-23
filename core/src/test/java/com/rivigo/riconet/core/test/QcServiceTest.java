@@ -527,7 +527,7 @@ public class QcServiceTest {
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID + 1)
                 .status(TicketStatus.CLOSED)
                 .build());
-    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l, "qc");
     verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(5l);
   }
 
@@ -539,7 +539,7 @@ public class QcServiceTest {
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
                 .status(TicketStatus.CLOSED)
                 .build());
-    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l);
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l, "qc");
     verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
   }
 
@@ -575,7 +575,7 @@ public class QcServiceTest {
 
   @Test
   public void consumeQcBlockerTicketClosedEventNullTest() {
-    qcService.consumeQcBlockerTicketClosedEvent(null, 10l);
+    qcService.consumeQcBlockerTicketClosedEvent(null, 10l, "qc");
     verify(zoomBackendAPIClientService, times(0)).handleQcBlockerClosure(any());
   }
 
@@ -715,6 +715,7 @@ public class QcServiceTest {
     consignment.setValue(100.0);
     consignment.setCnoteType(CnoteType.NORMAL);
     consignment.setVolume(10.0);
+    consignment.setTotalBoxes(5);
 
     return consignment;
   }

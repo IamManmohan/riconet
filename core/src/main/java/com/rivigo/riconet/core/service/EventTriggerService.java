@@ -32,6 +32,8 @@ public class EventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
+  @Autowired private HandoverService handoverService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     String entityId;
@@ -112,10 +114,18 @@ public class EventTriggerService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
             notificationDTO.getEntityId());
         break;
-      case QC_TICKET_ACTION:
+      case TICKET_ACTION:
         qcService.consumeQcBlockerTicketClosedEvent(
             notificationDTO.getEntityId(),
             getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
+                .orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
+                .orElse(null));
+        handoverService.consumeHandoverTicketAction(
+            notificationDTO.getEntityId(),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ENTITY_ID.name()).orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
         break;
       case TICKET_CREATION:
@@ -162,9 +172,17 @@ public class EventTriggerService {
         .build();
   }
 
-  public Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
+  private Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
     try {
       return Optional.of(Long.parseLong(notificationDTO.getMetadata().get(fieldName)));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
+  private Optional<String> getString(NotificationDTO notificationDTO, String fieldName) {
+    try {
+      return Optional.of((notificationDTO.getMetadata().get(fieldName)));
     } catch (Exception e) {
       return Optional.empty();
     }
