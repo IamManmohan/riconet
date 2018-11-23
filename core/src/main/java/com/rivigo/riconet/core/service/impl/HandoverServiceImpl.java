@@ -42,7 +42,7 @@ public class HandoverServiceImpl implements HandoverService {
     if (ticketDTO == null) {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
-    if (ticketDTO.getTypeId() != ZoomTicketingConstant.WRITEOFF_TYPE_ID) {
+    if (ZoomTicketingConstant.WRITEOFF_TYPE_ID.equals(ticketDTO.getTypeId())) {
       log.info("Ticket is not write-off ticket");
       return;
     }
