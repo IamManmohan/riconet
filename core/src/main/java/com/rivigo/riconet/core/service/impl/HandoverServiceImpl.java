@@ -43,9 +43,11 @@ public class HandoverServiceImpl implements HandoverService {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
     if (ticketDTO.getTypeId() != ZoomTicketingConstant.WRITEOFF_TYPE_ID) {
+      log.info("Ticket is not write-off ticket");
       return;
     }
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Auto closing write-off ticket");
       ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
     }
     WriteOffRequestAction writeOffRequestAction;
@@ -54,7 +56,8 @@ public class HandoverServiceImpl implements HandoverService {
     } else {
       writeOffRequestAction = WriteOffRequestAction.REJECT;
     }
+    log.info("Initiating write off, reuest status : {}", writeOffRequestAction);
     zoomBackendAPIClientService.handleApproveRejectRequest(
-        ticketDTO.getEntityId(), writeOffRequestAction);
+        cnote, writeOffRequestAction);
   }
 }
