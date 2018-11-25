@@ -6,7 +6,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFIC
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAUL_APP_USER_ID;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -18,10 +18,13 @@ import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -79,12 +82,18 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId) {
-    if (!"production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
-      userId = zoomPropertyService.getLong(DEFAUL_APP_USER_ID, 57L);
+    List<DeviceAppVersionMapper> deviceAppVersionMappers;
+    if (!"production"
+        .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
+      List<Long> userIdList =
+          Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
+              .map(Long::valueOf)
+              .collect(Collectors.toList());
       log.info("Staging server. sending notification to user {}", userId);
+      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserIdIn(userIdList);
+    } else {
+      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserId(userId);
     }
-    List<DeviceAppVersionMapper> deviceAppVersionMappers =
-        deviceAppVersionMapperRepository.findByUserId(userId);
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
       return;
