@@ -14,4 +14,6 @@ public interface TicketingService {
   void setPriorityMapping(NotificationDTO notificationDTO);
 
   void closeTicket(TicketDTO ticketDTO, String reasonOfClosure);
+
+  TicketDTO getTicketByTicketId(Long ticketId);
 }
