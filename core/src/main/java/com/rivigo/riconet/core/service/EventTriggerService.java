@@ -123,7 +123,7 @@ public class EventTriggerService {
                 .orElse(null));
         handoverService.consumeHandoverTicketAction(
             notificationDTO.getEntityId(),
-            getString(notificationDTO, ZoomCommunicationFieldNames.ENTITY_ID.name()).orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name()).orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
@@ -131,7 +131,7 @@ public class EventTriggerService {
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(
             notificationDTO.getEntityId(),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name()),
             getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
