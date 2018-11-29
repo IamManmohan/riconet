@@ -23,6 +23,7 @@ public enum ZoomCommunicationFieldNames {
   ORGANIZATION_ID,
   PICK_UP_ID,
   USER_ID,
+  TASK_ID,
   FROM_LOCATION_ID,
   LAST_UPDATED_BY_ID,
   ENTITY_ID,

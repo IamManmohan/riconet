@@ -92,6 +92,12 @@ public class EventTriggerService {
       case UNLOADING_IN_LOADING:
         appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
         break;
+      case PALLET_CLOSED:
+        appNotificationService.sendPalletClosedNotification(notificationDTO);
+        break;
+      case TASK_CLOSED_OR_REASSIGNED:
+        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
+        break;
       case CN_TOTAL_BOXES_CHANGE:
         appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
