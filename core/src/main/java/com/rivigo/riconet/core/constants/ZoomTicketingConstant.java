@@ -15,7 +15,7 @@ public class ZoomTicketingConstant {
 
   public static final Long QC_BLOCKER_TYPE_ID = 75L;
 
-  public static final Long WRITEOFF_TYPE_ID = 516L;
+  public static final Long WRITEOFF_TYPE_ID = 539L;
 
   public static final String QC_GROUP_NAME = "QC";
 
