@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.PickupService;
@@ -52,6 +53,8 @@ public class EventTriggerServiceTest {
 
   @Mock private PickupService pickupService;
 
+  @Mock private AppNotificationService appNotificationService;
+
   @Captor private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
 
   @Captor private ArgumentCaptor<ConsignmentCompletionEventDTO> consignmentCompletionEventDTOCaptor;
@@ -88,10 +91,8 @@ public class EventTriggerServiceTest {
   @Test
   public void cnReceivedAtOutest() {
     Map<String, String> metadata = new HashMap<>();
-    metadata.put("CNOTE", "1234567890");
-    metadata.put("CONSIGNMENT_ID", "5");
-    metadata.put("LOCATION_ID", "12");
-    metadata.put("TO_LOCATION_ID", "13");
+    metadata.put("USER_ID", "1234567890");
+    metadata.put("TASK_TYPE", "LOADING");
     NotificationDTO notificationDTO =
         NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
     eventTriggerService.processNotification(notificationDTO);
@@ -100,6 +101,25 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+  }
+
+  @Test
+  public void palletCloseTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("USER_ID", "1234567890");
+    metadata.put("TASK_TYPE", "UNLOADING");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+  }
+
+  @Test
+  public void taskClosedReassignedTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("USER_ID", "1234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
   }
 
   @Test
