@@ -84,6 +84,11 @@ public class TicketingServiceImpl implements TicketingService {
     zoomTicketingAPIClientService.editTicket(ticketDTO);
   }
 
+  @Override
+  public TicketDTO getTicketByTicketId(Long ticketId) {
+    return zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+  }
+
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
       case TICKET_CREATION:
