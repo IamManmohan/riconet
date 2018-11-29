@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -90,6 +91,23 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while handling QcBlocker ticket closure with ticketId: {}", ticketId, e);
       throw new ZoomException(
           "Error while handling QcBlocker ticket closure with ticketId: %s", ticketId);
+    }
+    apiClientService.parseJsonNode(responseJson, null);
+  }
+
+  @Override
+  public void handleApproveRejectRequest(
+      String cnote, WriteOffRequestAction writeOffRequestAction) {
+    JsonNode responseJson;
+    String url =
+        UrlConstant.ZOOM_BACKEND_WRITE_OFF_REQUEST_ONBOARDING
+            .replace("{cnote}", cnote)
+            .replace("{requestAction}", writeOffRequestAction.name());
+    try {
+      responseJson = apiClientService.getEntity(null, HttpMethod.PUT, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while handling Writeoff request with cnote: {} ", cnote, e);
+      throw new ZoomException("Error while handling Writeoff request with cnote: %s", cnote);
     }
     apiClientService.parseJsonNode(responseJson, null);
   }

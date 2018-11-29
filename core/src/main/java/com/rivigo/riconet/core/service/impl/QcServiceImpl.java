@@ -697,19 +697,24 @@ public class QcServiceImpl implements QcService {
   }
 
   @Override
-  public void consumeQcBlockerTicketClosedEvent(Long ticketId, Long ticketingUserId) {
+  public void consumeQcBlockerTicketClosedEvent(
+      Long ticketId, Long ticketingUserId, String actionName) {
     if (ticketId == null) {
+      return;
+    }
+    if (!ZoomTicketingConstant.QC_ACTION_NAME.equals(actionName)) {
+      log.info("Action ignored since it is not related to QC");
       return;
     }
     TicketDTO ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
     if (ticketDTO == null) {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
-    if (ticketDTO.getTypeId() != ZoomTicketingConstant.QC_BLOCKER_TYPE_ID) {
+    if (!ZoomTicketingConstant.QC_BLOCKER_TYPE_ID.equals(ticketDTO.getTypeId())) {
       return;
     }
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      closeTicket(ticketDTO, ZoomTicketingConstant.QC_BLOCKER_CLOSURE_MESSAGE);
+      closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
     }
     zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
   }
