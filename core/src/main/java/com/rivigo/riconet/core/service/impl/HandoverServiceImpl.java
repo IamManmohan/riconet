@@ -53,8 +53,7 @@ public class HandoverServiceImpl implements HandoverService {
       writeOffRequestAction = WriteOffRequestAction.REJECT;
     }
     log.info("Initiating write off, reuest status : {}", writeOffRequestAction);
-    zoomBackendAPIClientService.handleApproveRejectRequest(
-        cnote, writeOffRequestAction);
+    zoomBackendAPIClientService.handleApproveRejectRequest(cnote, writeOffRequestAction);
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
       log.info("Auto closing write-off ticket");
       ticketingService.closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);

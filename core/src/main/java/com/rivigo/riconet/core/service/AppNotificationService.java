@@ -8,4 +8,8 @@ public interface AppNotificationService {
   void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO);
 
   void sendLoadingUnloadingNotification(NotificationDTO notificationDTO);
+
+  void sendPalletClosedNotification(NotificationDTO notificationDTO);
+
+  void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO);
 }

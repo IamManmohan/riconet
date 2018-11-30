@@ -94,6 +94,12 @@ public class EventTriggerService {
       case UNLOADING_IN_LOADING:
         appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
         break;
+      case PALLET_CLOSED:
+        appNotificationService.sendPalletClosedNotification(notificationDTO);
+        break;
+      case TASK_CLOSED_OR_REASSIGNED:
+        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
+        break;
       case CN_TOTAL_BOXES_CHANGE:
         appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
@@ -123,7 +129,8 @@ public class EventTriggerService {
                 .orElse(null));
         handoverService.consumeHandoverTicketAction(
             notificationDTO.getEntityId(),
-            getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name()).orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
+                .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
