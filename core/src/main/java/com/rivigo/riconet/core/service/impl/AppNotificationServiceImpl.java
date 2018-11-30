@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
@@ -76,6 +77,39 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, taskType.name());
     data.put(TASK_ID, taskId);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, userId);
+  }
+
+  @Override
+  public void sendPalletClosedNotification(NotificationDTO notificationDTO) {
+    Long userId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    Long palletId = notificationDTO.getEntityId();
+    Long taskId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TASK_ID.name()));
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    data.put(ENTITY_ID, palletId);
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(TASK_ID, taskId);
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, userId);
+  }
+
+  @Override
+  public void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO) {
+    Long userId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    Long taskId = notificationDTO.getEntityId();
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, userId);
