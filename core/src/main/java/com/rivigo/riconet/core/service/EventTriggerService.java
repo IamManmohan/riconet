@@ -32,6 +32,8 @@ public class EventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
+  @Autowired private HandoverService handoverService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     String entityId;
@@ -92,6 +94,12 @@ public class EventTriggerService {
       case UNLOADING_IN_LOADING:
         appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
         break;
+      case PALLET_CLOSED:
+        appNotificationService.sendPalletClosedNotification(notificationDTO);
+        break;
+      case TASK_CLOSED_OR_REASSIGNED:
+        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
+        break;
       case CN_TOTAL_BOXES_CHANGE:
         appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
@@ -112,16 +120,25 @@ public class EventTriggerService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
             notificationDTO.getEntityId());
         break;
-      case QC_TICKET_ACTION:
+      case TICKET_ACTION:
         qcService.consumeQcBlockerTicketClosedEvent(
             notificationDTO.getEntityId(),
             getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
+                .orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
+                .orElse(null));
+        handoverService.consumeHandoverTicketAction(
+            notificationDTO.getEntityId(),
+            getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
+                .orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
+            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
         break;
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(
             notificationDTO.getEntityId(),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ENTITY_ID.name()),
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name()),
             getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
@@ -162,9 +179,17 @@ public class EventTriggerService {
         .build();
   }
 
-  public Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
+  private Optional<Long> getLong(NotificationDTO notificationDTO, String fieldName) {
     try {
       return Optional.of(Long.parseLong(notificationDTO.getMetadata().get(fieldName)));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
+  private Optional<String> getString(NotificationDTO notificationDTO, String fieldName) {
+    try {
+      return Optional.of((notificationDTO.getMetadata().get(fieldName)));
     } catch (Exception e) {
       return Optional.empty();
     }

@@ -54,7 +54,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: "com.typesafe.akka", name: "akka-stream-kafka_2.11", version: "0.17"
+        compile group: "com.typesafe.akka", name: "akka-stream-kafka_2.11", version: "1.0-M1"
         compile "org.slf4j:slf4j-api:1.7.25"
         compile "com.h2database:h2:1.4.196"
         compile "org.projectlombok:lombok:1.16.6"
@@ -66,11 +66,14 @@ subprojects {
             exclude module: 'jira-rest-java-client-core'
             exclude module: 'slf4j-log4j12'
             exclude module: 'jackson-databind'
+            exclude module: 'cms-external-api'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
 
-        compile "com.rivigo:rivigo-finance-external-api:0.0.7"
+        compile("com.rivigo:rivigo-finance-external-api:0.0.7") {
+            exclude module: 'cms-external-api'
+        }
 
         compile "com.fasterxml.jackson.core:jackson-databind:2.9.0"
         compile "org.jboss.netty:netty:3.2.10.Final"

@@ -15,7 +15,13 @@ public class ZoomTicketingConstant {
 
   public static final Long QC_BLOCKER_TYPE_ID = 75L;
 
+  public static final Long WRITEOFF_TYPE_ID = 539L;
+
   public static final String QC_GROUP_NAME = "QC";
+
+  public static final String QC_ACTION_NAME = "qc";
+
+  public static final String WRITE_OFF_ACTION_NAME = "write_off";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";
 
@@ -45,7 +51,7 @@ public class ZoomTicketingConstant {
   public static final String QC_AUTO_CLOSURE_DEPS_CREATION =
       "The task got auto closed because consignment is marked as DEPS";
 
-  public static final String QC_BLOCKER_CLOSURE_MESSAGE =
+  public static final String ACTION_CLOSURE_MESSAGE =
       "Ticket got auto-closed after action is taken";
 
   public static final String QC_BLOCKER_AUTO_CLOSURE_MESSAGE =
@@ -57,4 +63,6 @@ public class ZoomTicketingConstant {
   public static final String ZOOM_PROPERTIES_PRIORITY_SEPORATOR = ",";
 
   public static final String UNDERSCORE = "_";
+
+  public static final String TICKET_ACTION_VALUE_APPROVE = "approve";
 }

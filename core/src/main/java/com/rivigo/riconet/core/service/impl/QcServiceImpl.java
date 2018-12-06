@@ -33,7 +33,6 @@ import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomBillingAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
@@ -109,8 +108,6 @@ public class QcServiceImpl implements QcService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private LocationService locationService;
-
-  @Autowired private ZoomBillingAPIClientService zoomBillingAPIClientService;
 
   @Autowired private EmailService emailService;
 
@@ -460,18 +457,8 @@ public class QcServiceImpl implements QcService {
 
   private Map<String, Object> getVariablesMapToApplyQCRules(
       ConsignmentCompletionEventDTO completionData, Consignment consignment) {
-
     Map<String, Object> bindings = new HashMap<>();
-
-    Double minimumNumberOfCnRequired =
-        zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
-
-    String requiredClientType =
-        zoomPropertyService.getString(
-            ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
-    bindings.put(
-        RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
-    bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
+    populateQcConstants(bindings);
     bindings.put(RuleEngineVariableNameConstant.CLIENT_TYPE, consignment.getCnoteType().name());
     if (completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getCount() != null) {
@@ -482,7 +469,30 @@ public class QcServiceImpl implements QcService {
       log.info("one of the NUMBER_OF_CN param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
     }
-
+    if (consignment.getTotalBoxes() != null) {
+      bindings.put(
+          RuleEngineVariableNameConstant.TOTAL_BOXES, (double) consignment.getTotalBoxes());
+    } else {
+      log.info("Total boxes param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    if (consignment.getWeight() != null) {
+      bindings.put(
+          RuleEngineVariableNameConstant.WEIGHT_TOTAL_BOXES_DIFF,
+          Math.abs(consignment.getWeight() - consignment.getTotalBoxes()));
+    } else {
+      log.info("Weight param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    if (consignment.getVolume() != null) {
+      bindings.put(RuleEngineVariableNameConstant.VOLUME, consignment.getVolume());
+    } else {
+      log.info("Volume param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+    bindings.put(
+        RuleEngineVariableNameConstant.VOLUME_TO_WEIGHT_RATIO,
+        (consignment.getVolume() / consignment.getWeight()));
     if (consignment.getWeight() != null
         && completionData.getClientPincodeMetadataDTO() != null
         && completionData.getClientPincodeMetadataDTO().getMinWeight() != null
@@ -499,24 +509,21 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
 
-    Double chargedWeight =
-        zoomBillingAPIClientService.getChargedWeightForConsignment(consignment.getCnote());
-
-    if (chargedWeight != null
+    if (consignment.getVolume() != null
         && consignment.getWeight() != null
         && consignment.getWeight() > 0.001
         && completionData.getClientPincodeMetadataDTO() != null
-        && completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight() != null
-        && completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight() != null) {
+        && completionData.getClientPincodeMetadataDTO().getMinVolumePerWeight() != null
+        && completionData.getClientPincodeMetadataDTO().getMaxVolumePerWeight() != null) {
       bindings.put(
-          RuleEngineVariableNameConstant.CHARGED_WEIGHT_PER_WEIGHT,
-          chargedWeight / consignment.getWeight());
+          RuleEngineVariableNameConstant.VOLUME_PER_WEIGHT,
+          consignment.getVolume() / consignment.getWeight());
       bindings.put(
-          RuleEngineVariableNameConstant.MIN_CHARGED_WEIGHT_PER_WEIGHT,
-          completionData.getClientPincodeMetadataDTO().getMinChargedWeightPerWeight());
+          RuleEngineVariableNameConstant.MIN_VOLUME_PER_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMinVolumePerWeight());
       bindings.put(
-          RuleEngineVariableNameConstant.MAX_CHARGED_WEIGHT_PER_WEIGHT,
-          completionData.getClientPincodeMetadataDTO().getMaxChargedWeightPerWeight());
+          RuleEngineVariableNameConstant.MAX_VOLUME_PER_WEIGHT,
+          completionData.getClientPincodeMetadataDTO().getMaxVolumePerWeight());
     } else {
       log.info("one of the CHARGED_WEIGHT param is null...returning bindings as emptyMap");
       return Collections.emptyMap();
@@ -542,7 +549,72 @@ public class QcServiceImpl implements QcService {
       return Collections.emptyMap();
     }
 
+    if (consignment.getVolumeDetails() != null) {
+      List<Double> length =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getLength())
+              .collect(Collectors.toList());
+      bindings.put("LENGTH", length);
+      List<Double> breadth =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getBreadth())
+              .collect(Collectors.toList());
+      bindings.put("BREADTH", breadth);
+      List<Double> height =
+          consignment
+              .getVolumeDetails()
+              .stream()
+              .map(volumeDetails -> volumeDetails.getHeight())
+              .collect(Collectors.toList());
+      bindings.put("HEIGHT", height);
+    } else {
+      log.info("Volume details param is null...returning bindings as emptyMap");
+      return Collections.emptyMap();
+    }
+
     return bindings;
+  }
+
+  private void populateQcConstants(Map<String, Object> bindings) {
+    Double minimumNumberOfCnRequired =
+        zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_NUMBER_OF_CN_REQUIRED, 30.0);
+
+    String requiredClientType =
+        zoomPropertyService.getString(
+            ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name());
+
+    bindings.put(
+        RuleEngineVariableNameConstant.MINIMUM_NUMBER_OF_CN_REQUIRED, minimumNumberOfCnRequired);
+    bindings.put(RuleEngineVariableNameConstant.REQUIRED_CLIENT_TYPE, requiredClientType);
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.MAXIMUM_VOLUME_ALLOWED_WITHOUT_QC, 35.0));
+    bindings.put(
+        ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.WEIGHT_TOTAL_BOXES_DIFF_QC, 0.001));
+    bindings.put(
+        ZoomPropertyName.QC_DIMENSION_VALUE.name(),
+        zoomPropertyService.getDouble(ZoomPropertyName.QC_DIMENSION_VALUE, 1.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WEIGHT_RATIO_ALLOWED_WITHOUT_QC, 4.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_VOLUME_WITH_RATIO_CONSTRAINT_QC, 15.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_RATIO_WITH_VOLUME_CONSTRAINT_QC, 2.0));
+    bindings.put(
+        ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC.name(),
+        zoomPropertyService.getDouble(
+            ZoomPropertyName.MAXIMUM_BOXES_WITH_WEIGHT_EQUALS_BOXES_QC, 5.0));
   }
 
   @Override
@@ -625,19 +697,24 @@ public class QcServiceImpl implements QcService {
   }
 
   @Override
-  public void consumeQcBlockerTicketClosedEvent(Long ticketId, Long ticketingUserId) {
+  public void consumeQcBlockerTicketClosedEvent(
+      Long ticketId, Long ticketingUserId, String actionName) {
     if (ticketId == null) {
+      return;
+    }
+    if (!ZoomTicketingConstant.QC_ACTION_NAME.equals(actionName)) {
+      log.info("Action ignored since it is not related to QC");
       return;
     }
     TicketDTO ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
     if (ticketDTO == null) {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
-    if (ticketDTO.getTypeId() != ZoomTicketingConstant.QC_BLOCKER_TYPE_ID) {
+    if (!ZoomTicketingConstant.QC_BLOCKER_TYPE_ID.equals(ticketDTO.getTypeId())) {
       return;
     }
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      closeTicket(ticketDTO, ZoomTicketingConstant.QC_BLOCKER_CLOSURE_MESSAGE);
+      closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
     }
     zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
   }

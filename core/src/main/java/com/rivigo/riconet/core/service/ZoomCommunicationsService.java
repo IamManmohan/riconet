@@ -1,7 +1,11 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import java.io.IOException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -17,6 +21,8 @@ public class ZoomCommunicationsService {
   @Autowired private SmsService smsService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private ObjectMapper objectMapper;
 
   public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
 
@@ -40,15 +46,39 @@ public class ZoomCommunicationsService {
       return;
     }
 
+    boolean isDndExempted = false;
+    // To Note: Not all events may have been added to EventName so deserialization for those will
+    // fail
+    // and exemption will not work by adding new events only to zoom property.
+    // Best solution: Single common list be maintained in a communications commons
+    try {
+      NotificationDTO notificationDTO =
+          objectMapper.readValue(
+              zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
+      List<String> dndExemptedEvents =
+          zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
+      isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName().toString());
+      log.debug("NotificationDTO {}", notificationDTO);
+    } catch (IOException ex) {
+      log.error(
+          "Error occured while processing NotificationDTO for {} ",
+          zoomCommunicationsSMSDTO.getEventUID(),
+          ex);
+    }
+
     log.info(
         "Sending sms, message {}, on Phone number {}",
         zoomCommunicationsSMSDTO.getMessage(),
         zoomCommunicationsSMSDTO.getPhoneNumber());
 
-    log.debug("DND start time {} and end time {}", dndStartTime, dndEndTime);
+    log.debug(
+        "DND start time {} and end time {}, isDndExempted: {}",
+        dndStartTime,
+        dndEndTime,
+        isDndExempted);
     int millisOfDay =
         DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
-    if (millisOfDay >= dndEndTime && millisOfDay < dndStartTime) {
+    if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
       String returnValue =
           smsService.sendSms(
               zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
