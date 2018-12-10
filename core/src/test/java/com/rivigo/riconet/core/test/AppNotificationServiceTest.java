@@ -4,11 +4,19 @@ import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_ID
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
+import com.rivigo.zoom.common.enums.TaskType;
+import com.rivigo.zoom.common.enums.ZoomTripType;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
+import com.rivigo.zoom.common.model.OATaskAssignment;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
+import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,13 +35,17 @@ import org.mockito.MockitoAnnotations;
 @Slf4j
 public class AppNotificationServiceTest {
 
-  @InjectMocks private AppNotificationServiceImpl appNotificationService;
+  @Mock private PushNotificationService pushNotificationService;
 
   @Mock private DeviceAppVersionMapperRepository deviceAppVersionMapperRepository;
 
-  @Mock private PushNotificationService pushNotificationService;
-
   @Mock private ZoomPropertyService zoomPropertyService;
+
+  @Mock private ConsignmentScheduleService consignmentScheduleService;
+
+  @Mock private OATaskAssignmentRepository oaTaskAssignmentRepository;
+
+  @InjectMocks private AppNotificationServiceImpl appNotificationService;
 
   @Before
   public void initMocks() {
@@ -51,8 +63,8 @@ public class AppNotificationServiceTest {
     notificationDTO.setMetadata(metadata);
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
-    List<DeviceAppVersionMapper> deviceAppVersionMappers = new ArrayList<>();
-    deviceAppVersionMappers.addAll(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
     Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
@@ -70,11 +82,56 @@ public class AppNotificationServiceTest {
     notificationDTO.setMetadata(metadata);
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
-    List<DeviceAppVersionMapper> deviceAppVersionMappers = new ArrayList<>();
-    deviceAppVersionMappers.addAll(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
     Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+  }
+
+  @Test
+  public void sendIBClearNotification() throws IOException {
+    NotificationDTO notificationDTO = new NotificationDTO();
+    notificationDTO.setEntityId(1L);
+    notificationDTO.setTsMs(DateTime.now().getMillis());
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.LOCATION_ID.name(), "1");
+    notificationDTO.setMetadata(metadata);
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(deviceAppVersionMapperRepository.findByUserIdIn(Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
+        .thenReturn(
+            Arrays.asList(
+                getDummyConsignmentSchedule(1L, 1L), getDummyConsignmentSchedule(2L, 2L)));
+    Mockito.when(
+            oaTaskAssignmentRepository
+                .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
+                    Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn(
+            OATaskAssignment.builder()
+                .id(1L)
+                .locationId(1L)
+                .taskType(TaskType.LOADING)
+                .tripType(ZoomTripType.TRIP)
+                .isActive(Boolean.TRUE)
+                .build());
+    appNotificationService.sendIBClearEvent(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+  }
+
+  private ConsignmentSchedule getDummyConsignmentSchedule(Long locationId, Long tripId) {
+    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
+    consignmentSchedule.setLocationId(locationId);
+    consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
+    consignmentSchedule.setDepartureTripId(tripId);
+    consignmentSchedule.setDepartureTripType(ZoomTripType.TRIP);
+    return consignmentSchedule;
   }
 }

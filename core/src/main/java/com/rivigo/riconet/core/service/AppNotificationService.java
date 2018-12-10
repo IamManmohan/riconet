@@ -12,4 +12,6 @@ public interface AppNotificationService {
   void sendPalletClosedNotification(NotificationDTO notificationDTO);
 
   void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO);
+
+  void sendIBClearEvent(NotificationDTO notificationDTO);
 }

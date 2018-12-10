@@ -75,6 +75,7 @@ public class EventTriggerService {
         // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
         qcService.consumeUnloadingEvent(unloadingData);
         consignmentService.triggerBfCpdCalcualtion(unloadingData);
+        appNotificationService.sendIBClearEvent(notificationDTO);
         break;
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
