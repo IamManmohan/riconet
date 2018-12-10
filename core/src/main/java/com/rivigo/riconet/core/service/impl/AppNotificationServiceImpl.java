@@ -10,6 +10,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
+import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
@@ -151,7 +152,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               JSONObject pushObject = new JSONObject();
               JSONObject data = new JSONObject();
 
-              data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+              data.put(NOTIFICATION_TYPE, PushNotificationConstant.IB_CLEAR_EVENT);
               data.put(TASK_ID, taskId);
 
               pushObject.put(DATA, data);
