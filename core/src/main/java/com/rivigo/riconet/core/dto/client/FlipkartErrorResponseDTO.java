@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.dto.client;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @ToString
 public class FlipkartErrorResponseDTO {
     private Long error_response_code;
