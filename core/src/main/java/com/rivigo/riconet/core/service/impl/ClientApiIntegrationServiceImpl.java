@@ -70,8 +70,10 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${hilti.update.transactions.url}")
   private String hiltiUpdateTransactionsUrl;
 
+  /*
   @Value("${flipkart.login.url}")
   private String flipkartLoginUrl;
+  */
 
   @Value("${flipkart.update.transaction.url}")
   private String flipkartUpdateTransactionUrl;
@@ -135,7 +137,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     headers.set(RestUtilConstants.TENANT_ID, flipkartTenantId);
 
     return restClientUtilityService.executeRest(
-            flipkartLoginUrl,
+            //flipkartLoginUrl,
+            "http://transport.preprod.inbound.ekartlogistics.com/v1/login",
             HttpMethod.POST,
             new HttpEntity<>(null, headers),
             Object.class);
