@@ -70,10 +70,10 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${hilti.update.transactions.url}")
   private String hiltiUpdateTransactionsUrl;
 
-  /*
-  @Value("${flipkart.login.url}")
-  private String flipkartLoginUrl;
-  */
+
+
+  private String flipkartLoginUrl="http://transport.preprod.inbound.ekartlogistics.com/v1/login";
+
 
   @Value("${flipkart.update.transaction.url}")
   private String flipkartUpdateTransactionUrl;
@@ -137,8 +137,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     headers.set(RestUtilConstants.TENANT_ID, flipkartTenantId);
 
     return restClientUtilityService.executeRest(
-            //flipkartLoginUrl,
-            "http://transport.preprod.inbound.ekartlogistics.com/v1/login",
+            flipkartLoginUrl,
             HttpMethod.POST,
             new HttpEntity<>(null, headers),
             Object.class);
@@ -147,8 +146,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   private Optional<?> sendRequestToFlipkart(List<ClientIntegrationRequestDTO> requestDtos)  {
 
     /** Calling Flipkart Login Api */
-    log.info("Sending login request to flipkart for", "username: " + flipkartLoginUsername, "password: " + flipkartLoginPassword,
-            "clientId: " + flipkartClientId,"tenantID: " + flipkartTenantId);
+    log.info("Sending login request to flipkart for" + "username: " + flipkartLoginUsername + "password: " + flipkartLoginPassword +
+            "clientId: " + flipkartClientId + "tenantID: " + flipkartTenantId);
     FlipkartLoginResponseDTO loginResponseDto =
             objectMapper.convertValue(
                     loginToFlipkart()
