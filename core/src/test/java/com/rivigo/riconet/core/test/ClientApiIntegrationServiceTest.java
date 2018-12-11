@@ -8,7 +8,7 @@ import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
-import com.rivigo.riconet.core.service.impl.HiltiApiServiceImpl;
+import com.rivigo.riconet.core.service.impl.ClientApiIntegrationServiceImpl;
 import com.rivigo.riconet.core.service.impl.RestClientUtilityServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
@@ -30,7 +30,7 @@ import org.mockito.Spy;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @Slf4j
-public class HiltiApiServiceTest {
+public class ClientApiIntegrationServiceTest {
 
   @Spy private ObjectMapper objectMapper;
 
@@ -48,7 +48,7 @@ public class HiltiApiServiceTest {
 
   @Mock private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
 
-  @InjectMocks private HiltiApiServiceImpl hiltiApiService;
+  @InjectMocks private ClientApiIntegrationServiceImpl clientApiIntegrationService;
 
   public static final List<String> CNOTES =
       Arrays.asList("6000320900", "6000339900", "6000345901", "6000472125");
@@ -59,10 +59,10 @@ public class HiltiApiServiceTest {
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
     ReflectionTestUtils.setField(
-        hiltiApiService,
+            clientApiIntegrationService,
         "hiltiUpdateTransactionsUrl",
         "https://staging.fareye.co/api/v1/update_transactions_status?api_key=VmyY0lEUNrj4eUUn5jqWYMgGjpeeLtDS");
-    ReflectionTestUtils.setField(hiltiApiService, "objectMapper", objectMapper);
+    ReflectionTestUtils.setField(clientApiIntegrationService, "objectMapper", objectMapper);
     Mockito.when(pickupRepository.findOne(ApiServiceUtils.PICKUP_ID))
         .thenReturn(ApiServiceUtils.getDummyPickup());
     Mockito.when(consignmentReadOnlyService.findConsignmentByPickupId(ApiServiceUtils.PICKUP_ID))
@@ -91,8 +91,8 @@ public class HiltiApiServiceTest {
   private void addPickupDoneEvent() {
 
     NotificationDTO notificationDTO = ApiServiceUtils.getDummyPickupCompleteNotificationDto();
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addintransitArrivedEvent() {
@@ -101,8 +101,8 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addIntransitDispatchedEvent() {
@@ -111,8 +111,8 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_LOADED, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addIntransitArrivedAtDestinationEvent() {
@@ -128,8 +128,8 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addDeliveryOFDEvent() {
@@ -138,8 +138,8 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_OUT_FOR_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addDeliveryDeliveredEvent() {
@@ -148,8 +148,8 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
   private void addDeliveryUndeliveredEvent() {
@@ -158,9 +158,9 @@ public class HiltiApiServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_UNDELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = hiltiApiService.getRequestDtosByType(notificationDTO);
-    hiltiApiService.addEventsToQueue(requestDtos);
-    hiltiApiService.publishEventsAndProcessErrors();
+    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
+    clientApiIntegrationService.publishEventsOfHiltiAndProcessErrors();
   }
 
   @Test

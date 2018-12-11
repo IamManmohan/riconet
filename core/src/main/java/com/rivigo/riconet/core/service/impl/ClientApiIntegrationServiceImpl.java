@@ -1,9 +1,16 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.RestUtilConstants;
+import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
+import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
+import com.rivigo.riconet.core.service.ClientConsignmentMetadataService;
+import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
+import org.apache.commons.codec.binary.Base64;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.client.ClientIntegrationRequestDTO;
 import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.DeliveryDeliveredDto;
 import com.rivigo.riconet.core.dto.hilti.DeliveryNotDeliveredDto;
@@ -18,7 +25,7 @@ import com.rivigo.riconet.core.enums.HiltiStatusCode;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
-import com.rivigo.riconet.core.service.HiltiApiService;
+import com.rivigo.riconet.core.service.ClientApiIntegrationService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
@@ -50,16 +57,36 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class HiltiApiServiceImpl implements HiltiApiService {
+public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationService {
 
   @Value("${hilti.update.transactions.url}")
   private String hiltiUpdateTransactionsUrl;
+
+  @Value("${flipkart.login.url}")
+  private String flipkartLoginUrl;
+
+  @Value("${flipkart.update.transaction.url}")
+  private String flipkartUpdateTransactionUrl;
+
+  @Value("rivigo_test_client")
+  private String flipkartLoginUsername;
+
+  @Value("lXIqM9G/Rnyy1KWsmNBGVuEZbfy5MIJTdVXYwsmhIDU5XwXg")
+  private String flipkartLoginPassword;
+
+  @Value("test")
+  private String flipkartClientId;
+
+  @Value("TRANSPORT")
+  private String flipkartTenantId;
 
   @Autowired private RestClientUtilityService restClientUtilityService;
 
@@ -77,11 +104,17 @@ public class HiltiApiServiceImpl implements HiltiApiService {
 
   @Autowired private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
 
+  @Autowired private ClientConsignmentMetadataService clientConsignmentMetadataService;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   private static BlockingQueue<HiltiRequestDto> eventBuffer = new LinkedBlockingQueue<>();
 
-  private List<HiltiRequestDto> lastRequestDtos = new ArrayList<>();
+  private static BlockingQueue<ClientIntegrationRequestDTO> clientEventBuffer = new LinkedBlockingQueue<>();
+
+  private List<HiltiRequestDto> hiltiRequestDtoList = new ArrayList<>();
+
+  private List<ClientIntegrationRequestDTO> clientIntegrationRequestDtoList = new ArrayList<>();
 
   private Optional<?> sendRequestToHilti(List<HiltiRequestDto> requestDtos) {
     return restClientUtilityService.executeRest(
@@ -89,6 +122,47 @@ public class HiltiApiServiceImpl implements HiltiApiService {
         HttpMethod.POST,
         new HttpEntity<>(requestDtos, restClientUtilityService.getHeaders()),
         Object.class);
+  }
+
+  private Optional<?> loginToFlipkart() {
+    String authString= flipkartLoginUsername + ":" + flipkartLoginPassword;
+    byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
+    String authStringEnc = "Basic " + new String(authEncBytes);
+
+    HttpHeaders headers= restClientUtilityService.getHeaders();
+    headers.set(HttpHeaders.AUTHORIZATION, authStringEnc);
+    headers.set(RestUtilConstants.CLIENT_ID, flipkartClientId);
+    headers.set(RestUtilConstants.TENANT_ID, flipkartTenantId);
+
+    return restClientUtilityService.executeRest(
+            flipkartLoginUrl,
+            HttpMethod.POST,
+            new HttpEntity<>(null, headers),
+            Object.class);
+  }
+
+  private Optional<?> sendRequestToFlipkart(List<ClientIntegrationRequestDTO> requestDtos)  {
+
+    /** Calling Flipkart Login Api */
+    log.info("Sending login request to flipkart for", "username: " + flipkartLoginUsername, "password: " + flipkartLoginPassword,
+            "clientId: " + flipkartClientId,"tenantID: " + flipkartTenantId);
+    FlipkartLoginResponseDTO loginResponseDto =
+            objectMapper.convertValue(
+                    loginToFlipkart()
+                            .orElseThrow(() -> new ZoomException("Unable to login to Flipkart")),
+                    FlipkartLoginResponseDTO.class);
+    log.info("Login Response from Flipkart: {}", loginResponseDto);
+
+    HttpHeaders headers= restClientUtilityService.getHeaders();
+    headers.set(HttpHeaders.AUTHORIZATION, RestUtilConstants.TOKEN_PREFIX + loginResponseDto.getData().get("access_token"));
+    headers.set(RestUtilConstants.CLIENT_ID, flipkartClientId);
+    headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+    return restClientUtilityService.executeRest(
+            flipkartUpdateTransactionUrl,
+            HttpMethod.POST,
+            new HttpEntity<>(requestDtos, headers),
+            Object.class);
   }
 
   private List<HiltiRequestDto> getPickupRequestDtos(NotificationDTO notificationDTO) {
@@ -222,7 +296,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
     return fieldData;
   }
 
-  public List<HiltiRequestDto> getRequestDtosByType(NotificationDTO notificationDTO) {
+  public List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO) {
 
     HiltiJobType jobType;
     HiltiStatusCode statusCode;
@@ -264,6 +338,7 @@ public class HiltiApiServiceImpl implements HiltiApiService {
               .orElseThrow(
                   () -> new ZoomException("Unable to get consignment from " + notificationDTO));
     }
+
     return Collections.singletonList(
         HiltiRequestDto.builder()
             .jobType(jobType.toString())
@@ -273,22 +348,44 @@ public class HiltiApiServiceImpl implements HiltiApiService {
             .build());
   }
 
-  public boolean addEventsToQueue(List<HiltiRequestDto> requestDtos) {
+  public List<ClientIntegrationRequestDTO> getClientRequestDtosByType(NotificationDTO notificationDTO)  {
+    List<HiltiRequestDto> hiltiRequestDtoList = getHiltiRequestDtosByType(notificationDTO);
+
+    List<String> cnoteList= hiltiRequestDtoList.stream().map(HiltiRequestDto::getReferenceNumber).collect(Collectors.toList());
+    Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap= clientConsignmentMetadataService.getCnoteToConsignmentMetadataMapFromCnoteList(cnoteList);
+
+    List<ClientIntegrationRequestDTO> clientIntegrationRequestDTOList= new ArrayList<>();
+    ClientIntegrationRequestDTO clientIntegrationRequestDto;
+    for(HiltiRequestDto hiltiRequestDto: hiltiRequestDtoList)  {
+      clientIntegrationRequestDto= new ClientIntegrationRequestDTO(hiltiRequestDto);
+      clientIntegrationRequestDto.setMetadata(cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber()));
+      clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
+    }
+
+    return clientIntegrationRequestDTOList;
+  }
+
+  public boolean addEventsToHiltiQueue(List<HiltiRequestDto> requestDtos) {
     log.info("Adding events to queue to send to Hilti {}", requestDtos);
     return eventBuffer.addAll(requestDtos);
   }
 
+  public boolean addEventsToFlipkartQueue(List<ClientIntegrationRequestDTO> requestDtos)  {
+    log.info("Adding events to queue to send to Flipakrt {}", requestDtos);
+    return eventBuffer.addAll(requestDtos);
+  }
+
   @Scheduled(fixedDelay = 500L)
-  public void publishEventsAndProcessErrors() {
-    lastRequestDtos.clear();
-    int pushedEventCount = eventBuffer.drainTo(lastRequestDtos);
+  public void publishEventsOfHiltiAndProcessErrors() {
+    hiltiRequestDtoList.clear();
+    int pushedEventCount = eventBuffer.drainTo(hiltiRequestDtoList);
 
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     if (pushedEventCount > 0) {
-      log.info("Sending requests for {}", lastRequestDtos);
+      log.info("Sending requests for {}", hiltiRequestDtoList);
       HiltiResponseDto responseDto =
           objectMapper.convertValue(
-              sendRequestToHilti(lastRequestDtos)
+              sendRequestToHilti(hiltiRequestDtoList)
                   .orElseThrow(() -> new ZoomException("Unable to get response from Hilti")),
               HiltiResponseDto.class);
       log.info("Response from Hilti: {}", responseDto);
@@ -296,6 +393,24 @@ public class HiltiApiServiceImpl implements HiltiApiService {
       if (responseDto.getFailCount() > 0) {
         handleFailures(responseDto.getFailureList());
       }
+    }
+  }
+
+  @Scheduled(fixedDelay =  500L)
+  public void publishEventsOfFlipkartAndProcessErrors() {
+    clientIntegrationRequestDtoList.clear();
+    int pushedEventCount = clientEventBuffer.drainTo(clientIntegrationRequestDtoList);
+
+    objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+    if(pushedEventCount > 0)  {
+      /** Calling Flipkart send events Api */
+      log.info("Trying Send event request to flipkart {}", clientIntegrationRequestDtoList);
+      ClientIntegrationResponseDTO responseDto =
+              objectMapper.convertValue(
+                      sendRequestToFlipkart(clientIntegrationRequestDtoList)
+                              .orElseThrow(() -> new ZoomException("Unable to get response from Flipkart")),
+                      ClientIntegrationResponseDTO.class);
+      log.info("Response from Flipkart: {}", responseDto);
     }
   }
 
