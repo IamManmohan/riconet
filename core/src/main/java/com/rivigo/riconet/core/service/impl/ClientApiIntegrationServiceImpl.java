@@ -372,7 +372,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   public boolean addEventsToFlipkartQueue(List<ClientIntegrationRequestDTO> requestDtos)  {
     log.info("Adding events to queue to send to Flipakrt {}", requestDtos);
-    return eventBuffer.addAll(requestDtos);
+    return clientEventBuffer.addAll(requestDtos);
   }
 
   @Scheduled(fixedDelay = 500L)
