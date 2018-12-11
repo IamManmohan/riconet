@@ -139,7 +139,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     return restClientUtilityService.executeRest(
             flipkartLoginUrl,
             HttpMethod.POST,
-            new HttpEntity<>(null, headers),
+            new HttpEntity<>(headers),
             Object.class);
   }
 
