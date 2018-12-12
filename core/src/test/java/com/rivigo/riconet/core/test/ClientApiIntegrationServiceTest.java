@@ -59,7 +59,7 @@ public class ClientApiIntegrationServiceTest {
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
     ReflectionTestUtils.setField(
-            clientApiIntegrationService,
+        clientApiIntegrationService,
         "hiltiUpdateTransactionsUrl",
         "https://staging.fareye.co/api/v1/update_transactions_status?api_key=VmyY0lEUNrj4eUUn5jqWYMgGjpeeLtDS");
     ReflectionTestUtils.setField(clientApiIntegrationService, "objectMapper", objectMapper);
@@ -91,7 +91,8 @@ public class ClientApiIntegrationServiceTest {
   private void addPickupDoneEvent() {
 
     NotificationDTO notificationDTO = ApiServiceUtils.getDummyPickupCompleteNotificationDto();
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -101,7 +102,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -111,7 +113,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_LOADED, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -128,7 +131,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -138,7 +142,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_OUT_FOR_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -148,7 +153,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
   }
 
@@ -158,7 +164,8 @@ public class ClientApiIntegrationServiceTest {
         ApiServiceUtils.getDummyCnNotificationDtoForEvent(
             EventName.CN_UNDELIVERY, CNOTES.get(CNOTE_INDEX));
 
-    List<HiltiRequestDto> requestDtos = clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
+    List<HiltiRequestDto> requestDtos =
+        clientApiIntegrationService.getHiltiRequestDtosByType(notificationDTO);
     clientApiIntegrationService.addEventsToHiltiQueue(requestDtos);
     clientApiIntegrationService.publishEventsOfHiltiAndProcessErrors();
   }

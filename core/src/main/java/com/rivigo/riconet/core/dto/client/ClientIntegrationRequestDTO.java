@@ -14,12 +14,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ClientIntegrationRequestDTO extends HiltiRequestDto {
-    private ClientConsignmentMetadata metadata;
+  private ClientConsignmentMetadata metadata;
 
-    public ClientIntegrationRequestDTO(HiltiRequestDto requestDto) {
-        this.setReferenceNumber(requestDto.getReferenceNumber());
-        this.setJobType(requestDto.getJobType());
-        this.setNewStatusCode(requestDto.getNewStatusCode());
-        this.setFieldData(requestDto.getFieldData());
-    }
+  public ClientIntegrationRequestDTO(HiltiRequestDto requestDto) {
+    this.setReferenceNumber(requestDto.getReferenceNumber());
+    this.setJobType(requestDto.getJobType());
+    this.setNewStatusCode(requestDto.getNewStatusCode());
+    this.setFieldData(requestDto.getFieldData());
+  }
 }
