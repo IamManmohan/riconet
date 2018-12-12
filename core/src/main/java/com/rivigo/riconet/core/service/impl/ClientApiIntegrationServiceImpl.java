@@ -70,10 +70,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${hilti.update.transactions.url}")
   private String hiltiUpdateTransactionsUrl;
 
-
-
-  private String flipkartLoginUrl="http://transport.preprod.inbound.ekartlogistics.com/v1/login";
-
+  @Value("${flipkart.login.url}")
+  private String flipkartLoginUrl;
+  //private String flipkartLoginUrl="http://transport.preprod.inbound.ekartlogistics.com/v1/login";
 
   @Value("${flipkart.update.transaction.url}")
   private String flipkartUpdateTransactionUrl;
