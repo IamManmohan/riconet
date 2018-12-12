@@ -138,16 +138,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
   @Override
   public List<Consignment> getConsignmentListByCnoteList(List<String> cnoteList) {
-    List<Consignment> consignmentList= new ArrayList<>();
-    for(String cnote: cnoteList)  {
+    List<Consignment> consignmentList = new ArrayList<>();
+    for (String cnote : cnoteList) {
       consignmentList.add(consignmentRepo.findByCnote(cnote));
     }
     return consignmentList;
   }
 
   @Override
-  public Map<Long, String> getIdToCnoteMap(List<String> cnoteList)  {
-    return getConsignmentListByCnoteList(cnoteList).stream().collect(Collectors.toMap(Consignment::getId, Consignment::getCnote));
+  public Map<Long, String> getIdToCnoteMap(List<String> cnoteList) {
+    return getConsignmentListByCnoteList(cnoteList)
+        .stream()
+        .collect(Collectors.toMap(Consignment::getId, Consignment::getCnote));
   }
 
   @Override
