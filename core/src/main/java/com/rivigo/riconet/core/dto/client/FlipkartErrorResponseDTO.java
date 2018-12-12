@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.dto.client;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class FlipkartErrorResponseDTO {
     @JsonProperty("error_response_code")
     private Long errorResponseCode;
