@@ -9,15 +9,9 @@ import java.util.List;
 
 public interface ClientApiIntegrationService {
 
-  List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO);
-
-  List<ClientIntegrationRequestDTO> getClientRequestDtosByType(NotificationDTO notificationDTO);
+  void getClientRequestDtosByType(NotificationDTO notificationDTO, String clientId);
 
   void publishEventsOfHiltiAndProcessErrors();
 
   void publishEventsOfFlipkartAndProcessErrors();
-
-  boolean addEventsToHiltiQueue(List<HiltiRequestDto> requestDto);
-
-  boolean addEventsToFlipkartQueue(List<ClientIntegrationRequestDTO> requestDto);
 }

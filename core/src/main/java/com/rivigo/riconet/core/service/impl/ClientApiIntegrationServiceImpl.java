@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.RestUtilConstants;
 import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
@@ -45,10 +46,12 @@ import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
@@ -72,7 +75,6 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   @Value("${flipkart.login.url}")
   private String flipkartLoginUrl;
-  //private String flipkartLoginUrl="http://transport.preprod.inbound.ekartlogistics.com/v1/login";
 
   @Value("${flipkart.update.transaction.url}")
   private String flipkartUpdateTransactionUrl;
@@ -349,31 +351,36 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             .build());
   }
 
-  public List<ClientIntegrationRequestDTO> getClientRequestDtosByType(NotificationDTO notificationDTO)  {
+  public void getClientRequestDtosByType(NotificationDTO notificationDTO, String clientId)  {
     List<HiltiRequestDto> hiltiRequestDtoList = getHiltiRequestDtosByType(notificationDTO);
 
-    List<String> cnoteList= hiltiRequestDtoList.stream().map(HiltiRequestDto::getReferenceNumber).collect(Collectors.toList());
-    Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap= clientConsignmentMetadataService.getCnoteToConsignmentMetadataMapFromCnoteList(cnoteList);
+    switch (clientId) {
+      case ClientConstants.HILTI_CLIENT_ID:
+      case ClientConstants.HILTI_CLIENT_ID_DEP:
+        addEventsToQueue(hiltiRequestDtoList, eventBuffer);
+        break;
+      case ClientConstants.FLIPKART_CLIENT:
+        List<String> cnoteList= hiltiRequestDtoList.stream().map(HiltiRequestDto::getReferenceNumber).collect(Collectors.toList());
+        Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap= clientConsignmentMetadataService.getCnoteToConsignmentMetadataMapFromCnoteList(cnoteList);
 
-    List<ClientIntegrationRequestDTO> clientIntegrationRequestDTOList= new ArrayList<>();
-    ClientIntegrationRequestDTO clientIntegrationRequestDto;
-    for(HiltiRequestDto hiltiRequestDto: hiltiRequestDtoList)  {
-      clientIntegrationRequestDto= new ClientIntegrationRequestDTO(hiltiRequestDto);
-      clientIntegrationRequestDto.setMetadata(cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber()));
-      clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
+        List<ClientIntegrationRequestDTO> clientIntegrationRequestDTOList= new ArrayList<>();
+        ClientIntegrationRequestDTO clientIntegrationRequestDto;
+        for(HiltiRequestDto hiltiRequestDto: hiltiRequestDtoList)  {
+          clientIntegrationRequestDto= new ClientIntegrationRequestDTO(hiltiRequestDto);
+          clientIntegrationRequestDto.setMetadata(cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber()));
+          clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
+        }
+        addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);
+        break;
+      default:
+        log.info("No event defined for this client {}", notificationDTO);
+        break;
     }
-
-    return clientIntegrationRequestDTOList;
   }
 
-  public boolean addEventsToHiltiQueue(List<HiltiRequestDto> requestDtos) {
-    log.info("Adding events to queue to send to Hilti {}", requestDtos);
-    return eventBuffer.addAll(requestDtos);
-  }
-
-  public boolean addEventsToFlipkartQueue(List<ClientIntegrationRequestDTO> requestDtos)  {
-    log.info("Adding events to queue to send to Flipakrt {}", requestDtos);
-    return clientEventBuffer.addAll(requestDtos);
+  public <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue)  {
+    log.info("Adding events to queue {}", requestDtos, queue.getClass());
+    return queue.addAll(requestDtos);
   }
 
   @Scheduled(fixedDelay = 500L)
