@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 public class FlipkartLoginResponseDTO {
     private Boolean success;
     private Map<String, String> data;
-    private String http_status;
+    @JsonProperty("http_status")
+    private String httpStatus;
     private FlipkartErrorResponseDTO errorResponseDTO;
 }
