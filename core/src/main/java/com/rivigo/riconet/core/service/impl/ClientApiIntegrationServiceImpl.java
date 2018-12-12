@@ -79,16 +79,16 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${flipkart.update.transaction.url}")
   private String flipkartUpdateTransactionUrl;
 
-  @Value("rivigo_test_client")
+  @Value("${flipkart.login.username}")
   private String flipkartLoginUsername;
 
-  @Value("lXIqM9G/Rnyy1KWsmNBGVuEZbfy5MIJTdVXYwsmhIDU5XwXg")
+  @Value("${flipkart.login.password}")
   private String flipkartLoginPassword;
 
-  @Value("test")
+  @Value("${flipkart.client.id}")
   private String flipkartClientId;
 
-  @Value("TRANSPORT")
+  @Value("${flipkart.tenant.id}")
   private String flipkartTenantId;
 
   @Autowired private RestClientUtilityService restClientUtilityService;
