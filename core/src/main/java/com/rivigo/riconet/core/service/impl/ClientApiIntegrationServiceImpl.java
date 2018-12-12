@@ -146,15 +146,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
     /** Calling Flipkart Login Api */
     log.info(
-        "Sending login request to flipkart for"
-            + "username: "
-            + flipkartLoginUsername
-            + "password: "
-            + flipkartLoginPassword
-            + "clientId: "
-            + flipkartClientId
-            + "tenantID: "
-            + flipkartTenantId);
+        "Sending login request to flipkart");
     FlipkartLoginResponseDTO loginResponseDto =
         objectMapper.convertValue(
             loginToFlipkart().orElseThrow(() -> new ZoomException("Unable to login to Flipkart")),
@@ -380,8 +372,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         ClientIntegrationRequestDTO clientIntegrationRequestDto;
         for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoList) {
           clientIntegrationRequestDto = new ClientIntegrationRequestDTO(hiltiRequestDto);
-          clientIntegrationRequestDto.setMetadata(
-              cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber()));
+          clientIntegrationRequestDto.setMetadata(Optional.ofNullable(
+              cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber())).map(ClientConsignmentMetadata::getMetadata).orElse(Collections.emptyMap()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);

@@ -1,12 +1,13 @@
 package com.rivigo.riconet.core.dto.client;
 
 import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
-import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Map;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ClientIntegrationRequestDTO extends HiltiRequestDto {
-  private ClientConsignmentMetadata metadata;
+  private Map<String, String> metadata;
 
   public ClientIntegrationRequestDTO(HiltiRequestDto requestDto) {
     this.setReferenceNumber(requestDto.getReferenceNumber());
