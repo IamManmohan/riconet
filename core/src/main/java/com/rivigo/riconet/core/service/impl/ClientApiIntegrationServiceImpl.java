@@ -358,7 +358,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
       case ClientConstants.HILTI_CLIENT_ID_DEP:
         addEventsToQueue(hiltiRequestDtoList, eventBuffer);
         break;
-      case ClientConstants.FLIPKART_CLIENT:
+      case ClientConstants.FLIPKART_SELLER_CLIENT:
+      case ClientConstants.FLIPKART_INDIA_CLIENT:
         List<String> cnoteList =
             hiltiRequestDtoList
                 .stream()
