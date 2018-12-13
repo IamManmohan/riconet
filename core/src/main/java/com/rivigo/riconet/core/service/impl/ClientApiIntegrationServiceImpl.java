@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
 import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.RestUtilConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.client.ClientIntegrationRequestDTO;
+import com.rivigo.riconet.core.dto.client.FlipkartRequestDTO;
 import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
 import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
@@ -113,12 +113,12 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   private static BlockingQueue<HiltiRequestDto> eventBuffer = new LinkedBlockingQueue<>();
 
-  private static BlockingQueue<ClientIntegrationRequestDTO> clientEventBuffer =
+  private static BlockingQueue<FlipkartRequestDTO> clientEventBuffer =
       new LinkedBlockingQueue<>();
 
   private List<HiltiRequestDto> hiltiRequestDtoList = new ArrayList<>();
 
-  private List<ClientIntegrationRequestDTO> clientIntegrationRequestDtoList = new ArrayList<>();
+  private List<FlipkartRequestDTO> clientIntegrationRequestDtoList = new ArrayList<>();
 
   private Optional<?> sendRequestToHilti(List<HiltiRequestDto> requestDtos) {
     return restClientUtilityService.executeRest(
@@ -142,7 +142,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         flipkartLoginUrl, HttpMethod.POST, new HttpEntity<>(headers), Object.class);
   }
 
-  private Optional<?> sendRequestToFlipkart(List<ClientIntegrationRequestDTO> requestDtos) {
+  private Optional<?> sendRequestToFlipkart(List<FlipkartRequestDTO> requestDtos) {
 
     /** Calling Flipkart Login Api */
     log.info(
@@ -368,13 +368,15 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap =
             clientConsignmentMetadataService.getCnoteToConsignmentMetadataMapFromCnoteList(
                 cnoteList);
-
-        List<ClientIntegrationRequestDTO> clientIntegrationRequestDTOList = new ArrayList<>();
-        ClientIntegrationRequestDTO clientIntegrationRequestDto;
+        Map<String,List<String>> cnoteToBarcodesMap = null;
+                
+        List<FlipkartRequestDTO> clientIntegrationRequestDTOList = new ArrayList<>();
+        FlipkartRequestDTO clientIntegrationRequestDto;
         for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoList) {
-          clientIntegrationRequestDto = new ClientIntegrationRequestDTO(hiltiRequestDto);
+          clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto);
           clientIntegrationRequestDto.setMetadata(Optional.ofNullable(
               cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber())).map(ClientConsignmentMetadata::getMetadata).orElse(Collections.emptyMap()));
+          clientIntegrationRequestDto.setBarcodes(cnoteToBarcodesMap.getOrDefault(hiltiRequestDto.getReferenceNumber(), Collections.emptyList()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);
@@ -385,7 +387,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  public <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
+
+public <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
     log.info("Adding events to queue {}", requestDtos, queue.getClass());
     return queue.addAll(requestDtos);
   }
