@@ -7,4 +7,7 @@ import java.util.Map;
 public interface ClientConsignmentMetadataService {
   Map<String, ClientConsignmentMetadata> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList);
+
+  Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(
+          List<String> cnoteList);
 }
