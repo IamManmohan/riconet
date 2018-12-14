@@ -4,10 +4,10 @@ import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import java.util.List;
 import java.util.Map;
 
-public interface ClientConsignmentMetadataService {
+public interface ClientConsignmentService {
   Map<String, ClientConsignmentMetadata> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList);
 
-  Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(
+  Map<String, List<String>> getCnoteToBarcodeMapListFromCnoteList(
           List<String> cnoteList);
 }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.dto.client;
 
+import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.HiltiRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,14 +16,17 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class FlipkartRequestDTO extends HiltiRequestDto {
+public class FlipkartRequestDTO {
   private Map<String, String> metadata;
-  private List<String> barcodes;
+  private String referenceNumber;
+  private String jobType;
+  private String newStatusCode;
+  private BaseHiltiFieldData fieldData;
 
-  public FlipkartRequestDTO(HiltiRequestDto requestDto) {
+  public FlipkartRequestDTO(HiltiRequestDto requestDto,List<String> barcodes) {
     this.setReferenceNumber(requestDto.getReferenceNumber());
     this.setJobType(requestDto.getJobType());
     this.setNewStatusCode(requestDto.getNewStatusCode());
-    this.setFieldData(requestDto.getFieldData());
+    this.setFieldData(new BaseFlipkartFieldData(barcodes));
   }
 }

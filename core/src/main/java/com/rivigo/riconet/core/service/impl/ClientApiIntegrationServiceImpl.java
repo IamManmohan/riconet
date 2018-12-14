@@ -22,7 +22,7 @@ import com.rivigo.riconet.core.enums.HiltiJobType;
 import com.rivigo.riconet.core.enums.HiltiStatusCode;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ClientApiIntegrationService;
-import com.rivigo.riconet.core.service.ClientConsignmentMetadataService;
+import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
@@ -107,7 +107,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   @Autowired private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
 
-  @Autowired private ClientConsignmentMetadataService clientConsignmentMetadataService;
+  @Autowired private ClientConsignmentService clientConsignmentService;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -366,17 +366,19 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                 .map(HiltiRequestDto::getReferenceNumber)
                 .collect(Collectors.toList());
         Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap =
-            clientConsignmentMetadataService.getCnoteToConsignmentMetadataMapFromCnoteList(
+            clientConsignmentService.getCnoteToConsignmentMetadataMapFromCnoteList(
                 cnoteList);
-        Map<String,List<String>> cnoteToBarcodesMap = null;
+        Map<String,List<String>> cnoteToBarcodesMap =
+                clientConsignmentService.getCnoteToBarcodeMapListFromCnoteList(
+                        cnoteList);
                 
         List<FlipkartRequestDTO> clientIntegrationRequestDTOList = new ArrayList<>();
         FlipkartRequestDTO clientIntegrationRequestDto;
         for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoList) {
-          clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto);
+          List<String> barcodes = cnoteToBarcodesMap.getOrDefault(hiltiRequestDto.getReferenceNumber(), Collections.emptyList());
+          clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto,barcodes);
           clientIntegrationRequestDto.setMetadata(Optional.ofNullable(
               cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber())).map(ClientConsignmentMetadata::getMetadata).orElse(Collections.emptyMap()));
-          clientIntegrationRequestDto.setBarcodes(cnoteToBarcodesMap.getOrDefault(hiltiRequestDto.getReferenceNumber(), Collections.emptyList()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);

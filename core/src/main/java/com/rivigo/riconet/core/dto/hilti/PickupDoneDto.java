@@ -17,6 +17,6 @@ import lombok.ToString;
 @ToString
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PickupDoneDto extends BaseHiltiFieldData {
-  private String pickupTime;
-  private String expectedDeliveryDate;
+    private String pickupTime;
+    private String expectedDeliveryDate;
 }

@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.rivigo.riconet.core.service.ClientConsignmentMetadataService;
+import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class ClientConsignmentMetadataServiceImpl implements ClientConsignmentMetadataService {
+public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   @Autowired private ClientConsignmentMetadataRepository clientConsignmentMetadataRepository;
 
@@ -36,7 +36,7 @@ public class ClientConsignmentMetadataServiceImpl implements ClientConsignmentMe
     return cnoteToMetadataMap;
   }
 
-  public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(
+  public Map<String, List<String>> getCnoteToBarcodeMapListFromCnoteList(
           List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
     return  boxRepository
