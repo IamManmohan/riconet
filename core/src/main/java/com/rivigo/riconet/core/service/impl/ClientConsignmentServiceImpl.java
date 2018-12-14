@@ -36,11 +36,18 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
     return cnoteToMetadataMap;
   }
 
-  public Map<String, List<String>> getCnoteToBarcodeMapListFromCnoteList(
+  public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(
           List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
     return  boxRepository
             .findByConsignmentIdIn(new ArrayList<>((idToCnoteMap.keySet()))).stream().
             collect(Collectors.groupingBy(Box::getCnote,Collectors.mapping(Box::getBarCode,Collectors.toList())));
+  }
+
+  public List<String> getBarcodeListFromConsignmentId(
+          Long cnId)  {
+   return boxRepository
+          .findByConsignmentId(cnId).stream().
+           map(Box::getBarCode).collect(Collectors.toList());
   }
 }

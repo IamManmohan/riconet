@@ -167,10 +167,13 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         Object.class);
   }
 
-  private List<HiltiRequestDto> getPickupRequestDtos(NotificationDTO notificationDTO) {
+  private List<HiltiRequestDto> getPickupRequestDtos(NotificationDTO notificationDTO, Boolean addBarcodes) {
     Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
     List<ConsignmentReadOnly> cnList =
         consignmentReadOnlyService.findConsignmentByPickupId(notificationDTO.getEntityId());
+    Map<String, List<String>> cnoteToBarcodesMap =
+              clientConsignmentService.getCnoteToBarcodeMapFromCnoteList(
+                      cnList.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()));
     return cnList
         .stream()
         .map(
@@ -180,6 +183,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                       .pickupTime(TimeUtilsZoom.getTime(pickup.getPickupDate()))
                       .expectedDeliveryDate(TimeUtilsZoom.getDate(v.getPromisedDeliveryDateTime()))
                       .build();
+              if(addBarcodes) {
+                pickupDoneDto.setBarcodes(cnoteToBarcodesMap.get(v.getCnote()));
+              }
               pickupDoneDto.setDate(TimeUtilsZoom.getDate(pickup.getPickupDate()));
               return HiltiRequestDto.builder()
                   .jobType(HiltiJobType.PICKUP.toString())
@@ -240,7 +246,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
+  private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO, Boolean addBarcodes) {
     switch (notificationDTO.getEventName()) {
       case CN_OUT_FOR_DELIVERY:
         return DeliveryOFDDto.builder().build();
@@ -254,11 +260,25 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                     Collectors.toMap(
                         ConsignmentUploadedFiles::getFileTypes,
                         ConsignmentUploadedFiles::getS3URL));
-        return DeliveryDeliveredDto.builder()
-            .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
-            .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
-            .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
-            .build();
+        /** Adding CN's barcodes */
+        List<String> barCodes =
+                clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
+        if(addBarcodes) {
+          return DeliveryDeliveredDto.builder()
+                  .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
+                  .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
+                  .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
+                  .barcodes(barCodes)
+                  .build();
+        }
+        /** If barcode is not to be added */
+        else  {
+          return DeliveryDeliveredDto.builder()
+                  .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
+                  .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
+                  .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
+                  .build();
+        }
       case CN_UNDELIVERY:
         UndeliveredConsignment undeliveredConsignment =
             undeliveredConsignmentsRepository
@@ -275,7 +295,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  private BaseHiltiFieldData getFieldDataForCnEvents(NotificationDTO notificationDTO) {
+  private BaseHiltiFieldData getFieldDataForCnEvents(NotificationDTO notificationDTO, Boolean addBarcodes) {
     BaseHiltiFieldData fieldData;
     switch (notificationDTO.getEventName()) {
       case CN_RECEIVED_AT_OU:
@@ -286,7 +306,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
       case CN_OUT_FOR_DELIVERY:
       case CN_DELIVERY:
       case CN_UNDELIVERY:
-        fieldData = getDeliveryFieldData(notificationDTO);
+        fieldData = getDeliveryFieldData(notificationDTO, addBarcodes);
         break;
       default:
         log.error("Unrecognized event {}", notificationDTO);
@@ -298,14 +318,14 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     return fieldData;
   }
 
-  public List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO) {
+  public List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO, Boolean addBarcodes) {
 
     HiltiJobType jobType;
     HiltiStatusCode statusCode;
 
     switch (notificationDTO.getEventName()) {
       case PICKUP_COMPLETION:
-        return getPickupRequestDtos(notificationDTO);
+        return getPickupRequestDtos(notificationDTO, addBarcodes);
       case CN_RECEIVED_AT_OU:
       case CN_DELIVERY_LOADED:
         jobType = HiltiJobType.INTRANSIT;
@@ -346,37 +366,33 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             .jobType(jobType.toString())
             .newStatusCode(statusCode.toString())
             .referenceNumber(cnote)
-            .fieldData(getFieldDataForCnEvents(notificationDTO))
+            .fieldData(getFieldDataForCnEvents(notificationDTO, addBarcodes))
             .build());
   }
 
   public void getClientRequestDtosByType(NotificationDTO notificationDTO, String clientId) {
-    List<HiltiRequestDto> hiltiRequestDtoList = getHiltiRequestDtosByType(notificationDTO);
-
     switch (clientId) {
       case ClientConstants.HILTI_CLIENT_ID:
       case ClientConstants.HILTI_CLIENT_ID_DEP:
+        List<HiltiRequestDto> hiltiRequestDtoList = getHiltiRequestDtosByType(notificationDTO, false);
         addEventsToQueue(hiltiRequestDtoList, eventBuffer);
         break;
       case ClientConstants.FLIPKART_SELLER_CLIENT:
       case ClientConstants.FLIPKART_INDIA_CLIENT:
+        List<HiltiRequestDto> hiltiRequestDtoListForFlipkart = getHiltiRequestDtosByType(notificationDTO, true);
         List<String> cnoteList =
-            hiltiRequestDtoList
+            hiltiRequestDtoListForFlipkart
                 .stream()
                 .map(HiltiRequestDto::getReferenceNumber)
                 .collect(Collectors.toList());
         Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap =
             clientConsignmentService.getCnoteToConsignmentMetadataMapFromCnoteList(
                 cnoteList);
-        Map<String,List<String>> cnoteToBarcodesMap =
-                clientConsignmentService.getCnoteToBarcodeMapListFromCnoteList(
-                        cnoteList);
                 
         List<FlipkartRequestDTO> clientIntegrationRequestDTOList = new ArrayList<>();
         FlipkartRequestDTO clientIntegrationRequestDto;
-        for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoList) {
-          List<String> barcodes = cnoteToBarcodesMap.getOrDefault(hiltiRequestDto.getReferenceNumber(), Collections.emptyList());
-          clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto,barcodes);
+        for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoListForFlipkart) {
+          clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto);
           clientIntegrationRequestDto.setMetadata(Optional.ofNullable(
               cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber())).map(ClientConsignmentMetadata::getMetadata).orElse(Collections.emptyMap()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
