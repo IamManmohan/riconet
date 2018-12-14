@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -15,4 +17,5 @@ import lombok.ToString;
 public abstract class BaseHiltiFieldData {
   private String date;
   private String time;
+  private List<String> barcodes;
 }

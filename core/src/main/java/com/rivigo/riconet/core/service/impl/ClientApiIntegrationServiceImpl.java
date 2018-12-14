@@ -246,7 +246,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO, Boolean addBarcodes) {
+  private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
     switch (notificationDTO.getEventName()) {
       case CN_OUT_FOR_DELIVERY:
         return DeliveryOFDDto.builder().build();
@@ -260,25 +260,11 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                     Collectors.toMap(
                         ConsignmentUploadedFiles::getFileTypes,
                         ConsignmentUploadedFiles::getS3URL));
-        /** Adding CN's barcodes */
-        List<String> barCodes =
-                clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
-        if(addBarcodes) {
-          return DeliveryDeliveredDto.builder()
-                  .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
-                  .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
-                  .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
-                  .barcodes(barCodes)
-                  .build();
-        }
-        /** If barcode is not to be added */
-        else  {
-          return DeliveryDeliveredDto.builder()
+        return DeliveryDeliveredDto.builder()
                   .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
                   .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
                   .deliverySignature(fileTypeToUrlMap.getOrDefault(FileTypes.DELIVERY_CHALLAN, ""))
                   .build();
-        }
       case CN_UNDELIVERY:
         UndeliveredConsignment undeliveredConsignment =
             undeliveredConsignmentsRepository
@@ -306,7 +292,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
       case CN_OUT_FOR_DELIVERY:
       case CN_DELIVERY:
       case CN_UNDELIVERY:
-        fieldData = getDeliveryFieldData(notificationDTO, addBarcodes);
+        fieldData = getDeliveryFieldData(notificationDTO);
         break;
       default:
         log.error("Unrecognized event {}", notificationDTO);
@@ -314,11 +300,15 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
     fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
     fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
-
+    if(addBarcodes) {
+      List<String> barCodes =
+              clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
+      fieldData.setBarcodes(barCodes);
+    }
     return fieldData;
   }
 
-  public List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO, Boolean addBarcodes) {
+  private List<HiltiRequestDto> getHiltiRequestDtosByType(NotificationDTO notificationDTO, Boolean addBarcodes) {
 
     HiltiJobType jobType;
     HiltiStatusCode statusCode;

@@ -25,5 +25,4 @@ public class DeliveryDeliveredDto extends BaseHiltiFieldData {
   private String deliverySignature;
   private String podDelivered;
   private String codImage;
-  private List<String> barcodes;
 }
