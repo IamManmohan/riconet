@@ -393,7 +393,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         FlipkartRequestDTO clientIntegrationRequestDto;
         for (HiltiRequestDto hiltiRequestDto : hiltiRequestDtoListForFlipkart) {
           clientIntegrationRequestDto = new FlipkartRequestDTO(hiltiRequestDto);
-          clientIntegrationRequestDto.setMetadata(Optional.ofNullable(
+          clientIntegrationRequestDto.setMetaData(Optional.ofNullable(
               cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber())).map(ClientConsignmentMetadata::getMetadata).orElse(Collections.emptyMap()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
