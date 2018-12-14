@@ -15,7 +15,7 @@ import java.util.Map;
 @NoArgsConstructor
 @ToString
 public class FlipkartRequestDTO extends HiltiRequestDto {
-    private Map<String, String> metadata;
+    private Map<String, String> metaData;
 
     public FlipkartRequestDTO(HiltiRequestDto requestDto) {
         this.setReferenceNumber(requestDto.getReferenceNumber());
