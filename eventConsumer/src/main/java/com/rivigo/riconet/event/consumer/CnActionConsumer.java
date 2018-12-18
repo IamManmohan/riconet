@@ -25,6 +25,7 @@ public class CnActionConsumer extends EventConsumer {
         EventName.PICKUP_COMPLETION,
         EventName.CN_RECEIVED_AT_OU,
         EventName.CN_LOADED,
+        EventName.CN_DELIVERY_LOADED,
         EventName.CN_OUT_FOR_DELIVERY,
         EventName.CN_DELIVERY,
         EventName.CN_UNDELIVERY);

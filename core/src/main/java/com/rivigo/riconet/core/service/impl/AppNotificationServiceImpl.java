@@ -1,12 +1,13 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAUL_APP_USER_ID;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -18,10 +19,13 @@ import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -78,13 +82,52 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sendNotification(pushObject, userId);
   }
 
+  @Override
+  public void sendPalletClosedNotification(NotificationDTO notificationDTO) {
+    Long userId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    Long palletId = notificationDTO.getEntityId();
+    Long taskId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TASK_ID.name()));
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    data.put(ENTITY_ID, palletId);
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(TASK_ID, taskId);
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, userId);
+  }
+
+  @Override
+  public void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO) {
+    Long userId =
+        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    Long taskId = notificationDTO.getEntityId();
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(TASK_ID, taskId);
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, userId);
+  }
+
   private void sendNotification(JSONObject notificationPayload, Long userId) {
-    if (!"production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
-      userId = zoomPropertyService.getLong(DEFAUL_APP_USER_ID, 57L);
+    List<DeviceAppVersionMapper> deviceAppVersionMappers;
+    if (!"production"
+        .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
+      List<Long> userIdList =
+          Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
+              .map(Long::valueOf)
+              .collect(Collectors.toList());
       log.info("Staging server. sending notification to user {}", userId);
+      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserIdIn(userIdList);
+    } else {
+      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserId(userId);
     }
-    List<DeviceAppVersionMapper> deviceAppVersionMappers =
-        deviceAppVersionMapperRepository.findByUserId(userId);
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
       return;

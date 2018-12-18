@@ -5,6 +5,7 @@ import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 
 public interface ZoomBackendAPIClientService {
@@ -30,6 +31,8 @@ public interface ZoomBackendAPIClientService {
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
 
   void handleQcBlockerClosure(Long ticketId);
+
+  void handleApproveRejectRequest(String cnote, WriteOffRequestAction writeOffRequestAction);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 

@@ -9,8 +9,10 @@ import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
+import com.rivigo.riconet.core.service.HandoverService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
@@ -51,6 +53,10 @@ public class EventTriggerServiceTest {
   @Mock private ConsignmentService consignmentService;
 
   @Mock private PickupService pickupService;
+
+  @Mock private AppNotificationService appNotificationService;
+
+  @Mock private HandoverService handoverService;
 
   @Captor private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
 
@@ -100,6 +106,25 @@ public class EventTriggerServiceTest {
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+  }
+
+  @Test
+  public void palletCloseTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("USER_ID", "1234567890");
+    metadata.put("TASK_TYPE", "UNLOADING");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+  }
+
+  @Test
+  public void taskClosedReassignedTest() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("USER_ID", "1234567890");
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
   }
 
   @Test
@@ -182,11 +207,12 @@ public class EventTriggerServiceTest {
   }
 
   @Test
-  public void cnQcBlockerTicketClosedTest() {
+  public void ticketActionEVentTest() {
     NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.QC_TICKET_ACTION).entityId(5l).build();
+        NotificationDTO.builder().eventName(EventName.TICKET_ACTION).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any());
+    verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any(), any());
+    verify(handoverService, times(1)).consumeHandoverTicketAction(eq(5l), any(), any(), any());
   }
 
   @Test

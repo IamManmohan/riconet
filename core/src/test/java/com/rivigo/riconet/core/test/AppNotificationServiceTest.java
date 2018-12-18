@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.test;
 
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAUL_APP_USER_ID;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -55,7 +55,7 @@ public class AppNotificationServiceTest {
     deviceAppVersionMappers.addAll(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
     Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getLong(DEFAUL_APP_USER_ID, 57L)).thenReturn(1L);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
   }
 
@@ -74,7 +74,7 @@ public class AppNotificationServiceTest {
     deviceAppVersionMappers.addAll(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
     Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getLong(DEFAUL_APP_USER_ID, 57L)).thenReturn(1L);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
   }
 }

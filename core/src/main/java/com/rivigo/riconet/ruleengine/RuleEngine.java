@@ -2,6 +2,7 @@ package com.rivigo.riconet.ruleengine;
 
 import com.rivigo.riconet.ruleengine.operators.Addition;
 import com.rivigo.riconet.ruleengine.operators.And;
+import com.rivigo.riconet.ruleengine.operators.AnyMatchInList;
 import com.rivigo.riconet.ruleengine.operators.Equals;
 import com.rivigo.riconet.ruleengine.operators.GreaterThan;
 import com.rivigo.riconet.ruleengine.operators.LessThan;
@@ -35,6 +36,7 @@ public interface RuleEngine {
     operations.registerOperation(new Or());
     operations.registerOperation(new Addition());
     operations.registerOperation(new Subtraction());
+    operations.registerOperation(new AnyMatchInList());
 
     Map<String, Expression> basicExpressiosMap = new HashMap<>();
 
