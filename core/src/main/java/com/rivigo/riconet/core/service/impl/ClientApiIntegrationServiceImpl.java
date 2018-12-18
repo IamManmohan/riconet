@@ -399,7 +399,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   }
 
   public <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
-    log.info("Adding events to queue {}", requestDtos, queue.getClass());
+    log.info("Adding events to queue {}", requestDtos);
     return queue.addAll(requestDtos);
   }
 
