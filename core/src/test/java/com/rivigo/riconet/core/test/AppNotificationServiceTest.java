@@ -109,7 +109,7 @@ public class AppNotificationServiceTest {
     Mockito.when(
             consignmentScheduleService.getCacheForConsignmentAtLocation(
                 Mockito.anyLong(), Mockito.anyLong()))
-        .thenReturn(Optional.ofNullable(getDummyConsignmentScheduleCache(1L, 1L)));
+        .thenReturn(Optional.ofNullable(getDummyConsignmentScheduleCache()));
     Mockito.when(
             oaTaskAssignmentRepository
                 .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
@@ -127,11 +127,11 @@ public class AppNotificationServiceTest {
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
   }
 
-  private ConsignmentScheduleCache getDummyConsignmentScheduleCache(Long locationId, Long tripId) {
+  private ConsignmentScheduleCache getDummyConsignmentScheduleCache() {
     ConsignmentScheduleCache consignmentSchedule = new ConsignmentScheduleCache();
-    consignmentSchedule.setLocationId(locationId);
+    consignmentSchedule.setLocationId(1L);
     consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
-    consignmentSchedule.setTripId(tripId);
+    consignmentSchedule.setTripId(1L);
     consignmentSchedule.setTripType(ZoomTripType.TRIP);
     return consignmentSchedule;
   }
