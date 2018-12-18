@@ -17,7 +17,6 @@ import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
@@ -26,7 +25,6 @@ import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -131,22 +129,19 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         Long.valueOf(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name()));
     consignmentScheduleService
-        .getActivePlan(notificationDTO.getEntityId())
-        .stream()
-        .filter(v -> v.getLocationType() == LocationTypeV2.LOCATION)
-        .filter(v -> Objects.equals(v.getLocationId(), locationId))
-        .findFirst()
+        .getCacheForConsignmentAtLocation(notificationDTO.getEntityId(), locationId)
         .map(
             currentSchedule ->
                 oaTaskAssignmentRepository
                     .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
-                        currentSchedule.getDepartureTripId(),
-                        currentSchedule.getDepartureTripType(),
+                        currentSchedule.getTripId(),
+                        currentSchedule.getTripType(),
                         locationId,
                         TaskType.LOADING,
                         Arrays.asList(TaskStatus.OPEN, TaskStatus.IN_PROGRESS, TaskStatus.PAUSED)))
         .ifPresent(
             oaTask -> {
+              log.info("Sending ib clear event for " + notificationDTO.getEntityId());
               Long userId = oaTask.getUserId();
               Long taskId = oaTask.getId();
               JSONObject pushObject = new JSONObject();
