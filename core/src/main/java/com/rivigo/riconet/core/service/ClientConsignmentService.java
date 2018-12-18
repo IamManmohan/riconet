@@ -8,10 +8,7 @@ public interface ClientConsignmentService {
   Map<String, ClientConsignmentMetadata> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList);
 
-  Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(
-          List<String> cnoteList);
+  Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList);
 
-  List<String> getBarcodeListFromConsignmentId(
-          Long cnId);
-
+  List<String> getBarcodeListFromConsignmentId(Long cnId);
 }
