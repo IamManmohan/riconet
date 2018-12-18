@@ -71,11 +71,7 @@ public class EventTriggerService {
         qcService.consumeLoadingEvent(loadingData);
         break;
       case CN_RECEIVED_AT_OU:
-        ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
-        // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
-        qcService.consumeUnloadingEvent(unloadingData);
-        consignmentService.triggerBfCpdCalcualtion(unloadingData);
-        appNotificationService.sendIBClearEvent(notificationDTO);
+        processCNReceivedAtOuAndHandleException(notificationDTO);
         break;
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
@@ -206,5 +202,25 @@ public class EventTriggerService {
                     .getMetadata()
                     .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
         .build();
+  }
+
+  private void processCNReceivedAtOuAndHandleException(NotificationDTO notificationDTO) {
+    ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
+    // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
+    try {
+      qcService.consumeUnloadingEvent(unloadingData);
+    } catch (Exception e) {
+      log.error("QC service failed", e);
+    }
+    try {
+      consignmentService.triggerBfCpdCalcualtion(unloadingData);
+    } catch (Exception e) {
+      log.error("BF CPD calculation failed", e);
+    }
+    try {
+      appNotificationService.sendIBClearEvent(notificationDTO);
+    } catch (Exception e) {
+      log.error("IB clear event failed", e);
+    }
   }
 }
