@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.rivigo.notification.common.dto.AttachmentDto;
-import com.rivigo.notification.common.request.SendEmailRequest;
+import com.rivigo.riconet.core.dto.AttachmentDto;
+import com.rivigo.riconet.core.dto.SendEmailRequestDTO;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
@@ -60,7 +60,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   @Override
   public void sendEmail(
       List<String> recipients, String subject, String body, MultipartFile file, String type) {
-    SendEmailRequest request = new SendEmailRequest();
+    SendEmailRequestDTO request = new SendEmailRequestDTO();
     request.setFrom(senderServerName);
 
     if ("production"
@@ -97,13 +97,13 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   }
 
   private void send(
-      SendEmailRequest request, List<String> recipients, String subject, String body) {
+          SendEmailRequestDTO request, List<String> recipients, String subject, String body) {
     try {
 
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("X-User-Agent", emailUserAgent);
-      HttpEntity<SendEmailRequest> entity = new HttpEntity<>(request, headers);
+      HttpEntity<SendEmailRequestDTO> entity = new HttpEntity<>(request, headers);
       log.info(
           "senderServerName : {} ,  emailServiceApi : {} , emailUserAgent : {} ",
           senderServerName,

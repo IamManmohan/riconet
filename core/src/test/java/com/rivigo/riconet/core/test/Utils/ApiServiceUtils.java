@@ -3,6 +3,9 @@ package com.rivigo.riconet.core.test.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
+import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
+import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
@@ -13,8 +16,10 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
+import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +39,35 @@ public class ApiServiceUtils {
   public static final Long START_LOCATION_ID = 1L;
   public static final Long CURRENT_LOCATION_ID = 2L;
   public static final Long END_LOCATION_ID = 3L;
+  public static final Map<String, List<String>> CNOTE_TO_BARCODE_MAP = new HashMap<String, List<String>>()
+  {
+    {
+      put("1000010000", new ArrayList<String>() {{
+        add("10001");
+        add("10002");
+      }});
+      put("1000110001", new ArrayList<String>() {{
+        add("20001");
+        add("20002");
+      }});
+    }
+  };
+
+  public static final List<String> BARCODE_LIST = new ArrayList<String>() {{
+    add("30001");
+    add("30002");
+    add("30003");
+    add("30004");
+    add("30005");
+  }};
+
+  public static final Map<String, ClientConsignmentMetadata> CNOTE_TO_METADATA_MAP= new HashMap<String, ClientConsignmentMetadata> ()
+  {
+    {
+      put("2000120001", new ClientConsignmentMetadata());
+      put("2000220002", new ClientConsignmentMetadata());
+    }
+  };
 
   public static JsonNode getSampleJsonNode() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -141,5 +175,37 @@ public class ApiServiceUtils {
     undeliveredConsignment.setReason(RandomStringUtils.randomAlphabetic(10));
     undeliveredConsignment.setSubReason(RandomStringUtils.randomAlphabetic(10));
     return undeliveredConsignment;
+  }
+
+  public static HiltiResponseDto getHiltiResponseDTO()  {
+    HiltiResponseDto responseDto = new HiltiResponseDto();
+    responseDto.setSuccessCount(1L);
+    responseDto.setSuccessMessage(new ArrayList<String>() {{
+      add("OK");
+      add("OK");
+    }});
+    responseDto.setFailCount(0L);
+    return responseDto;
+  }
+
+  public static FlipkartLoginResponseDTO getFlipkartLoginResponseDTO() {
+    FlipkartLoginResponseDTO responseDto = new FlipkartLoginResponseDTO();
+    responseDto.setHttpStatus("OK");
+    responseDto.setSuccess(Boolean.TRUE);
+    responseDto.setData(new HashMap<String, String> ()  {
+      {
+        put("access_token", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
+      }
+    });
+    return responseDto;
+  }
+
+  public static ClientIntegrationResponseDTO getClientResponseDTO() {
+    ClientIntegrationResponseDTO responseDto = new ClientIntegrationResponseDTO();
+    responseDto.setHttpStatus("OK");
+    responseDto.setSuccess(Boolean.TRUE);
+    responseDto.setSuccessDescription("ok");
+    responseDto.setSuccessCode("OK");
+    return responseDto;
   }
 }

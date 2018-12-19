@@ -71,13 +71,13 @@ import org.springframework.stereotype.Service;
 public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationService {
 
   @Value("${hilti.update.transactions.url}")
-  private String hiltiUpdateTransactionsUrl;
+  public String hiltiUpdateTransactionsUrl;
 
   @Value("${flipkart.login.url}")
-  private String flipkartLoginUrl;
+  public String flipkartLoginUrl;
 
   @Value("${flipkart.update.transaction.url}")
-  private String flipkartUpdateTransactionUrl;
+  public String flipkartUpdateTransactionUrl;
 
   @Value("${flipkart.login.username}")
   private String flipkartLoginUsername;
@@ -111,9 +111,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
-  private static BlockingQueue<HiltiRequestDto> eventBuffer = new LinkedBlockingQueue<>();
+  private BlockingQueue<HiltiRequestDto> eventBuffer = new LinkedBlockingQueue<>();
 
-  private static BlockingQueue<FlipkartRequestDTO> clientEventBuffer = new LinkedBlockingQueue<>();
+  private BlockingQueue<FlipkartRequestDTO> clientEventBuffer = new LinkedBlockingQueue<>();
 
   private List<HiltiRequestDto> hiltiRequestDtoList = new ArrayList<>();
 
@@ -398,7 +398,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  public <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
+  private  <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
     log.info("Adding events to queue {}", requestDtos);
     return queue.addAll(requestDtos);
   }
