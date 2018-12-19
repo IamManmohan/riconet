@@ -10,14 +10,18 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
+import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
+import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +43,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private PushNotificationService pushNotificationService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private ConsignmentScheduleService consignmentScheduleService;
+
+  @Autowired private OATaskAssignmentRepository oaTaskAssignmentRepository;
 
   @Override
   public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
@@ -113,6 +121,38 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, userId);
+  }
+
+  @Override
+  public void sendIBClearEvent(NotificationDTO notificationDTO) {
+    Long locationId =
+        Long.valueOf(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name()));
+    consignmentScheduleService
+        .getCacheForConsignmentAtLocation(notificationDTO.getEntityId(), locationId)
+        .map(
+            cache ->
+                oaTaskAssignmentRepository
+                    .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
+                        cache.getTripId(),
+                        cache.getTripType(),
+                        locationId,
+                        TaskType.LOADING,
+                        Arrays.asList(TaskStatus.OPEN, TaskStatus.IN_PROGRESS, TaskStatus.PAUSED)))
+        .ifPresent(
+            oaTask -> {
+              log.info("Sending ib clear event for {}", notificationDTO.getEntityId());
+              Long userId = oaTask.getUserId();
+              Long taskId = oaTask.getId();
+              JSONObject pushObject = new JSONObject();
+              JSONObject data = new JSONObject();
+
+              data.put(NOTIFICATION_TYPE, PushNotificationConstant.IB_CLEAR_EVENT);
+              data.put(TASK_ID, taskId);
+
+              pushObject.put(DATA, data);
+              sendNotification(pushObject, userId);
+            });
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId) {

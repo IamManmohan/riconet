@@ -1,7 +1,10 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.ConsignmentScheduleCache;
+import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleCacheRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleRepository;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Service;
 public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleService {
 
   @Autowired private ConsignmentScheduleRepository consignmentScheduleRepository;
+
+  @Autowired private ConsignmentScheduleCacheRepository consignmentScheduleCacheRepository;
 
   @Override
   public Map<Long, List<ConsignmentSchedule>> getActivePlansMapByIds(
@@ -43,5 +49,13 @@ public class ConsignmentScheduleServiceImpl implements ConsignmentScheduleServic
         consignmentScheduleRepository.findByConsignmentIdAndIsActive(consignmentId, 1);
     Collections.sort(csList);
     return csList;
+  }
+
+  @Override
+  public Optional<ConsignmentScheduleCache> getCacheForConsignmentAtLocation(
+      Long consignmentId, Long locationId) {
+    return Optional.ofNullable(
+        consignmentScheduleCacheRepository.findByConsignmentIdAndLocationTypeAndLocationId(
+            consignmentId, LocationTypeV2.LOCATION, locationId));
   }
 }
