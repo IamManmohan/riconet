@@ -11,7 +11,7 @@ import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.enums.ZoomTripType;
-import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.ConsignmentScheduleCache;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.model.OATaskAssignment;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -105,10 +106,10 @@ public class AppNotificationServiceTest {
     Mockito.when(deviceAppVersionMapperRepository.findByUserIdIn(Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
-    Mockito.when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
-        .thenReturn(
-            Arrays.asList(
-                getDummyConsignmentSchedule(1L, 1L), getDummyConsignmentSchedule(2L, 2L)));
+    Mockito.when(
+            consignmentScheduleService.getCacheForConsignmentAtLocation(
+                Mockito.anyLong(), Mockito.anyLong()))
+        .thenReturn(Optional.ofNullable(getDummyConsignmentScheduleCache()));
     Mockito.when(
             oaTaskAssignmentRepository
                 .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
@@ -126,12 +127,12 @@ public class AppNotificationServiceTest {
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
   }
 
-  private ConsignmentSchedule getDummyConsignmentSchedule(Long locationId, Long tripId) {
-    ConsignmentSchedule consignmentSchedule = new ConsignmentSchedule();
-    consignmentSchedule.setLocationId(locationId);
+  private ConsignmentScheduleCache getDummyConsignmentScheduleCache() {
+    ConsignmentScheduleCache consignmentSchedule = new ConsignmentScheduleCache();
+    consignmentSchedule.setLocationId(1L);
     consignmentSchedule.setLocationType(LocationTypeV2.LOCATION);
-    consignmentSchedule.setDepartureTripId(tripId);
-    consignmentSchedule.setDepartureTripType(ZoomTripType.TRIP);
+    consignmentSchedule.setTripId(1L);
+    consignmentSchedule.setTripType(ZoomTripType.TRIP);
     return consignmentSchedule;
   }
 }
