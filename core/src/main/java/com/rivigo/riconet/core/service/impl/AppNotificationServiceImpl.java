@@ -131,17 +131,17 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     consignmentScheduleService
         .getCacheForConsignmentAtLocation(notificationDTO.getEntityId(), locationId)
         .map(
-            currentSchedule ->
+            cache ->
                 oaTaskAssignmentRepository
                     .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
-                        currentSchedule.getTripId(),
-                        currentSchedule.getTripType(),
+                        cache.getTripId(),
+                        cache.getTripType(),
                         locationId,
                         TaskType.LOADING,
                         Arrays.asList(TaskStatus.OPEN, TaskStatus.IN_PROGRESS, TaskStatus.PAUSED)))
         .ifPresent(
             oaTask -> {
-              log.info("Sending ib clear event for " + notificationDTO.getEntityId());
+              log.info("Sending ib clear event for {}", notificationDTO.getEntityId());
               Long userId = oaTask.getUserId();
               Long taskId = oaTask.getId();
               JSONObject pushObject = new JSONObject();
