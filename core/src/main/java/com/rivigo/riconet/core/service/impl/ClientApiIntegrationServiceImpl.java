@@ -363,9 +363,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     switch (clientId) {
       case ClientConstants.HILTI_CLIENT_ID:
       case ClientConstants.HILTI_CLIENT_ID_DEP:
-        List<HiltiRequestDto> hiltiRequestDtoList =
+        List<HiltiRequestDto> hiltiDtoList =
             getHiltiRequestDtosByType(notificationDTO, false);
-        addEventsToQueue(hiltiRequestDtoList, eventBuffer);
+        addEventsToQueue(hiltiDtoList, eventBuffer);
         break;
       case ClientConstants.FLIPKART_SELLER_CLIENT:
       case ClientConstants.FLIPKART_INDIA_CLIENT:

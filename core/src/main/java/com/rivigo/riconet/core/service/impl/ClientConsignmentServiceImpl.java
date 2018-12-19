@@ -27,12 +27,10 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   public Map<String, ClientConsignmentMetadata> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    Map<String, ClientConsignmentMetadata> cnoteToMetadataMap =
-        clientConsignmentMetadataRepository
+    return  clientConsignmentMetadataRepository
             .findByConsignmentIdIn(new ArrayList<>(idToCnoteMap.keySet()))
             .stream()
             .collect(Collectors.toMap(v -> idToCnoteMap.get(v.getConsignmentId()), v -> v));
-    return cnoteToMetadataMap;
   }
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
