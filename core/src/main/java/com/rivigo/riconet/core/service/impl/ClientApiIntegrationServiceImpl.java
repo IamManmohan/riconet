@@ -398,7 +398,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
-  private  <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
+  private <T> boolean addEventsToQueue(Collection<T> requestDtos, Queue<T> queue) {
     log.info("Adding events to queue {}", requestDtos);
     return queue.addAll(requestDtos);
   }

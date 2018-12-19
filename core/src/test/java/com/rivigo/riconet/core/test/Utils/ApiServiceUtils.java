@@ -39,35 +39,46 @@ public class ApiServiceUtils {
   public static final Long START_LOCATION_ID = 1L;
   public static final Long CURRENT_LOCATION_ID = 2L;
   public static final Long END_LOCATION_ID = 3L;
-  public static final Map<String, List<String>> CNOTE_TO_BARCODE_MAP = new HashMap<String, List<String>>()
-  {
-    {
-      put("1000010000", new ArrayList<String>() {{
-        add("10001");
-        add("10002");
-      }});
-      put("1000110001", new ArrayList<String>() {{
-        add("20001");
-        add("20002");
-      }});
-    }
-  };
+  public static final Map<String, List<String>> CNOTE_TO_BARCODE_MAP =
+      new HashMap<String, List<String>>() {
+        {
+          put(
+              "1000010000",
+              new ArrayList<String>() {
+                {
+                  add("10001");
+                  add("10002");
+                }
+              });
+          put(
+              "1000110001",
+              new ArrayList<String>() {
+                {
+                  add("20001");
+                  add("20002");
+                }
+              });
+        }
+      };
 
-  public static final List<String> BARCODE_LIST = new ArrayList<String>() {{
-    add("30001");
-    add("30002");
-    add("30003");
-    add("30004");
-    add("30005");
-  }};
+  public static final List<String> BARCODE_LIST =
+      new ArrayList<String>() {
+        {
+          add("30001");
+          add("30002");
+          add("30003");
+          add("30004");
+          add("30005");
+        }
+      };
 
-  public static final Map<String, ClientConsignmentMetadata> CNOTE_TO_METADATA_MAP= new HashMap<String, ClientConsignmentMetadata> ()
-  {
-    {
-      put("2000120001", new ClientConsignmentMetadata());
-      put("2000220002", new ClientConsignmentMetadata());
-    }
-  };
+  public static final Map<String, ClientConsignmentMetadata> CNOTE_TO_METADATA_MAP =
+      new HashMap<String, ClientConsignmentMetadata>() {
+        {
+          put("2000120001", new ClientConsignmentMetadata());
+          put("2000220002", new ClientConsignmentMetadata());
+        }
+      };
 
   public static JsonNode getSampleJsonNode() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -177,13 +188,16 @@ public class ApiServiceUtils {
     return undeliveredConsignment;
   }
 
-  public static HiltiResponseDto getHiltiResponseDTO()  {
+  public static HiltiResponseDto getHiltiResponseDTO() {
     HiltiResponseDto responseDto = new HiltiResponseDto();
     responseDto.setSuccessCount(1L);
-    responseDto.setSuccessMessage(new ArrayList<String>() {{
-      add("OK");
-      add("OK");
-    }});
+    responseDto.setSuccessMessage(
+        new ArrayList<String>() {
+          {
+            add("OK");
+            add("OK");
+          }
+        });
     responseDto.setFailCount(0L);
     return responseDto;
   }
@@ -192,11 +206,12 @@ public class ApiServiceUtils {
     FlipkartLoginResponseDTO responseDto = new FlipkartLoginResponseDTO();
     responseDto.setHttpStatus("OK");
     responseDto.setSuccess(Boolean.TRUE);
-    responseDto.setData(new HashMap<String, String> ()  {
-      {
-        put("access_token", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
-      }
-    });
+    responseDto.setData(
+        new HashMap<String, String>() {
+          {
+            put("access_token", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
+          }
+        });
     return responseDto;
   }
 

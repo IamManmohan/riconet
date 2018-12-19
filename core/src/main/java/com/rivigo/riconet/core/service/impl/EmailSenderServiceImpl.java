@@ -1,8 +1,8 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.AttachmentDto;
-import com.rivigo.riconet.core.dto.SendEmailRequestDTO;
 import com.rivigo.riconet.core.dto.NotificationResponseDTO;
+import com.rivigo.riconet.core.dto.SendEmailRequestDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -97,7 +97,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   }
 
   private void send(
-          SendEmailRequestDTO request, List<String> recipients, String subject, String body) {
+      SendEmailRequestDTO request, List<String> recipients, String subject, String body) {
     try {
 
       HttpHeaders headers = new HttpHeaders();
