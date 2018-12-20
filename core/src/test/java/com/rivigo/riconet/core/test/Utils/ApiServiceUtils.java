@@ -190,11 +190,11 @@ public class ApiServiceUtils {
     return undeliveredConsignment;
   }
 
-  public static List<Consignment> getDummyConignmentListFromCnoteList(List<String> cnoteList)  {
-    List<Consignment> consignmentList= new ArrayList<>();
-    Long i= 1L;
-    for(String cnote: cnoteList)  {
-      Consignment consignment= new Consignment();
+  public static List<Consignment> getDummyConignmentListFromCnoteList(List<String> cnoteList) {
+    List<Consignment> consignmentList = new ArrayList<>();
+    Long i = 1L;
+    for (String cnote : cnoteList) {
+      Consignment consignment = new Consignment();
       consignment.setId(i);
       consignment.setCnote(cnote);
       ++i;
@@ -203,9 +203,9 @@ public class ApiServiceUtils {
     return consignmentList;
   }
 
-  public static Map<Long, String> getDummyIdToCnoteMap(List<String> cnoteList, List<Long> ids)  {
+  public static Map<Long, String> getDummyIdToCnoteMap(List<String> cnoteList, List<Long> ids) {
     Map<Long, String> idToCnoteMap = new HashMap<Long, String>();
-    for(Long id : ids)  {
+    for (Long id : ids) {
       idToCnoteMap.put(id, cnoteList.get(ids.indexOf(id)));
     }
     return idToCnoteMap;
@@ -213,7 +213,7 @@ public class ApiServiceUtils {
 
   public static List<ClientConsignmentMetadata> getDummyMetadataList(List<Long> ids) {
     List<ClientConsignmentMetadata> metadataList = new ArrayList<>();
-    for(Long id: ids)  {
+    for (Long id : ids) {
       ClientConsignmentMetadata metadata = new ClientConsignmentMetadata();
       metadata.setConsignmentId(id);
       metadataList.add(metadata);
@@ -222,8 +222,8 @@ public class ApiServiceUtils {
   }
 
   public static List<Box> getDummyBoxList(List<Long> Ids, List<String> Cnotes) {
-    List<Box> boxList= new ArrayList<>();
-    for(Long id: Ids) {
+    List<Box> boxList = new ArrayList<>();
+    for (Long id : Ids) {
       Box box = new Box();
       box.setId(id);
       box.setCnote(Cnotes.get(Ids.indexOf(id)));
@@ -233,9 +233,10 @@ public class ApiServiceUtils {
     return boxList;
   }
 
-  public static Map<String, List<String>> getDummyCnoteToBarcodeMap(List<String> cnotes, List<List<String>> Barcodes) {
+  public static Map<String, List<String>> getDummyCnoteToBarcodeMap(
+      List<String> cnotes, List<List<String>> Barcodes) {
     Map<String, List<String>> cnoteToBarcodesMap = new HashMap<String, List<String>>();
-    for(String cnote: cnotes) {
+    for (String cnote : cnotes) {
       cnoteToBarcodesMap.put(cnote, Barcodes.get(cnotes.indexOf(cnote)));
     }
     return cnoteToBarcodesMap;
