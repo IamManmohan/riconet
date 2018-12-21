@@ -4,8 +4,7 @@ import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
-import com.rivigo.riconet.core.service.HiltiApiService;
-import com.rivigo.riconet.event.constants.ClientConstants;
+import com.rivigo.riconet.core.service.ClientApiIntegrationService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CnActionConsumer extends EventConsumer {
 
-  @Autowired private HiltiApiService hiltiApiService;
+  @Autowired private ClientApiIntegrationService clientApiIntegrationService;
 
   @Override
   public List<EventName> eventNamesToBeConsumed() {
@@ -38,15 +37,8 @@ public class CnActionConsumer extends EventConsumer {
 
     if (Strings.isNullOrEmpty(clientId))
       throw new ZoomException("Client Id not found in the event {}", notificationDTO);
-    switch (clientId) {
-      case ClientConstants.HILTI_CLIENT_ID:
-      case ClientConstants.HILTI_CLIENT_ID_DEP:
-        hiltiApiService.addEventsToQueue(hiltiApiService.getRequestDtosByType(notificationDTO));
-        break;
-      default:
-        log.info("No event defined for this client {}", notificationDTO);
-        break;
-    }
+
+    clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, clientId);
   }
 
   @Override

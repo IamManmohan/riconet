@@ -137,6 +137,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   }
 
   @Override
+  public List<Consignment> getConsignmentListByCnoteList(List<String> cnoteList) {
+    return consignmentRepo.findByCnoteIn(cnoteList);
+  }
+
+  @Override
+  public Map<Long, String> getIdToCnoteMap(List<String> cnoteList) {
+    return getConsignmentListByCnoteList(cnoteList)
+        .stream()
+        .collect(Collectors.toMap(Consignment::getId, Consignment::getCnote));
+  }
+
+  @Override
   public void triggerAssetCnUnload(
       NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO) {
     List<String> conditions = notificationDTO.getConditions();
