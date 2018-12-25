@@ -229,6 +229,13 @@ public class QcServiceImpl implements QcService {
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+    if (completionData.getClientPincodeMetadataDTO() == null) {
+      return true;
+    }
+    if (completionData.getClientPincodeMetadataDTO().getCount()
+        < zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L)) {
+      return true;
+    }
     Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
     if (bindings.isEmpty()) {
       return false;
