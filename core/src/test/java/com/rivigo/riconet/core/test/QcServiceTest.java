@@ -491,6 +491,30 @@ public class QcServiceTest {
   }
 
   @Test
+  // positive test case for first CN
+  public void checkTest9() {
+
+    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+    Consignment consignment = getConsignmentDTO();
+    consignmentCompletionEventDTO.setClientPincodeMetadataDTO(null);
+    mockingParamsForCheckFunction();
+    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+    assertEquals(result, true);
+  }
+
+  @Test
+  // positive test case for next N CNs
+  public void checkTest10() {
+
+    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+    Consignment consignment = getConsignmentDTO();
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setCount(9L);
+    mockingParamsForCheckFunction();
+    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+    assertEquals(result, true);
+  }
+
+  @Test
   public void isMeasurementQcRequiredTest() {
     ConsignmentCompletionEventDTO completionEventDTO = new ConsignmentCompletionEventDTO();
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
@@ -593,6 +617,9 @@ public class QcServiceTest {
             zoomPropertyService.getString(
                 ZoomPropertyName.REQUIRED_CLIENT_TYPE, CnoteType.NORMAL.name()))
         .thenReturn(CnoteType.NORMAL.name());
+    Mockito.when(
+            zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L))
+        .thenReturn(10L);
   }
 
   @Test
