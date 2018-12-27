@@ -279,7 +279,7 @@ public class QcServiceImpl implements QcService {
 
     PinCode pincode = pincodeService.findByCode(consignment.getFromPinCode());
     int bufferDays =
-        zoomPropertyService.getInteger(ZoomPropertyName.CLIENT_PINCODE_AGGREGATE_BUFFER_DAYS, 300);
+        zoomPropertyService.getInteger(ZoomPropertyName.CLIENT_ENTITY_METADATA_SCHEDULER_PERIOD, 1);
     Long lastUpdateTime = DateTime.now().minusDays(bufferDays).getMillis();
     ClientEntityMetadata pincodeMetadata =
         clientEntityMetadataService
