@@ -10,6 +10,7 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,19 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
     return clientEntityMetadataRepository
         .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
             entityType, entityId, clientId, organizationId, status);
+  }
+
+  public ClientEntityMetadata
+      getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndUpdatedAtGreaterThan(
+          ClientEntityType entityType,
+          Long entityId,
+          Long clientId,
+          Long organizationId,
+          OperationalStatus status,
+          DateTime lastUpdatedTime) {
+    return clientEntityMetadataRepository
+        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndLastUpdatedAtGreaterThan(
+            entityType, entityId, clientId, organizationId, status, lastUpdatedTime);
   }
 
   public ClientEntityMetadata getClientClusterMetadata(Consignment consignment) {

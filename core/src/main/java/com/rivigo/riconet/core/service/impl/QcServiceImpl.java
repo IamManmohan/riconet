@@ -72,6 +72,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -229,6 +230,22 @@ public class QcServiceImpl implements QcService {
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+    if (completionData.getClientPincodeMetadataDTO() == null) {
+      log.info("First Consignment from client in this pincode. Mandatory QC required.");
+      return true;
+    }
+    log.info(
+        "Client entity Metadata for pincode {} is {}",
+        consignment.getFromPinCode(),
+        completionData.getClientPincodeMetadataDTO());
+    Long madatoryQcLimit =
+        zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L);
+    if (completionData.getClientPincodeMetadataDTO().getCount() < madatoryQcLimit) {
+      log.info(
+          "Consignment count from client in this pincode hasn't reached Mandatory QC limit, {} Cns. Mandatory QC required.",
+          madatoryQcLimit);
+      return true;
+    }
     Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
     if (bindings.isEmpty()) {
       return false;
@@ -267,13 +284,18 @@ public class QcServiceImpl implements QcService {
         clientEntityMetadataService.getClientClusterMetadata(consignment);
 
     PinCode pincode = pincodeService.findByCode(consignment.getFromPinCode());
+    int bufferDays =
+        zoomPropertyService.getInteger(ZoomPropertyName.CLIENT_ENTITY_METADATA_SCHEDULER_PERIOD, 1);
+    Long lastUpdateTime = DateTime.now().minusDays(bufferDays).getMillis();
     ClientEntityMetadata pincodeMetadata =
-        clientEntityMetadataService.getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-            ClientEntityType.PINCODE,
-            pincode.getId(),
-            consignment.getClient().getId(),
-            ClientEntityMetadata.getDefaultLongValue(),
-            OperationalStatus.ACTIVE);
+        clientEntityMetadataService
+            .getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndUpdatedAtGreaterThan(
+                ClientEntityType.PINCODE,
+                pincode.getId(),
+                consignment.getClient().getId(),
+                ClientEntityMetadata.getDefaultLongValue(),
+                OperationalStatus.ACTIVE,
+                new DateTime(lastUpdateTime));
 
     if (clusterMetadata != null) {
       completionData.setClientClusterMetadataDTO(
