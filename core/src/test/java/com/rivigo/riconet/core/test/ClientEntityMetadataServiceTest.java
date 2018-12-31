@@ -15,6 +15,7 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +47,18 @@ public class ClientEntityMetadataServiceTest {
     verify(clientEntityMetadataRepository, times(1))
         .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
             ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE);
+  }
+
+  @Test
+  public void
+      getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndLastUpdatedGreaterThanTest() {
+    DateTime time = DateTime.now();
+    clientEntityMetadataService
+        .getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndUpdatedAtGreaterThan(
+            ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE, time);
+    verify(clientEntityMetadataRepository, times(1))
+        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndLastUpdatedAtGreaterThan(
+            ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE, time);
   }
 
   @Test
