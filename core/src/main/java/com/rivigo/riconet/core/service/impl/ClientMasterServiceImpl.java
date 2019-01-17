@@ -220,8 +220,11 @@ public class ClientMasterServiceImpl implements ClientMasterService {
   }
 
   private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId) {
-
     ClientVasDetail clientVasDetail = clientVasDetailsService.getClientVasDetails(clientId);
+    if (!clientCreateUpdateDTO.getFinanceActivated() && clientVasDetail == null) {
+      log.info("Vas details not required for client");
+      return;
+    }
     ClientCodDodDTO clientVasDetailDTO = new ClientCodDodDTO();
     clientVasDetailDTO.setClientId(clientId);
     clientVasDetailDTO.setClientVasType(ClientVasType.COD_DOD);
