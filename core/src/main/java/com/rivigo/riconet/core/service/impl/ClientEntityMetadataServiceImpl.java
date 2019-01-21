@@ -4,6 +4,8 @@ import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientEntityMetadataService;
 import com.rivigo.zoom.common.enums.ClientEntityType;
+import com.rivigo.zoom.common.enums.ClientEntityUserType;
+import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
@@ -49,6 +51,19 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
   public ClientEntityMetadata getClientClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
         administrativeEntityService.findParentCluster(consignment.getFromId());
+    if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+      if (consignment.getPrs() == null) {
+        log.info("No Pickup BP for this CN");
+        return null;
+      }
+      return clientEntityMetadataRepository
+          .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
+              ClientEntityType.CLUSTER,
+              administrativeEntity.getId(),
+              ClientEntityUserType.RP,
+              consignment.getPrs().getId(),
+              OperationalStatus.ACTIVE);
+    }
 
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
