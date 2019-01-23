@@ -53,7 +53,11 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         administrativeEntityService.findParentCluster(consignment.getFromId());
     if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
       if (consignment.getPrs() == null) {
-        log.info("No Pickup BP for this CN");
+        log.info("No Pickup or this CN : {}", consignment.getCnote());
+        return null;
+      }
+      if (consignment.getPrs().getBusinessPartner() == null) {
+        log.info("No Pickup BP for this CN : {}", consignment.getCnote());
         return null;
       }
       return clientEntityMetadataRepository
@@ -61,7 +65,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
               ClientEntityType.CLUSTER,
               administrativeEntity.getId(),
               ClientEntityUserType.RP,
-              consignment.getPrs().getId(),
+              consignment.getPrs().getBusinessPartner().getId(),
               OperationalStatus.ACTIVE);
     }
 
