@@ -60,6 +60,8 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         log.info("No Pickup BP for this CN : {}", consignment.getCnote());
         return null;
       }
+      log.info(
+          "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
       return clientEntityMetadataRepository
           .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
               ClientEntityType.CLUSTER,
@@ -70,6 +72,9 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
     }
 
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+      log.info(
+          "Returning Client Cluster metadata for Client  {}",
+          consignment.getClient().getClientCode());
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),
@@ -77,6 +82,9 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           ClientEntityMetadata.getDefaultLongValue(),
           OperationalStatus.ACTIVE);
     } else {
+      log.info(
+          "Returning Organization CLuster metadata for Organization id  {}",
+          consignment.getOrganizationId());
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),

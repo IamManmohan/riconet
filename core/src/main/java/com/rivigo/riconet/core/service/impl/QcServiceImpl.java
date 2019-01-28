@@ -266,6 +266,9 @@ public class QcServiceImpl implements QcService {
     if (completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
       return Boolean.FALSE;
 
+    log.info(
+        "Returning Measurement flag with probability {}",
+        completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability());
     return Math.random()
         <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() / 100.0;
   }
