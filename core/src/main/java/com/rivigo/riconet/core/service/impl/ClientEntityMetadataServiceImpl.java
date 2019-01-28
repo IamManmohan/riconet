@@ -51,27 +51,26 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
   public ClientEntityMetadata getClientClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
         administrativeEntityService.findParentCluster(consignment.getFromId());
-    if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-      if (consignment.getPrs() == null) {
-        log.info("No Pickup or this CN : {}", consignment.getCnote());
-        return null;
-      }
-      if (consignment.getPrs().getBusinessPartner() == null) {
-        log.info("No Pickup BP for this CN : {}", consignment.getCnote());
-        return null;
-      }
-      log.info(
-          "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
-      return clientEntityMetadataRepository
-          .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
-              ClientEntityType.CLUSTER,
-              administrativeEntity.getId(),
-              ClientEntityUserType.RP,
-              consignment.getPrs().getBusinessPartner().getId(),
-              OperationalStatus.ACTIVE);
-    }
-
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+      if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+        if (consignment.getPrs() == null) {
+          log.info("No Pickup or this CN : {}", consignment.getCnote());
+          return null;
+        }
+        if (consignment.getPrs().getBusinessPartner() == null) {
+          log.info("No Pickup BP for this CN : {}", consignment.getCnote());
+          return null;
+        }
+        log.info(
+                "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
+        return clientEntityMetadataRepository
+                .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
+                        ClientEntityType.CLUSTER,
+                        administrativeEntity.getId(),
+                        ClientEntityUserType.RP,
+                        consignment.getPrs().getBusinessPartner().getId(),
+                        OperationalStatus.ACTIVE);
+      }
       log.info(
           "Returning Client Cluster metadata for Client  {}",
           consignment.getClient().getClientCode());
@@ -83,7 +82,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           OperationalStatus.ACTIVE);
     } else {
       log.info(
-          "Returning Organization CLuster metadata for Organization id  {}",
+          "Returning Organization Cluster metadata for Organization id  {}",
           consignment.getOrganizationId());
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
