@@ -329,7 +329,7 @@ public class QcServiceImpl implements QcService {
         consignmentService.isPrimaryConsignment(consignment.getCnote()),
         consignment.getCnoteType());
     if (!consignmentService.isPrimaryConsignment(consignment.getCnote())
-        || !CnoteType.NORMAL.equals(consignment.getCnoteType())) {
+        || CnoteType.NORMAL_TO_PAY.equals(consignment.getCnoteType())) {
       return;
     }
     fillClientMetadata(completionData, consignment);
