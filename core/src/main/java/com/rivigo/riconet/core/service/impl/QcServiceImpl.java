@@ -230,6 +230,10 @@ public class QcServiceImpl implements QcService {
   }
 
   public Boolean check(ConsignmentCompletionEventDTO completionData, Consignment consignment) {
+    if (!CnoteType.NORMAL.equals(consignment.getCnoteType())) {
+      log.info("Consignment is not TBB paid, Validation is not enabled.");
+      return false;
+    }
     if (completionData.getClientPincodeMetadataDTO() == null) {
       log.info("First Consignment from client in this pincode. Mandatory QC required.");
       return true;
@@ -751,7 +755,8 @@ public class QcServiceImpl implements QcService {
       return;
     }
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
-    if (CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())) {
+    if (CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())
+        || CollectionUtils.isEmpty(getToRecepients(consignment))) {
       TicketDTO qcBlockerTicket = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
       closeTicket(qcBlockerTicket, ZoomTicketingConstant.QC_BLOCKER_AUTO_CLOSURE_MESSAGE);
       zoomBackendAPIClientService.handleConsignmentBlocker(
@@ -828,6 +833,14 @@ public class QcServiceImpl implements QcService {
 
   public Collection<String> getToRecepients(Consignment consignment) {
     if (consignment.getOrganizationId() == RIVIGO_ORGANIZATION_ID) {
+      if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+        User user = userMasterService.getById(consignment.getPrs().getBusinessPartner().getId());
+        if (user == null) {
+          log.info("Auto cloeing tickets as there is no RP user");
+          return Collections.emptyList();
+        }
+        return Collections.singleton(user.getEmail());
+      }
       return consignment.getClient().getClientNotificationList();
     }
     Organization organization = organizationService.getById(consignment.getOrganizationId());
@@ -835,6 +848,9 @@ public class QcServiceImpl implements QcService {
   }
 
   public Collection<String> getCcRecepients(Consignment consignment) {
+    if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+      return Collections.emptyList();
+    }
     User sam = userMasterService.getById(consignment.getClient().getSamUserId());
     if (sam == null) {
       throw new ZoomException(

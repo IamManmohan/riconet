@@ -62,14 +62,15 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           return null;
         }
         log.info(
-                "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
+            "Returning RP metadata for RP ID {}",
+            consignment.getPrs().getBusinessPartner().getId());
         return clientEntityMetadataRepository
-                .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
-                        ClientEntityType.CLUSTER,
-                        administrativeEntity.getId(),
-                        ClientEntityUserType.RP,
-                        consignment.getPrs().getBusinessPartner().getId(),
-                        OperationalStatus.ACTIVE);
+            .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
+                ClientEntityType.CLUSTER,
+                administrativeEntity.getId(),
+                ClientEntityUserType.RP,
+                consignment.getPrs().getBusinessPartner().getId(),
+                OperationalStatus.ACTIVE);
       }
       log.info(
           "Returning Client Cluster metadata for Client  {}",
