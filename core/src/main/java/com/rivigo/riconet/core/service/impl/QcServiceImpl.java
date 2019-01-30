@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
+import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKET_QC_BLOCKER_FAILURE_COMMENT;
 import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -745,7 +746,14 @@ public class QcServiceImpl implements QcService {
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
       closeTicket(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
     }
-    zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
+    try {
+      zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
+    } catch (ZoomException zoomException) {
+      ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+      ticketDTO.setStatus(TicketStatus.REOPENED);
+      zoomTicketingAPIClientService.editTicket(ticketDTO);
+      zoomTicketingAPIClientService.makeComment(ticketId, TICKET_QC_BLOCKER_FAILURE_COMMENT);
+    }
   }
 
   @Override
