@@ -752,7 +752,8 @@ public class QcServiceImpl implements QcService {
       ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
       ticketDTO.setStatus(TicketStatus.REOPENED);
       zoomTicketingAPIClientService.editTicket(ticketDTO);
-      zoomTicketingAPIClientService.makeComment(ticketId, TICKET_QC_BLOCKER_FAILURE_COMMENT);
+      zoomTicketingAPIClientService.makeComment(
+          ticketId, String.format(TICKET_QC_BLOCKER_FAILURE_COMMENT, zoomException.getMessage()));
     }
   }
 
@@ -842,9 +843,10 @@ public class QcServiceImpl implements QcService {
   public Collection<String> getToRecepients(Consignment consignment) {
     if (consignment.getOrganizationId() == RIVIGO_ORGANIZATION_ID) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+        // TODO : find correct user
         User user = userMasterService.getById(consignment.getPrs().getBusinessPartner().getId());
         if (user == null) {
-          log.info("Auto cloeing tickets as there is no RP user");
+          log.info("Auto closing tickets as there is no RP user");
           return Collections.emptyList();
         }
         return Collections.singleton(user.getEmail());

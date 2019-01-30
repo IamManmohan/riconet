@@ -67,5 +67,5 @@ public class ZoomTicketingConstant {
   public static final String TICKET_ACTION_VALUE_APPROVE = "approve";
 
   public static final String TICKET_QC_BLOCKER_FAILURE_COMMENT =
-      "ticket failed to be %s ed because of %s . Reopened now. please take appropraiate action and try again";
+      "ticket action failed because of %s . Reopened now. please take appropriate action and try again";
 }
