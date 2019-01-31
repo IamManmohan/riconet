@@ -3,12 +3,14 @@ package com.rivigo.riconet.core.service.impl;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientEntityMetadataService;
+import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.zoom.common.enums.ClientEntityType;
 import com.rivigo.zoom.common.enums.ClientEntityUserType;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
+import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,8 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
   @Autowired private ClientEntityMetadataRepository clientEntityMetadataRepository;
 
   @Autowired private AdministrativeEntityService administrativeEntityService;
+
+  @Autowired private ZoomUserMasterService zoomUserMasterService;
 
   public ClientEntityMetadata getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
       ClientEntityType entityType,
@@ -64,12 +68,24 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         log.info(
             "Returning RP metadata for RP ID {}",
             consignment.getPrs().getBusinessPartner().getId());
+
+        ZoomUser zoomUser =
+            zoomUserMasterService.getZoomUserByBPId(
+                consignment.getPrs().getBusinessPartner().getId());
+        if (zoomUser == null) {
+          log.info("No ZoomUser for this BP");
+          return null;
+        }
+        if (zoomUser.getUser() == null) {
+          log.info("No User for this BP");
+          return null;
+        }
         return clientEntityMetadataRepository
             .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
                 ClientEntityType.CLUSTER,
                 administrativeEntity.getId(),
                 ClientEntityUserType.RP,
-                consignment.getPrs().getBusinessPartner().getId(),
+                zoomUser.getUser().getId(),
                 OperationalStatus.ACTIVE);
       }
       log.info(

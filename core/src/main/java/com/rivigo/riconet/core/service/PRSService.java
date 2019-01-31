@@ -9,5 +9,4 @@ import org.springframework.stereotype.Service;
 public interface PRSService {
 
   Map<Long, PickupRunSheet> getPrsMapByPRSIdIn(List<Long> prsTripIdList);
-
 }

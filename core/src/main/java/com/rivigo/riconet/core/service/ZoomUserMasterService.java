@@ -9,6 +9,8 @@ public interface ZoomUserMasterService {
 
   ZoomUser getZoomUser(String userName);
 
+  ZoomUser getZoomUserByBPId(Long bpId);
+
   List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(
       Long locationId, String zoomUserType, String excludedZoomUserType);
 
