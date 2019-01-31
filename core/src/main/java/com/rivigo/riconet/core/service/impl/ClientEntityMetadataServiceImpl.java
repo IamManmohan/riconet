@@ -57,35 +57,16 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         administrativeEntityService.findParentCluster(consignment.getFromId());
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-        if (consignment.getPrs() == null) {
-          log.info("No Pickup or this CN : {}", consignment.getCnote());
-          return null;
-        }
-        if (consignment.getPrs().getBusinessPartner() == null) {
-          log.info("No Pickup BP for this CN : {}", consignment.getCnote());
-          return null;
-        }
-        log.info(
-            "Returning RP metadata for RP ID {}",
-            consignment.getPrs().getBusinessPartner().getId());
-
-        ZoomUser zoomUser =
-            zoomUserMasterService.getZoomUserByBPId(
-                consignment.getPrs().getBusinessPartner().getId());
-        if (zoomUser == null) {
-          log.info("No ZoomUser for this BP");
-          return null;
-        }
-        if (zoomUser.getUser() == null) {
-          log.info("No User for this BP");
-          return null;
+        Long rpId = getRpForConsignment(consignment);
+        if (rpId == null) {
+          log.info("No RP exists for this consignment");
         }
         return clientEntityMetadataRepository
             .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
                 ClientEntityType.CLUSTER,
                 administrativeEntity.getId(),
                 ClientEntityUserType.RP,
-                zoomUser.getUser().getId(),
+                rpId,
                 OperationalStatus.ACTIVE);
       }
       log.info(
@@ -108,5 +89,30 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           consignment.getOrganizationId(),
           OperationalStatus.ACTIVE);
     }
+  }
+
+  private Long getRpForConsignment(Consignment consignment) {
+    if (consignment.getPrs() == null) {
+      log.info("No Pickup or this CN : {}", consignment.getCnote());
+      return null;
+    }
+    if (consignment.getPrs().getBusinessPartner() == null) {
+      log.info("No Pickup BP for this CN : {}", consignment.getCnote());
+      return null;
+    }
+    log.info(
+        "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
+
+    ZoomUser zoomUser =
+        zoomUserMasterService.getZoomUserByBPId(consignment.getPrs().getBusinessPartner().getId());
+    if (zoomUser == null) {
+      log.info("No ZoomUser for this BP");
+      return null;
+    }
+    if (zoomUser.getUser() == null) {
+      log.info("No User for this BP");
+      return null;
+    }
+    return zoomUser.getUser().getId();
   }
 }
