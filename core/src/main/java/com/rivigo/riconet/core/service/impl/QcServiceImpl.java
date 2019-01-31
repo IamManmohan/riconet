@@ -36,6 +36,7 @@ import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
+import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.riconet.ruleengine.constants.RuleEngineVariableNameConstant;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
@@ -55,6 +56,7 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PinCode;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
@@ -120,6 +122,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
   @Autowired private TicketingService ticketingService;
+
+  @Autowired private ZoomUserMasterService zoomUserMasterService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -843,8 +847,14 @@ public class QcServiceImpl implements QcService {
   public Collection<String> getToRecepients(Consignment consignment) {
     if (consignment.getOrganizationId() == RIVIGO_ORGANIZATION_ID) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-        // TODO : find correct user
-        User user = userMasterService.getById(consignment.getPrs().getBusinessPartner().getId());
+        ZoomUser zoomUser =
+            zoomUserMasterService.getZoomUserByBPId(
+                consignment.getPrs().getBusinessPartner().getId());
+        if (zoomUser == null) {
+          log.info("Auto closing tickets as there is no RP user");
+          return Collections.emptyList();
+        }
+        User user = zoomUser.getUser();
         if (user == null) {
           log.info("Auto closing tickets as there is no RP user");
           return Collections.emptyList();

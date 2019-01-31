@@ -6,12 +6,18 @@ import static org.mockito.Mockito.when;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
+import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.riconet.core.service.impl.ClientEntityMetadataServiceImpl;
 import com.rivigo.zoom.common.enums.ClientEntityType;
+import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
+import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
+import com.rivigo.zoom.common.model.PickupRunSheet;
+import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +38,8 @@ public class ClientEntityMetadataServiceTest {
   @Mock private ClientEntityMetadataRepository clientEntityMetadataRepository;
 
   @Mock private AdministrativeEntityService administrativeEntityService;
+
+  @Mock private ZoomUserMasterService zoomUserMasterService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -81,6 +89,93 @@ public class ClientEntityMetadataServiceTest {
             30l,
             ClientEntityMetadata.getDefaultLongValue(),
             OperationalStatus.ACTIVE);
+  }
+
+  @Test
+  public void getClientClusterMetadataRetailPRSnullTest() {
+    Consignment consignment = new Consignment();
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setFromId(10l);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(20l);
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
+        .thenReturn(administrativeEntity);
+    clientEntityMetadataService.getClientClusterMetadata(consignment);
+  }
+
+  @Test
+  public void getClientClusterMetadataRetailBPnullTest() {
+    Consignment consignment = new Consignment();
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setFromId(10l);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    consignment.setPrs(new PickupRunSheet());
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(20l);
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
+        .thenReturn(administrativeEntity);
+    clientEntityMetadataService.getClientClusterMetadata(consignment);
+  }
+
+  @Test
+  public void getClientClusterMetadataRetailZoomUserNullTest() {
+    Consignment consignment = new Consignment();
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setFromId(10l);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    PickupRunSheet pickupRunSheet = new PickupRunSheet();
+    BusinessPartner businessPartner = new BusinessPartner();
+    businessPartner.setId(1L);
+    pickupRunSheet.setBusinessPartner(businessPartner);
+    consignment.setPrs(pickupRunSheet);
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(20l);
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
+        .thenReturn(administrativeEntity);
+    clientEntityMetadataService.getClientClusterMetadata(consignment);
+  }
+
+  @Test
+  public void getClientClusterMetadataRetailUserNullTest() {
+    Consignment consignment = new Consignment();
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setFromId(10l);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    PickupRunSheet pickupRunSheet = new PickupRunSheet();
+    BusinessPartner businessPartner = new BusinessPartner();
+    businessPartner.setId(1L);
+    pickupRunSheet.setBusinessPartner(businessPartner);
+    consignment.setPrs(pickupRunSheet);
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(20l);
+    ZoomUser zoomUser = new ZoomUser();
+    when(zoomUserMasterService.getZoomUserByBPId(1L)).thenReturn(zoomUser);
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
+        .thenReturn(administrativeEntity);
+    clientEntityMetadataService.getClientClusterMetadata(consignment);
+  }
+
+  @Test
+  public void getClientClusterMetadataRetailTest() {
+    Consignment consignment = new Consignment();
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setFromId(10l);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    PickupRunSheet pickupRunSheet = new PickupRunSheet();
+    BusinessPartner businessPartner = new BusinessPartner();
+    businessPartner.setId(1L);
+    pickupRunSheet.setBusinessPartner(businessPartner);
+    consignment.setPrs(pickupRunSheet);
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(20l);
+    ZoomUser zoomUser = new ZoomUser();
+    User user = new User();
+    zoomUser.setUser(user);
+    when(zoomUserMasterService.getZoomUserByBPId(1L)).thenReturn(zoomUser);
+    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
+        .thenReturn(administrativeEntity);
+    clientEntityMetadataService.getClientClusterMetadata(consignment);
   }
 
   @Test
