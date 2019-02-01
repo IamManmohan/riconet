@@ -29,10 +29,10 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.riconet.core.service.impl.QcServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
@@ -42,6 +42,7 @@ import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentType;
+import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.enums.ruleengine.RuleType;
 import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Client;
@@ -49,8 +50,8 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.PickupRunSheet;
+import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.User;
-import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.ruleengine.RuleEngineRule;
@@ -110,7 +111,7 @@ public class QcServiceTest {
 
   @Mock private ConsignmentScheduleService consignmentScheduleService;
 
-  @Mock private ZoomUserMasterService zoomUserMasterService;
+  @Mock private StockAccumulatorService stockAccumulatorService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -698,10 +699,11 @@ public class QcServiceTest {
     businessPartner.setId(1L);
     pickupRunSheet.setBusinessPartner(businessPartner);
     consignment.setPrs(pickupRunSheet);
-    ZoomUser zoomUser = new ZoomUser();
-    User user = new User();
-    zoomUser.setUser(user);
-    when(zoomUserMasterService.getZoomUserByBPId(1L)).thenReturn(zoomUser);
+    StockAccumulator stockAccumulator = new StockAccumulator();
+    stockAccumulator.setEmail("test@rivigo.com");
+    when(stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(
+            StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, 1L))
+        .thenReturn(Arrays.asList(stockAccumulator));
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());
@@ -730,9 +732,6 @@ public class QcServiceTest {
     businessPartner.setId(1L);
     pickupRunSheet.setBusinessPartner(businessPartner);
     consignment.setPrs(pickupRunSheet);
-    ZoomUser zoomUser = new ZoomUser();
-    User user = new User();
-    zoomUser.setUser(user);
     when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
     when(locationService.getLocationById(any())).thenReturn(new Location());
     when(userMasterService.getById(any())).thenReturn(new User());

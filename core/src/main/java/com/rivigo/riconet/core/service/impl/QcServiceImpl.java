@@ -31,12 +31,12 @@ import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
-import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.riconet.ruleengine.constants.RuleEngineVariableNameConstant;
 import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
@@ -49,14 +49,15 @@ import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.QcType;
+import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.PinCode;
+import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.User;
-import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
@@ -123,7 +124,7 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private TicketingService ticketingService;
 
-  @Autowired private ZoomUserMasterService zoomUserMasterService;
+  @Autowired private StockAccumulatorService stockAccumulatorService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -847,19 +848,18 @@ public class QcServiceImpl implements QcService {
   public Collection<String> getToRecepients(Consignment consignment) {
     if (consignment.getOrganizationId() == RIVIGO_ORGANIZATION_ID) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-        ZoomUser zoomUser =
-            zoomUserMasterService.getZoomUserByBPId(
-                consignment.getPrs().getBusinessPartner().getId());
-        if (zoomUser == null) {
-          log.info("Auto closing tickets as there is no RP user");
+        Long rpId = consignment.getPrs().getBusinessPartner().getId();
+        List<StockAccumulator> stockAccumulators =
+            stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(
+                StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, rpId);
+        if (CollectionUtils.isEmpty(stockAccumulators)) {
+          log.info("No Stock accumalator admins present for this BP, ticket closing.");
           return Collections.emptyList();
         }
-        User user = zoomUser.getUser();
-        if (user == null) {
-          log.info("Auto closing tickets as there is no RP user");
-          return Collections.emptyList();
-        }
-        return Collections.singleton(user.getEmail());
+        return stockAccumulators
+            .stream()
+            .map(StockAccumulator::getEmail)
+            .collect(Collectors.toList());
       }
       return consignment.getClient().getClientNotificationList();
     }

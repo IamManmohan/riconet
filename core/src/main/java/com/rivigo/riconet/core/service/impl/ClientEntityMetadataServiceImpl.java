@@ -10,7 +10,6 @@ import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
-import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +56,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         administrativeEntityService.findParentCluster(consignment.getFromId());
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-        Long rpId = getRpForConsignment(consignment);
+        Long rpId = getRpIdForConsignment(consignment);
         if (rpId == null) {
           log.info("No RP exists for this consignment");
         }
@@ -91,7 +90,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
     }
   }
 
-  private Long getRpForConsignment(Consignment consignment) {
+  private Long getRpIdForConsignment(Consignment consignment) {
     if (consignment.getPrs() == null) {
       log.info("No Pickup or this CN : {}", consignment.getCnote());
       return null;
@@ -102,17 +101,6 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
     }
     log.info(
         "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
-
-    ZoomUser zoomUser =
-        zoomUserMasterService.getZoomUserByBPId(consignment.getPrs().getBusinessPartner().getId());
-    if (zoomUser == null) {
-      log.info("No ZoomUser for this BP");
-      return null;
-    }
-    if (zoomUser.getUser() == null) {
-      log.info("No User for this BP");
-      return null;
-    }
-    return zoomUser.getUser().getId();
+    return consignment.getPrs().getBusinessPartner().getId();
   }
 }

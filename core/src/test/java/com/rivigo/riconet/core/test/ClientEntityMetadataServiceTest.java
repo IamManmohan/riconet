@@ -16,8 +16,6 @@ import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.PickupRunSheet;
-import com.rivigo.zoom.common.model.User;
-import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -119,44 +117,6 @@ public class ClientEntityMetadataServiceTest {
   }
 
   @Test
-  public void getClientClusterMetadataRetailZoomUserNullTest() {
-    Consignment consignment = new Consignment();
-    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
-    consignment.setFromId(10l);
-    consignment.setCnoteType(CnoteType.RETAIL);
-    PickupRunSheet pickupRunSheet = new PickupRunSheet();
-    BusinessPartner businessPartner = new BusinessPartner();
-    businessPartner.setId(1L);
-    pickupRunSheet.setBusinessPartner(businessPartner);
-    consignment.setPrs(pickupRunSheet);
-    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
-    administrativeEntity.setId(20l);
-    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
-        .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
-  }
-
-  @Test
-  public void getClientClusterMetadataRetailUserNullTest() {
-    Consignment consignment = new Consignment();
-    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
-    consignment.setFromId(10l);
-    consignment.setCnoteType(CnoteType.RETAIL);
-    PickupRunSheet pickupRunSheet = new PickupRunSheet();
-    BusinessPartner businessPartner = new BusinessPartner();
-    businessPartner.setId(1L);
-    pickupRunSheet.setBusinessPartner(businessPartner);
-    consignment.setPrs(pickupRunSheet);
-    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
-    administrativeEntity.setId(20l);
-    ZoomUser zoomUser = new ZoomUser();
-    when(zoomUserMasterService.getZoomUserByBPId(1L)).thenReturn(zoomUser);
-    when(administrativeEntityService.findParentCluster(consignment.getFromId()))
-        .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
-  }
-
-  @Test
   public void getClientClusterMetadataRetailTest() {
     Consignment consignment = new Consignment();
     consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
@@ -169,10 +129,6 @@ public class ClientEntityMetadataServiceTest {
     consignment.setPrs(pickupRunSheet);
     AdministrativeEntity administrativeEntity = new AdministrativeEntity();
     administrativeEntity.setId(20l);
-    ZoomUser zoomUser = new ZoomUser();
-    User user = new User();
-    zoomUser.setUser(user);
-    when(zoomUserMasterService.getZoomUserByBPId(1L)).thenReturn(zoomUser);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
     clientEntityMetadataService.getClientClusterMetadata(consignment);
