@@ -813,8 +813,15 @@ public class QcServiceImpl implements QcService {
     qcBlockerActionParamsRedisRepository.set(
         uuid, qcBlockerActionParams, expiryHours, TimeUnit.HOURS);
 
-    String subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT);
-    String bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
+    String subject;
+    String bodyTemplate;
+    if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+      subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT_RETAIL);
+      bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY_RETAIL);
+    } else {
+      subject = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_SUBJECT);
+      bodyTemplate = zoomPropertyService.getString(ZoomPropertyName.QC_BLOCKER_EMAIL_BODY);
+    }
 
     Location fromLocation = locationService.getLocationById(consignment.getFromId());
     Location toLocation = locationService.getLocationById(consignment.getToId());
