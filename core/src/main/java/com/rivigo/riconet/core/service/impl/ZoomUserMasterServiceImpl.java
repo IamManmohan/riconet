@@ -22,11 +22,6 @@ public class ZoomUserMasterServiceImpl implements ZoomUserMasterService {
   }
 
   @Override
-  public ZoomUser getZoomUserByBPId(Long bpId) {
-    return zoomUserRepository.findByBpId(bpId);
-  }
-
-  @Override
   public List<ZoomUser> getActiveZoomUsersByLocationAndZoomUserType(
       Long locationId, String zoomUserType, String excludedZoomUserType) {
     if (zoomUserType == null) {
