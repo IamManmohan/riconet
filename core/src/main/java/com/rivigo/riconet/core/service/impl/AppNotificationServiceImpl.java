@@ -10,18 +10,24 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
+import com.google.common.collect.ImmutableMap;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
+import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.TaskDto;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
+import com.rivigo.riconet.core.service.RestClientUtilityService;
+import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
-import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
+import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
-import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -46,10 +54,15 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
-  @Autowired private OATaskAssignmentRepository oaTaskAssignmentRepository;
+  @Autowired private RestClientUtilityService restClientUtilityService;
+
+  @Autowired private LocationService locationService;
+
+  @Autowired private UserMasterService userMasterService;
 
   @Override
   public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
+    // Should be in sync with user table in backen
     Long userId =
         Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
     Long taskId = notificationDTO.getEntityId();
@@ -71,8 +84,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Override
   public void sendLoadingUnloadingNotification(NotificationDTO notificationDTO) {
-    Long userId =
-        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    String userEmail =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_EMAIL.name());
     Long taskId = notificationDTO.getEntityId();
 
     TaskType taskType =
@@ -87,13 +100,16 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    User user = userMasterService.getByEmail(userEmail);
+    if (user != null) {
+      sendNotification(pushObject, user.getId());
+    }
   }
 
   @Override
   public void sendPalletClosedNotification(NotificationDTO notificationDTO) {
-    Long userId =
-        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
+    String userEmail =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_EMAIL.name());
     Long palletId = notificationDTO.getEntityId();
     Long taskId =
         Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TASK_ID.name()));
@@ -105,11 +121,15 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    User user = userMasterService.getByEmail(userEmail);
+    if (user != null) {
+      sendNotification(pushObject, user.getId());
+    }
   }
 
   @Override
   public void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO) {
+    // Should be in sync with user table in backend
     Long userId =
         Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
     Long taskId = notificationDTO.getEntityId();
@@ -130,28 +150,40 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name()));
     consignmentScheduleService
         .getCacheForConsignmentAtLocation(notificationDTO.getEntityId(), locationId)
-        .map(
-            cache ->
-                oaTaskAssignmentRepository
-                    .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
-                        cache.getTripId(),
-                        cache.getTripType(),
-                        locationId,
-                        TaskType.LOADING,
-                        Arrays.asList(TaskStatus.OPEN, TaskStatus.IN_PROGRESS, TaskStatus.PAUSED)))
+        .flatMap(
+            cache -> {
+              Location location = locationService.getLocationById(locationId);
+              HttpEntity<?> entity = new HttpEntity<>(restClientUtilityService.getHeaders());
+              return restClientUtilityService.executeRest(
+                  restClientUtilityService.buildUrlWithParams(
+                      UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
+                      ImmutableMap.of(
+                          "tripId",
+                          String.valueOf(cache.getTripId()),
+                          "tripType",
+                          String.valueOf(cache.getTripType()),
+                          "locationCode",
+                          location.getCode(),
+                          "taskType",
+                          String.valueOf(TaskType.LOADING))),
+                  HttpMethod.GET,
+                  entity,
+                  TaskDto.class);
+            })
         .ifPresent(
-            oaTask -> {
+            taskDto -> {
               log.info("Sending ib clear event for {}", notificationDTO.getEntityId());
-              Long userId = oaTask.getUserId();
-              Long taskId = oaTask.getId();
               JSONObject pushObject = new JSONObject();
               JSONObject data = new JSONObject();
 
               data.put(NOTIFICATION_TYPE, PushNotificationConstant.IB_CLEAR_EVENT);
-              data.put(TASK_ID, taskId);
+              data.put(TASK_ID, taskDto.getId());
 
               pushObject.put(DATA, data);
-              sendNotification(pushObject, userId);
+              User user = userMasterService.getByEmail(taskDto.getUserEmail());
+              if (user != null) {
+                sendNotification(pushObject, user.getId());
+              }
             });
   }
 

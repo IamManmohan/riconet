@@ -3,9 +3,13 @@ package com.rivigo.riconet.core.test;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.TaskDto;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
+import com.rivigo.riconet.core.service.RestClientUtilityService;
+import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
@@ -13,9 +17,9 @@ import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.enums.ZoomTripType;
 import com.rivigo.zoom.common.model.ConsignmentScheduleCache;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
-import com.rivigo.zoom.common.model.OATaskAssignment;
+import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
-import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,15 +46,22 @@ public class AppNotificationServiceTest {
 
   @Mock private ZoomPropertyService zoomPropertyService;
 
+  @Mock private RestClientUtilityService restClientUtilityService;
+
+  @Mock private LocationService locationService;
+
   @Mock private ConsignmentScheduleService consignmentScheduleService;
 
-  @Mock private OATaskAssignmentRepository oaTaskAssignmentRepository;
+  @Mock private UserMasterService userMasterService;
 
   @InjectMocks private AppNotificationServiceImpl appNotificationService;
 
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(userMasterService.getById(Mockito.anyLong())).thenReturn(new User());
+    Mockito.when(userMasterService.getByEmail(Mockito.anyString())).thenReturn(new User());
+    Mockito.when(locationService.getLocationById(Mockito.anyLong())).thenReturn(getDummyLocation());
   }
 
   @Test
@@ -110,18 +121,11 @@ public class AppNotificationServiceTest {
             consignmentScheduleService.getCacheForConsignmentAtLocation(
                 Mockito.anyLong(), Mockito.anyLong()))
         .thenReturn(Optional.ofNullable(getDummyConsignmentScheduleCache()));
+    Mockito.when(locationService.getLocationById(Mockito.anyLong())).thenReturn(getDummyLocation());
     Mockito.when(
-            oaTaskAssignmentRepository
-                .findByTripIdAndTripTypeAndLocationIdAndTaskTypeAndStatusInAndIsActiveTrue(
-                    Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenReturn(
-            OATaskAssignment.builder()
-                .id(1L)
-                .locationId(1L)
-                .taskType(TaskType.LOADING)
-                .tripType(ZoomTripType.TRIP)
-                .isActive(Boolean.TRUE)
-                .build());
+            restClientUtilityService.executeRest(
+                Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
+        .thenReturn(Optional.of(TaskDto.builder().id(1L).taskType(TaskType.LOADING).build()));
     appNotificationService.sendIBClearEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
@@ -134,5 +138,12 @@ public class AppNotificationServiceTest {
     consignmentSchedule.setTripId(1L);
     consignmentSchedule.setTripType(ZoomTripType.TRIP);
     return consignmentSchedule;
+  }
+
+  private Location getDummyLocation() {
+    Location location = new Location();
+    location.setCode("locationCode");
+    location.setId(1L);
+    return location;
   }
 }

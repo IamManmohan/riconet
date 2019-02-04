@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,12 +19,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -50,6 +54,38 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
     headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
     headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
     return headers;
+  }
+
+  /**
+   * RestTemplate.exchange internally encodes the url to UTF-8. Do not encode here.
+   *
+   * @param url
+   * @param params
+   * @return
+   */
+  @Override
+  public String buildUrlWithParams(String url, List<Pair<String, String>> params) {
+    if (CollectionUtils.isEmpty(params)) return url;
+    return url
+        + params
+            .stream()
+            .map(p -> p.getFirst() + "=" + p.getSecond())
+            .reduce((p1, p2) -> p1 + "&" + p2)
+            .map(s -> "?" + s)
+            .orElse("");
+  }
+
+  @Override
+  public String buildUrlWithParams(String url, Map<String, String> params) {
+    if (CollectionUtils.isEmpty(params)) return url;
+    return url
+        + params
+            .entrySet()
+            .stream()
+            .map(p -> p.getKey() + "=" + p.getValue())
+            .reduce((p1, p2) -> p1 + "&" + p2)
+            .map(s -> "?" + s)
+            .orElse("");
   }
 
   @Override
