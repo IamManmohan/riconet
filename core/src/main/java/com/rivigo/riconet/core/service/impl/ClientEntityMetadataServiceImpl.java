@@ -59,6 +59,7 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
         Long rpId = getRpIdForConsignment(consignment);
         if (rpId == null) {
           log.info("No RP exists for this consignment");
+          return null;
         }
         return clientEntityMetadataRepository
             .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
