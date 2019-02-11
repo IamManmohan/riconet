@@ -1,10 +1,16 @@
 package com.rivigo.riconet.core.consumerabstract;
 
 import akka.Done;
+import akka.NotUsed;
+import akka.kafka.CommitterSettings;
+import akka.kafka.ConsumerMessage;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
+import akka.kafka.javadsl.Committer;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
+import akka.stream.javadsl.Flow;
+import akka.stream.javadsl.Keep;
 import akka.stream.javadsl.Sink;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
 import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
@@ -49,7 +55,7 @@ public abstract class ConsumerModel {
     return NUM_RETRIES;
   }
 
-  private final AtomicLong offset = new AtomicLong();
+//  private final AtomicLong offset = new AtomicLong();
 
   @Autowired private ExecutorService executorService;
 
@@ -91,13 +97,13 @@ public abstract class ConsumerModel {
             }
           });
     }
-    offset.set(record.offset());
+//    offset.set(record.offset());
     return CompletableFuture.completedFuture(Done.getInstance());
   }
 
-  private CompletionStage<Long> loadOffset() {
-    return CompletableFuture.completedFuture(offset.get());
-  }
+//  private CompletionStage<Long> loadOffset() {
+//    return CompletableFuture.completedFuture(offset.get());
+//  }
 
   public abstract void processMessage(String str) throws IOException;
 
@@ -148,11 +154,25 @@ public abstract class ConsumerModel {
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-    this.loadOffset()
-        .thenAccept(
-            fromOffset ->
-                Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
-                    .mapAsync(1, this::save)
-                    .runWith(Sink.ignore(), materializer));
+    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
+            .mapAsync(
+                    1,
+                    msg ->
+                            save(msg.record())
+                                    .thenApply(done -> msg.committableOffset()))
+                    .batch(
+                            20,
+                            ConsumerMessage::createCommittableOffsetBatch,
+                            ConsumerMessage.CommittableOffsetBatch::updated
+                    )
+                    .mapAsync(3, c -> c.commitJavadsl())
+                    .to(Sink.ignore())
+                    .run(materializer);
+//    this.loadOffset()
+//        .thenAccept(
+//            fromOffset ->
+//                Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
+//                    .mapAsync(1, this::save)
+//                    .runWith(Sink.ignore(), materializer));
   }
 }
