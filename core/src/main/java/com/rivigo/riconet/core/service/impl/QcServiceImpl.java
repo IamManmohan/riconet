@@ -880,7 +880,7 @@ public class QcServiceImpl implements QcService {
       log.info("Calling Qc model for Cn Id : {}", cnId);
       QcRequestDTO qcRequestDTO = new QcRequestDTO();
       qcRequestDTO.setConsignment_id(cnId);
-      QcResponseDTO qcResponseDTO = qcApiClientService.getQcFlag(qcRequestDTO);
+      QcResponseDTO qcResponseDTO = this.qcApiClientService.getQcFlag(qcRequestDTO);
       log.info(
           "Response from QC model for Cn Id : {}, QC needed : {}, Reason : {}",
           cnId,
