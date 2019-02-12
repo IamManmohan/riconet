@@ -13,5 +13,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class QcRequestDTO {
-  Long consignment_id;
+  Long consignmentId;
 }

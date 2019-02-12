@@ -37,9 +37,9 @@ public class QcApiClientServiceImpl implements QcApiClientService {
       responseJson =
           apiClientService.getEntity(qcRequestDTO, HttpMethod.POST, QC_MODEL_GET_FLAG, null, qcBaseUrl);
     } catch (IOException e) {
-      log.error("Error while calling QC API for cn id {}", qcRequestDTO.getConsignment_id(), e);
+      log.error("Error while calling QC API for cn id {}", qcRequestDTO.getConsignmentId(), e);
       throw new ZoomException(
-          "Error while calling QC API for cn id : " + qcRequestDTO.getConsignment_id());
+          "Error while calling QC API for cn id : " + qcRequestDTO.getConsignmentId());
     }
     TypeReference<QcResponseDTO> mapType = new TypeReference<QcResponseDTO>() {};
 

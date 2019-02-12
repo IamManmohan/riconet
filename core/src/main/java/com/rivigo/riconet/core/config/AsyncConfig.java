@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -25,5 +26,10 @@ public class AsyncConfig extends AsyncConfigurerSupport {
         executor.setThreadNamePrefix("AyncThread-");
         executor.initialize();
         return executor;
+    }
+
+    @Bean(name = "asyncTaskExecutor")
+    public Executor threadPoolTaskExecutor() {
+        return new ThreadPoolTaskExecutor();
     }
 }

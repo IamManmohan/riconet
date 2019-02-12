@@ -874,12 +874,12 @@ public class QcServiceImpl implements QcService {
     }
   }
 
-  @Async
-  public void getAndLogQcFlagInAsync(Long cnId) {
+  @Async("asyncTaskExecutor")
+  private void getAndLogQcFlagInAsync(Long cnId) {
     try {
       log.info("Calling Qc model for Cn Id : {}", cnId);
       QcRequestDTO qcRequestDTO = new QcRequestDTO();
-      qcRequestDTO.setConsignment_id(cnId);
+      qcRequestDTO.setConsignmentId(cnId);
       QcResponseDTO qcResponseDTO = this.qcApiClientService.getQcFlag(qcRequestDTO);
       log.info(
           "Response from QC model for Cn Id : {}, QC needed : {}, Reason : {}",
