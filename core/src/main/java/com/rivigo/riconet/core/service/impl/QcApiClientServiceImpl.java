@@ -1,11 +1,12 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.UrlConstant.QC_MODEL_GET_FLAG;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.qc.QcRequestDTO;
 import com.rivigo.riconet.core.dto.qc.QcResponseDTO;
-import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.QcApiClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-
-import static com.rivigo.riconet.core.constants.UrlConstant.QC_MODEL_GET_FLAG;
 
 /** Created by ashfakh on 11/02/19. */
 @Slf4j
@@ -35,7 +34,8 @@ public class QcApiClientServiceImpl implements QcApiClientService {
     JsonNode responseJson;
     try {
       responseJson =
-          apiClientService.getEntity(qcRequestDTO, HttpMethod.POST, QC_MODEL_GET_FLAG, null, qcBaseUrl);
+          apiClientService.getEntity(
+              qcRequestDTO, HttpMethod.POST, QC_MODEL_GET_FLAG, null, qcBaseUrl);
     } catch (IOException e) {
       log.error("Error while calling QC API for cn id {}", qcRequestDTO.getConsignmentId(), e);
       throw new ZoomException(
