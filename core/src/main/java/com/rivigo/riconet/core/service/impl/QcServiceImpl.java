@@ -12,6 +12,8 @@ import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
+import com.rivigo.riconet.core.dto.qc.QcRequestDTO;
+import com.rivigo.riconet.core.dto.qc.QcResponseDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
@@ -28,6 +30,7 @@ import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.PincodeService;
+import com.rivigo.riconet.core.service.QcApiClientService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.TicketingService;
@@ -77,6 +80,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -119,6 +123,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
   @Autowired private TicketingService ticketingService;
+
+  @Autowired private QcApiClientService qcApiClientService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -333,6 +339,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     fillClientMetadata(completionData, consignment);
+    getAndLogQcFlagInAsync(consignment.getId());
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(
@@ -864,6 +871,23 @@ public class QcServiceImpl implements QcService {
     if (locationId.equals(firstLocationId)) {
       handleQcConsignmentBlocker(
           consignmentId, ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
+    }
+  }
+
+  @Async
+  private void getAndLogQcFlagInAsync(Long cnId) {
+    try {
+      log.info("Calling Qc model for Cn Id : {}", cnId);
+      QcRequestDTO qcRequestDTO = new QcRequestDTO();
+      qcRequestDTO.setConsignment_id(cnId);
+      QcResponseDTO qcResponseDTO = qcApiClientService.getQcFlag(qcRequestDTO);
+      log.info(
+          "Response from QC model for Cn Id : {}, QC needed : {}, Reason : {}",
+          cnId,
+          qcResponseDTO.getDecision(),
+          qcResponseDTO.getDisposition());
+    } catch (Exception e) {
+      log.error("Error calling QC model API {}", e);
     }
   }
 }
