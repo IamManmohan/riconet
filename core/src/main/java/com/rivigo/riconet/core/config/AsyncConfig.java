@@ -18,7 +18,6 @@ public class AsyncConfig extends AsyncConfigurerSupport {
     public static final int BATCH_SIZE = 1000;
 
     @Override
-    @Bean(name = "asyncTaskExecutor")
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(10);

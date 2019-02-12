@@ -31,6 +31,7 @@ import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.QcApiClientService;
+import com.rivigo.riconet.core.service.QcModelService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.TicketingService;
@@ -124,7 +125,7 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private TicketingService ticketingService;
 
-  @Autowired private QcApiClientService qcApiClientService;
+  @Autowired private QcModelService qcModelService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
@@ -339,7 +340,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     fillClientMetadata(completionData, consignment);
-    getAndLogQcFlagInAsync(consignment.getId());
+    qcModelService.getAndLogQcFlagInAsync(consignment.getId());
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(
@@ -871,23 +872,6 @@ public class QcServiceImpl implements QcService {
     if (locationId.equals(firstLocationId)) {
       handleQcConsignmentBlocker(
           consignmentId, ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
-    }
-  }
-
-  @Async("asyncTaskExecutor")
-  public void getAndLogQcFlagInAsync(Long cnId) {
-    try {
-      log.info("Calling Qc model for Cn Id : {}", cnId);
-      QcRequestDTO qcRequestDTO = new QcRequestDTO();
-      qcRequestDTO.setConsignmentId(cnId);
-      QcResponseDTO qcResponseDTO = this.qcApiClientService.getQcFlag(qcRequestDTO);
-      log.info(
-          "Response from QC model for Cn Id : {}, QC needed : {}, Reason : {}",
-          cnId,
-          qcResponseDTO.getDecision(),
-          qcResponseDTO.getDisposition());
-    } catch (Exception e) {
-      log.error("Error calling QC model API {}", e);
     }
   }
 }
