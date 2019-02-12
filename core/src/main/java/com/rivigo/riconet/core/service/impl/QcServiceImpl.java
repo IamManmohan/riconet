@@ -166,6 +166,26 @@ public class QcServiceImpl implements QcService {
         });
   }
 
+  public void consumeDeliveryLoadingEvent(ConsignmentBasicDTO loadingData) {
+    if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
+      return;
+    }
+    List<TicketDTO> ticketList =
+        zoomTicketingAPIClientService
+            .getTicketsByCnoteAndType(loadingData.getCnote(), getQcTicketTypes())
+            .stream()
+            .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
+            .collect(Collectors.toList());
+    if (CollectionUtils.isEmpty(ticketList)) {
+      return;
+    }
+    ticketList.forEach(
+        ticketDTO -> {
+          closeTicket(ticketDTO, ZoomTicketingConstant.QC_AUTO_CLOSURE_MESSAGE_DISPATCH);
+          zoomBackendAPIClientService.updateQcCheck(loadingData.getConsignmentId(), false);
+        });
+  }
+
   private void closeTicket(TicketDTO ticketDTO, String reasonOfClosure) {
     if (TicketStatus.NEW.equals(ticketDTO.getStatus())) {
       ticketDTO.setStatus(TicketStatus.IN_PROGRESS);
