@@ -874,8 +874,8 @@ public class QcServiceImpl implements QcService {
     }
   }
 
-  @Async
-  private void getAndLogQcFlagInAsync(Long cnId) {
+  @Async("asyncTaskExecutor")
+  public void getAndLogQcFlagInAsync(Long cnId) {
     try {
       log.info("Calling Qc model for Cn Id : {}", cnId);
       QcRequestDTO qcRequestDTO = new QcRequestDTO();
