@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import static com.rivigo.riconet.core.constants.UrlConstant.QC_MODEL_GET_FLAG;
+
 /** Created by ashfakh on 11/02/19. */
 @Slf4j
 @Service
@@ -33,7 +35,7 @@ public class QcApiClientServiceImpl implements QcApiClientService {
     JsonNode responseJson;
     try {
       responseJson =
-          apiClientService.getEntity(qcRequestDTO, HttpMethod.POST, null, null, qcBaseUrl);
+          apiClientService.getEntity(qcRequestDTO, HttpMethod.POST, QC_MODEL_GET_FLAG, null, qcBaseUrl);
     } catch (IOException e) {
       log.error("Error while calling QC API for cn id {}", qcRequestDTO.getConsignment_id(), e);
       throw new ZoomException(

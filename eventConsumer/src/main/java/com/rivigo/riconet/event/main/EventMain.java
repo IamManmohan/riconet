@@ -3,6 +3,7 @@ package com.rivigo.riconet.event.main;
 import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
+import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
@@ -55,7 +56,7 @@ public class EventMain {
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     ApplicationContext context =
         new AnnotationConfigApplicationContext(
-            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
