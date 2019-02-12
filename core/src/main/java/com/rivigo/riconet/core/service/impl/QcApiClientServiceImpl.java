@@ -41,7 +41,7 @@ public class QcApiClientServiceImpl implements QcApiClientService {
       throw new ZoomException(
           "Error while calling QC API for cn id : " + qcRequestDTO.getConsignment_id());
     }
-    TypeReference<TicketDTO> mapType = new TypeReference<TicketDTO>() {};
+    TypeReference<QcResponseDTO> mapType = new TypeReference<QcResponseDTO>() {};
 
     return (QcResponseDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
