@@ -165,7 +165,7 @@ public abstract class ConsumerModel {
                     ConsumerMessage::createCommittableOffsetBatch,
                     ConsumerMessage.CommittableOffsetBatch::updated
             )
-            .mapAsync(3, c -> c.commitJavadsl())
+            .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
             .to(Sink.ignore())
             .run(materializer);
 //    this.loadOffset()
