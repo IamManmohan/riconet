@@ -127,7 +127,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private StockAccumulatorService stockAccumulatorService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
-    if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())) {
+    if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())
+        || isConsigmentStatusDeps(loadingData.getStatus())) {
       return;
     }
     List<TicketDTO> ticketList =
@@ -931,5 +932,14 @@ public class QcServiceImpl implements QcService {
       handleQcConsignmentBlocker(
           consignmentId, ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
     }
+  }
+
+  private Boolean isConsigmentStatusDeps(ConsignmentStatus consignmentStatus) {
+    return Arrays.asList(
+            ConsignmentStatus.EXCESS,
+            ConsignmentStatus.DAMAGE,
+            ConsignmentStatus.PILFERAGE,
+            ConsignmentStatus.EXCESS)
+        .contains(consignmentStatus);
   }
 }
