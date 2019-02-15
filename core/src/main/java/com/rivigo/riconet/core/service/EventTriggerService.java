@@ -34,6 +34,8 @@ public class EventTriggerService {
 
   @Autowired private HandoverService handoverService;
 
+  @Autowired private DatastoreService datastoreService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     String entityId;
@@ -147,6 +149,9 @@ public class EventTriggerService {
       case TICKET_SEVERITY_CHANGE:
       case TICKET_COMMENT_CREATION:
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
+        break;
+      case CONSIGNMENT_EWAYBILL_METADATA_CREATION:
+        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

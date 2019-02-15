@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.cms.constants.ServiceType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
+import com.rivigo.riconet.core.constants.ZoomDatastoreConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
@@ -80,6 +81,40 @@ public class ApiClientServiceImpl implements ApiClientService {
       }
     }
     String errorMessage = responseJson.get(ZoomTicketingConstant.ERROR_MESSAGE_KEY).toString();
+    log.error(
+        "API Response Status : {}  Error Message : {} , response : {} ",
+        status,
+        errorMessage,
+        responseJson);
+    throw new ZoomException(errorMessage);
+  }
+
+  @Override
+  public Object parseResponseJsonNodeFromDatastore(JsonNode responseJson, TypeReference mapType) {
+    String status = responseJson.get(ZoomDatastoreConstant.STATUS_KEY).toString();
+    log.debug(responseJson.toString());
+    log.debug(status);
+    if ("\"SUCCESS\"".equals(status)) {
+      if (mapType == null) {
+        return null;
+      }
+      try {
+        return objectMapper.readValue(
+            responseJson.get(ZoomDatastoreConstant.PAYLOAD_KEY).toString(), mapType);
+      } catch (IOException e) {
+        log.error(
+            "Error while parsing API response,  {} at epoch {} :",
+            responseJson.get(ZoomDatastoreConstant.PAYLOAD_KEY).toString(),
+            DateTime.now().getMillis(),
+            e);
+        throw new ZoomException(
+            "Error while parsing API response: errorCode-"
+                + DateTime.now().getMillis()
+                + " :"
+                + e.getMessage());
+      }
+    }
+    String errorMessage = responseJson.get(ZoomDatastoreConstant.ERROR_MESSAGE_KEY).toString();
     log.error(
         "API Response Status : {}  Error Message : {} , response : {} ",
         status,
