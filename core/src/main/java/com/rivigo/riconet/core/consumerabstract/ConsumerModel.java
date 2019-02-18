@@ -141,22 +141,23 @@ public abstract class ConsumerModel {
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-      Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
-              .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
-              .batch(20,
-                      first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
-                      ConsumerMessage.CommittableOffsetBatch::updated)
-              .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
-              .runWith(Sink.ignore(), materializer);
+    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
+        .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
+        .batch(
+            20,
+            first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
+            ConsumerMessage.CommittableOffsetBatch::updated)
+        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
+        .runWith(Sink.ignore(), materializer);
 
-//    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
-//        .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
-//        .batch(
-//            20,
-//            ConsumerMessage::createCommittableOffsetBatch,
-//            ConsumerMessage.CommittableOffsetBatch::updated)
-//        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
-//        .to(Sink.ignore())
-//        .run(materializer);
+    //    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
+    //        .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
+    //        .batch(
+    //            20,
+    //            ConsumerMessage::createCommittableOffsetBatch,
+    //            ConsumerMessage.CommittableOffsetBatch::updated)
+    //        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
+    //        .to(Sink.ignore())
+    //        .run(materializer);
   }
 }
