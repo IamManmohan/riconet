@@ -49,4 +49,6 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_WRITE_OFF_REQUEST_ONBOARDING =
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
+
+  public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 }
