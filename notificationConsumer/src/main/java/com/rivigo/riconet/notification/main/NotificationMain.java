@@ -3,6 +3,7 @@ package com.rivigo.riconet.notification.main;
 import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
+import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
@@ -44,7 +45,7 @@ public class NotificationMain {
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     ApplicationContext context =
         new AnnotationConfigApplicationContext(
-            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class);
     NotificationMain consumer = context.getBean(NotificationMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");

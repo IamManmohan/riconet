@@ -29,6 +29,7 @@ import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.PincodeService;
+import com.rivigo.riconet.core.service.QcModelService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.StockAccumulatorService;
@@ -125,6 +126,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private TicketingService ticketingService;
 
   @Autowired private StockAccumulatorService stockAccumulatorService;
+
+  @Autowired private QcModelService qcModelService;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())
@@ -367,6 +370,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     fillClientMetadata(completionData, consignment);
+    qcModelService.getAndLogQcFlagInAsync(consignment.getId());
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(
