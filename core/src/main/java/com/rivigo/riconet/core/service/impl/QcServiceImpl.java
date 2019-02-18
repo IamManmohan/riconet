@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
+import static com.rivigo.riconet.core.constants.EmailConstant.CE_TEAM_EMAIL_ID;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
 import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKET_QC_BLOCKER_FAILURE_COMMENT;
@@ -901,7 +902,7 @@ public class QcServiceImpl implements QcService {
 
   public Collection<String> getCcRecepients(Consignment consignment) {
     if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-      return Collections.emptyList();
+      return Collections.singletonList(CE_TEAM_EMAIL_ID);
     }
     User sam = userMasterService.getById(consignment.getClient().getSamUserId());
     if (sam == null) {
