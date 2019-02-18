@@ -872,7 +872,7 @@ public class QcServiceImpl implements QcService {
         EmailConstant.SERVICE_EMAIL_ID,
         getToRecepients(consignment),
         getCcRecepients(consignment),
-        Collections.emptyList(),
+        getBccRecepients(consignment),
         sub.replace(subject),
         sub.replace(bodyTemplate),
         null);
@@ -902,7 +902,7 @@ public class QcServiceImpl implements QcService {
 
   public Collection<String> getCcRecepients(Consignment consignment) {
     if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-      return Collections.singletonList(CE_TEAM_EMAIL_ID);
+      return Collections.emptyList();
     }
     User sam = userMasterService.getById(consignment.getClient().getSamUserId());
     if (sam == null) {
@@ -910,6 +910,13 @@ public class QcServiceImpl implements QcService {
           "Sam user is missing for client {} ", consignment.getClient().getId());
     }
     return Collections.singleton(sam.getEmail());
+  }
+
+  public Collection<String> getBccRecepients(Consignment consignment) {
+    if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+      return Collections.singletonList(CE_TEAM_EMAIL_ID);
+    }
+    return Collections.emptyList();
   }
 
   private void placeValidationBlockerForBFCNsAtFirstRivigoLocation(
