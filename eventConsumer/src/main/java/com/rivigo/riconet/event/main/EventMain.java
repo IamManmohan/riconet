@@ -114,19 +114,24 @@ public class EventMain {
       ConsumerSettings<String, String> financeEventsConsumerSettings,
       ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings) {
     log.info(
-        "Loading zoom event trigger consumer with settings {}", zoomEventTriggerConsumerSettings);
+        "Loading zoom event trigger consumer with settings {}",
+        zoomEventTriggerConsumerSettings.toString());
     zoomEventTriggerConsumer.load(materializer, zoomEventTriggerConsumerSettings);
     log.info(
-        "Loading event trigger for cn status change with settings {}", cnActionConsumerSettings);
+        "Loading event trigger for cn status change with settings {}",
+        cnActionConsumerSettings.toString());
     cnActionConsumer.load(materializer, cnActionConsumerSettings);
     log.info(
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
-    log.info("Loading Finance event consumer with settings {}", financeEventsConsumerSettings);
+    log.info(
+        "Loading Finance event consumer with settings {}",
+        financeEventsConsumerSettings.toString());
     financeEventsConsumer.load(materializer, financeEventsConsumerSettings);
     log.info(
-        "Loading bfPickup event consumer with settings {}", bfPickupChargesActionConsumerSettings);
+        "Loading bfPickup event consumer with settings {}",
+        bfPickupChargesActionConsumerSettings.toString());
     bfPickupChargesActionConsumer.load(materializer, bfPickupChargesActionConsumerSettings);
   }
 }
