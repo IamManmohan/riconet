@@ -54,7 +54,7 @@ subprojects {
     }
 
     dependencies {
-        compile group: "com.typesafe.akka", name: "akka-stream-kafka_2.11", version: "0.17"
+        compile group: "com.typesafe.akka", name: "akka-stream-kafka_2.11", version: "1.0-RC1"
         compile "org.slf4j:slf4j-api:1.7.25"
         compile "com.h2database:h2:1.4.196"
         compile "org.projectlombok:lombok:1.16.6"

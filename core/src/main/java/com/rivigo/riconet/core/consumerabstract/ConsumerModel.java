@@ -153,7 +153,7 @@ public abstract class ConsumerModel {
             first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
             ConsumerMessage.CommittableOffsetBatch::updated)
         .mapAsync(
-            3,
+            1,
             f -> {
               log.info("Committing offset for {}", consumerSettings.getProperty("group.id"));
               return f.commitJavadsl();
