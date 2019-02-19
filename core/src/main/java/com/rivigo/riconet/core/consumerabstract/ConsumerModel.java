@@ -148,16 +148,16 @@ public abstract class ConsumerModel {
 
     Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
         .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
-        .batch(
-            20,
-            first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
-            ConsumerMessage.CommittableOffsetBatch::updated)
-        .mapAsync(
-            1,
-            f -> {
-              log.info("Committing offset for {}", consumerSettings.getProperty("group.id"));
-              return f.commitJavadsl();
-            })
+//        .batch(
+//            20,
+//            first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
+//            ConsumerMessage.CommittableOffsetBatch::updated)
+//        .mapAsync(
+//            1,
+//            f -> {
+//              log.info("Committing offset for {}", consumerSettings.getProperty("group.id"));
+//              return f.commitJavadsl();
+//            })
         .runWith(Sink.ignore(), materializer);
   }
 }
