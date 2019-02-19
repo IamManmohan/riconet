@@ -145,8 +145,8 @@ public abstract class ConsumerModel {
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
-        .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
+    Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
+        .mapAsync(1, this::save)
         .runWith(Sink.ignore(), materializer);
   }
 }
