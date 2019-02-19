@@ -177,7 +177,8 @@ public class EventTriggerServiceTest {
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(qcService, times(1)).consumeLoadingEvent(consignmentBasicDTOArgumentCaptor.capture());
+    verify(qcService, times(1))
+        .consumeDeliveryLoadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
     Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);

@@ -7,6 +7,8 @@ public interface QcService {
 
   void consumeLoadingEvent(ConsignmentBasicDTO loadingData);
 
+  void consumeDeliveryLoadingEvent(ConsignmentBasicDTO loadingData);
+
   void consumeUnloadingEvent(ConsignmentBasicDTO loadingData);
 
   void consumeCompletionEvent(ConsignmentCompletionEventDTO completionData);
