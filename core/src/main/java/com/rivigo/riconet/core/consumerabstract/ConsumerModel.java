@@ -137,7 +137,7 @@ public abstract class ConsumerModel {
 
   public void load(
       ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
-    log.info("Loading Consumer");
+    log.info("Loading Consumer {}",consumerSettings.getProperty("group.id"));
     Set<String> topics = new HashSet<>();
     topics.add(getTopic());
     topics.add(getErrorTopic());
