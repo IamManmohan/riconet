@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.consumerabstract;
 
 import akka.Done;
-import akka.kafka.ConsumerMessage;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
@@ -146,18 +145,8 @@ public abstract class ConsumerModel {
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-    Consumer.committableSource(consumerSettings, Subscriptions.topics(topics))
-        .mapAsync(1, msg -> save(msg.record()).thenApply(done -> msg.committableOffset()))
-        .batch(
-            20,
-            first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
-            ConsumerMessage.CommittableOffsetBatch::updated)
-        .mapAsync(
-            1,
-            f -> {
-              log.info("Committing offset for {}", consumerSettings.getProperty("group.id"));
-              return f.commitJavadsl();
-            })
+    Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
+        .mapAsync(1, this::save)
         .runWith(Sink.ignore(), materializer);
   }
 }
