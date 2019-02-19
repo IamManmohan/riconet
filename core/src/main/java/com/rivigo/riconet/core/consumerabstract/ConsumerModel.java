@@ -137,6 +137,7 @@ public abstract class ConsumerModel {
 
   public void load(
       ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+    log.info("Loading Consumer");
     Set<String> topics = new HashSet<>();
     topics.add(getTopic());
     topics.add(getErrorTopic());
@@ -147,7 +148,13 @@ public abstract class ConsumerModel {
             20,
             first -> ConsumerMessage.emptyCommittableOffsetBatch().updated(first),
             ConsumerMessage.CommittableOffsetBatch::updated)
-        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
+        .mapAsync(
+            3,
+            f -> {
+              log.info("Commiting offset");
+              return f.commitJavadsl();
+            })
+        //        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
         .runWith(Sink.ignore(), materializer);
   }
 }
