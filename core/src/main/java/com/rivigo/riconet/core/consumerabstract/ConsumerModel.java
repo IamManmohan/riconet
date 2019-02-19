@@ -155,10 +155,9 @@ public abstract class ConsumerModel {
         .mapAsync(
             3,
             f -> {
-              log.info("Commiting offset for {}", consumerSettings.getProperty("group.id"));
+              log.info("Committing offset for {}", consumerSettings.getProperty("group.id"));
               return f.commitJavadsl();
             })
-        //        .mapAsync(3, ConsumerMessage.Committable::commitJavadsl)
         .runWith(Sink.ignore(), materializer);
   }
 }
