@@ -51,4 +51,6 @@ public class UrlConstant {
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
 
   public static final String WMS_TASK_BY_TRIP_LOCATION_AND_TYPE = "/enriched/task";
+
+  public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 }

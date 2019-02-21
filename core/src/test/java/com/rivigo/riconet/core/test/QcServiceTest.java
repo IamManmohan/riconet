@@ -29,6 +29,7 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.SmsService;
+import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -41,11 +42,15 @@ import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentType;
+import com.rivigo.zoom.common.enums.StockAccumulatorRole;
 import com.rivigo.zoom.common.enums.ruleengine.RuleType;
+import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Client;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.PickupRunSheet;
+import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
@@ -105,6 +110,8 @@ public class QcServiceTest {
   @Mock private QcBlockerActionParamsRedisRepository qcBlockerActionParamsRedisRepository;
 
   @Mock private ConsignmentScheduleService consignmentScheduleService;
+
+  @Mock private StockAccumulatorService stockAccumulatorService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -515,6 +522,19 @@ public class QcServiceTest {
   }
 
   @Test
+  // positive test case for next N CNs
+  public void checkTest11() {
+
+    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+    Consignment consignment = getConsignmentDTO();
+    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setCount(9L);
+    mockingParamsForCheckFunction();
+    consignment.setCnoteType(CnoteType.RETAIL);
+    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+    assertEquals(false, result);
+  }
+
+  @Test
   public void isMeasurementQcRequiredTest() {
     ConsignmentCompletionEventDTO completionEventDTO = new ConsignmentCompletionEventDTO();
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
@@ -565,6 +585,22 @@ public class QcServiceTest {
                 .build());
     qcService.consumeQcBlockerTicketClosedEvent(5l, 10l, "qc");
     verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
+  }
+
+  @Test
+  public void qcBlockerActionExceptionTest() {
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+        .thenReturn(
+            TicketDTO.builder()
+                .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
+                .status(TicketStatus.CLOSED)
+                .build());
+    doThrow(new ZoomException()).when(zoomBackendAPIClientService).handleQcBlockerClosure(any());
+    qcService.consumeQcBlockerTicketClosedEvent(5l, 10l, "qc");
+    verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
+    verify(zoomTicketingAPIClientService, times(1)).editTicket(any());
+    verify(zoomTicketingAPIClientService, times(2)).getTicketByTicketId(any());
+    verify(zoomTicketingAPIClientService, times(1)).makeComment(any(), any());
   }
 
   @Test
@@ -642,6 +678,71 @@ public class QcServiceTest {
         5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
     verify(emailService, times(1))
         .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
+  }
+
+  @Test
+  public void consumeRetailQcBlockerTicketCreationEventTest() {
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            "1234567890",
+            Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
+        .thenReturn(Collections.singletonList(new TicketDTO()));
+    Client client = new Client();
+    client.setClientNotificationList(Collections.singleton("dummy@rivigo.com"));
+
+    Consignment consignment = new Consignment();
+    consignment.setId(100l);
+    consignment.setClient(client);
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    PickupRunSheet pickupRunSheet = new PickupRunSheet();
+    BusinessPartner businessPartner = new BusinessPartner();
+    businessPartner.setId(1L);
+    pickupRunSheet.setBusinessPartner(businessPartner);
+    consignment.setPrs(pickupRunSheet);
+    StockAccumulator stockAccumulator = new StockAccumulator();
+    stockAccumulator.setEmail("test@rivigo.com");
+    when(stockAccumulatorService.getByStockAccumulatorRoleAndAccumulationPartnerId(
+            StockAccumulatorRole.STOCK_ACCUMULATOR_ADMIN, 1L))
+        .thenReturn(Arrays.asList(stockAccumulator));
+    when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
+    when(locationService.getLocationById(any())).thenReturn(new Location());
+    when(userMasterService.getById(any())).thenReturn(new User());
+    qcService.consumeQcBlockerTicketCreationEvent(
+        5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
+    verify(emailService, times(1))
+        .sendEmail(eq(EmailConstant.SERVICE_EMAIL_ID), any(), any(), any(), any(), any(), any());
+  }
+
+  @Test
+  public void consumeRetailQcBlockerTicketCreationNoUserEventTest() {
+    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+            "1234567890",
+            Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
+        .thenReturn(Collections.singletonList(new TicketDTO()));
+    Client client = new Client();
+    client.setClientNotificationList(Collections.singleton("dummy@rivigo.com"));
+
+    Consignment consignment = new Consignment();
+    consignment.setId(100l);
+    consignment.setClient(client);
+    consignment.setOrganizationId(ConsignmentConstant.RIVIGO_ORGANIZATION_ID);
+    consignment.setCnoteType(CnoteType.RETAIL);
+    PickupRunSheet pickupRunSheet = new PickupRunSheet();
+    BusinessPartner businessPartner = new BusinessPartner();
+    businessPartner.setId(1L);
+    pickupRunSheet.setBusinessPartner(businessPartner);
+    consignment.setPrs(pickupRunSheet);
+    when(consignmentService.getConsignmentByCnote(any())).thenReturn(consignment);
+    when(locationService.getLocationById(any())).thenReturn(new Location());
+    when(userMasterService.getById(any())).thenReturn(new User());
+    TicketDTO ticketDTO = new TicketDTO();
+    ticketDTO.setStatus(TicketStatus.NEW);
+    when(zoomTicketingAPIClientService.getTicketByTicketId(5l)).thenReturn(ticketDTO);
+    qcService.consumeQcBlockerTicketCreationEvent(
+        5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
+    verify(zoomTicketingAPIClientService, times(1)).getTicketByTicketId(any());
+    verify(zoomTicketingAPIClientService, times(2)).editTicket(any());
+    verify(zoomBackendAPIClientService, times(1)).handleConsignmentBlocker(any());
   }
 
   private List<RuleEngineRule> getBasicRuleList() {

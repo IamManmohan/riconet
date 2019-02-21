@@ -48,6 +48,6 @@ public class CnActionConsumer extends EventConsumer {
 
   @Override
   public String getConsumerName() {
-    return this.getClass().getName();
+    return "CnActionConsumer";
   }
 }
