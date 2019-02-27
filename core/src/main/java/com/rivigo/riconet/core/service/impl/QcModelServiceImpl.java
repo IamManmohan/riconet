@@ -6,7 +6,6 @@ import com.rivigo.riconet.core.service.QcApiClientService;
 import com.rivigo.riconet.core.service.QcModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /** Created by ashfakh on 12/02/19. */
@@ -16,8 +15,8 @@ public class QcModelServiceImpl implements QcModelService {
 
   @Autowired private QcApiClientService qcApiClientService;
 
-  @Async
-  public void getAndLogQcFlagInAsync(Long cnId) {
+  @Override
+  public Boolean getQcValidationFlag(Long cnId) {
     try {
       log.info("Calling Qc model for Cn Id : {}", cnId);
       QcRequestDTO qcRequestDTO = new QcRequestDTO();
@@ -28,8 +27,10 @@ public class QcModelServiceImpl implements QcModelService {
           cnId,
           qcResponseDTO.getDecision(),
           qcResponseDTO.getDisposition());
+      return qcResponseDTO.getDecision();
     } catch (Exception e) {
       log.error("Error calling QC model API {}", e);
+      return Boolean.FALSE;
     }
   }
 }
