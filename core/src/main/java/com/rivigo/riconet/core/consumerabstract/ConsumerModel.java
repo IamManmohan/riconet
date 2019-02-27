@@ -17,7 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -48,8 +47,6 @@ public abstract class ConsumerModel {
   public Long getNumRetries() {
     return NUM_RETRIES;
   }
-
-  private final AtomicLong offset = new AtomicLong();
 
   @Autowired private ExecutorService executorService;
 
@@ -91,12 +88,7 @@ public abstract class ConsumerModel {
             }
           });
     }
-    offset.set(record.offset());
     return CompletableFuture.completedFuture(Done.getInstance());
-  }
-
-  private CompletionStage<Long> loadOffset() {
-    return CompletableFuture.completedFuture(offset.get());
   }
 
   public abstract void processMessage(String str) throws IOException;
@@ -144,15 +136,17 @@ public abstract class ConsumerModel {
 
   public void load(
       ActorMaterializer materializer, ConsumerSettings<String, String> consumerSettings) {
+    log.info(
+        "Loading Consumer {} with source topic : {} and error topic {}",
+        consumerSettings.getProperty("group.id"),
+        getTopic(),
+        getErrorTopic());
     Set<String> topics = new HashSet<>();
     topics.add(getTopic());
     topics.add(getErrorTopic());
 
-    this.loadOffset()
-        .thenAccept(
-            fromOffset ->
-                Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
-                    .mapAsync(1, this::save)
-                    .runWith(Sink.ignore(), materializer));
+    Consumer.plainSource(consumerSettings, Subscriptions.topics(topics))
+        .mapAsync(1, this::save)
+        .runWith(Sink.ignore(), materializer);
   }
 }

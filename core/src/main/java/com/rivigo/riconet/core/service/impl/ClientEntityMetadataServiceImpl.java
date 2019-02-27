@@ -3,7 +3,10 @@ package com.rivigo.riconet.core.service.impl;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientEntityMetadataService;
+import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.zoom.common.enums.ClientEntityType;
+import com.rivigo.zoom.common.enums.ClientEntityUserType;
+import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
@@ -21,6 +24,8 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
   @Autowired private ClientEntityMetadataRepository clientEntityMetadataRepository;
 
   @Autowired private AdministrativeEntityService administrativeEntityService;
+
+  @Autowired private ZoomUserMasterService zoomUserMasterService;
 
   public ClientEntityMetadata getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
       ClientEntityType entityType,
@@ -49,8 +54,24 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
   public ClientEntityMetadata getClientClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
         administrativeEntityService.findParentCluster(consignment.getFromId());
-
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+      if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
+        Long rpId = getRpIdForConsignment(consignment);
+        if (rpId == null) {
+          log.info("No RP exists for this consignment");
+          return null;
+        }
+        return clientEntityMetadataRepository
+            .findByEntityTypeAndEntityIdAndEntityUserTypeAndEntityUserIdAndStatus(
+                ClientEntityType.CLUSTER,
+                administrativeEntity.getId(),
+                ClientEntityUserType.RP,
+                rpId,
+                OperationalStatus.ACTIVE);
+      }
+      log.info(
+          "Returning Client Cluster metadata for Client  {}",
+          consignment.getClient().getClientCode());
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),
@@ -58,6 +79,9 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           ClientEntityMetadata.getDefaultLongValue(),
           OperationalStatus.ACTIVE);
     } else {
+      log.info(
+          "Returning Organization Cluster metadata for Organization id  {}",
+          consignment.getOrganizationId());
       return getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
           ClientEntityType.CLUSTER,
           administrativeEntity.getId(),
@@ -65,5 +89,19 @@ public class ClientEntityMetadataServiceImpl implements ClientEntityMetadataServ
           consignment.getOrganizationId(),
           OperationalStatus.ACTIVE);
     }
+  }
+
+  private Long getRpIdForConsignment(Consignment consignment) {
+    if (consignment.getPrs() == null) {
+      log.info("No Pickup or this CN : {}", consignment.getCnote());
+      return null;
+    }
+    if (consignment.getPrs().getBusinessPartner() == null) {
+      log.info("No Pickup BP for this CN : {}", consignment.getCnote());
+      return null;
+    }
+    log.info(
+        "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
+    return consignment.getPrs().getBusinessPartner().getId();
   }
 }

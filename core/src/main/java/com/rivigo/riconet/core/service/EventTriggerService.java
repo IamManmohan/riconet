@@ -77,7 +77,7 @@ public class EventTriggerService {
         break;
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
-        qcService.consumeLoadingEvent(deliveryUnloadingData);
+        qcService.consumeDeliveryLoadingEvent(deliveryUnloadingData);
         break;
       case CN_COMPLETION_ALL_INSTANCES:
         ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);

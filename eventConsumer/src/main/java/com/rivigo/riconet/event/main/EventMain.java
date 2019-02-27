@@ -3,6 +3,7 @@ package com.rivigo.riconet.event.main;
 import akka.actor.ActorSystem;
 import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
+import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
@@ -55,7 +56,7 @@ public class EventMain {
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     ApplicationContext context =
         new AnnotationConfigApplicationContext(
-            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class);
+            ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class);
     EventMain consumer = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
     String bootstrapServers = config.getString("bootstrap.servers");
@@ -113,19 +114,24 @@ public class EventMain {
       ConsumerSettings<String, String> financeEventsConsumerSettings,
       ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings) {
     log.info(
-        "Loading zoom event trigger consumer with settings {}", zoomEventTriggerConsumerSettings);
+        "Loading zoom event trigger consumer with settings {}",
+        zoomEventTriggerConsumerSettings.toString());
     zoomEventTriggerConsumer.load(materializer, zoomEventTriggerConsumerSettings);
     log.info(
-        "Loading event trigger for cn status change with settings {}", cnActionConsumerSettings);
+        "Loading event trigger for cn status change with settings {}",
+        cnActionConsumerSettings.toString());
     cnActionConsumer.load(materializer, cnActionConsumerSettings);
     log.info(
         "Loading consignment blocker consumer with settings {}",
         consignmentBlockerConsumerSettings);
     consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
-    log.info("Loading Finance event consumer with settings {}", financeEventsConsumerSettings);
+    log.info(
+        "Loading Finance event consumer with settings {}",
+        financeEventsConsumerSettings.toString());
     financeEventsConsumer.load(materializer, financeEventsConsumerSettings);
     log.info(
-        "Loading bfPickup event consumer with settings {}", bfPickupChargesActionConsumerSettings);
+        "Loading bfPickup event consumer with settings {}",
+        bfPickupChargesActionConsumerSettings.toString());
     bfPickupChargesActionConsumer.load(materializer, bfPickupChargesActionConsumerSettings);
   }
 }
