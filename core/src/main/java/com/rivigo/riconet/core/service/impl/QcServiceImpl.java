@@ -373,7 +373,6 @@ public class QcServiceImpl implements QcService {
       return;
     }
     fillClientMetadata(completionData, consignment);
-    qcModelService.getQcValidationFlag(consignment.getId());
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(
