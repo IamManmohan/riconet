@@ -150,7 +150,7 @@ public class EventTriggerService {
       case TICKET_COMMENT_CREATION:
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
-      case CONSIGNMENT_EWAYBILL_METADATA_CREATION:
+      case CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP:
         datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
         break;
       default:

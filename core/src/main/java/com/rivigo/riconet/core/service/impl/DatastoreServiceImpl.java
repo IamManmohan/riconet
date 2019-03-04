@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.service.DatastoreService;
 import com.rivigo.riconet.core.service.ZoomDatastoreAPIClientService;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class DatastoreServiceImpl implements DatastoreService {
     EventName eventName = notificationDTO.getEventName();
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
-    if (null == metadata) {
+    if (MapUtils.isEmpty(notificationDTO.getMetadata())) {
       log.info(
           "No metadata found for ewaybill metadata based cleanup of Event: {} EventUID: {} ",
           eventName,
@@ -51,6 +52,6 @@ public class DatastoreServiceImpl implements DatastoreService {
         "ewaybill metadata based cleanup of Event: {} EventUID: {} : {}",
         eventName,
         notificationDTO.getEventUID(),
-        cleanupSuccessful ? "done" : "failed");
+        cleanupSuccessful);
   }
 }

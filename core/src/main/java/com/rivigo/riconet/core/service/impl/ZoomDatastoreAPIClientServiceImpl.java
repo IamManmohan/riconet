@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.datastore.EwaybillMetadataDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
@@ -22,9 +22,13 @@ public class ZoomDatastoreAPIClientServiceImpl implements ZoomDatastoreAPIClient
 
   private ApiClientService apiClientService;
 
+  private ObjectMapper objectMapper;
+
   @Autowired
-  public ZoomDatastoreAPIClientServiceImpl(ApiClientService apiClientService) {
+  public ZoomDatastoreAPIClientServiceImpl(
+      ApiClientService apiClientService, ObjectMapper objectMapper) {
     this.apiClientService = apiClientService;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -37,8 +41,8 @@ public class ZoomDatastoreAPIClientServiceImpl implements ZoomDatastoreAPIClient
       responseJson =
           apiClientService.getEntity(
               ewaybillMetadataDTO, HttpMethod.POST, url, null, datastoreBaseUrl);
-      TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      return (boolean) apiClientService.parseResponseJsonNodeFromDatastore(responseJson, mapType);
+      return apiClientService.parseResponseJsonNodeFromDatastore(
+          responseJson, objectMapper.constructType(Boolean.class));
     } catch (IOException e) {
       log.error(
           "Error while doing cleanup from ewaybill metadata from ewaybill {} : {}",

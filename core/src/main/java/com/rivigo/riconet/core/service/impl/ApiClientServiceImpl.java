@@ -2,13 +2,14 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.cms.constants.ServiceType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
-import com.rivigo.riconet.core.constants.ZoomDatastoreConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
+import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -90,37 +91,22 @@ public class ApiClientServiceImpl implements ApiClientService {
   }
 
   @Override
-  public Object parseResponseJsonNodeFromDatastore(JsonNode responseJson, TypeReference mapType) {
-    String status = responseJson.get(ZoomDatastoreConstant.STATUS_KEY).toString();
+  public <T> T parseResponseJsonNodeFromDatastore(JsonNode responseJson, JavaType javaType) {
+
+    DatastoreResponseDto response =
+        objectMapper.convertValue(responseJson, DatastoreResponseDto.class);
+
     log.debug(responseJson.toString());
-    log.debug(status);
-    if ("\"SUCCESS\"".equals(status)) {
-      if (mapType == null) {
-        return null;
-      }
-      try {
-        return objectMapper.readValue(
-            responseJson.get(ZoomDatastoreConstant.PAYLOAD_KEY).toString(), mapType);
-      } catch (IOException e) {
-        log.error(
-            "Error while parsing API response,  {} at epoch {} :",
-            responseJson.get(ZoomDatastoreConstant.PAYLOAD_KEY).toString(),
-            DateTime.now().getMillis(),
-            e);
-        throw new ZoomException(
-            "Error while parsing API response: errorCode-"
-                + DateTime.now().getMillis()
-                + " :"
-                + e.getMessage());
-      }
+    log.debug(response.getStatus());
+    if (response.getStatus().equals("SUCCESS")) {
+      return objectMapper.convertValue(response.getPayload(), javaType);
     }
-    String errorMessage = responseJson.get(ZoomDatastoreConstant.ERROR_MESSAGE_KEY).toString();
     log.error(
         "API Response Status : {}  Error Message : {} , response : {} ",
-        status,
-        errorMessage,
+        response.getStatus(),
+        response.getErrorMessage(),
         responseJson);
-    throw new ZoomException(errorMessage);
+    throw new ZoomException(response.getErrorMessage());
   }
 
   private HttpHeaders getHeaders(String token, String uri) {

@@ -13,15 +13,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EwaybillMetadataDTO {
+public class DatastoreResponseDto {
 
-  private String ewaybillNumber;
-  private String fromAddress;
-  private String fromPob; // from Place of Business
-  private String fromName;
-  private String fromPincode;
-  private String toAddress; // to Place of Business
-  private String toPob;
-  private String toName;
-  private String toPincode;
+  private String status;
+  private String errorMessage;
+  private Object payload;
 }
