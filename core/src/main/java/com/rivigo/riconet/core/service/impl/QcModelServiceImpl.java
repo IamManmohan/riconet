@@ -31,7 +31,7 @@ public class QcModelServiceImpl implements QcModelService {
       log.info("Calling Qc model for Cn Id : {}", cnId);
       QcRequestDTO qcRequestDTO = new QcRequestDTO();
       qcRequestDTO.setConsignmentId(cnId);
-      Long qcApiTimeOut = zoomPropertyService.getLong(ZoomPropertyName.QC_MODEL_API_TIMEOUT, 1000L);
+      Long qcApiTimeOut = zoomPropertyService.getLong(ZoomPropertyName.QC_MODEL_API_TIMEOUT, 6000L);
       final Future<QcResponseDTO> f =
           executorService.submit(() -> qcApiClientService.getQcFlag(qcRequestDTO));
       QcResponseDTO qcResponseDTO = f.get(qcApiTimeOut, TimeUnit.MILLISECONDS);
