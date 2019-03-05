@@ -40,7 +40,7 @@ public class QcModelServiceImpl implements QcModelService {
           cnId,
           qcResponseDTO.getDecision(),
           qcResponseDTO.getDisposition());
-      return qcResponseDTO.getDecision();
+      return getValue(qcResponseDTO.getDecision());
     } catch (TimeoutException e) {
       log.error("QC model API Call Timed out for {}, Exception :{}", cnId, e);
       return Boolean.FALSE;
@@ -48,5 +48,12 @@ public class QcModelServiceImpl implements QcModelService {
       log.error("Error calling QC model API {}", e);
       return Boolean.FALSE;
     }
+  }
+
+  private Boolean getValue(Integer integer) {
+    if (integer == 1) {
+      return Boolean.TRUE;
+    }
+    return Boolean.FALSE;
   }
 }
