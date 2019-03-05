@@ -17,53 +17,55 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-
 public class DatastoreServiceTest {
 
-    @InjectMocks
-    private DatastoreServiceImpl datastoreService;
+  @InjectMocks private DatastoreServiceImpl datastoreService;
 
-    @Mock
-    private ZoomDatastoreAPIClientService zoomDatastoreAPIClientService;
+  @Mock private ZoomDatastoreAPIClientService zoomDatastoreAPIClientService;
 
-    @Captor
-    private ArgumentCaptor<EwaybillMetadataDTO> ewaybillMetadataDTOArgumentCaptor;
+  @Captor private ArgumentCaptor<EwaybillMetadataDTO> ewaybillMetadataDTOArgumentCaptor;
 
-    @Before
-    public void initMocks() {
-        MockitoAnnotations.initMocks(this);
-        ObjectMapper objectMapper = new ObjectMapper();
-        org.springframework.test.util.ReflectionTestUtils.setField(
-                datastoreService, "objectMapper", objectMapper);
-        Mockito.when(zoomDatastoreAPIClientService.cleanupAddressesUsingEwaybillMetadata(Mockito.any(EwaybillMetadataDTO.class))).thenReturn(true);
-    }
+  @Before
+  public void initMocks() {
+    MockitoAnnotations.initMocks(this);
+    ObjectMapper objectMapper = new ObjectMapper();
+    org.springframework.test.util.ReflectionTestUtils.setField(
+        datastoreService, "objectMapper", objectMapper);
+    Mockito.when(
+            zoomDatastoreAPIClientService.cleanupAddressesUsingEwaybillMetadata(
+                Mockito.any(EwaybillMetadataDTO.class)))
+        .thenReturn(true);
+  }
 
-    @Test
-    public void cleanupAddressesUsingEwaybillMetadataTest() {
+  @Test
+  public void cleanupAddressesUsingEwaybillMetadataTest() {
 
-        NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDtoForEwaybillMetadataBasedCleanup();
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDtoForEwaybillMetadataBasedCleanup();
 
-        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
+    datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
 
-        Mockito.verify(zoomDatastoreAPIClientService, Mockito.times(1)).cleanupAddressesUsingEwaybillMetadata(ewaybillMetadataDTOArgumentCaptor.capture());
+    Mockito.verify(zoomDatastoreAPIClientService, Mockito.times(1))
+        .cleanupAddressesUsingEwaybillMetadata(ewaybillMetadataDTOArgumentCaptor.capture());
 
-        EwaybillMetadataDTO ewaybillMetadataDTOActual = ewaybillMetadataDTOArgumentCaptor.getValue();
+    EwaybillMetadataDTO ewaybillMetadataDTOActual = ewaybillMetadataDTOArgumentCaptor.getValue();
 
-        Assert.assertEquals(TestConstants.EWAYBILL_NUMBER, ewaybillMetadataDTOActual.getEwaybillNumber());
-        Assert.assertEquals(TestConstants.FROM_PINCODE, ewaybillMetadataDTOActual.getFromPincode());
-        Assert.assertEquals(TestConstants.TO_PINCODE, ewaybillMetadataDTOActual.getToPincode());
+    Assert.assertEquals(
+        TestConstants.EWAYBILL_NUMBER, ewaybillMetadataDTOActual.getEwaybillNumber());
+    Assert.assertEquals(TestConstants.FROM_PINCODE, ewaybillMetadataDTOActual.getFromPincode());
+    Assert.assertEquals(TestConstants.TO_PINCODE, ewaybillMetadataDTOActual.getToPincode());
+  }
 
-    }
+  @Test
+  public void cleanupAddressesUsingEwaybillMetadataNullTest() {
 
-    @Test
-    public void cleanupAddressesUsingEwaybillMetadataNullTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDtoForEwaybillMetadataBasedCleanup();
+    notificationDTO.setMetadata(null);
 
-        NotificationDTO notificationDTO = NotificationDTOModel.getNotificationDtoForEwaybillMetadataBasedCleanup();
-        notificationDTO.setMetadata(null);
+    datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
 
-        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
-
-        Mockito.verify(zoomDatastoreAPIClientService, Mockito.times(0)).cleanupAddressesUsingEwaybillMetadata(Mockito.any());
-
-    }
+    Mockito.verify(zoomDatastoreAPIClientService, Mockito.times(0))
+        .cleanupAddressesUsingEwaybillMetadata(Mockito.any());
+  }
 }

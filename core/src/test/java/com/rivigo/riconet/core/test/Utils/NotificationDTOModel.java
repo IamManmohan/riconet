@@ -257,7 +257,7 @@ public class NotificationDTOModel {
 
   public static NotificationDTO getNotificationDtoForEwaybillMetadataBasedCleanup() {
     Map<String, String> metadata = new HashMap<>();
-    metadata.put("ewaybillNumber",TestConstants.EWAYBILL_NUMBER);
+    metadata.put("ewaybillNumber", TestConstants.EWAYBILL_NUMBER);
     metadata.put("fromPincode", TestConstants.FROM_PINCODE);
     metadata.put("toPincode", TestConstants.TO_PINCODE);
 

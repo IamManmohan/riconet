@@ -87,6 +87,17 @@ public class ApiServiceUtils {
     return mapper.readTree("{\"test-key\":\"test-value\"}");
   }
 
+  public static JsonNode getDatastoreSuccessResponseSampleJsonNode() throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readTree("{\"status\":\"SUCCESS\",\"payload\":\"true\"}");
+  }
+
+  public static JsonNode getDatastoreFailureResponseSampleJsonNode() throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    return mapper.readTree(
+        "{\"status\":\"FAILURE\",\"errorMessage\":\"Error while cleanup from datastore\"}");
+  }
+
   public static NotificationDTO getDummyPickupCompleteNotificationDto() {
     Map<String, String> hmap = new HashMap<>();
     hmap.put(ZoomCommunicationFieldNames.CLIENT_ID.name(), CLIENT_ID.toString());
