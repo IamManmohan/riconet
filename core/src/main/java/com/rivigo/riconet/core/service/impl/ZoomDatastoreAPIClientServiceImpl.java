@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.datastore.EwaybillMetadataDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomDatastoreAPIClientService;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,9 @@ public class ZoomDatastoreAPIClientServiceImpl implements ZoomDatastoreAPIClient
           "Error while doing cleanup from ewaybill metadata from ewaybill {} : {}",
           ewaybillMetadataDTO.getEwaybillNumber(),
           e.getMessage());
+      throw new ZoomException(
+          "Error while doing cleanup from ewaybill metadata from ewaybill %s",
+          ewaybillMetadataDTO.getEwaybillNumber());
     }
-
-    return false;
   }
 }
