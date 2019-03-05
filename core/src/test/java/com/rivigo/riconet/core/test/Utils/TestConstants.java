@@ -6,5 +6,12 @@ package com.rivigo.riconet.core.test.Utils;
  */
 public class TestConstants {
 
-  public static final String CREATOR_EMAIL = "rameshc10695@gmail.com";
+  static final String CREATOR_EMAIL = "rameshc10695@gmail.com";
+
+  public static final String EWAYBILL_NUMBER = "112233445566";
+
+  public static final String FROM_PINCODE = "122001";
+
+  public static final String TO_PINCODE = "560011";
+
 }

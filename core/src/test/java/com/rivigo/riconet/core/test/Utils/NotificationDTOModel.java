@@ -254,4 +254,18 @@ public class NotificationDTOModel {
         .conditions(new ArrayList<>())
         .build();
   }
+
+  public static NotificationDTO getNotificationDtoForEwaybillMetadataBasedCleanup() {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("ewaybillNumber",TestConstants.EWAYBILL_NUMBER);
+    metadata.put("fromPincode", TestConstants.FROM_PINCODE);
+    metadata.put("toPincode", TestConstants.TO_PINCODE);
+
+    NotificationDTO notificationDTO = new NotificationDTO();
+    notificationDTO.setEventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP);
+    notificationDTO.setEventUID(TestConstants.EWAYBILL_NUMBER);
+    notificationDTO.setMetadata(metadata);
+
+    return notificationDTO;
+  }
 }
