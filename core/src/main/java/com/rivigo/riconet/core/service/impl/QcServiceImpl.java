@@ -265,31 +265,33 @@ public class QcServiceImpl implements QcService {
       log.info("Consignment is not TBB paid, Validation is not enabled.");
       return false;
     }
-    if (completionData.getClientPincodeMetadataDTO() == null) {
-      log.info("First Consignment from client in this pincode. Mandatory QC required.");
-      return true;
-    }
-    log.info(
-        "Client entity Metadata for pincode {} is {}",
-        consignment.getFromPinCode(),
-        completionData.getClientPincodeMetadataDTO());
-    Long madatoryQcLimit =
-        zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L);
-    if (completionData.getClientPincodeMetadataDTO().getCount() < madatoryQcLimit) {
-      log.info(
-          "Consignment count from client in this pincode hasn't reached Mandatory QC limit, {} Cns. Mandatory QC required.",
-          madatoryQcLimit);
-      return true;
-    }
-    Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
-    if (bindings.isEmpty()) {
-      return false;
-    }
-    log.info(
-        "Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",
-        consignment.getCnote(),
-        bindings);
-    return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
+    return qcModelService.getQcValidationFlag(consignment.getId());
+    //    if (completionData.getClientPincodeMetadataDTO() == null) {
+    //      log.info("First Consignment from client in this pincode. Mandatory QC required.");
+    //      return true;
+    //    }
+    //    log.info(
+    //        "Client entity Metadata for pincode {} is {}",
+    //        consignment.getFromPinCode(),
+    //        completionData.getClientPincodeMetadataDTO());
+    //    Long madatoryQcLimit =
+    //        zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L);
+    //    if (completionData.getClientPincodeMetadataDTO().getCount() < madatoryQcLimit) {
+    //      log.info(
+    //          "Consignment count from client in this pincode hasn't reached Mandatory QC limit, {}
+    // Cns. Mandatory QC required.",
+    //          madatoryQcLimit);
+    //      return true;
+    //    }
+    //    Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
+    //    if (bindings.isEmpty()) {
+    //      return false;
+    //    }
+    //    log.info(
+    //        "Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",
+    //        consignment.getCnote(),
+    //        bindings);
+    //    return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
   public Boolean isMeasurementQcRequired(ConsignmentCompletionEventDTO completionData) {
@@ -371,7 +373,6 @@ public class QcServiceImpl implements QcService {
       return;
     }
     fillClientMetadata(completionData, consignment);
-    qcModelService.getAndLogQcFlagInAsync(consignment.getId());
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
     log.info(

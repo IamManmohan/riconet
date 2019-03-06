@@ -425,101 +425,101 @@ public class QcServiceTest {
   //
   //  }
 
-  @Test
-  // negative test case when condition fails for min_weight
-  public void checkTest3() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinWeight(11.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // negative test case when condition fails for max_weight
-  public void checkTest4() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxWeight(10.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // negative test case when condition fails for min__charged_weight
-  public void checkTest5() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinVolumePerWeight(11.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // negative test case when condition fails for max__charged_weight
-  public void checkTest6() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxVolumePerWeight(10.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // negative test case when condition fails for min_invoice_per_weight
-  public void checkTest7() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinInvoicePerWeight(110.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // negative test case when condition fails for max_invoice_per_weight
-  public void checkTest8() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxInvoicePerWeight(90.0);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // positive test case for first CN
-  public void checkTest9() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.setClientPincodeMetadataDTO(null);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
-
-  @Test
-  // positive test case for next N CNs
-  public void checkTest10() {
-
-    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
-    Consignment consignment = getConsignmentDTO();
-    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setCount(9L);
-    mockingParamsForCheckFunction();
-    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
-    assertEquals(result, true);
-  }
+  //  @Test
+  //  // negative test case when condition fails for min_weight
+  //  public void checkTest3() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinWeight(11.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // negative test case when condition fails for max_weight
+  //  public void checkTest4() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxWeight(10.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // negative test case when condition fails for min__charged_weight
+  //  public void checkTest5() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinVolumePerWeight(11.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // negative test case when condition fails for max__charged_weight
+  //  public void checkTest6() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxVolumePerWeight(10.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // negative test case when condition fails for min_invoice_per_weight
+  //  public void checkTest7() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMinInvoicePerWeight(110.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // negative test case when condition fails for max_invoice_per_weight
+  //  public void checkTest8() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setMaxInvoicePerWeight(90.0);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // positive test case for first CN
+  //  public void checkTest9() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.setClientPincodeMetadataDTO(null);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
+  //
+  //  @Test
+  //  // positive test case for next N CNs
+  //  public void checkTest10() {
+  //
+  //    ConsignmentCompletionEventDTO consignmentCompletionEventDTO = getConsignmentCompletionDTO();
+  //    Consignment consignment = getConsignmentDTO();
+  //    consignmentCompletionEventDTO.getClientPincodeMetadataDTO().setCount(9L);
+  //    mockingParamsForCheckFunction();
+  //    boolean result = qcService.check(consignmentCompletionEventDTO, consignment);
+  //    assertEquals(result, true);
+  //  }
 
   @Test
   // positive test case for next N CNs
