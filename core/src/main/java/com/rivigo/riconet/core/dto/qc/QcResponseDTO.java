@@ -13,6 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class QcResponseDTO {
-  Boolean decision;
+  Integer decision;
   String disposition;
 }
