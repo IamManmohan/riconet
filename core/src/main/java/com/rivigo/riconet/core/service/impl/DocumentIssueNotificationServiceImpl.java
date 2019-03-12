@@ -35,7 +35,6 @@ import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mongo.DocumentIssueNotificationRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -187,21 +186,36 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
 
     Location pc = locationServiceV2.getPcOrReportingPc(loc);
 
-    List<String> ccUserTypeList =
-        Arrays.asList(
-            ZoomUserType.ZOOM_CLM.name(),
-            ZoomUserType.ZOOM_BO_PCE.name(),
-            ZoomUserType.ZOOM_PCM.name(),
-            ZoomUserType.ZOOM_PCE.name());
-    ccUserTypeList.forEach(
-        cc ->
-            ccList.addAll(
-                zoomUserMasterService
-                    .getActiveZoomUsersByLocationInAndZoomUserType(
-                        locIds, cc, ZoomUserType.ZOOM_TECH_SUPPORT.name())
-                    .stream()
-                    .map(ZoomUser::getEmail)
-                    .collect(Collectors.toList())));
+    //location is different for each ZoomUserType
+
+    ccList.addAll(
+        zoomUserMasterService
+            .getActiveZoomUsersByLocationInAndZoomUserType(
+                locIds, "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .stream()
+            .map(ZoomUser::getEmail)
+            .collect(Collectors.toList()));
+    ccList.addAll(
+        zoomUserMasterService
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                locationId, "ZOOM_BO_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .stream()
+            .map(ZoomUser::getEmail)
+            .collect(Collectors.toList()));
+    ccList.addAll(
+        zoomUserMasterService
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                pc.getId(), "ZOOM_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .stream()
+            .map(ZoomUser::getEmail)
+            .collect(Collectors.toList()));
+    ccList.addAll(
+        zoomUserMasterService
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                pc.getId(), "ZOOM_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .stream()
+            .map(ZoomUser::getEmail)
+            .collect(Collectors.toList()));
     return ccList;
   }
 
