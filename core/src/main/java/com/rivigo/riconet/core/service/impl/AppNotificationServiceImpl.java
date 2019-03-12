@@ -10,6 +10,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
+import com.rivigo.riconet.core.constants.AppConstant;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -66,7 +67,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
   }
 
   @Override
@@ -87,7 +88,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
   }
 
   @Override
@@ -105,7 +106,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
   }
 
   @Override
@@ -120,7 +121,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId);
+    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
   }
 
   @Override
@@ -151,11 +152,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               data.put(TASK_ID, taskId);
 
               pushObject.put(DATA, data);
-              sendNotification(pushObject, userId);
+              sendNotification(pushObject, userId, AppConstant.SCAN_APP);
             });
   }
 
-  private void sendNotification(JSONObject notificationPayload, Long userId) {
+  private void sendNotification(JSONObject notificationPayload, Long userId, String app_id) {
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
@@ -164,9 +165,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               .map(Long::valueOf)
               .collect(Collectors.toList());
       log.info("Staging server. sending notification to user {}", userId);
-      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserIdIn(userIdList);
+      deviceAppVersionMappers =
+          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, app_id);
     } else {
-      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserId(userId);
+      deviceAppVersionMappers =
+          deviceAppVersionMapperRepository.findByUserIdAndAppId(userId, app_id);
     }
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
