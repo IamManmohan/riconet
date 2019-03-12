@@ -156,7 +156,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             });
   }
 
-  private void sendNotification(JSONObject notificationPayload, Long userId, String app_id) {
+  private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
@@ -166,10 +166,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               .collect(Collectors.toList());
       log.info("Staging server. sending notification to user {}", userId);
       deviceAppVersionMappers =
-          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, app_id);
+          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId);
     } else {
       deviceAppVersionMappers =
-          deviceAppVersionMapperRepository.findByUserIdAndAppId(userId, app_id);
+          deviceAppVersionMapperRepository.findByUserIdAndAppId(userId, appId);
     }
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
