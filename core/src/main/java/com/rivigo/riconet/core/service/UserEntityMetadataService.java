@@ -16,5 +16,5 @@ public interface UserEntityMetadataService {
           Long userEntityId,
           OperationalStatus status);
 
-  UserEntityMetadata getClientClusterMetadata(Consignment consignment);
+  UserEntityMetadata getUserClusterMetadata(Consignment consignment);
 }

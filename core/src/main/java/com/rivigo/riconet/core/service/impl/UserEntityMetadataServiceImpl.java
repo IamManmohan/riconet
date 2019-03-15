@@ -35,7 +35,7 @@ public class UserEntityMetadataServiceImpl implements UserEntityMetadataService 
             locationEntityType, locationEntityId, userEntityType, userEntityId, status);
   }
 
-  public UserEntityMetadata getClientClusterMetadata(Consignment consignment) {
+  public UserEntityMetadata getUserClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
         administrativeEntityService.findParentCluster(consignment.getFromId());
     if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {

@@ -57,7 +57,7 @@ public class UserEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    userEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getUserClusterMetadata(consignment);
     verify(userEntityMetadataRepository, times(1))
         .findByLocationEntityTypeAndLocationEntityIdAndUserEntityTypeAndUserEntityIdAndStatus(
             LocationEntityType.CLUSTER, 20l, UserEntityType.CLIENT, 30l, OperationalStatus.ACTIVE);
@@ -73,7 +73,7 @@ public class UserEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    userEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getUserClusterMetadata(consignment);
   }
 
   @Test
@@ -87,7 +87,7 @@ public class UserEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    userEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getUserClusterMetadata(consignment);
   }
 
   @Test
@@ -105,7 +105,7 @@ public class UserEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    userEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getUserClusterMetadata(consignment);
   }
 
   @Test
@@ -117,7 +117,7 @@ public class UserEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    userEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getUserClusterMetadata(consignment);
     verify(userEntityMetadataRepository, times(1))
         .findByLocationEntityTypeAndLocationEntityIdAndUserEntityTypeAndUserEntityIdAndStatus(
             LocationEntityType.CLUSTER,

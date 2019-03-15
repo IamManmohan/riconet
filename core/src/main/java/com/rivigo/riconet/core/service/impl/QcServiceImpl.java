@@ -290,9 +290,9 @@ public class QcServiceImpl implements QcService {
     }
 
     UserEntityMetadata userEntityMetadata =
-        clientEntityMetadataService.getClientClusterMetadata(consignment);
+        clientEntityMetadataService.getUserClusterMetadata(consignment);
     if (userEntityMetadata != null) {
-      completionData.setClientClusterMetadataDTO(
+      completionData.setUserClusterMetadataDTO(
           objectMapper.convertValue(
               userEntityMetadata.getMetadata(), UserClusterMetadataDTO.class));
     }
