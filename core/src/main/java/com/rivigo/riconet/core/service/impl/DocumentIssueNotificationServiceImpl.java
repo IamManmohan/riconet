@@ -212,7 +212,7 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
     ccList.addAll(
         zoomUserMasterService
             .getActiveZoomUsersByLocationAndZoomUserType(
-                pc.getId(), ZoomUserType.ZOOM_PCE.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
+                locationId, ZoomUserType.ZOOM_PCE.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
