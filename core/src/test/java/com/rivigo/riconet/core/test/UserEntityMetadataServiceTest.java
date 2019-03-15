@@ -7,19 +7,18 @@ import static org.mockito.Mockito.when;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ZoomUserMasterService;
-import com.rivigo.riconet.core.service.impl.ClientEntityMetadataServiceImpl;
-import com.rivigo.zoom.common.enums.ClientEntityType;
+import com.rivigo.riconet.core.service.impl.UserEntityMetadataServiceImpl;
 import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.LocationEntityType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
+import com.rivigo.zoom.common.enums.UserEntityType;
 import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.Client;
-import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.PickupRunSheet;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
-import com.rivigo.zoom.common.repository.mysql.ClientEntityMetadataRepository;
+import com.rivigo.zoom.common.repository.mysql.UserEntityMetadataRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,11 +28,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @Slf4j
-public class ClientEntityMetadataServiceTest {
+public class UserEntityMetadataServiceTest {
 
-  @InjectMocks private ClientEntityMetadataServiceImpl clientEntityMetadataService;
+  @InjectMocks private UserEntityMetadataServiceImpl userEntityMetadataService;
 
-  @Mock private ClientEntityMetadataRepository clientEntityMetadataRepository;
+  @Mock private UserEntityMetadataRepository userEntityMetadataRepository;
 
   @Mock private AdministrativeEntityService administrativeEntityService;
 
@@ -44,27 +43,6 @@ public class ClientEntityMetadataServiceTest {
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
-  }
-
-  @Test
-  public void getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusTest() {
-    clientEntityMetadataService.getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-        ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE);
-    verify(clientEntityMetadataRepository, times(1))
-        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-            ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE);
-  }
-
-  @Test
-  public void
-      getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndLastUpdatedGreaterThanTest() {
-    DateTime time = DateTime.now();
-    clientEntityMetadataService
-        .getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndUpdatedAtGreaterThan(
-            ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE, time);
-    verify(clientEntityMetadataRepository, times(1))
-        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndLastUpdatedAtGreaterThan(
-            ClientEntityType.CLUSTER, 2l, 3l, 4l, OperationalStatus.ACTIVE, time);
   }
 
   @Test
@@ -79,14 +57,10 @@ public class ClientEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
-    verify(clientEntityMetadataRepository, times(1))
-        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-            ClientEntityType.CLUSTER,
-            20l,
-            30l,
-            ClientEntityMetadata.getDefaultLongValue(),
-            OperationalStatus.ACTIVE);
+    userEntityMetadataService.getClientClusterMetadata(consignment);
+    verify(userEntityMetadataRepository, times(1))
+        .findByLocationEntityTypeAndLocationEntityIdAndUserEntityTypeAndUserEntityIdAndStatus(
+            LocationEntityType.CLUSTER, 20l, UserEntityType.CLIENT, 30l, OperationalStatus.ACTIVE);
   }
 
   @Test
@@ -99,7 +73,7 @@ public class ClientEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getClientClusterMetadata(consignment);
   }
 
   @Test
@@ -113,7 +87,7 @@ public class ClientEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getClientClusterMetadata(consignment);
   }
 
   @Test
@@ -131,7 +105,7 @@ public class ClientEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
+    userEntityMetadataService.getClientClusterMetadata(consignment);
   }
 
   @Test
@@ -143,12 +117,12 @@ public class ClientEntityMetadataServiceTest {
     administrativeEntity.setId(20l);
     when(administrativeEntityService.findParentCluster(consignment.getFromId()))
         .thenReturn(administrativeEntity);
-    clientEntityMetadataService.getClientClusterMetadata(consignment);
-    verify(clientEntityMetadataRepository, times(1))
-        .findByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatus(
-            ClientEntityType.CLUSTER,
+    userEntityMetadataService.getClientClusterMetadata(consignment);
+    verify(userEntityMetadataRepository, times(1))
+        .findByLocationEntityTypeAndLocationEntityIdAndUserEntityTypeAndUserEntityIdAndStatus(
+            LocationEntityType.CLUSTER,
             20l,
-            ClientEntityMetadata.getDefaultLongValue(),
+            UserEntityType.ORGANIZATION,
             ConsignmentConstant.RIVIGO_ORGANIZATION_ID + 1,
             OperationalStatus.ACTIVE);
   }
