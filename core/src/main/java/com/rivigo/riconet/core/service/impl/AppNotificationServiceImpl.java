@@ -261,6 +261,26 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
   }
 
+  @Override
+  public void sendCnOutForDelivery(NotificationDTO notificationDTO) {
+
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    Long consigneeUserId =
+            Long.valueOf(
+                    notificationDTO
+                            .getMetadata()
+                            .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(CNOTE, cnote);
+    // put captain's number.
+    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+  }
+
   private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"

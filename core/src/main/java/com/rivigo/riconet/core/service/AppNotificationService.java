@@ -20,4 +20,6 @@ public interface AppNotificationService {
   void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
 
   void sendCnLoadedEvent(NotificationDTO notificationDTO);
+
+  void sendCnOutForDelivery(NotificationDTO notificationDTO);
 }
