@@ -39,8 +39,14 @@ public enum ZoomCommunicationFieldNames {
   PICKUP_CAPTAIN_NAME,
   PICKUP_CAPTAIN_CONTACT_NUMBER,
 
+  CNOTE_TYPE,
   CONSIGNOR_USER_ID,
-  CONSIGNEE_USER_ID;
+  CONSIGNEE_USER_ID,
+
+  NAME, // tpm partner name
+  MOBILE_NO, // tpm partner mobile number
+
+  ONLINE_PAYMENT_LINK;
 
   public enum Reason {
     REASON,

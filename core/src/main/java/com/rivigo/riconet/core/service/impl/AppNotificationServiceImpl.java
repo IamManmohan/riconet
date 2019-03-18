@@ -4,8 +4,12 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_TOPAY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_MOBILE_NUMBER;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
@@ -22,6 +26,8 @@ import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.CnoteType;
+import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
@@ -267,17 +273,43 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
 
-
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
     Long consigneeUserId =
-            Long.valueOf(
-                    notificationDTO
-                            .getMetadata()
-                            .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+
+    String cnoteType =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE_TYPE.name());
+    String paymentMode =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
+
+    Boolean isToPay = false;
+    if (cnoteType != null
+        && paymentMode != null
+        && CnoteType.RETAIL.name().equals(cnote)
+        && PaymentMode.TO_PAY.name().equals(paymentMode)) isToPay = true;
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
+
+    if (isToPay) data.put(IS_TOPAY, "TRUE");
+    else data.put(IS_TOPAY, "FALSE");
     // put captain's number.
+    String tpmCaptainPhoneNumber =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.MOBILE_NO.name());
+    String tpmCaptainName =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.NAME.name());
+    String onlinePaymentLink =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ONLINE_PAYMENT_LINK.name());
+
+    if (onlinePaymentLink != null) data.put(ONLINE_PAYMENT_LINK, onlinePaymentLink);
+
+    data.put(PARTNER_MOBILE_NUMBER, tpmCaptainPhoneNumber);
+    data.put(PARTNER_NAME, tpmCaptainName);
+
+    pushObject.put(DATA, data);
     sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
   }
 
