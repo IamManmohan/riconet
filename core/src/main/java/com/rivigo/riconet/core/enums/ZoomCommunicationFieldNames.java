@@ -33,7 +33,14 @@ public enum ZoomCommunicationFieldNames {
   ACTION_VALUE,
 
   STALE_CATEGORY,
-  TYPE_ID;
+  TYPE_ID,
+
+  PICKUP_CREATED_BY_USER_ID,
+  PICKUP_CAPTAIN_NAME,
+  PICKUP_CAPTAIN_CONTACT_NUMBER,
+
+  CONSIGNOR_USER_ID,
+  CONSIGNEE_USER_ID;
 
   public enum Reason {
     REASON,

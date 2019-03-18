@@ -1,10 +1,14 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NAME;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NUMBER;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
@@ -154,6 +158,107 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               pushObject.put(DATA, data);
               sendNotification(pushObject, userId, AppConstant.SCAN_APP);
             });
+  }
+
+  @Override
+  public void sendPickUpAssignmentEvent(NotificationDTO notificationDTO) {
+
+    Long pickUpCreatorUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name()));
+
+    Long pickUpId =
+        Long.valueOf(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
+
+    String pickUpCaptainName =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
+
+    Long pickUpCaptainNumber =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name()));
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    // populate data.
+    // put pickup id and captain number.
+    data.put(PICKUP_ID, pickUpId);
+    data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
+    data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    pushObject.put(DATA, data);
+
+    sendNotification(pushObject, pickUpCreatorUserId, AppConstant.RETAIL_APP);
+  }
+
+  @Override
+  public void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO) {
+
+    Long pickUpCreatorUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name()));
+
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    // put pickupId and captain number
+
+    Long pickUpId =
+        Long.valueOf(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
+
+    Long pickUpCaptainNumber =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name()));
+
+    String pickUpCaptainName =
+        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
+
+    data.put(PICKUP_ID, pickUpId);
+    data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
+    data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, pickUpCreatorUserId, AppConstant.RETAIL_APP);
+  }
+
+  @Override
+  public void sendCnLoadedEvent(NotificationDTO notificationDTO) {
+
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    // cnote and consignor/consignee.
+    Long consignorUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+    Long consigneeUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(CNOTE, cnote);
+
+    pushObject.put(DATA, data);
+    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
