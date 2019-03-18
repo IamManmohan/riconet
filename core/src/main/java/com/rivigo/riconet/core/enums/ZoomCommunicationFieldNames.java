@@ -48,6 +48,16 @@ public enum ZoomCommunicationFieldNames {
 
   ONLINE_PAYMENT_LINK;
 
+  public enum Consignment {
+    DELIVERY_DATE_TIME
+  }
+
+  public enum CpbSummary {
+    PROMISED_DELIVERY_DATE_TIME,
+    SCHEDULED_TIME,
+    IS_ASSUMED_DST_PC
+  }
+
   public enum Reason {
     REASON,
     SUB_REASON

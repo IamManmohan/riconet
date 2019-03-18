@@ -22,4 +22,6 @@ public interface AppNotificationService {
   void sendCnLoadedEvent(NotificationDTO notificationDTO);
 
   void sendCnOutForDelivery(NotificationDTO notificationDTO);
+
+  void sendCnDeliveredNotification(NotificationDTO notificationDTO);
 }

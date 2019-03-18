@@ -4,6 +4,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_CN_DELIVERY_DELAYED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_TOPAY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
@@ -36,6 +37,7 @@ import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -285,7 +287,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     String paymentMode =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
 
-    Boolean isToPay = false;
+    boolean isToPay = false;
     if (cnoteType != null
         && paymentMode != null
         && CnoteType.RETAIL.name().equals(cnote)
@@ -294,8 +296,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
 
+    data.put(IS_TOPAY, "FALSE");
     if (isToPay) data.put(IS_TOPAY, "TRUE");
-    else data.put(IS_TOPAY, "FALSE");
+
     // put captain's number.
     String tpmCaptainPhoneNumber =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.MOBILE_NO.name());
@@ -311,6 +314,53 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+  }
+
+  @Override
+  public void sendCnDeliveredNotification(NotificationDTO notificationDTO) {
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+
+    Long consignorUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+    Long consigneeUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(CNOTE, cnote);
+    // add is cn delivery delayed.
+    data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
+
+    Long promisedDeliveryDateTime =
+        Optional.of(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.CpbSummary.PROMISED_DELIVERY_DATE_TIME.name()))
+            .map(Long::valueOf)
+            .orElse(null);
+    Long deliveryDateTime =
+        Optional.of(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name()))
+            .map(Long::valueOf)
+            .orElse(null);
+
+    if (deliveryDateTime != null
+        && promisedDeliveryDateTime != null
+        && deliveryDateTime > promisedDeliveryDateTime) data.put(IS_CN_DELIVERY_DELAYED, "TRUE");
+    pushObject.put(DATA, data);
+
+    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {

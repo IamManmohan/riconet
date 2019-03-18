@@ -28,4 +28,5 @@ public class PushNotificationConstant {
   public static final String PARTNER_MOBILE_NUMBER = "partnerMobileNumber";
   public static final String PARTNER_NAME = "partnerName";
   public static final String ONLINE_PAYMENT_LINK = "onlinePaymentLink";
+  public static final String IS_CN_DELIVERY_DELAYED = "isDeliveryDelayed";
 }

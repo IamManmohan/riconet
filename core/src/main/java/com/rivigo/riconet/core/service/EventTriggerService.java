@@ -40,6 +40,7 @@ public class EventTriggerService {
     switch (eventName) {
       case CN_DELIVERY:
         // TODO 5a and 5b
+        appNotificationService.sendCnDeliveredNotification(notificationDTO);
       case CN_TRIP_DISPATCHED:
       case CN_PAYMENT_HANDOVER_COMPLETED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
