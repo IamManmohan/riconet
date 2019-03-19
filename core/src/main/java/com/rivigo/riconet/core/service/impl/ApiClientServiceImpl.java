@@ -10,6 +10,7 @@ import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
+import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -97,8 +98,8 @@ public class ApiClientServiceImpl implements ApiClientService {
         objectMapper.convertValue(responseJson, DatastoreResponseDto.class);
 
     log.debug(responseJson.toString());
-    log.debug(response.getStatus());
-    if (response.getStatus().equals("SUCCESS")) {
+    log.debug(response.getStatus().toString());
+    if (response.getStatus().equals(RequestStatus.SUCCESS)) {
       return objectMapper.convertValue(response.getPayload(), javaType);
     }
     log.error(
