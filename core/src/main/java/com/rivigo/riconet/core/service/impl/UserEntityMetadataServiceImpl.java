@@ -11,6 +11,7 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.UserEntityMetadata;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.UserEntityMetadataRepository;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,18 +39,18 @@ public class UserEntityMetadataServiceImpl implements UserEntityMetadataService 
   public UserEntityMetadata getUserClusterMetadata(Consignment consignment) {
     AdministrativeEntity administrativeEntity =
         administrativeEntityService.findParentCluster(consignment.getFromId());
-    if (consignment.getOrganizationId() == ConsignmentConstant.RIVIGO_ORGANIZATION_ID) {
+    if (consignment.getOrganizationId().equals(ConsignmentConstant.RIVIGO_ORGANIZATION_ID)) {
       if (CnoteType.RETAIL.equals(consignment.getCnoteType())) {
-        Long rpId = getRpIdForConsignment(consignment);
-        if (rpId == null) {
-          log.info("No RP exists for this consignment");
+        Optional<Long> rpId = getRpIdForConsignment(consignment);
+        if (!rpId.isPresent()) {
+          log.info("No RP exists for this consignment : {}", consignment.getCnote());
           return null;
         }
         return getByLocationEntityTypeAndLocationEntityIdAndUserEntityTypeAndUserEntityIdAndStatus(
             LocationEntityType.CLUSTER,
             administrativeEntity.getId(),
             UserEntityType.RP,
-            rpId,
+            rpId.get(),
             OperationalStatus.ACTIVE);
       }
       log.info(
@@ -74,17 +75,17 @@ public class UserEntityMetadataServiceImpl implements UserEntityMetadataService 
     }
   }
 
-  private Long getRpIdForConsignment(Consignment consignment) {
+  private Optional<Long> getRpIdForConsignment(Consignment consignment) {
     if (consignment.getPrs() == null) {
       log.info("No Pickup or this CN : {}", consignment.getCnote());
-      return null;
+      return Optional.empty();
     }
     if (consignment.getPrs().getBusinessPartner() == null) {
       log.info("No Pickup BP for this CN : {}", consignment.getCnote());
-      return null;
+      return Optional.empty();
     }
     log.info(
         "Returning RP metadata for RP ID {}", consignment.getPrs().getBusinessPartner().getId());
-    return consignment.getPrs().getBusinessPartner().getId();
+    return Optional.ofNullable(consignment.getPrs().getBusinessPartner().getId());
   }
 }

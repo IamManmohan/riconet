@@ -35,6 +35,7 @@ import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.TicketingService;
+import com.rivigo.riconet.core.service.UserEntityMetadataService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -101,7 +102,7 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private ConsignmentCodDodService consignmentCodDodService;
 
-  @Autowired private UserEntityMetadataServiceImpl clientEntityMetadataService;
+  @Autowired private UserEntityMetadataService userEntityMetadataService;
 
   @Autowired private PincodeService pincodeService;
 
@@ -290,7 +291,7 @@ public class QcServiceImpl implements QcService {
     }
 
     UserEntityMetadata userEntityMetadata =
-        clientEntityMetadataService.getUserClusterMetadata(consignment);
+        userEntityMetadataService.getUserClusterMetadata(consignment);
     if (userEntityMetadata != null) {
       completionData.setUserClusterMetadataDTO(
           objectMapper.convertValue(
