@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.dto;
 
-import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
+import com.rivigo.zoom.common.dto.client.UserClusterMetadataDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +18,5 @@ public class ConsignmentCompletionEventDTO {
   private String cnote;
   private Long consignmentId;
   private ClientPincodeMetadataDTO clientPincodeMetadataDTO;
-  private ClientClusterMetadataDTO clientClusterMetadataDTO;
+  private UserClusterMetadataDTO userClusterMetadataDTO;
 }

@@ -35,31 +35,28 @@ import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.TicketingService;
+import com.rivigo.riconet.core.service.UserEntityMetadataService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
 import com.rivigo.riconet.ruleengine.constants.RuleEngineVariableNameConstant;
-import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
-import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
-import com.rivigo.zoom.common.enums.ClientEntityType;
+import com.rivigo.zoom.common.dto.client.UserClusterMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
-import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.QcType;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
-import com.rivigo.zoom.common.model.ClientEntityMetadata;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentCodDod;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
-import com.rivigo.zoom.common.model.PinCode;
 import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.UserEntityMetadata;
 import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
@@ -78,7 +75,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -106,7 +102,7 @@ public class QcServiceImpl implements QcService {
 
   @Autowired private ConsignmentCodDodService consignmentCodDodService;
 
-  @Autowired private ClientEntityMetadataServiceImpl clientEntityMetadataService;
+  @Autowired private UserEntityMetadataService userEntityMetadataService;
 
   @Autowired private PincodeService pincodeService;
 
@@ -266,48 +262,22 @@ public class QcServiceImpl implements QcService {
       return false;
     }
     return qcModelService.getQcValidationFlag(consignment.getId());
-    //    if (completionData.getClientPincodeMetadataDTO() == null) {
-    //      log.info("First Consignment from client in this pincode. Mandatory QC required.");
-    //      return true;
-    //    }
-    //    log.info(
-    //        "Client entity Metadata for pincode {} is {}",
-    //        consignment.getFromPinCode(),
-    //        completionData.getClientPincodeMetadataDTO());
-    //    Long madatoryQcLimit =
-    //        zoomPropertyService.getLong(ZoomPropertyName.MANDATORY_QC_VALIDATION_CN_LIMIT, 10L);
-    //    if (completionData.getClientPincodeMetadataDTO().getCount() < madatoryQcLimit) {
-    //      log.info(
-    //          "Consignment count from client in this pincode hasn't reached Mandatory QC limit, {}
-    // Cns. Mandatory QC required.",
-    //          madatoryQcLimit);
-    //      return true;
-    //    }
-    //    Map<String, Object> bindings = getVariablesMapToApplyQCRules(completionData, consignment);
-    //    if (bindings.isEmpty()) {
-    //      return false;
-    //    }
-    //    log.info(
-    //        "Calling QCRuleEngine to getRulesFromDBAndApply cnote: {} bindings Map: {}",
-    //        consignment.getCnote(),
-    //        bindings);
-    //    return qcRuleEngine.getRulesFromDBAndApply(bindings, "QC_CHECK");
   }
 
   public Boolean isMeasurementQcRequired(ConsignmentCompletionEventDTO completionData) {
 
-    if (completionData.getClientClusterMetadataDTO() == null) return Boolean.FALSE;
-    if (completionData.getClientClusterMetadataDTO().getMeasurementCheckNeeded() != Boolean.TRUE)
+    if (completionData.getUserClusterMetadataDTO() == null) return Boolean.FALSE;
+    if (completionData.getUserClusterMetadataDTO().getMeasurementCheckNeeded() != Boolean.TRUE)
       return Boolean.FALSE;
 
-    if (completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
+    if (completionData.getUserClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
       return Boolean.FALSE;
 
     log.info(
         "Returning Measurement flag with probability {}",
-        completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability());
+        completionData.getUserClusterMetadataDTO().getQcMeasurementTicketProbability());
     return Math.random()
-        <= completionData.getClientClusterMetadataDTO().getQcMeasurementTicketProbability() / 100.0;
+        <= completionData.getUserClusterMetadataDTO().getQcMeasurementTicketProbability() / 100.0;
   }
 
   private void fillClientMetadata(
@@ -320,30 +290,12 @@ public class QcServiceImpl implements QcService {
           "CompletionData is not present for consignment with cnote: " + consignment.getCnote());
     }
 
-    ClientEntityMetadata clusterMetadata =
-        clientEntityMetadataService.getClientClusterMetadata(consignment);
-
-    PinCode pincode = pincodeService.findByCode(consignment.getFromPinCode());
-    int bufferDays =
-        zoomPropertyService.getInteger(ZoomPropertyName.CLIENT_ENTITY_METADATA_SCHEDULER_PERIOD, 1);
-    Long lastUpdateTime = DateTime.now().minusDays(bufferDays).getMillis();
-    ClientEntityMetadata pincodeMetadata =
-        clientEntityMetadataService
-            .getByEntityTypeAndEntityIdAndClientIdAndOrganizationIdAndStatusAndUpdatedAtGreaterThan(
-                ClientEntityType.PINCODE,
-                pincode.getId(),
-                consignment.getClient().getId(),
-                ClientEntityMetadata.getDefaultLongValue(),
-                OperationalStatus.ACTIVE,
-                new DateTime(lastUpdateTime));
-
-    if (clusterMetadata != null) {
-      completionData.setClientClusterMetadataDTO(
-          objectMapper.convertValue(clusterMetadata.getMetadata(), ClientClusterMetadataDTO.class));
-    }
-    if (pincodeMetadata != null) {
-      completionData.setClientPincodeMetadataDTO(
-          objectMapper.convertValue(pincodeMetadata.getMetadata(), ClientPincodeMetadataDTO.class));
+    UserEntityMetadata userEntityMetadata =
+        userEntityMetadataService.getUserClusterMetadata(consignment);
+    if (userEntityMetadata != null) {
+      completionData.setUserClusterMetadataDTO(
+          objectMapper.convertValue(
+              userEntityMetadata.getMetadata(), UserClusterMetadataDTO.class));
     }
   }
 

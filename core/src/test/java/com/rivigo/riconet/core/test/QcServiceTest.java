@@ -37,8 +37,8 @@ import com.rivigo.riconet.core.service.impl.QcServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.ruleengine.QCRuleEngine;
-import com.rivigo.zoom.common.dto.client.ClientClusterMetadataDTO;
 import com.rivigo.zoom.common.dto.client.ClientPincodeMetadataDTO;
+import com.rivigo.zoom.common.dto.client.UserClusterMetadataDTO;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentType;
@@ -539,17 +539,17 @@ public class QcServiceTest {
     ConsignmentCompletionEventDTO completionEventDTO = new ConsignmentCompletionEventDTO();
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
 
-    completionEventDTO.setClientClusterMetadataDTO(new ClientClusterMetadataDTO());
-    completionEventDTO.getClientClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.FALSE);
+    completionEventDTO.setUserClusterMetadataDTO(new UserClusterMetadataDTO());
+    completionEventDTO.getUserClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.FALSE);
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
 
-    completionEventDTO.getClientClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.TRUE);
+    completionEventDTO.getUserClusterMetadataDTO().setMeasurementCheckNeeded(Boolean.TRUE);
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
 
-    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(0.0);
+    completionEventDTO.getUserClusterMetadataDTO().setQcMeasurementTicketProbability(0.0);
     Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
 
-    completionEventDTO.getClientClusterMetadataDTO().setQcMeasurementTicketProbability(100.0);
+    completionEventDTO.getUserClusterMetadataDTO().setQcMeasurementTicketProbability(100.0);
     Assert.assertTrue(qcService.isMeasurementQcRequired(completionEventDTO));
   }
 
@@ -820,7 +820,7 @@ public class QcServiceTest {
     ConsignmentCompletionEventDTO consignmentCompletionEventDTO =
         new ConsignmentCompletionEventDTO();
     ClientPincodeMetadataDTO clientPincodeMetadataDTO = new ClientPincodeMetadataDTO();
-    ClientClusterMetadataDTO clientClusterMetadataDTO = new ClientClusterMetadataDTO();
+    UserClusterMetadataDTO clientClusterMetadataDTO = new UserClusterMetadataDTO();
 
     clientPincodeMetadataDTO.setCount((long) 31);
     clientPincodeMetadataDTO.setMinWeight(8.0);
@@ -830,7 +830,7 @@ public class QcServiceTest {
     clientPincodeMetadataDTO.setMinInvoicePerWeight(80.0);
     clientPincodeMetadataDTO.setMaxInvoicePerWeight(120.0);
 
-    consignmentCompletionEventDTO.setClientClusterMetadataDTO(clientClusterMetadataDTO);
+    consignmentCompletionEventDTO.setUserClusterMetadataDTO(clientClusterMetadataDTO);
     consignmentCompletionEventDTO.setClientPincodeMetadataDTO(clientPincodeMetadataDTO);
     consignmentCompletionEventDTO.setCnote("NORMAL");
 
