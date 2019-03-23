@@ -363,6 +363,54 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
   }
 
+  @Override
+  public void sendCnDelayEvent(NotificationDTO notificationDTO) {
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+
+    Long consignorUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+    Long consigneeUserId =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+
+    Long eventOccurredTime =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(
+                    ZoomCommunicationFieldNames.ConsignmentEventDelayNotification
+                        .EVENT_OCCURRED_TIME.name()));
+
+    Long eventCutOffTime =
+        Long.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(
+                    ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_CUT_OFF_TIME
+                        .name()));
+
+    if (eventCutOffTime != null
+        && eventOccurredTime != null
+        && eventCutOffTime < eventOccurredTime) {
+
+      data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+      data.put(CNOTE, cnote);
+
+      pushObject.put(DATA, data);
+
+      sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+      sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
+    }
+  }
+
   private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"

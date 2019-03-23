@@ -62,4 +62,16 @@ public enum ZoomCommunicationFieldNames {
     REASON,
     SUB_REASON
   }
+
+  public enum ConsignmentSchedule {
+    DEPARTURE_CUTOFF_TIME,
+    ARRIVAL_CUTOFF_TIME,
+    ARRIVAL_TIME,
+    DEPARTURE_TIME
+  }
+
+  public enum ConsignmentEventDelayNotification {
+    EVENT_CUT_OFF_TIME,
+    EVENT_OCCURRED_TIME
+  }
 }

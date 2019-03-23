@@ -235,5 +235,10 @@ public class EventTriggerService {
     } catch (Exception e) {
       log.error("IB clear event failed", e);
     }
+    try {
+      appNotificationService.sendCnDelayEvent(notificationDTO);
+    } catch (Exception e) {
+      log.error("An error occurred in sending Cn delay notification", e);
+    }
   }
 }
