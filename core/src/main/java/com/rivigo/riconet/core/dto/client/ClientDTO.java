@@ -49,4 +49,5 @@ public class ClientDTO {
   private Boolean laneRateBypass;
   private Set<String> notificationToList;
   private Set<String> notificationCcList;
+  private Set<String> clientNotificationList;
 }

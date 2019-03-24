@@ -186,24 +186,33 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
 
     Location pc = locationServiceV2.getPcOrReportingPc(loc);
 
+    // location is different for each ZoomUserType
+
     ccList.addAll(
         zoomUserMasterService
             .getActiveZoomUsersByLocationInAndZoomUserType(
-                locIds, "ZOOM_CLM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+                locIds, ZoomUserType.ZOOM_CLM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
             .getActiveZoomUsersByLocationAndZoomUserType(
-                locationId, "ZOOM_BO_PCE", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+                locationId, ZoomUserType.ZOOM_BO_PCE.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));
     ccList.addAll(
         zoomUserMasterService
             .getActiveZoomUsersByLocationAndZoomUserType(
-                pc.getId(), "ZOOM_PCM", ZoomUserType.ZOOM_TECH_SUPPORT.name())
+                pc.getId(), ZoomUserType.ZOOM_PCM.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
+            .stream()
+            .map(ZoomUser::getEmail)
+            .collect(Collectors.toList()));
+    ccList.addAll(
+        zoomUserMasterService
+            .getActiveZoomUsersByLocationAndZoomUserType(
+                locationId, ZoomUserType.ZOOM_PCE.name(), ZoomUserType.ZOOM_TECH_SUPPORT.name())
             .stream()
             .map(ZoomUser::getEmail)
             .collect(Collectors.toList()));

@@ -30,11 +30,15 @@ import com.rivigo.zoom.common.repository.mysql.ClientRepository;
 import com.rivigo.zoom.common.repository.mysql.IndustryTypeRepository;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -137,8 +141,26 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setCbm(dto.getCbm());
     clientDTO.setInsuranceReqd(dto.getInsuranceRequired());
     clientDTO.setFodApplicable(dto.getFodApplicable());
-    clientDTO.setNotificationToList(dto.getNotificationToList());
-    clientDTO.setNotificationCcList(dto.getNotificationCcList());
+    if (!CollectionUtils.isEmpty(dto.getNotificationToList())) {
+      clientDTO.setNotificationToList(dto.getNotificationToList());
+    } else {
+      clientDTO.setNotificationToList(Collections.emptySet());
+    }
+    if (!CollectionUtils.isEmpty(dto.getNotificationCcList())) {
+      clientDTO.setNotificationCcList(dto.getNotificationCcList());
+    } else {
+      clientDTO.setNotificationCcList(Collections.emptySet());
+    }
+    Set<String> clientNotificationList =
+        Stream.concat(
+                clientDTO.getNotificationToList().stream(),
+                clientDTO.getNotificationCcList().stream())
+            .collect(Collectors.toSet());
+    if (!CollectionUtils.isEmpty(clientNotificationList)) {
+      clientDTO.setClientNotificationList(clientNotificationList);
+    } else {
+      clientDTO.setClientNotificationList(Collections.emptySet());
+    }
     clientDTO.setStatus(OperationalStatus.ACTIVE);
     clientDTO.setLaneRateBypass(Boolean.FALSE);
     clientDTO.setOldClientCode("--");
