@@ -83,6 +83,7 @@ public class EventTriggerService {
         break;
       case CN_LOADED: // TODO 3
         appNotificationService.sendCnLoadedEvent(notificationDTO);
+        appNotificationService.sendCnDelayEvent(notificationDTO);
         break;
       case CN_DRS_DISPATCH: // TODO 4a and 4b
         appNotificationService.sendCnOutForDelivery(notificationDTO);
