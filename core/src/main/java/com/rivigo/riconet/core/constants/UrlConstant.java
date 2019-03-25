@@ -51,4 +51,6 @@ public class UrlConstant {
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
 
   public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
+
+  public static final String ZOOM_DATASTORE_EWAYBILL_METADATA_CLEANUP = "/address/cleanup/ewaybill";
 }
