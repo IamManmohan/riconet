@@ -151,7 +151,7 @@ public class EventTriggerService {
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP:
-        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
+        //        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
