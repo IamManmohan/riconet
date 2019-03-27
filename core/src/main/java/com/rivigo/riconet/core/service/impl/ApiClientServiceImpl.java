@@ -2,12 +2,15 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.cms.constants.ServiceType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
+import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
+import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -86,6 +89,25 @@ public class ApiClientServiceImpl implements ApiClientService {
         errorMessage,
         responseJson);
     throw new ZoomException(errorMessage);
+  }
+
+  @Override
+  public <T> T parseResponseJsonNodeFromDatastore(JsonNode responseJson, JavaType javaType) {
+
+    DatastoreResponseDto response =
+        objectMapper.convertValue(responseJson, DatastoreResponseDto.class);
+
+    log.debug(responseJson.toString());
+    log.debug(response.getStatus().toString());
+    if (response.getStatus().equals(RequestStatus.SUCCESS)) {
+      return objectMapper.convertValue(response.getPayload(), javaType);
+    }
+    log.error(
+        "API Response Status : {}  Error Message : {} , response : {} ",
+        response.getStatus(),
+        response.getErrorMessage(),
+        responseJson);
+    throw new ZoomException(response.getErrorMessage());
   }
 
   private HttpHeaders getHeaders(String token, String uri) {

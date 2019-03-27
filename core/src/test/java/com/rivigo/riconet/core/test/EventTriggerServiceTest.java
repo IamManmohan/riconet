@@ -16,6 +16,7 @@ import com.rivigo.riconet.core.service.HandoverService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.TicketingClientService;
+import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
@@ -31,6 +32,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +41,8 @@ import org.springframework.web.client.RestTemplate;
 public class EventTriggerServiceTest {
 
   @InjectMocks private EventTriggerService eventTriggerService;
+
+  @Mock private DatastoreServiceImpl datastoreService;
 
   @Mock private TicketingServiceImpl ticketingService;
 
@@ -241,5 +245,18 @@ public class EventTriggerServiceTest {
 
     notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_COMMENT_CREATION);
     eventTriggerService.processNotification(notificationDTO);
+  }
+
+  @Test
+  public void ewaybillMetadataBasedCleanupTest() {
+
+    NotificationDTO notificationDTO;
+    notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(datastoreService, times(1))
+        .cleanupAddressesUsingEwaybillMetadata(Matchers.eq(notificationDTO));
   }
 }
