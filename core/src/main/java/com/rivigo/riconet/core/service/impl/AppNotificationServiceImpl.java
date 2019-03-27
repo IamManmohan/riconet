@@ -412,6 +412,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
+    if (appId.equals("retail_app"))
+      log.info("the notification payload is {} and user id is {}", notificationPayload, userId);
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
@@ -420,6 +422,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               .map(Long::valueOf)
               .collect(Collectors.toList());
       log.info("Staging server. sending notification to user {}", userId);
+      userIdList.add(userId);
       deviceAppVersionMappers =
           deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId);
     } else {
