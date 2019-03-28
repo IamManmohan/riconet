@@ -19,7 +19,6 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
-import com.rivigo.riconet.core.constants.AppConstant;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -27,6 +26,7 @@ import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.enums.TaskStatus;
@@ -79,7 +79,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
+    sendNotification(pushObject, userId, ApplicationId.scan_app);
   }
 
   @Override
@@ -100,7 +100,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
+    sendNotification(pushObject, userId, ApplicationId.scan_app);
   }
 
   @Override
@@ -118,7 +118,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
+    sendNotification(pushObject, userId, ApplicationId.scan_app);
   }
 
   @Override
@@ -133,7 +133,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, AppConstant.SCAN_APP);
+    sendNotification(pushObject, userId, ApplicationId.scan_app);
   }
 
   @Override
@@ -164,7 +164,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               data.put(TASK_ID, taskId);
 
               pushObject.put(DATA, data);
-              sendNotification(pushObject, userId, AppConstant.SCAN_APP);
+              sendNotification(pushObject, userId, ApplicationId.scan_app);
             });
   }
 
@@ -202,7 +202,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     pushObject.put(DATA, data);
 
-    sendNotification(pushObject, pickUpCreatorUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, pickUpCreatorUserId, ApplicationId.retail_app);
   }
 
   @Override
@@ -238,7 +238,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, pickUpCreatorUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, pickUpCreatorUserId, ApplicationId.retail_app);
   }
 
   @Override
@@ -265,8 +265,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(CNOTE, cnote);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
-    sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
+    sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
   }
 
   @Override
@@ -313,7 +313,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PARTNER_NAME, tpmCaptainName);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
   }
 
   @Override
@@ -359,8 +359,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         && deliveryDateTime > promisedDeliveryDateTime) data.put(IS_CN_DELIVERY_DELAYED, "TRUE");
     pushObject.put(DATA, data);
 
-    sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
-    sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
+    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
+    sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
   }
 
   @Override
@@ -406,12 +406,12 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
       pushObject.put(DATA, data);
 
-      sendNotification(pushObject, consigneeUserId, AppConstant.RETAIL_APP);
-      sendNotification(pushObject, consignorUserId, AppConstant.RETAIL_APP);
+      sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
+      sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
     }
   }
 
-  private void sendNotification(JSONObject notificationPayload, Long userId, String appId) {
+  private void sendNotification(JSONObject notificationPayload, Long userId, ApplicationId appId) {
     if (appId.equals("retail_app"))
       log.info("the notification payload is {} and user id is {}", notificationPayload, userId);
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
