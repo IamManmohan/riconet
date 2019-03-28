@@ -412,7 +412,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId, ApplicationId appId) {
-    if (appId.equals("retail_app"))
+    if (ApplicationId.retail_app.equals(appId))
       log.info("the notification payload is {} and user id is {}", notificationPayload, userId);
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"
