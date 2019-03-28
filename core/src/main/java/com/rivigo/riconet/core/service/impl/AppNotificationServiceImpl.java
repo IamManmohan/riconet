@@ -179,7 +179,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     Long pickUpId =
         Long.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name()));
 
     String pickUpCaptainName =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
