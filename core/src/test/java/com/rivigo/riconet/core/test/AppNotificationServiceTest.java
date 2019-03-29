@@ -80,7 +80,7 @@ public class AppNotificationServiceTest {
     Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
-    appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
+    appNotificationService.sendTaskUpsertNotification(notificationDTO);
   }
 
   @Test

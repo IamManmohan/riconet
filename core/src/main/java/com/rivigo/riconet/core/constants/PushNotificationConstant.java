@@ -17,4 +17,6 @@ public class PushNotificationConstant {
   public static final String NOTIFICATION_TYPE = "notificationType";
   public static final String PARENT_TASK_ID = "parentTaskId";
   public static final String IB_CLEAR_EVENT = "IB_CLEAR";
+  public static final String OU_CODE = "ouCode";
+  public static final String SHOP_FLOOR_ENABLED = "shopFloorEnabled";
 }

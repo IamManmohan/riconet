@@ -4,17 +4,19 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.OU_CODE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.SHOP_FLOOR_ENABLED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
-import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
 import com.google.common.collect.ImmutableMap;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TaskDto;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -23,6 +25,7 @@ import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.model.User;
@@ -61,25 +64,55 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private UserMasterService userMasterService;
 
   @Override
-  public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
-    // Should be in sync with user table in backen
+  public void sendTaskUpsertNotification(NotificationDTO notificationDTO) {
+    // Should be in sync with user table in backend
     Long userId =
         Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
     Long taskId = notificationDTO.getEntityId();
-    Long parentTaskId =
-        Long.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PARENT_TASK_ID.name()));
+    Long parentTaskId = null;
+    if (notificationDTO
+        .getMetadata()
+        .containsKey(ZoomCommunicationFieldNames.PARENT_TASK_ID.name())) {
+      parentTaskId =
+          Long.valueOf(
+              notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PARENT_TASK_ID.name()));
+    }
 
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, UNLOADING_IN_LOADING.name());
+    data.put(NOTIFICATION_TYPE, EventName.TASK_UPSERT.name());
     data.put(TASK_ID, taskId);
     data.put(PARENT_TASK_ID, parentTaskId);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
     sendNotification(pushObject, userId);
+  }
+
+  @Override
+  public void sendShopFloorStatusUpdateNotifications(NotificationDTO notificationDTO) {
+    String ouCode = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OU_CODE.name());
+    Boolean shopFloorEnabled =
+        Boolean.valueOf(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.SHOP_FLOOR_ENABLED.name()));
+
+    JSONObject pushObject = new JSONObject();
+
+    JSONObject data = new JSONObject();
+    data.put(NOTIFICATION_TYPE, EventName.SHOP_FLOOR_STATUS_UPDATE.name());
+    data.put(OU_CODE, ouCode);
+    data.put(SHOP_FLOOR_ENABLED, shopFloorEnabled);
+    data.put(TIME_STAMP, notificationDTO.getTsMs());
+
+    pushObject.put(DATA, data);
+    Location locationByCode = locationService.getLocationByCode(ouCode);
+    List<DeviceAppVersionMapper> deviceAppVersionMapperList =
+        deviceAppVersionMapperRepository.findByAppIdAndLocationId(
+            ApplicationId.scan_app.name(), locationByCode.getId());
+    sendNotification(pushObject, deviceAppVersionMapperList);
   }
 
   @Override
@@ -188,29 +221,41 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId) {
-    List<DeviceAppVersionMapper> deviceAppVersionMappers;
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        deviceAppVersionMapperRepository.findByUserId(userId);
+    sendNotification(notificationPayload, deviceAppVersionMappers);
+  }
+
+  private void sendNotification(
+      JSONObject notificationPayload, List<DeviceAppVersionMapper> deviceAppVersionMappers) {
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
       List<Long> userIdList =
           Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
               .map(Long::valueOf)
               .collect(Collectors.toList());
-      log.info("Staging server. sending notification to user {}", userId);
+      log.info(
+          "Staging server. sending notification to users {}",
+          deviceAppVersionMappers
+              .stream()
+              .map(DeviceAppVersionMapper::getUserId)
+              .collect(Collectors.toSet()));
       deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserIdIn(userIdList);
-    } else {
-      deviceAppVersionMappers = deviceAppVersionMapperRepository.findByUserId(userId);
     }
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
       return;
     }
-    deviceAppVersionMappers.forEach(
-        d -> {
-          try {
-            pushNotificationService.send(notificationPayload, d.getFirebaseToken(), HIGH);
-          } catch (IOException e) {
-            log.error("Error sending push notification {}", e);
-          }
-        });
+    deviceAppVersionMappers
+        .stream()
+        .filter(d -> d.getFirebaseToken() != null)
+        .forEach(
+            d -> {
+              try {
+                pushNotificationService.send(notificationPayload, d.getFirebaseToken(), HIGH);
+              } catch (IOException e) {
+                log.error("Error sending push notification {}", e.getMessage(), e);
+              }
+            });
   }
 }

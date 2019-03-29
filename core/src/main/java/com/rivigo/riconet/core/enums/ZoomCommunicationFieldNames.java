@@ -34,7 +34,9 @@ public enum ZoomCommunicationFieldNames {
   ACTION_VALUE,
 
   STALE_CATEGORY,
-  TYPE_ID;
+  TYPE_ID,
+  SHOP_FLOOR_ENABLED,
+  OU_CODE;
 
   public enum Reason {
     REASON,

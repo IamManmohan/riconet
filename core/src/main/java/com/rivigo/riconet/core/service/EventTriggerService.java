@@ -88,8 +88,11 @@ public class EventTriggerService {
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
-      case UNLOADING_IN_LOADING:
-        appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
+      case TASK_UPSERT:
+        appNotificationService.sendTaskUpsertNotification(notificationDTO);
+        break;
+      case SHOP_FLOOR_STATUS_UPDATE:
+        appNotificationService.sendShopFloorStatusUpdateNotifications(notificationDTO);
         break;
       case PALLET_CLOSED:
         appNotificationService.sendPalletClosedNotification(notificationDTO);
