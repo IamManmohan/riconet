@@ -46,6 +46,7 @@ public class ClientDTO {
   private Boolean ewaybillExempted;
   private Unit defaultVolumeUnit;
   private Boolean fodApplicable;
+  private Boolean rtoApplicable;
   private Boolean laneRateBypass;
   private Set<String> notificationToList;
   private Set<String> notificationCcList;
