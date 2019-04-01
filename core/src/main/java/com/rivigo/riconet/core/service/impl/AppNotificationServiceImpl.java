@@ -37,8 +37,8 @@ import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,23 +172,20 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   public void sendPickUpAssignmentEvent(NotificationDTO notificationDTO) {
 
     Long pickUpCreatorUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
 
     Long pickUpId =
-        Long.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name());
 
     String pickUpCaptainName =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
 
     Long pickUpCaptainNumber =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name());
+
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
 
@@ -209,10 +206,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   public void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO) {
 
     Long pickUpCreatorUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
 
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -220,14 +215,12 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     // put pickupId and captain number
 
     Long pickUpId =
-        Long.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name());
 
     Long pickUpCaptainNumber =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name());
 
     String pickUpCaptainName =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
@@ -249,15 +242,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     // cnote and consignor/consignee.
     Long consignorUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
     Long consigneeUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
 
@@ -277,10 +266,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
     Long consigneeUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
     String cnoteType =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE_TYPE.name());
@@ -324,15 +311,12 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
 
     Long consignorUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
+
     Long consigneeUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
@@ -340,19 +324,13 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
 
     Long promisedDeliveryDateTime =
-        Optional.of(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CpbSummary.PROMISED_DELIVERY_DATE_TIME.name()))
-            .map(Long::valueOf)
-            .orElse(null);
+        getFieldAsLongFromNotificationDto(
+            notificationDTO,
+            ZoomCommunicationFieldNames.CpbSummary.PROMISED_DELIVERY_DATE_TIME.name());
+
     Long deliveryDateTime =
-        Optional.of(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name()))
-            .map(Long::valueOf)
-            .orElse(null);
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name());
 
     if (deliveryDateTime != null
         && promisedDeliveryDateTime != null
@@ -371,31 +349,24 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
 
     Long consignorUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
+
     Long consigneeUserId =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
     Long eventOccurredTime =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(
-                    ZoomCommunicationFieldNames.ConsignmentEventDelayNotification
-                        .EVENT_OCCURRED_TIME.name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO,
+            ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_OCCURRED_TIME
+                .name());
 
     Long eventCutOffTime =
-        Long.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(
-                    ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_CUT_OFF_TIME
-                        .name()));
+        getFieldAsLongFromNotificationDto(
+            notificationDTO,
+            ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_CUT_OFF_TIME
+                .name());
 
     if (eventCutOffTime != null
         && eventOccurredTime != null
@@ -411,9 +382,23 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     }
   }
 
+  private Long getFieldAsLongFromNotificationDto(
+      NotificationDTO notificationDTO, @NonNull String field) {
+    try {
+      return Long.valueOf(notificationDTO.getMetadata().get(field));
+    } catch (Exception e) {
+      log.info(
+          "An exception:{} occurred while getting filed: {} from notificationDTO: {}",
+          e,
+          field,
+          notificationDTO);
+      return null;
+    }
+  }
+
   private void sendNotification(JSONObject notificationPayload, Long userId, ApplicationId appId) {
     if (ApplicationId.retail_app.equals(appId))
-      log.info(
+      log.debug(
           "################################################the notification payload is {} and user id is {}",
           notificationPayload,
           userId);
