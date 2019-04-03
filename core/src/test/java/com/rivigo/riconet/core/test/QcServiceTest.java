@@ -398,7 +398,7 @@ public class QcServiceTest {
         .thenReturn(consignmentCodDod);
     qcService.consumeCompletionEvent(data);
     verify(smsService, times(1)).sendSms(any(), any());
-    verify(zoomBackendAPIClientService, times(1)).triggerPolicyGeneration(1l);
+    // verify(zoomBackendAPIClientService, times(1)).triggerPolicyGeneration(1l);
   }
 
   //  @Test
