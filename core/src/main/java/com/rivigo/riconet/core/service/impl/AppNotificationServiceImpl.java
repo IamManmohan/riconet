@@ -199,7 +199,20 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     pushObject.put(DATA, data);
 
-    sendNotification(pushObject, pickUpCreatorUserId, ApplicationId.retail_app);
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put("body", "Your Pickup has been assigned to captain:");
+    notificationBodyAndTitle.put("title", notificationDTO.getEventName());
+
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        pickUpCreatorUserId,
+        ApplicationId.retail_app);
+  }
+
+  private JSONObject getJsonObjectForRetailApp(
+      JSONObject pushObject, JSONObject notificationBodyAndTitle) {
+    pushObject.put("body", notificationBodyAndTitle);
+    return pushObject;
   }
 
   @Override
