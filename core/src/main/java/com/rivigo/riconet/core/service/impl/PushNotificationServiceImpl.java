@@ -6,6 +6,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
+import com.rivigo.zoom.common.enums.ApplicationId;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -30,6 +31,9 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 
   @Value("${firebase.server.key}")
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
+
+  private final String expressAppServerKey =
+      "AAAA3Z9onJc:APA91bEQacoMWOsvvBKC8ZBgxxW7pfra7MOOEOoffqnfp7Ys_owTLEaoCqBfj8BfCoeYEuYWqqyvNp6A-o8IKeez6u0jAODZ-Bt4W66eDGR8BGAQIWrDhi50vB7PXM20gqjylLqRvEMW";
 
   @Autowired
   @Qualifier("riconetRestTemplate")
@@ -56,19 +60,22 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   }
 
   @Override
-  public void send(JSONObject jsonObject, String firebaseToken, String priority) {
+  public void send(
+      JSONObject jsonObject, String firebaseToken, String priority, ApplicationId applicationId) {
 
     if (firebaseToken == null) {
       return;
     }
     // TODO : see why autowired restemplate is giving bad request
     RestTemplate restTemplate = new RestTemplate();
-
     jsonObject.put(PRIORITY, priority);
     jsonObject.put(TO, firebaseToken);
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
-    HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), jsonObject, uri);
+    String token;
+    if (ApplicationId.scan_app.equals(applicationId)) token = expressAppServerKey;
+    else token = firebaseServerKey;
+    HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
     restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
     log.info("Response is {}", jsonObject);
   }

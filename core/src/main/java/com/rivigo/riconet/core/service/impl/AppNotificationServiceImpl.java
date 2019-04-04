@@ -211,7 +211,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   private JSONObject getJsonObjectForRetailApp(
       JSONObject pushObject, JSONObject notificationBodyAndTitle) {
-    pushObject.put("body", notificationBodyAndTitle);
+    pushObject.put("notification", notificationBodyAndTitle);
     return pushObject;
   }
 
@@ -437,7 +437,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     deviceAppVersionMappers.forEach(
         d -> {
           try {
-            pushNotificationService.send(notificationPayload, d.getFirebaseToken(), HIGH);
+            pushNotificationService.send(notificationPayload, d.getFirebaseToken(), HIGH, appId);
           } catch (IOException e) {
             log.error("Error sending push notification {}", e);
           }
