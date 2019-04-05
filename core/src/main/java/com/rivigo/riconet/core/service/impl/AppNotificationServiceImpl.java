@@ -200,8 +200,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     pushObject.put(DATA, data);
 
     JSONObject notificationBodyAndTitle = new JSONObject();
-    notificationBodyAndTitle.put("body", "Your pickup partner has been assigned! ");
-    notificationBodyAndTitle.put("title", notificationDTO.getEventName());
+    String title = "Your pickup partner has been assigned for the pickup " + pickUpId.toString();
+    notificationBodyAndTitle.put("body", title);
+    notificationBodyAndTitle.put("title", "Partner assigned");
 
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
@@ -247,8 +248,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     JSONObject notificationBodyAndTitle = new JSONObject();
 
-    notificationBodyAndTitle.put("body", "Knock, knock! We have reached your location for pickup");
-    notificationBodyAndTitle.put("title", notificationDTO.getEventName());
+    String title = "Knock, knock! We have reached your location for pickup " + pickUpId.toString();
+    notificationBodyAndTitle.put("body", title);
+    notificationBodyAndTitle.put("title", "Partner reached");
 
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
