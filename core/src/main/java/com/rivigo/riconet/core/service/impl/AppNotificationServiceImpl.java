@@ -195,6 +195,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
     data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put("identifier", "PICKUP_ASSIGNED");
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     pushObject.put(DATA, data);
@@ -243,6 +244,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
     data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put("identifier", "PICKUP_REACHED_AT_CLIENT_WAREHOUSE");
 
     pushObject.put(DATA, data);
 
