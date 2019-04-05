@@ -74,7 +74,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
     String token;
-    if (ApplicationId.retail_app.equals(applicationId)) token = expressAppServerKe;
+    if (ApplicationId.retail_app.equals(applicationId)) token = expressAppServerKey;
     else token = firebaseUrl;
     log.debug("the notif I am sending is !!!!!!!!!!!!!!!! {}", jsonObject);
     HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
