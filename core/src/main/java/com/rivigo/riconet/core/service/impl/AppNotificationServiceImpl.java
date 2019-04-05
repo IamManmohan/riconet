@@ -278,10 +278,24 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
+    data.put("identifier", "DISPATCHED");
+
+    JSONObject notificationBodyAndTitle = new JSONObject();
+
+    String title = "Your shipment " + cnote + " has been dispatched!";
+    notificationBodyAndTitle.put("body", title);
+    notificationBodyAndTitle.put("title", "Dispatched");
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
-    sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
+
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consigneeUserId,
+        ApplicationId.retail_app);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consignorUserId,
+        ApplicationId.retail_app);
   }
 
   @Override
