@@ -75,6 +75,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     String token;
     if (ApplicationId.scan_app.equals(applicationId)) token = expressAppServerKey;
     else token = firebaseServerKey;
+    log.debug("the notif I am sending is !!!!!!!!!!!!!!!! ", jsonObject);
     HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
     restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
     log.info("Response is {}", jsonObject);
