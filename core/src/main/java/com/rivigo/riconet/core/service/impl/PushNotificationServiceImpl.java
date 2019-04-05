@@ -17,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -77,7 +78,9 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     else token = firebaseServerKey;
     log.debug("the notif I am sending is !!!!!!!!!!!!!!!! {}", jsonObject);
     HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
-    restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    ResponseEntity<JSONObject> response =
+        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    log.debug("%%%%%%%%%%%%%%%%%% the response of the api call is {}", response);
     log.info("Response is {}", jsonObject);
   }
 }
