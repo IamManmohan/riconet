@@ -299,7 +299,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   @Override
-  public void sendCnOutForDelivery(NotificationDTO notificationDTO) {
+  public void sendCnDrsDispatchEvent(NotificationDTO notificationDTO) {
 
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -317,7 +317,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     boolean isToPay = false;
     if (cnoteType != null
         && paymentMode != null
-        && CnoteType.RETAIL.name().equals(cnote)
+        && CnoteType.RETAIL.name().equals(cnoteType)
         && PaymentMode.TO_PAY.name().equals(paymentMode)) isToPay = true;
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
