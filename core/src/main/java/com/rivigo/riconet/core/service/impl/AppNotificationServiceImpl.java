@@ -323,8 +323,13 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
 
-    data.put(IS_TOPAY, "FALSE");
-    if (isToPay) data.put(IS_TOPAY, "TRUE");
+    if (isToPay) {
+      data.put(IS_TOPAY, "TRUE");
+      data.put("identifier", "OUT_FOR_DELIVERY_TO_PAY");
+    } else {
+      data.put(IS_TOPAY, "FALSE");
+      data.put("identifier", "OUT_FOR_DELIVERY_PAID");
+    }
 
     // put captain's number.
     String tpmCaptainPhoneNumber =
@@ -339,8 +344,18 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PARTNER_MOBILE_NUMBER, tpmCaptainPhoneNumber);
     data.put(PARTNER_NAME, tpmCaptainName);
 
+    String title = "Your shipment " + cnote + " is out for delivery! ";
+    if (isToPay && onlinePaymentLink != null) title = title + "Make your payment now ";
+
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put("body", title);
+    notificationBodyAndTitle.put("title", "Out for delivery! ");
+
     pushObject.put(DATA, data);
-    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consigneeUserId,
+        ApplicationId.retail_app);
   }
 
   @Override
