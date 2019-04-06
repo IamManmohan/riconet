@@ -387,13 +387,32 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name());
 
+    String title = "Your shipment " + cnote + " has been delivered";
+
     if (deliveryDateTime != null
         && promisedDeliveryDateTime != null
-        && deliveryDateTime > promisedDeliveryDateTime) data.put(IS_CN_DELIVERY_DELAYED, "TRUE");
-    pushObject.put(DATA, data);
+        && deliveryDateTime > promisedDeliveryDateTime) {
+      data.put(IS_CN_DELIVERY_DELAYED, "TRUE");
+      title = title + "! We sincerely apologize for any inconvenience due to the delay";
+      data.put("identifier", "DELIVERED_DELAYED");
+    } else {
+      title = title + " on time";
+      data.put("identifier", "DELIVERED");
+    }
 
-    sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
-    sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put("body", title);
+    notificationBodyAndTitle.put("title", "Delivered");
+
+    pushObject.put(DATA, data);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consigneeUserId,
+        ApplicationId.retail_app);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consignorUserId,
+        ApplicationId.retail_app);
   }
 
   @Override
