@@ -87,7 +87,7 @@ public class EventTriggerService {
         appNotificationService.sendCnLoadedEvent(notificationDTO);
         appNotificationService.sendCnDelayEvent(notificationDTO);
         break;
-      case CN_DRS_DISPATCH: // TODO 4a and 4b
+      case CN_OUT_FOR_DELIVERY: // TODO 4a and 4b
         appNotificationService.sendCnOutForDelivery(notificationDTO);
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
