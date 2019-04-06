@@ -375,8 +375,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
-    // add is cn delivery delayed.
-    data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
 
     Long promisedDeliveryDateTime =
         getFieldAsLongFromNotificationDto(
@@ -396,6 +394,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
       title = title + "! We sincerely apologize for any inconvenience due to the delay";
       data.put("identifier", "DELIVERED_DELAYED");
     } else {
+      data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
       title = title + " on time";
       data.put("identifier", "DELIVERED");
     }
@@ -476,6 +475,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
           "################################################the notification payload is {} and user id is {}",
           notificationPayload,
           userId);
+    if (userId == null) {
+      log.info("Cannot send notification if userId is null");
+      return;
+    }
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
