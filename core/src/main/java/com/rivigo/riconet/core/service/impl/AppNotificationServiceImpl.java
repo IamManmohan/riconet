@@ -32,8 +32,10 @@ import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
+import com.rivigo.zoom.common.model.retail_app.CnDelayNotification;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
+import com.rivigo.zoom.common.repository.mysql.retail_app.CnDelayNotificationRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +62,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private OATaskAssignmentRepository oaTaskAssignmentRepository;
+
+  @Autowired private CnDelayNotificationRepository cnDelayNotificationRepository;
 
   @Override
   public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
@@ -444,14 +448,32 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     if (eventCutOffTime != null
         && eventOccurredTime != null
         && eventCutOffTime < eventOccurredTime) {
+      CnDelayNotification cnDelayNotification = cnDelayNotificationRepository.findByCnote(cnote);
+      if (cnDelayNotification == null) {
 
-      data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-      data.put(CNOTE, cnote);
+        data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+        data.put(CNOTE, cnote);
 
-      pushObject.put(DATA, data);
+        pushObject.put(DATA, data);
 
-      sendNotification(pushObject, consigneeUserId, ApplicationId.retail_app);
-      sendNotification(pushObject, consignorUserId, ApplicationId.retail_app);
+        String title =
+            "Your shipment "
+                + cnote
+                + " is expected to be delayed. We are working on getting it delivered soon!";
+
+        JSONObject notificationBodyAndTitle = new JSONObject();
+        notificationBodyAndTitle.put("body", title);
+        notificationBodyAndTitle.put("title", "Sorry ");
+
+        sendNotification(
+            getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+            consigneeUserId,
+            ApplicationId.retail_app);
+        sendNotification(
+            getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+            consignorUserId,
+            ApplicationId.retail_app);
+      }
     }
   }
 
