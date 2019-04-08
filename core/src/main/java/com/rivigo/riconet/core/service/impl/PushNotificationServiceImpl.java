@@ -34,7 +34,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
   private final String expressAppServerKey =
-      "AAAA3Z9onJc:APA91bEQacoMWOsvvBKC8ZBgxxW7pfra7MOOEOoffqnfp7Ys_owTLEaoCqBfj8BfCoeYEuYWqqyvNp6A-o8IKeez6u0jAODZ-Bt4W66eDGR8BGAQIWrDhi50vB7PXM20gqjylLqRvEMW";
+      "AAAAzR5d2LM:APA91bGAM9jrzz6GuO-JR0yhaZeyFWQwX9nZVOPPtKQv_SU32rQWll8IKgI7HyZ0slFFp9hKMJFu8xm3McTc9c8fYZe0nkqI5yS3nyl_ganSnx_-sEFBEcDyGlId_2Y829H2y-0FkL59";
 
   @Autowired
   @Qualifier("riconetRestTemplate")
