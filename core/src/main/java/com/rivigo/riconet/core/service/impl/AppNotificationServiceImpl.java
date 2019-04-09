@@ -32,7 +32,6 @@ import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.enums.TaskStatus;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
-import com.rivigo.zoom.common.model.retail_app.CnDelayNotification;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
 import com.rivigo.zoom.common.repository.mysql.retail_app.CnDelayNotificationRepository;
@@ -416,65 +415,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
         consignorUserId,
         ApplicationId.retail_app);
-  }
-
-  @Override
-  public void sendCnDelayEvent(NotificationDTO notificationDTO) {
-    JSONObject pushObject = new JSONObject();
-    JSONObject data = new JSONObject();
-
-    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-
-    Long consignorUserId =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
-
-    Long consigneeUserId =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
-
-    Long eventOccurredTime =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO,
-            ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_OCCURRED_TIME
-                .name());
-
-    Long eventCutOffTime =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO,
-            ZoomCommunicationFieldNames.ConsignmentEventDelayNotification.EVENT_CUT_OFF_TIME
-                .name());
-
-    if (eventCutOffTime != null
-        && eventOccurredTime != null
-        && eventCutOffTime < eventOccurredTime) {
-      CnDelayNotification cnDelayNotification = cnDelayNotificationRepository.findByCnote(cnote);
-      if (cnDelayNotification == null) {
-
-        data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-        data.put(CNOTE, cnote);
-
-        pushObject.put(DATA, data);
-
-        String title =
-            "Your shipment "
-                + cnote
-                + " is expected to be delayed. We are working on getting it delivered soon!";
-
-        JSONObject notificationBodyAndTitle = new JSONObject();
-        notificationBodyAndTitle.put("body", title);
-        notificationBodyAndTitle.put("title", "Sorry ");
-
-        sendNotification(
-            getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
-            consigneeUserId,
-            ApplicationId.retail_app);
-        sendNotification(
-            getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
-            consignorUserId,
-            ApplicationId.retail_app);
-      }
-    }
   }
 
   private Long getFieldAsLongFromNotificationDto(
