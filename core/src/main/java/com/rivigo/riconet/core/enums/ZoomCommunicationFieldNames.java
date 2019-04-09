@@ -70,11 +70,6 @@ public enum ZoomCommunicationFieldNames {
     DEPARTURE_TIME
   }
 
-  public enum ConsignmentEventDelayNotification {
-    EVENT_CUT_OFF_TIME,
-    EVENT_OCCURRED_TIME
-  }
-
   public enum Pickup {
     PICKUP_ID
   }

@@ -41,7 +41,6 @@ public class EventTriggerService {
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
-        // TODO 5a and 5b
         appNotificationService.sendCnDeliveredNotification(notificationDTO);
       case CN_TRIP_DISPATCHED:
       case CN_PAYMENT_HANDOVER_COMPLETED:
@@ -70,10 +69,10 @@ public class EventTriggerService {
             TicketEntityType.PRQ.name(),
             eventName.name());
         break;
-      case PICKUP_ASSIGNMENT: // TODO 1
+      case PICKUP_ASSIGNMENT:
         appNotificationService.sendPickUpAssignmentEvent(notificationDTO);
         break;
-      case PICKUP_REACHED_AT_CLIENT_WAREHOUSE: // TODO 2
+      case PICKUP_REACHED_AT_CLIENT_WAREHOUSE:
         appNotificationService.sendPickUpReachedAtClientAddress(notificationDTO);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
@@ -83,11 +82,10 @@ public class EventTriggerService {
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
         break;
-      case CN_LOADED: // TODO 3
+      case CN_LOADED:
         appNotificationService.sendCnLoadedEvent(notificationDTO);
-        // appNotificationService.sendCnDelayEvent(notificationDTO);
         break;
-      case CN_DRS_DISPATCH: // TODO 4a and 4b
+      case CN_DRS_DISPATCH:
         appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
