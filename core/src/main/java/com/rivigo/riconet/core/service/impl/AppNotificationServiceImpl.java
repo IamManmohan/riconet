@@ -1,21 +1,35 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DELIVERED_NOTIFICATION_TITLE_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_LOADED_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_LOADED_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_CN_DELIVERY_DELAYED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_TOPAY;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_BODY_AND_TITLE_KEY;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_BODY_KEY;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_IDENTIFIER_KEY;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TITLE_KEY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_MOBILE_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_NAME;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 import static com.rivigo.zoom.common.enums.TaskType.UNLOADING_IN_LOADING;
 
@@ -181,13 +195,25 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     Long pickUpId =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name());
+    if (pickUpId == null) {
+      log.warn("Cannot send notification when pickup id is null");
+      return;
+    }
 
     String pickUpCaptainName =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
+    if (pickUpCaptainName == null) {
+      log.warn("Cannot send notification when captain name is null");
+      return;
+    }
 
     Long pickUpCaptainNumber =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name());
+    if (pickUpCaptainNumber == null) {
+      log.warn("Cannot send notification when captain number is null");
+      return;
+    }
 
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -198,15 +224,18 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
     data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put("identifier", "PICKUP_ASSIGNED");
+    data.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE);
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     pushObject.put(DATA, data);
 
     JSONObject notificationBodyAndTitle = new JSONObject();
-    String title = "Your pickup partner has been assigned for the pickup " + pickUpId.toString();
-    notificationBodyAndTitle.put("body", title);
-    notificationBodyAndTitle.put("title", "Partner assigned");
+    StringBuilder sb = new StringBuilder();
+    sb.append("Your pickup partner has been assigned! ");
+    // delivery truck emoji
+    sb.append(Character.toChars(128666));
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE);
 
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
@@ -216,7 +245,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   private JSONObject getJsonObjectForRetailApp(
       JSONObject pushObject, JSONObject notificationBodyAndTitle) {
-    pushObject.put("notification", notificationBodyAndTitle);
+    pushObject.put(NOTIFICATION_BODY_AND_TITLE_KEY, notificationBodyAndTitle);
     return pushObject;
   }
 
@@ -235,27 +264,43 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     Long pickUpId =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name());
+    if (pickUpId == null) {
+      log.warn("Cannot send notification when pickup id is null");
+      return;
+    }
 
     Long pickUpCaptainNumber =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name());
+    if (pickUpCaptainNumber == null) {
+      log.warn("Cannot send notification when captain number is null");
+      return;
+    }
 
     String pickUpCaptainName =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name());
+    if (pickUpCaptainName == null) {
+      log.warn("Cannot send notification when captain name is null");
+      return;
+    }
 
     data.put(PICKUP_ID, pickUpId);
     data.put(PICKUP_CAPTAIN_NAME, pickUpCaptainName);
     data.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put("identifier", "PICKUP_REACHED_AT_CLIENT_WAREHOUSE");
+    data.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE);
 
     pushObject.put(DATA, data);
 
     JSONObject notificationBodyAndTitle = new JSONObject();
 
-    String title = "Knock, knock! We have reached your location for pickup " + pickUpId.toString();
-    notificationBodyAndTitle.put("body", title);
-    notificationBodyAndTitle.put("title", "Partner reached");
+    StringBuilder sb = new StringBuilder();
+    sb.append("Knock, knock! We have reached your location for pickup ");
+    // man in business suit levitating emoji
+    sb.append(Character.toChars(128666));
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(
+        NOTIFICATION_TITLE_KEY, PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE);
 
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
@@ -278,16 +323,28 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    if (cnote == null) {
+      log.warn("Cannot send notification when cnote is null");
+      return;
+    }
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
-    data.put("identifier", "DISPATCHED");
+    data.put(NOTIFICATION_IDENTIFIER_KEY, CN_LOADED_IDENTIFIER_VALUE);
 
     JSONObject notificationBodyAndTitle = new JSONObject();
 
-    String title = "Your shipment " + cnote + " has been dispatched!";
-    notificationBodyAndTitle.put("body", title);
-    notificationBodyAndTitle.put("title", "Dispatched");
+    StringBuilder sb = new StringBuilder();
+    sb.append("Your shipment ");
+    sb.append(cnote);
+    sb.append(" has been dispatched! ");
+    // delivery truck emoji
+    sb.append(Character.toChars(128666));
+    // dash emoji
+    sb.append(Character.toChars(128168));
+
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_LOADED_NOTIFICATION_TITLE_VALUE);
 
     pushObject.put(DATA, data);
 
@@ -308,6 +365,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject data = new JSONObject();
 
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    if (cnote == null) {
+      log.warn("Cannot send notification when cnote is null");
+      return;
+    }
     Long consigneeUserId =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
@@ -328,10 +389,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     if (isToPay) {
       data.put(IS_TOPAY, "TRUE");
-      data.put("identifier", "OUT_FOR_DELIVERY_TO_PAY");
+      data.put(NOTIFICATION_IDENTIFIER_KEY, TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE);
     } else {
       data.put(IS_TOPAY, "FALSE");
-      data.put("identifier", "OUT_FOR_DELIVERY_PAID");
+      data.put(NOTIFICATION_IDENTIFIER_KEY, PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE);
     }
 
     // put captain's number.
@@ -347,12 +408,19 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(PARTNER_MOBILE_NUMBER, tpmCaptainPhoneNumber);
     data.put(PARTNER_NAME, tpmCaptainName);
 
-    String title = "Your shipment " + cnote + " is out for delivery! ";
-    if (isToPay && onlinePaymentLink != null) title = title + "Make your payment now ";
+    StringBuilder sb = new StringBuilder();
+    sb.append("Your shipment ");
+    sb.append(cnote);
+    sb.append(" is out for delivery! ");
+    if (isToPay && onlinePaymentLink != null) {
+      sb.append("Make your payment now ");
+      // money with wings emoji
+      sb.append(Character.toChars(128184));
+    }
 
     JSONObject notificationBodyAndTitle = new JSONObject();
-    notificationBodyAndTitle.put("body", title);
-    notificationBodyAndTitle.put("title", "Out for delivery! ");
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE);
 
     pushObject.put(DATA, data);
     sendNotification(
@@ -367,6 +435,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject data = new JSONObject();
 
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    if (cnote == null) {
+      log.warn("Cannot send notification when cnote is null");
+      return;
+    }
 
     Long consignorUserId =
         getFieldAsLongFromNotificationDto(
@@ -387,24 +459,28 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     Long deliveryDateTime =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name());
-
-    String title = "Your shipment " + cnote + " has been delivered";
+    StringBuilder sb = new StringBuilder();
+    sb.append("Your shipment ");
+    sb.append(cnote);
+    sb.append(" has been delivered");
 
     if (deliveryDateTime != null
         && promisedDeliveryDateTime != null
         && deliveryDateTime > promisedDeliveryDateTime) {
       data.put(IS_CN_DELIVERY_DELAYED, "TRUE");
-      title = title + "! We sincerely apologize for any inconvenience due to the delay";
-      data.put("identifier", "DELIVERED_DELAYED");
+      sb.append("! We sincerely apologize for any inconvenience due to the delay");
+      data.put(NOTIFICATION_IDENTIFIER_KEY, "DELIVERED_DELAYED");
     } else {
       data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
-      title = title + " on time";
-      data.put("identifier", "DELIVERED");
+      sb.append(" on time");
+      // flexed bicep emoji
+      sb.append(Character.toChars(128170));
+      data.put(NOTIFICATION_IDENTIFIER_KEY, "DELIVERED");
     }
 
     JSONObject notificationBodyAndTitle = new JSONObject();
-    notificationBodyAndTitle.put("body", title);
-    notificationBodyAndTitle.put("title", "Delivered");
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_DELIVERED_NOTIFICATION_TITLE_VALUE);
 
     pushObject.put(DATA, data);
     sendNotification(
@@ -438,7 +514,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
           notificationPayload,
           userId);
     if (userId == null) {
-      log.info("Cannot send notification if userId is null");
+      log.warn("Cannot send notification if userId is null");
       return;
     }
     List<DeviceAppVersionMapper> deviceAppVersionMappers;
