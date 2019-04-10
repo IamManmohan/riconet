@@ -68,8 +68,7 @@ public class SmsServiceImpl implements SmsService {
     if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
       phoneNumbers.add(mobileNo);
     } else {
-      String defaultPhone =
-          zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "7503810874");
+      String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "");
       String[] defaultPhones = defaultPhone.split(",");
       Arrays.stream(defaultPhones)
           .forEach(
