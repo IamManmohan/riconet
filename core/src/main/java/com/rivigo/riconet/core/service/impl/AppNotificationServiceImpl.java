@@ -492,11 +492,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   private void sendNotification(JSONObject notificationPayload, Long userId, ApplicationId appId) {
-    if (ApplicationId.retail_app.equals(appId))
-      log.debug(
-          "################################################the notification payload is {} and user id is {}",
-          notificationPayload,
-          userId);
     if (userId == null) {
       log.warn("Cannot send notification if userId is null");
       return;

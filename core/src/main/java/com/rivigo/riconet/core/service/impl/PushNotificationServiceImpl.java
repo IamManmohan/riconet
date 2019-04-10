@@ -91,7 +91,6 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
     ResponseEntity<JSONObject> response =
         restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
-    log.debug("%%%%%%%%%%%%%%%%%% the response of the api call is {}", response);
     log.info("Response is {}", jsonObject);
   }
 }
