@@ -14,4 +14,14 @@ public interface AppNotificationService {
   void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO);
 
   void sendIBClearEvent(NotificationDTO notificationDTO);
+
+  void sendPickUpAssignmentEvent(NotificationDTO notificationDTO);
+
+  void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
+
+  void sendCnLoadedEvent(NotificationDTO notificationDTO);
+
+  void sendCnDrsDispatchEvent(NotificationDTO notificationDTO);
+
+  void sendCnDeliveredNotification(NotificationDTO notificationDTO);
 }
