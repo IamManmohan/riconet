@@ -41,4 +41,6 @@ public interface ConsignmentService {
       NotificationDTO notificationDTO, ConsignmentBasicDTO consignmentBasicDTO);
 
   Long getOrganizationIdFromCnId(Long cnId);
+
+  void validateAndCreateRTOForwardTask(NotificationDTO notificationDTO);
 }

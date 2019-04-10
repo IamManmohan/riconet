@@ -167,4 +167,19 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     }
     return null;
   }
+
+  @Override
+  public void validateAndCreateRTOForwardTask(NotificationDTO notificationDTO) {
+    log.debug("RTO Forward task request for {}", notificationDTO);
+    Map<String, String> hmap = notificationDTO.getMetadata();
+    String userLocationCode = hmap.get("ASSIGNEE_LOCATION_CODE");
+    String userEmailId = hmap.get("ASSIGNEE_EMAIL_ID");
+    String cnote = hmap.get("TICKET_ENTITY_ID");
+
+    if (userLocationCode == null || userEmailId == null || cnote == null) {
+      log.debug(
+          "Necessary data not found to trigger RTO Forward Task Creation with data {}",
+          notificationDTO);
+    }
+  }
 }
