@@ -33,10 +33,44 @@ public enum ZoomCommunicationFieldNames {
   ACTION_VALUE,
 
   STALE_CATEGORY,
-  TYPE_ID;
+  TYPE_ID,
+
+  PICKUP_CREATED_BY_USER_ID,
+  PICKUP_CAPTAIN_NAME,
+  PICKUP_CAPTAIN_CONTACT_NUMBER,
+
+  CNOTE_TYPE,
+  CONSIGNOR_USER_ID,
+  CONSIGNEE_USER_ID,
+
+  NAME, // tpm partner name
+  MOBILE_NO, // tpm partner mobile number
+
+  ONLINE_PAYMENT_LINK;
+
+  public enum Consignment {
+    DELIVERY_DATE_TIME
+  }
+
+  public enum CpbSummary {
+    PROMISED_DELIVERY_DATE_TIME,
+    SCHEDULED_TIME,
+    IS_ASSUMED_DST_PC
+  }
 
   public enum Reason {
     REASON,
     SUB_REASON
+  }
+
+  public enum ConsignmentSchedule {
+    DEPARTURE_CUTOFF_TIME,
+    ARRIVAL_CUTOFF_TIME,
+    ARRIVAL_TIME,
+    DEPARTURE_TIME
+  }
+
+  public enum Pickup {
+    PICKUP_ID
   }
 }
