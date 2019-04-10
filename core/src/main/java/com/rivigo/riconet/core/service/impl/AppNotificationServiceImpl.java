@@ -48,7 +48,6 @@ import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import com.rivigo.zoom.common.repository.mysql.OATaskAssignmentRepository;
-import com.rivigo.zoom.common.repository.mysql.retail_app.CnDelayNotificationRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -75,8 +74,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private OATaskAssignmentRepository oaTaskAssignmentRepository;
-
-  @Autowired private CnDelayNotificationRepository cnDelayNotificationRepository;
 
   @Override
   public void sendUnloadingInLoadingNotification(NotificationDTO notificationDTO) {
