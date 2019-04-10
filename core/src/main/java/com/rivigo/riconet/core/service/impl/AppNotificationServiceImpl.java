@@ -232,8 +232,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject notificationBodyAndTitle = new JSONObject();
     StringBuilder sb = new StringBuilder();
     sb.append("Your pickup partner has been assigned! ");
-    // delivery truck emoji
-    sb.append(Character.toChars(128666));
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
     notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE);
 
@@ -296,8 +294,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     StringBuilder sb = new StringBuilder();
     sb.append("Knock, knock! We have reached your location for pickup ");
-    // man in business suit levitating emoji
-    sb.append(Character.toChars(128666));
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
     notificationBodyAndTitle.put(
         NOTIFICATION_TITLE_KEY, PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE);
@@ -338,11 +334,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sb.append("Your shipment ");
     sb.append(cnote);
     sb.append(" has been dispatched! ");
-    // delivery truck emoji
-    sb.append(Character.toChars(128666));
-    // dash emoji
-    sb.append(Character.toChars(128168));
-
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
     notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_LOADED_NOTIFICATION_TITLE_VALUE);
 
@@ -414,8 +405,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sb.append(" is out for delivery! ");
     if (isToPay && onlinePaymentLink != null) {
       sb.append("Make your payment now ");
-      // money with wings emoji
-      sb.append(Character.toChars(128184));
     }
 
     JSONObject notificationBodyAndTitle = new JSONObject();
@@ -473,8 +462,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     } else {
       data.put(IS_CN_DELIVERY_DELAYED, "FALSE");
       sb.append(" on time");
-      // flexed bicep emoji
-      sb.append(Character.toChars(128170));
       data.put(NOTIFICATION_IDENTIFIER_KEY, "DELIVERED");
     }
 
