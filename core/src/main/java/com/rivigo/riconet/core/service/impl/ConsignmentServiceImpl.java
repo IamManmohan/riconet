@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.OrganizationService;
+import com.rivigo.riconet.core.service.WMSService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
@@ -46,6 +47,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private WMSService wmsService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
@@ -181,5 +184,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
           "Necessary data not found to trigger RTO Forward Task Creation with data {}",
           notificationDTO);
     }
+    wmsService.createRTOForwardTask(cnote, userEmailId, userLocationCode);
   }
 }
