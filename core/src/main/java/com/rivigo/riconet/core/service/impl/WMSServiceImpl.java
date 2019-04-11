@@ -40,7 +40,7 @@ public class WMSServiceImpl implements WMSService {
             .taskEntityMap(hmap)
             .build();
 
-    String url = UrlConstant.ZOOM_BACKEND_CLIENT_SERVICE;
+    String url = UrlConstant.WMS_SERVICE_TASK_CREATION;
 
     try {
       JsonNode responseJson =
