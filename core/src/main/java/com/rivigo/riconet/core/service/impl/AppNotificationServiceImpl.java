@@ -134,11 +134,12 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    Location locationByCode = locationService.getLocationByCode(ouCode);
-    List<DeviceAppVersionMapper> deviceAppVersionMapperList =
-        deviceAppVersionMapperRepository.findByAppIdAndLocationId(
-            ApplicationId.scan_app.name(), locationByCode.getId());
-    sendNotification(pushObject, deviceAppVersionMapperList, ApplicationId.scan_app);
+    // TODO: Uncomment me
+    //    Location locationByCode = locationService.getLocationByCode(ouCode);
+    //    List<DeviceAppVersionMapper> deviceAppVersionMapperList =
+    //        deviceAppVersionMapperRepository.findByAppIdAndLocationId(
+    //            ApplicationId.scan_app.name(), locationByCode.getId());
+    //    sendNotification(pushObject, deviceAppVersionMapperList, ApplicationId.scan_app);
   }
 
   @Override
