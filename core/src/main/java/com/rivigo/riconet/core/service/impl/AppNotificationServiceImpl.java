@@ -22,6 +22,9 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
@@ -228,7 +231,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     JSONObject notificationBodyAndTitle = new JSONObject();
     StringBuilder sb = new StringBuilder();
-    sb.append("Your pickup partner has been assigned! ");
+    sb.append("Your pickup partner has been assigned!");
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
     notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE);
 
@@ -299,6 +302,26 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
         pickUpCreatorUserId,
         ApplicationId.retail_app);
+  }
+
+  @Override
+  public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
+    Long pickUpCreatorUserId =
+            getFieldAsLongFromNotificationDto(
+                    notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
+    pushObject.put(DATA, data);
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
+    notificationBodyAndTitle.put(
+            NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
+    sendNotification(
+            getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+            pickUpCreatorUserId,
+            ApplicationId.retail_app);
   }
 
   @Override

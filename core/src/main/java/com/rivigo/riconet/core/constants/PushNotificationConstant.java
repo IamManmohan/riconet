@@ -47,6 +47,12 @@ public class PushNotificationConstant {
   public static final String PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE = "Partner assigned";
   public static final String PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE =
       "Partner reached";
+
+  public static final String PICKUP_CANCELLATION_IDENTIFIER_VALUE =
+          "PICKUP_CANCELLATION";
+  public static final String PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE = "Request cancelled";
+  public static final String PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE = "We are sorry we could not cater to your pickup request. We hope to serve you again soon.";
+
   public static final String CN_LOADED_NOTIFICATION_TITLE_VALUE = "Dispatched";
   public static final String CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE = "Out for delivery! ";
   public static final String CN_DELIVERED_NOTIFICATION_TITLE_VALUE = "Delivered";
