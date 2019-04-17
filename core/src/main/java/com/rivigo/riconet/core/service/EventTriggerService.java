@@ -82,8 +82,8 @@ public class EventTriggerService {
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
         break;
-      case CN_LOADED:
-        appNotificationService.sendCnLoadedEvent(notificationDTO);
+      case CN_DISPATCHED:
+        appNotificationService.sendCnDispatchedEvent(notificationDTO);
         break;
       case CN_DRS_DISPATCH:
         appNotificationService.sendCnDrsDispatchEvent(notificationDTO);

@@ -302,7 +302,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   @Override
-  public void sendCnLoadedEvent(NotificationDTO notificationDTO) {
+  public void sendCnDispatchedEvent(NotificationDTO notificationDTO) {
 
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
