@@ -231,7 +231,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     JSONObject notificationBodyAndTitle = new JSONObject();
     StringBuilder sb = new StringBuilder();
-    sb.append("Your pickup partner has been assigned!");
+    sb.append("Your pickup partner has been assigned! ");
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
     notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE);
 
