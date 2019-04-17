@@ -527,7 +527,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
           Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
               .map(Long::valueOf)
               .collect(Collectors.toList());
-      log.info("Staging server. sending notification to user {}", userId);
+      log.info("Staging server. sending notification to user {} and app {}", userId, appId);
       userIdList.add(userId);
       deviceAppVersionMappers =
           deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId);
