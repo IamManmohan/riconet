@@ -318,6 +318,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
     notificationBodyAndTitle.put(
             NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
+    log.info("Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
     sendNotification(
             getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
             pickUpCreatorUserId,
