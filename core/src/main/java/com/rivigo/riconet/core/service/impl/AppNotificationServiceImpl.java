@@ -3,8 +3,8 @@ package com.rivigo.riconet.core.service.impl;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DELIVERED_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_LOADED_IDENTIFIER_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_LOADED_NOTIFICATION_TITLE_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_FIRST_DISPATCH_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_FIRST_DISPATCH_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
@@ -302,7 +302,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   @Override
-  public void sendCnDispatchedEvent(NotificationDTO notificationDTO) {
+  public void sendCnFirstDispatchNotification(NotificationDTO notificationDTO) {
 
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -323,7 +323,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(CNOTE, cnote);
-    data.put(NOTIFICATION_IDENTIFIER_KEY, CN_LOADED_IDENTIFIER_VALUE);
+    data.put(NOTIFICATION_IDENTIFIER_KEY, CN_FIRST_DISPATCH_IDENTIFIER_VALUE);
 
     JSONObject notificationBodyAndTitle = new JSONObject();
 
@@ -332,7 +332,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sb.append(cnote);
     sb.append(" has been dispatched! ");
     notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_LOADED_NOTIFICATION_TITLE_VALUE);
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_FIRST_DISPATCH_NOTIFICATION_TITLE_VALUE);
 
     pushObject.put(DATA, data);
 
