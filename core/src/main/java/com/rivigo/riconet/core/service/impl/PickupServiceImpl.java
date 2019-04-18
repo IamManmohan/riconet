@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoombook.ZoomBookBfPickupChargesRemarksDTO;
+import com.rivigo.riconet.core.enums.BfPickupChargesEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
@@ -404,7 +405,7 @@ public class PickupServiceImpl implements PickupService {
         metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()),
         metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()),
         notificationDTO.getEntityId());
-    switch (notificationDTO.getEventName()) {
+    switch (BfPickupChargesEventName.valueOf(notificationDTO.getEventName())) {
       case CN_COMPLETION_ALL_INSTANCES:
       case CN_DELETED:
         if (StringUtils.isBlank(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()))
@@ -440,7 +441,7 @@ public class PickupServiceImpl implements PickupService {
         deductPickupCharges(pickup, client.getOrganizationId());
         break;
       default:
-        log.error(
+        log.warn(
             "Unhandled event {} occured in deductPickupCharges", notificationDTO.getEventName());
     }
   }

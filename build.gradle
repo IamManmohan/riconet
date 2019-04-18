@@ -14,6 +14,7 @@ allprojects {
     group 'com.riCoNet'
     version '1.0-SNAPSHOT'
     apply plugin: 'java'
+    apply plugin: 'com.diffplug.gradle.spotless'
     sourceCompatibility = 1.8
     repositories {
         mavenLocal()
@@ -36,6 +37,8 @@ allprojects {
             html.destination "${buildDir}/jacocoHtml"
         }
     }
+
+    processResources.dependsOn('spotlessApply')
 
     task copyToLib(type: Copy) {
         into "$buildDir/libs"

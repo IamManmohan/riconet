@@ -9,6 +9,7 @@ import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
+import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
@@ -36,6 +37,8 @@ public class EventMain {
 
   private final CnActionConsumer cnActionConsumer;
 
+  private final WmsEventConsumer wmsEventConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -43,12 +46,14 @@ public class EventMain {
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
       FinanceEventsConsumer financeEventsConsumer,
-      CnActionConsumer cnActionConsumer) {
+      CnActionConsumer cnActionConsumer,
+      WmsEventConsumer wmsEventConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
+    this.wmsEventConsumer = wmsEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -97,13 +102,21 @@ public class EventMain {
             .withGroupId(bfPickupChargesGroupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
+    String wmsEventConsumerGroupId = config.getString("wmsEventConsumer.group.id");
+    final ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(wmsEventConsumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+
     consumer.load(
         materializer,
         zoomEventTriggerConsumerSettings,
         cnActionConsumerSettings,
         consignmentBlockerConsumerSettings,
         financeEventsConsumerSettings,
-        bfPickupChargesConsumerSettings);
+        bfPickupChargesConsumerSettings,
+        wmsEventConsumerGroupIdSettings);
   }
 
   private void load(
@@ -112,7 +125,8 @@ public class EventMain {
       ConsumerSettings<String, String> cnActionConsumerSettings,
       ConsumerSettings<String, String> consignmentBlockerConsumerSettings,
       ConsumerSettings<String, String> financeEventsConsumerSettings,
-      ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings) {
+      ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings,
+      ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings) {
     log.info(
         "Loading zoom event trigger consumer with settings {}",
         zoomEventTriggerConsumerSettings.toString());
@@ -133,5 +147,8 @@ public class EventMain {
         "Loading bfPickup event consumer with settings {}",
         bfPickupChargesActionConsumerSettings.toString());
     bfPickupChargesActionConsumer.load(materializer, bfPickupChargesActionConsumerSettings);
+    log.info(
+        "Loading wms event consumer with settings {}", wmsEventConsumerGroupIdSettings.toString());
+    wmsEventConsumer.load(materializer, wmsEventConsumerGroupIdSettings);
   }
 }

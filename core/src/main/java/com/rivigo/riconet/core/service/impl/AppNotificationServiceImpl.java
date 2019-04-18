@@ -39,7 +39,7 @@ import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TaskDto;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -107,7 +107,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, EventName.TASK_UPSERT.name());
+    data.put(NOTIFICATION_TYPE, WmsEventName.TASK_UPSERT.name());
     data.put(TASK_ID, taskId);
     data.put(PARENT_TASK_ID, parentTaskId);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
@@ -128,7 +128,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, EventName.SHOP_FLOOR_STATUS_UPDATE.name());
+    data.put(NOTIFICATION_TYPE, WmsEventName.SHOP_FLOOR_STATUS_UPDATE.name());
     data.put(OU_CODE, ouCode);
     data.put(SHOP_FLOOR_ENABLED, shopFloorEnabled);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
