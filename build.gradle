@@ -67,11 +67,12 @@ subprojects {
             exclude module: 'slf4j-log4j12'
             exclude module: 'jackson-databind'
             exclude module: 'cms-external-api'
+            exclude module: 'rivigo-finance-external-api'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
 
-        compile("com.rivigo:rivigo-finance-external-api:0.0.7") {
+        compile("com.rivigo:rivigo-finance-external-api:0.0.11-SNAPSHOT") {
             exclude module: 'cms-external-api'
         }
 

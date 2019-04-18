@@ -327,11 +327,18 @@ public class QcServiceImpl implements QcService {
     fillClientMetadata(completionData, consignment);
     boolean reCheckQcNeeded = check(completionData, consignment);
     boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
+    boolean isRTOCN = completionData.getIsRTOCnote();
     log.info(
-        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {}",
+        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {} isRTOCN: {}",
         consignment.getCnote(),
         reCheckQcNeeded,
-        measurementQcNeeded);
+        measurementQcNeeded,
+        isRTOCN);
+
+    if (isRTOCN) {
+      log.debug("QC ticket is not required for rto cnote: {}", completionData.getCnote());
+      return;
+    }
     if (!measurementQcNeeded && !reCheckQcNeeded) {
       return;
     }

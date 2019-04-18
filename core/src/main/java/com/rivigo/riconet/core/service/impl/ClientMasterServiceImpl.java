@@ -141,6 +141,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setCbm(dto.getCbm());
     clientDTO.setInsuranceReqd(dto.getInsuranceRequired());
     clientDTO.setFodApplicable(dto.getFodApplicable());
+    clientDTO.setRtoApplicable(dto.getRtoApplicable());
     if (!CollectionUtils.isEmpty(dto.getNotificationToList())) {
       clientDTO.setNotificationToList(dto.getNotificationToList());
     } else {

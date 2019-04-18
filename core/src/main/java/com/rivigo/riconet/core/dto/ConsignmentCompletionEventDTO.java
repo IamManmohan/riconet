@@ -17,6 +17,7 @@ public class ConsignmentCompletionEventDTO {
 
   private String cnote;
   private Long consignmentId;
+  private Boolean isRTOCnote;
   private ClientPincodeMetadataDTO clientPincodeMetadataDTO;
   private UserClusterMetadataDTO userClusterMetadataDTO;
 }
