@@ -204,6 +204,10 @@ public class EventTriggerService {
       NotificationDTO notificationDTO) {
     return ConsignmentCompletionEventDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
+        .isRTOCnote(
+            notificationDTO
+                .getMetadata()
+                .containsKey(ZoomCommunicationFieldNames.FORWARD_CONSIGNMENT_ID.name()))
         .consignmentId(
             Long.parseLong(
                 notificationDTO

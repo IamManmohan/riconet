@@ -33,6 +33,7 @@ public enum ZoomCommunicationFieldNames {
   ACTION_VALUE,
 
   STALE_CATEGORY,
+  FORWARD_CONSIGNMENT_ID,
   TYPE_ID;
 
   public enum Reason {
