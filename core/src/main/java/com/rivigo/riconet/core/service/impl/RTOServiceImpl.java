@@ -50,17 +50,10 @@ public class RTOServiceImpl implements RTOService {
       Map<String, String> metadata = notificationDTO.getMetadata();
       String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
       String locationId = metadata.get(ZoomCommunicationFieldNames.LOCATION_ID.name());
-      String ticketTypeId = metadata.get(ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name());
 
-      if (cnote == null
-          || locationId == null
-          || ticketTypeId == null
-          || !ZoomTicketingConstant.RTO_TICKET_TYPE_ID.equals(Long.valueOf(ticketTypeId))) {
+      if (cnote == null || locationId == null) {
         log.debug(
-            "Insufficient data cnote {} locationId {} ticketTypeId {} for rtoReAssignment",
-            cnote,
-            locationId,
-            ticketTypeId);
+            "Insufficient data cnote {} locationId {} for rtoReAssignment", cnote, locationId);
         return;
       }
 
