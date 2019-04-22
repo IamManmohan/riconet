@@ -36,6 +36,8 @@ public class EventTriggerService {
 
   @Autowired private DatastoreService datastoreService;
 
+  @Autowired private RTOService rtoService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = notificationDTO.getEventName();
     String entityId;
@@ -81,6 +83,7 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
+        rtoService.reassignRTOTicketIfExists(notificationDTO);
         break;
       case CN_LOADED:
         appNotificationService.sendCnLoadedEvent(notificationDTO);
@@ -158,7 +161,7 @@ public class EventTriggerService {
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case RTO_TICKET_ASSIGNEE_CHANGE:
-        consignmentService.validateAndCreateRTOForwardTask(notificationDTO);
+        rtoService.validateAndCreateRTOForwardTask(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:

@@ -19,6 +19,8 @@ public class ZoomTicketingConstant {
 
   public static final String QC_GROUP_NAME = "QC";
 
+  public static final String RTO_GROUP_NAME = "Zoom-RTO";
+
   public static final String QC_ACTION_NAME = "qc";
 
   public static final String WRITE_OFF_ACTION_NAME = "write_off";
@@ -68,4 +70,6 @@ public class ZoomTicketingConstant {
 
   public static final String TICKET_QC_BLOCKER_FAILURE_COMMENT =
       "Ticket action failed because of %s . Reopened now. Please take appropriate action and try again";
+
+  public static final Long RTO_TICKET_TYPE_ID = 711L;
 }
