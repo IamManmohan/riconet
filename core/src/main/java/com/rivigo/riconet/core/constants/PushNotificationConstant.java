@@ -36,6 +36,8 @@ public class PushNotificationConstant {
   public static final String NOTIFICATION_BODY_KEY = "body";
   public static final String NOTIFICATION_TITLE_KEY = "title";
   // identifiers
+  public static final String CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE = "Dispatched";
+  public static final String CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE = "DISPATCHED";
   public static final String PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE = "PICKUP_ASSIGNED";
   public static final String PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE =
       "PICKUP_REACHED_AT_CLIENT_WAREHOUSE";
@@ -48,6 +50,4 @@ public class PushNotificationConstant {
       "Partner reached";
   public static final String CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE = "Out for delivery! ";
   public static final String CN_DELIVERED_NOTIFICATION_TITLE_VALUE = "Delivered";
-  public static final String CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE = "Dispatched";
-  public static final String CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE = "DISPATCHED";
 }
