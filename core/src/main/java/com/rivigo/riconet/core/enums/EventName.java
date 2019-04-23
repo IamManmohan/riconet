@@ -38,5 +38,4 @@ public enum EventName {
 
   /** Datastore address cleanup * */
   CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP,
-
 }

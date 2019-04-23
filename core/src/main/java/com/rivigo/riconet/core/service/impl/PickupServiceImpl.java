@@ -118,23 +118,26 @@ public class PickupServiceImpl implements PickupService {
                 .collect(Collectors.toList()));
     String locationCodes =
         zoomPropertyService.getString(ZoomPropertyName.PICKUP_NOTIFICATION_ALLOWED_LOCATIONS);
-    pickupNotificationDTOList.forEach(
-        pickupNotificationDTO -> {
-          PickupNotification pickupNotification =
-              getPickupNotification(
-                  pickupMap.get(pickupNotificationDTO.getId()),
-                  pickupNotificationDTO.getLastUpdatedAt(),
-                  pickupNotificationDTO.getNotificationType());
-          if (pickupNotification == null) {
-            return;
-          }
+    pickupNotificationDTOList
+        .stream()
+        .filter(pickupNotificationDTO -> pickupMap.containsKey(pickupNotificationDTO.getId()))
+        .forEach(
+            pickupNotificationDTO -> {
+              PickupNotification pickupNotification =
+                  getPickupNotification(
+                      pickupMap.get(pickupNotificationDTO.getId()),
+                      pickupNotificationDTO.getLastUpdatedAt(),
+                      pickupNotificationDTO.getNotificationType());
+              if (pickupNotification == null) {
+                return;
+              }
 
-          if (locationCodes == null
-              || locationCodes.contains(pickupNotification.getLocationCode())) {
-            sendSms(pickupNotification, getSmsTemplate(pickupNotification));
-          }
-          pickupNotificationRepository.save(pickupNotification);
-        });
+              if (locationCodes == null
+                  || locationCodes.contains(pickupNotification.getLocationCode())) {
+                sendSms(pickupNotification, getSmsTemplate(pickupNotification));
+              }
+              pickupNotificationRepository.save(pickupNotification);
+            });
   }
 
   private void processDelayedPickups(Long lastExecutedAt) {
