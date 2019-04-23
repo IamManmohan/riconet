@@ -39,7 +39,6 @@ public class PushNotificationConstant {
   public static final String PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE = "PICKUP_ASSIGNED";
   public static final String PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE =
       "PICKUP_REACHED_AT_CLIENT_WAREHOUSE";
-  public static final String CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE = "DISPATCHED";
   public static final String TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE =
       "OUT_FOR_DELIVERY_TO_PAY";
   public static final String PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE = "OUT_FOR_DELIVERY_PAID";
@@ -47,7 +46,8 @@ public class PushNotificationConstant {
   public static final String PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE = "Partner assigned";
   public static final String PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE =
       "Partner reached";
-  public static final String CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE = "Dispatched";
   public static final String CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE = "Out for delivery! ";
   public static final String CN_DELIVERED_NOTIFICATION_TITLE_VALUE = "Delivered";
+  public static final String CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE = "Dispatched";
+  public static final String CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE = "DISPATCHED";
 }
