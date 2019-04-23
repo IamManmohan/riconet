@@ -305,29 +305,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   }
 
   @Override
-  public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
-    Long pickUpCreatorUserId =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
-    JSONObject pushObject = new JSONObject();
-    JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
-    pushObject.put(DATA, data);
-    JSONObject notificationBodyAndTitle = new JSONObject();
-    notificationBodyAndTitle.put(
-        NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
-    notificationBodyAndTitle.put(
-        NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
-    log.info(
-        "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
-    sendNotification(
-        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
-        pickUpCreatorUserId,
-        ApplicationId.retail_app);
-  }
-
-  @Override
   public void sendCnLoadedEvent(NotificationDTO notificationDTO) {
 
     JSONObject pushObject = new JSONObject();
@@ -500,6 +477,29 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
         consignorUserId,
+        ApplicationId.retail_app);
+  }
+
+  @Override
+  public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
+    Long pickUpCreatorUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
+    pushObject.put(DATA, data);
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put(
+        NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
+    notificationBodyAndTitle.put(
+        NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
+    log.info(
+        "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        pickUpCreatorUserId,
         ApplicationId.retail_app);
   }
 
