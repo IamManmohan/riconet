@@ -103,7 +103,8 @@ public class AppNotificationServiceTest {
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(deviceAppVersionMapperRepository.findByUserIdIn(Mockito.any()))
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     Mockito.when(
@@ -121,10 +122,11 @@ public class AppNotificationServiceTest {
                 .taskType(TaskType.LOADING)
                 .tripType(ZoomTripType.TRIP)
                 .isActive(Boolean.TRUE)
+                .userId(1L)
                 .build());
     appNotificationService.sendIBClearEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
-        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(),Mockito.any());
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
   }
 
   private ConsignmentScheduleCache getDummyConsignmentScheduleCache() {
