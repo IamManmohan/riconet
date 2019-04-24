@@ -31,6 +31,7 @@ public enum ZoomCommunicationFieldNames {
   TASK_TYPE,
   ACTION_NAME,
   ACTION_VALUE,
+  FIRST_RIVIGO_OU,
 
   STALE_CATEGORY,
   TYPE_ID,
