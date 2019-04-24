@@ -107,7 +107,7 @@ public class EventMain {
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-    log.info("Loading zoom event trigger consumer with settings {}", consumerSettings.toString());
+    log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }
 }
