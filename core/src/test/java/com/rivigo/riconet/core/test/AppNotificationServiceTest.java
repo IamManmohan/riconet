@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
+import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.enums.ZoomTripType;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,8 +61,11 @@ public class AppNotificationServiceTest {
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
-    Mockito.when(userMasterService.getById(Mockito.anyLong())).thenReturn(new User());
-    Mockito.when(userMasterService.getByEmail(Mockito.anyString())).thenReturn(new User());
+    User user = new User();
+    user.setId(1L);
+    user.setEmail(RandomStringUtils.randomAlphanumeric(10));
+    Mockito.when(userMasterService.getById(Mockito.anyLong())).thenReturn(user);
+    Mockito.when(userMasterService.getByEmail(Mockito.anyString())).thenReturn(user);
     Mockito.when(locationService.getLocationById(Mockito.anyLong())).thenReturn(getDummyLocation());
   }
 
@@ -111,10 +116,13 @@ public class AppNotificationServiceTest {
     metadata.put(ZoomCommunicationFieldNames.LOCATION_ID.name(), "1");
     notificationDTO.setMetadata(metadata);
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(deviceAppVersionMapperRepository.findByUserIdIn(Mockito.any()))
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(
+                Mockito.any(), Mockito.any(ApplicationId.class)))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     Mockito.when(
@@ -128,7 +136,11 @@ public class AppNotificationServiceTest {
         .thenReturn(Optional.of(TaskDto.builder().id(1L).taskType(TaskType.LOADING).build()));
     appNotificationService.sendIBClearEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
-        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+        .send(
+            Mockito.any(),
+            Mockito.anyString(),
+            Mockito.anyString(),
+            Mockito.any(ApplicationId.class));
   }
 
   private ConsignmentScheduleCache getDummyConsignmentScheduleCache() {
