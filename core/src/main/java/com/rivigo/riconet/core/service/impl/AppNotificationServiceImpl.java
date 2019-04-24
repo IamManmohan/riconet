@@ -64,6 +64,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -88,6 +89,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
   @Autowired private LocationService locationService;
 
   @Autowired private UserMasterService userMasterService;
+
+  @Value("${zoom.wms.url}")
+  private String zoomWmsUrl;
 
   @Override
   public void sendTaskUpsertNotification(NotificationDTO notificationDTO) {
@@ -216,7 +220,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               HttpEntity<?> entity = new HttpEntity<>(restClientUtilityService.getHeaders());
               return restClientUtilityService.executeRest(
                   restClientUtilityService.buildUrlWithParams(
-                      UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
+                      zoomWmsUrl + UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
                       ImmutableMap.of(
                           "tripId",
                           String.valueOf(cache.getTripId()),
