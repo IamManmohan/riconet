@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DELAYED_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DELIVERED_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_LOADED_IDENTIFIER_VALUE;
@@ -536,6 +537,53 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_DELIVERED_NOTIFICATION_TITLE_VALUE);
 
     pushObject.put(DATA, data);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consigneeUserId,
+        ApplicationId.retail_app);
+    sendNotification(
+        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        consignorUserId,
+        ApplicationId.retail_app);
+  }
+
+  @Override
+  public void sendCnDelayedNotification(NotificationDTO notificationDTO) {
+    JSONObject pushObject = new JSONObject();
+    JSONObject data = new JSONObject();
+
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    if (cnote == null) {
+      log.warn("Cannot send notification when cnote is null");
+      return;
+    }
+
+    Long consignorUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
+
+    Long consigneeUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
+
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    data.put(CNOTE, cnote);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("We're sorry your shipment ");
+    sb.append(cnote);
+    sb.append(
+        " is late. We're working to get it delivered soon and will let you know once it is out for delivery.");
+
+    data.put(NOTIFICATION_IDENTIFIER_KEY, "CN_DELAYED");
+
+    JSONObject notificationBodyAndTitle = new JSONObject();
+    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_DELAYED_NOTIFICATION_TITLE_VALUE);
+
+    pushObject.put(DATA, data);
+
+    log.info("CN DELAYED: {}", pushObject.toString());
     sendNotification(
         getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
         consigneeUserId,

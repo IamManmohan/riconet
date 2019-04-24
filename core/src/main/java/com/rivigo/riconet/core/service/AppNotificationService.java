@@ -26,4 +26,6 @@ public interface AppNotificationService {
   void sendCnDrsDispatchEvent(NotificationDTO notificationDTO);
 
   void sendCnDeliveredNotification(NotificationDTO notificationDTO);
+
+  void sendCnDelayedNotification(NotificationDTO notificationDTO);
 }

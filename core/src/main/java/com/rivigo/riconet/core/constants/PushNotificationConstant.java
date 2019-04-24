@@ -52,4 +52,5 @@ public class PushNotificationConstant {
   public static final String CN_LOADED_NOTIFICATION_TITLE_VALUE = "Dispatched";
   public static final String CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE = "Out for delivery! ";
   public static final String CN_DELIVERED_NOTIFICATION_TITLE_VALUE = "Delivered";
+  public static final String CN_DELAYED_NOTIFICATION_TITLE_VALUE = "Consignment Delayed";
 }
