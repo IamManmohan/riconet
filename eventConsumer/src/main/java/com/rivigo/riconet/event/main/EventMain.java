@@ -9,6 +9,7 @@ import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
+import com.rivigo.riconet.event.consumer.KairosRetailAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
@@ -39,6 +40,8 @@ public class EventMain {
 
   private final WmsEventConsumer wmsEventConsumer;
 
+  private final KairosRetailAppEventConsumer kairosRetailAppEventConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -47,13 +50,15 @@ public class EventMain {
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
-      WmsEventConsumer wmsEventConsumer) {
+      WmsEventConsumer wmsEventConsumer,
+      KairosRetailAppEventConsumer kairosRetailAppEventConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
+    this.kairosRetailAppEventConsumer = kairosRetailAppEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -109,6 +114,14 @@ public class EventMain {
             .withGroupId(wmsEventConsumerGroupId)
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
 
+    String kairosRetailAppEventConsumerGroupId =
+        config.getString("kairosRetailAppEventConsumer.group.id");
+    final ConsumerSettings<String, String> kairosRetailAppEventConsumerGroupIdSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(kairosRetailAppEventConsumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+
     consumer.load(
         materializer,
         zoomEventTriggerConsumerSettings,
@@ -116,7 +129,8 @@ public class EventMain {
         consignmentBlockerConsumerSettings,
         financeEventsConsumerSettings,
         bfPickupChargesConsumerSettings,
-        wmsEventConsumerGroupIdSettings);
+        wmsEventConsumerGroupIdSettings,
+        kairosRetailAppEventConsumerGroupIdSettings);
   }
 
   private void load(
@@ -126,7 +140,8 @@ public class EventMain {
       ConsumerSettings<String, String> consignmentBlockerConsumerSettings,
       ConsumerSettings<String, String> financeEventsConsumerSettings,
       ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings,
-      ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings) {
+      ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings,
+      ConsumerSettings<String, String> kairosRetailAppEventConsumerGroupIdSettings) {
     log.info(
         "Loading zoom event trigger consumer with settings {}",
         zoomEventTriggerConsumerSettings.toString());
@@ -150,5 +165,9 @@ public class EventMain {
     log.info(
         "Loading wms event consumer with settings {}", wmsEventConsumerGroupIdSettings.toString());
     wmsEventConsumer.load(materializer, wmsEventConsumerGroupIdSettings);
+    log.info(
+        "Loading kairos retail app event consumer with settings {}",
+        kairosRetailAppEventConsumerGroupIdSettings.toString());
+    kairosRetailAppEventConsumer.load(materializer, kairosRetailAppEventConsumerGroupIdSettings);
   }
 }
