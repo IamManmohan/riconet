@@ -14,10 +14,11 @@ import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
@@ -41,27 +42,6 @@ public class EventMain {
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
-  @Value("${bootstrap.servers}")
-  private String bootstrapServers;
-
-  @Value("${zoomEventTriggerConsumer.group.id}")
-  private String zoomEventTriggerConsumerGroupId;
-
-  @Value("${cnActionConsumer.group.id}")
-  private String cnActionConsumerGroupId;
-
-  @Value("${consignmentblocker.group.id}")
-  private String consignmentBlockerGroupId;
-
-  @Value("${financeEventsConsumer.group.id}")
-  private String financeEventsConsumerGroupId;
-
-  @Value("${bfPickupCharges.group.id}")
-  private String bfPickupChargesActionConsumerGroupId;
-
-  @Value("${wmsEventConsumer.group.id}")
-  private String wmsEventConsumerGroupId;
-
   public EventMain(
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
@@ -84,22 +64,55 @@ public class EventMain {
             ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
-    eventMain.initialize(materializer, system);
+    Config config = ConfigFactory.load();
+    eventMain.initialize(materializer, system, config);
   }
 
-  private void initialize(ActorMaterializer materializer, ActorSystem system) {
+  private void initialize(ActorMaterializer materializer, ActorSystem system, Config config) {
+    String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
-    load(materializer, system, zoomEventTriggerConsumerGroupId, zoomEventTriggerConsumer);
-    load(materializer, system, cnActionConsumerGroupId, cnActionConsumer);
-    load(materializer, system, consignmentBlockerGroupId, consignmentBlockUnblockConsumer);
-    load(materializer, system, financeEventsConsumerGroupId, financeEventsConsumer);
-    load(materializer, system, bfPickupChargesActionConsumerGroupId, bfPickupChargesActionConsumer);
-    load(materializer, system, wmsEventConsumerGroupId, wmsEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("zoomEventTriggerConsumer.group.id"),
+        zoomEventTriggerConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("cnActionConsumer.group.id"),
+        cnActionConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("consignmentblocker.group.id"),
+        consignmentBlockUnblockConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("financeEventsConsumer.group.id"),
+        financeEventsConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("bfPickupCharges.group.id"),
+        bfPickupChargesActionConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("wmsEventConsumer.group.id"),
+        wmsEventConsumer);
   }
 
   private void load(
       ActorMaterializer materializer,
       ActorSystem system,
+      String bootstrapServers,
       String consumerGroupId,
       ConsumerModel consumer) {
     final ConsumerSettings<String, String> consumerSettings =
