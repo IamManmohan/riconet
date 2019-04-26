@@ -110,7 +110,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
       JsonNode responseJson =
           apiClientService.getEntity(
               chequeBounceDTO,
-              HttpMethod.POST,
+              HttpMethod.PUT,
               UrlConstant.ZOOM_BACKEND_MARK_RECOVERY_PENDING,
               null,
               zoomBackendBaseUrl);
