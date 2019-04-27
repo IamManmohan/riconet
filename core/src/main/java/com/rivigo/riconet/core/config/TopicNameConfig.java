@@ -33,6 +33,12 @@ public class TopicNameConfig {
   @Value("${FINANCE_EVENT_SINK_ERROR}")
   private String financeEventSinkError;
 
+  @Value("${WMS_EVENT_SINK}")
+  private String wmsEventSink;
+
+  @Value("${WMS_EVENT_SINK_ERROR}")
+  private String wmsEventSinkError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -63,5 +69,13 @@ public class TopicNameConfig {
 
   public String financeEventSinkError() {
     return financeEventSinkError;
+  }
+
+  public String wmsEventSink() {
+    return wmsEventSink;
+  }
+
+  public String wmsEventSinkError() {
+    return wmsEventSinkError;
   }
 }

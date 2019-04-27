@@ -3,7 +3,7 @@ package com.rivigo.riconet.event.consumer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +29,8 @@ public class ConsignmentBlockUnblockConsumer extends EventConsumer {
   }
 
   @Override
-  public List<EventName> eventNamesToBeConsumed() {
-    return Arrays.asList(EventName.values());
+  public List<Enum> eventNamesToBeConsumed() {
+    return Arrays.asList(CnBlockUnblockEventName.values());
   }
 
   @Override

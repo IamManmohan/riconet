@@ -23,6 +23,7 @@ public enum ZoomCommunicationFieldNames {
   ORGANIZATION_ID,
   PICK_UP_ID,
   USER_ID,
+  USER_EMAIL,
   TASK_ID,
   FROM_LOCATION_ID,
   LAST_UPDATED_BY_ID,
@@ -46,7 +47,10 @@ public enum ZoomCommunicationFieldNames {
   NAME, // tpm partner name
   MOBILE_NO, // tpm partner mobile number
 
-  ONLINE_PAYMENT_LINK;
+  ONLINE_PAYMENT_LINK,
+
+  SHOP_FLOOR_ENABLED,
+  OU_CODE;
 
   public enum Consignment {
     DELIVERY_DATE_TIME
@@ -61,13 +65,6 @@ public enum ZoomCommunicationFieldNames {
   public enum Reason {
     REASON,
     SUB_REASON
-  }
-
-  public enum ConsignmentSchedule {
-    DEPARTURE_CUTOFF_TIME,
-    ARRIVAL_CUTOFF_TIME,
-    ARRIVAL_TIME,
-    DEPARTURE_TIME
   }
 
   public enum Pickup {

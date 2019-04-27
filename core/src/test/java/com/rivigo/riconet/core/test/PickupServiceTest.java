@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.BfPickupChargesEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
@@ -77,7 +77,7 @@ public class PickupServiceTest {
     metadata.put(ZoomCommunicationFieldNames.ORGANIZATION_ID.name(), "23");
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
+            .eventName(BfPickupChargesEventName.CN_COMPLETION_ALL_INSTANCES.name())
             .metadata(metadata)
             .build());
     verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
@@ -89,7 +89,7 @@ public class PickupServiceTest {
     metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
+            .eventName(BfPickupChargesEventName.CN_COMPLETION_ALL_INSTANCES.name())
             .metadata(metadata)
             .build());
     verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
@@ -105,7 +105,7 @@ public class PickupServiceTest {
     when(pickupRepository.findOne(any())).thenReturn(new Pickup());
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
+            .eventName(BfPickupChargesEventName.CN_COMPLETION_ALL_INSTANCES.name())
             .metadata(metadata)
             .build());
     verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
@@ -132,7 +132,7 @@ public class PickupServiceTest {
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
+            .eventName(BfPickupChargesEventName.CN_COMPLETION_ALL_INSTANCES.name())
             .metadata(metadata)
             .build());
     verify(zoomBookAPIClientService, times(0)).processZoomBookTransaction(any());
@@ -163,7 +163,10 @@ public class PickupServiceTest {
     when(zoomPropertyService.getDouble(ZoomPropertyName.BF_PICKUP_CHARGE_PER_KG, 1.3))
         .thenReturn(1.3);
     pickupService.deductPickupCharges(
-        NotificationDTO.builder().eventName(EventName.CN_DELETED).metadata(metadata).build());
+        NotificationDTO.builder()
+            .eventName(BfPickupChargesEventName.CN_DELETED.name())
+            .metadata(metadata)
+            .build());
     verify(zoomBookAPIClientService, times(1))
         .processZoomBookTransaction(transactionListCaptor.capture());
     List<ZoomBookTransactionRequestDTO> transactionList = transactionListCaptor.getValue();
@@ -212,7 +215,7 @@ public class PickupServiceTest {
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
             .entityId(23l)
-            .eventName(EventName.PICKUP_COMPLETION)
+            .eventName(BfPickupChargesEventName.PICKUP_COMPLETION.name())
             .metadata(metadata)
             .build());
     verify(zoomBookAPIClientService, times(1))
