@@ -170,6 +170,7 @@ public class TicketingServiceTest {
   @Test
   public void setPriorityMappingTest() {
     NotificationDTO notificationDTO = new NotificationDTO();
+    notificationDTO.setEventName(EventName.TICKET_ACTION.name());
     ticketingService.setPriorityMapping(notificationDTO);
 
     notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
@@ -203,9 +204,6 @@ public class TicketingServiceTest {
     ticketingService.setPriorityMapping(notificationDTO);
 
     notificationDTO.setEntityId(null);
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    notificationDTO.setEventName(null);
     ticketingService.setPriorityMapping(notificationDTO);
   }
 }

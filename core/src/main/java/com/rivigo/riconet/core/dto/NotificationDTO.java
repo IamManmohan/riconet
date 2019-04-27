@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.dto;
 
-import com.rivigo.riconet.core.enums.EventName;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import lombok.ToString;
 @ToString
 public class NotificationDTO {
 
-  private EventName eventName;
+  private String eventName;
 
   private Long entityId;
 

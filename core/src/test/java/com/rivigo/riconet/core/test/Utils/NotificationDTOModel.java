@@ -61,7 +61,7 @@ public class NotificationDTOModel {
     metadata.put(TicketingFieldName.COMMENT_TEXT.toString(), "<p>Comment text</p>");
     metadata.put(TicketingFieldName.S3URL.toString(), "http://s3.url.com");
 
-    return NotificationDTO.builder().eventName(eventName).metadata(metadata).build();
+    return NotificationDTO.builder().eventName(eventName.name()).metadata(metadata).build();
   }
 
   public static NotificationDTO getNotificationDtoForTICKET_CC_NEW_PERSON_ADDITION() {
@@ -88,7 +88,7 @@ public class NotificationDTOModel {
         "<br><p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:05:40<br><br>Ticket status has been changed from CLOSED To REOPENED<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:07:48<br><br>Ticket status has been changed from REOPENED To CLOSED.<br> Reason: kkk<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:12:45<br><br>Ticket status has been changed from CLOSED To REOPENED<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:39:30<br><br>Ticket status has been changed from REOPENED To CLOSED.<br> Reason: jjhjnm<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:42:21<br><br>Ticket status has been changed from CLOSED To REOPENED<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:54:27<br><br>Ticket got assigned to Ramesh Chandra<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:57:39<br><br><p>ppppekoejdkjnf</p><br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 22:59:37<br><br>Ticket got assigned to Mayank Pandey by Ramesh Chandra<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 23:00:09<br><br>Ticket status has been changed from REOPENED To CLOSED.<br> Reason: k<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;21/08/2018 23:00:26<br><br>Ticket status has been changed from CLOSED To REOPENED<br><br></p><p>Ramesh Chandra&emsp;&emsp;ramesh.chandra@rivigo.com&emsp;&emsp;22/08/2018 01:34:59<br><br><p>Hi, <br>\r\nI'm attaching invoice.<br>\r\nPFA,</p>\r\n<p>Thanks.</p><br><br></p></p><br>");
 
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_CC_NEW_PERSON_ADDITION)
+        .eventName(EventName.TICKET_CC_NEW_PERSON_ADDITION.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -118,7 +118,7 @@ public class NotificationDTOModel {
     metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
     metadata.put("ESCALATED_TO_EMAIL", "rameshc10695@gmail.com");
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_ESCALATION_CHANGE)
+        .eventName(EventName.TICKET_ESCALATION_CHANGE.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -148,7 +148,7 @@ public class NotificationDTOModel {
     metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
     metadata.put("LAST_UPDATED_BY_EMAIL", "ramesh.chandra@rivigo.com");
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_STATUS_CHANGE)
+        .eventName(EventName.TICKET_STATUS_CHANGE.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -182,7 +182,7 @@ public class NotificationDTOModel {
     metadata.put("LAST_UPDATED_BY_EMAIL", "ramesh.chandra@rivigo.com");
     metadata.put("OLD_ASSIGNEE_GROUP_NAME_OR_ASSIGNEE_EMAIL", "mayank.pandey@rivigo.com");
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_ASSIGNEE_CHANGE)
+        .eventName(EventName.TICKET_ASSIGNEE_CHANGE.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -212,7 +212,7 @@ public class NotificationDTOModel {
     metadata.put("OWNER_GROUP_NAME_OR_OWNER_EMAIL", "rameshc10695@gmail.com");
     metadata.put("LAST_UPDATED_BY_EMAIL", "ramesh.chandra@rivigo.com");
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_SEVERITY_CHANGE)
+        .eventName(EventName.TICKET_SEVERITY_CHANGE.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -244,7 +244,7 @@ public class NotificationDTOModel {
     metadata.put("COMMENTOR_EMAIL", "ramesh.chandra@rivigo.com");
 
     return NotificationDTO.builder()
-        .eventName(EventName.TICKET_COMMENT_CREATION)
+        .eventName(EventName.TICKET_COMMENT_CREATION.name())
         .entityId(248212L)
         .entityName("TICKET")
         .eventGUID("TICKET_248212")
@@ -262,7 +262,8 @@ public class NotificationDTOModel {
     metadata.put("toPincode", TestConstants.TO_PINCODE);
 
     NotificationDTO notificationDTO = new NotificationDTO();
-    notificationDTO.setEventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP);
+    notificationDTO.setEventName(
+        EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP.name());
     notificationDTO.setEventUID(TestConstants.EWAYBILL_NUMBER);
     notificationDTO.setMetadata(metadata);
 
