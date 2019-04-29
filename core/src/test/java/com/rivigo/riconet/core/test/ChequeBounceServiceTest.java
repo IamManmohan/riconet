@@ -99,7 +99,7 @@ public class ChequeBounceServiceTest {
 
   private NotificationDTO getNotificationDTO() {
     NotificationDTO notificationDTO = new NotificationDTO();
-    notificationDTO.setEventName(EventName.COLLECTION_CHEQUE_BOUNCE);
+    notificationDTO.setEventName(EventName.COLLECTION_CHEQUE_BOUNCE.name());
     notificationDTO.setEntityId(1518945L);
     notificationDTO.setEntityName("CN");
     notificationDTO.setEventGUID("CN_1518945");

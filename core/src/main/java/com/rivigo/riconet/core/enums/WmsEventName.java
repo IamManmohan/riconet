@@ -1,0 +1,11 @@
+package com.rivigo.riconet.core.enums;
+
+public enum WmsEventName {
+  PALLET_CLOSED,
+  TASK_CLOSED_OR_REASSIGNED,
+  TASK_UPSERT,
+  SHOP_FLOOR_STATUS_UPDATE,
+  CN_TOTAL_BOXES_CHANGE,
+  CN_LOADING_PLAN_UNPLAN,
+  CN_UNLOADING_PLAN_UNPLAN
+}

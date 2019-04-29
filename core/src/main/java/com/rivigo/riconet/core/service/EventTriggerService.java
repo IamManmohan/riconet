@@ -26,20 +26,16 @@ public class EventTriggerService {
 
   @Autowired private ChequeBounceService chequeBounceService;
 
-  @Autowired private PickupService pickupService;
-
   @Autowired private TicketingService ticketingService;
 
   @Autowired private AppNotificationService appNotificationService;
 
   @Autowired private HandoverService handoverService;
 
-  @Autowired private DatastoreService datastoreService;
-
   @Autowired private RTOService rtoService;
 
   public void processNotification(NotificationDTO notificationDTO) {
-    EventName eventName = notificationDTO.getEventName();
+    EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
@@ -104,27 +100,6 @@ public class EventTriggerService {
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
-        break;
-      case TASK_UPSERT:
-        appNotificationService.sendTaskUpsertNotification(notificationDTO);
-        break;
-      case SHOP_FLOOR_STATUS_UPDATE:
-        appNotificationService.sendShopFloorStatusUpdateNotifications(notificationDTO);
-        break;
-      case PALLET_CLOSED:
-        appNotificationService.sendPalletClosedNotification(notificationDTO);
-        break;
-      case TASK_CLOSED_OR_REASSIGNED:
-        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
-        break;
-      case CN_TOTAL_BOXES_CHANGE:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
-        break;
-      case CN_LOADING_PLAN_UNPLAN:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
-        break;
-      case CN_UNLOADING_PLAN_UNPLAN:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
       case CN_CNOTE_CHANGE:
         qcService.consumeCnoteChangeEvent(

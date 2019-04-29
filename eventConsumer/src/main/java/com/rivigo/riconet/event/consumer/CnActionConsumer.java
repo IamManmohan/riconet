@@ -2,7 +2,7 @@ package com.rivigo.riconet.event.consumer;
 
 import com.google.common.base.Strings;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ClientApiIntegrationService;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -19,15 +19,8 @@ public class CnActionConsumer extends EventConsumer {
   @Autowired private ClientApiIntegrationService clientApiIntegrationService;
 
   @Override
-  public List<EventName> eventNamesToBeConsumed() {
-    return Arrays.asList(
-        EventName.PICKUP_COMPLETION,
-        EventName.CN_RECEIVED_AT_OU,
-        EventName.CN_LOADED,
-        EventName.CN_DELIVERY_LOADED,
-        EventName.CN_OUT_FOR_DELIVERY,
-        EventName.CN_DELIVERY,
-        EventName.CN_UNDELIVERY);
+  public List<Enum> eventNamesToBeConsumed() {
+    return Arrays.asList(CnActionEventName.values());
   }
 
   private void eventFactory(NotificationDTO notificationDTO) {

@@ -39,7 +39,7 @@ import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TaskDto;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -64,6 +64,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -89,6 +90,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired private UserMasterService userMasterService;
 
+  @Value("${zoom.wms.url}")
+  private String zoomWmsUrl;
+
   @Override
   public void sendTaskUpsertNotification(NotificationDTO notificationDTO) {
     // Should be in sync with user table in backend
@@ -107,7 +111,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, EventName.TASK_UPSERT.name());
+    data.put(NOTIFICATION_TYPE, WmsEventName.TASK_UPSERT.name());
     data.put(TASK_ID, taskId);
     data.put(PARENT_TASK_ID, parentTaskId);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
@@ -128,7 +132,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, EventName.SHOP_FLOOR_STATUS_UPDATE.name());
+    data.put(NOTIFICATION_TYPE, WmsEventName.SHOP_FLOOR_STATUS_UPDATE.name());
     data.put(OU_CODE, ouCode);
     data.put(SHOP_FLOOR_ENABLED, shopFloorEnabled);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
@@ -216,7 +220,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               HttpEntity<?> entity = new HttpEntity<>(restClientUtilityService.getHeaders());
               return restClientUtilityService.executeRest(
                   restClientUtilityService.buildUrlWithParams(
-                      UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
+                      zoomWmsUrl + UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
                       ImmutableMap.of(
                           "tripId",
                           String.valueOf(cache.getTripId()),

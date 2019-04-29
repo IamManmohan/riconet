@@ -17,7 +17,7 @@ public class ZoomEventTriggerConsumer extends EventConsumer {
   @Autowired private EventTriggerService eventTriggerService;
 
   @Override
-  public List<EventName> eventNamesToBeConsumed() {
+  public List<Enum> eventNamesToBeConsumed() {
     return Arrays.asList(EventName.values());
   }
 

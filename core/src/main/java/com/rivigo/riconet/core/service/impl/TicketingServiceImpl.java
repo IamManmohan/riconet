@@ -54,7 +54,7 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void sendTicketingEventsEmail(NotificationDTO notificationDTO) {
-    EventName eventName = notificationDTO.getEventName();
+    EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
     if (null == metadata) {
@@ -147,7 +147,7 @@ public class TicketingServiceImpl implements TicketingService {
 
   @Override
   public void setPriorityMapping(NotificationDTO notificationDTO) {
-    EventName eventName = notificationDTO.getEventName();
+    EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
     if (metadata.isEmpty()) {

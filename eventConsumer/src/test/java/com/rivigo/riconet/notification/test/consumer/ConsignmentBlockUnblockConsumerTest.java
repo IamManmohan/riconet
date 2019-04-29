@@ -3,7 +3,7 @@ package com.rivigo.riconet.notification.test.consumer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
@@ -40,7 +40,7 @@ public class ConsignmentBlockUnblockConsumerTest {
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.TO_PAY.name());
     NotificationDTO dto =
         NotificationDTO.builder()
-            .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
+            .eventName(CnBlockUnblockEventName.COLLECTION_CHEQUE_BOUNCE.name())
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
@@ -55,7 +55,7 @@ public class ConsignmentBlockUnblockConsumerTest {
     NotificationDTO dto =
         NotificationDTO.builder()
             .entityId(ENTITY_ID)
-            .eventName(EventName.COLLECTION_CHEQUE_BOUNCE)
+            .eventName(CnBlockUnblockEventName.COLLECTION_CHEQUE_BOUNCE.name())
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
@@ -70,7 +70,7 @@ public class ConsignmentBlockUnblockConsumerTest {
     NotificationDTO dto =
         NotificationDTO.builder()
             .entityId(ENTITY_ID)
-            .eventName(EventName.CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED)
+            .eventName(CnBlockUnblockEventName.CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED.name())
             .metadata(metadata)
             .build();
     String message = objectMapper.writeValueAsString(dto);
