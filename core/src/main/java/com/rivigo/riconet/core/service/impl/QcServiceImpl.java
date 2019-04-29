@@ -306,14 +306,6 @@ public class QcServiceImpl implements QcService {
       throw new ZoomException(
           "No consignment exists with id :" + completionData.getConsignmentId());
     }
-    //    try {
-    //      zoomBackendAPIClientService.triggerPolicyGeneration(completionData.getConsignmentId());
-    //    } catch (Exception e) {
-    //      log.info(
-    //          "Policy trigger failed for consignment with id {} ",
-    //          completionData.getConsignmentId(),
-    //          e);
-    //    }
     sendCodDodSms(completionData, consignment);
     log.info(
         "cnote: {} isPrimaryConsignment: {} cnoteType: {}",

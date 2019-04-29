@@ -93,23 +93,6 @@ public class ZoomBackendAPIClientServiceTest {
   }
 
   @Test
-  public void triggerPolicyGenerationTest() throws IOException {
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
-    mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.triggerPolicyGeneration(consignmentId);
-    validateReturnedData(jsonNode, HttpMethod.POST, false);
-  }
-
-  @Test
-  public void triggerPolicyGenerationExceptionTest() throws IOException {
-    mockApiClientServiceGetEntityException();
-    expectedException.expect(ZoomException.class);
-    expectedException.expectMessage(
-        "Error while triggering policy generation with consignmentId:  1234");
-    zoomBackendAPIClientServiceImpl.triggerPolicyGeneration(consignmentId);
-  }
-
-  @Test
   public void handleQcBlockerClosureTest() throws IOException {
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);

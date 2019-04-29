@@ -113,23 +113,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void triggerPolicyGeneration(Long consignmentId) {
-    JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    String url = UrlConstant.ZOOM_BACKEND_POLICY_GENERATION + consignmentId.toString();
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.POST, url, valuesMap, backendBaseUrl);
-    } catch (IOException e) {
-      log.error(
-          "Error while triggering policy generation with consignmentId: {}", consignmentId, e);
-      throw new ZoomException(
-          "Error while triggering policy generation with consignmentId:  " + consignmentId);
-    }
-    apiClientService.parseJsonNode(responseJson, null);
-  }
-
-  @Override
   public void unloadAssetCN(Long cnId) {
     String url = UrlConstant.ZOOM_BACKEND_ASSET_ONBOARDING.replace("{cnId}", cnId.toString());
     try {
