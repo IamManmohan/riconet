@@ -123,8 +123,8 @@ public class AppNotificationServiceTest {
                 .isActive(Boolean.TRUE)
                 .build());
     appNotificationService.sendIBClearEvent(notificationDTO);
-    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
-        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+    Mockito.verify(pushNotificationService, Mockito.never())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
   }
 
   private ConsignmentScheduleCache getDummyConsignmentScheduleCache() {

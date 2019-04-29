@@ -256,7 +256,7 @@ public class EventTriggerServiceTest {
             .eventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(datastoreService, times(1))
+    verify(datastoreService, times(0))
         .cleanupAddressesUsingEwaybillMetadata(Matchers.eq(notificationDTO));
   }
 }
