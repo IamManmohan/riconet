@@ -3,6 +3,7 @@ package com.rivigo.riconet.event.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.event.dto.ChequeBounceDTO;
@@ -35,7 +36,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
 
   @Override
   public void processNotification(NotificationDTO notificationDTO) {
-    switch (notificationDTO.getEventName()) {
+    switch (CnBlockUnblockEventName.valueOf(notificationDTO.getEventName())) {
       case COLLECTION_CHEQUE_BOUNCE:
         blockCn(notificationDTO);
         markRecoveryPending(notificationDTO);

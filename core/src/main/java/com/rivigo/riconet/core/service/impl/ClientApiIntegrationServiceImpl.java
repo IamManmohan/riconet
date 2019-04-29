@@ -18,6 +18,7 @@ import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitArrivedDto;
 import com.rivigo.riconet.core.dto.hilti.IntransitDispatchedDto;
 import com.rivigo.riconet.core.dto.hilti.PickupDoneDto;
+import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.enums.HiltiJobType;
 import com.rivigo.riconet.core.enums.HiltiStatusCode;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -37,7 +38,6 @@ import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
 import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mysql.ConsignmentHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository;
@@ -100,8 +100,6 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Autowired private ConsignmentReadOnlyService consignmentReadOnlyService;
 
   @Autowired private ConsignmentUploadedFilesRepository consignmentUploadedFilesRepository;
-
-  @Autowired private ConsignmentHistoryRepository consignmentHistoryRepository;
 
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
@@ -219,7 +217,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     Map<Long, String> idToLocationNameMap =
         locations.stream().collect(Collectors.toMap(Location::getId, Location::getName));
 
-    switch (notificationDTO.getEventName()) {
+    switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_RECEIVED_AT_OU:
         return IntransitArrivedDto.builder()
             .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
@@ -244,7 +242,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   }
 
   private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
-    switch (notificationDTO.getEventName()) {
+    switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_OUT_FOR_DELIVERY:
         return DeliveryOFDDto.builder().build();
       case CN_DELIVERY:
@@ -281,7 +279,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   private BaseHiltiFieldData getFieldDataForCnEvents(
       NotificationDTO notificationDTO, Boolean addBarcodes) {
     BaseHiltiFieldData fieldData;
-    switch (notificationDTO.getEventName()) {
+    switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_RECEIVED_AT_OU:
       case CN_DELIVERY_LOADED:
       case CN_LOADED:
@@ -312,7 +310,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     HiltiJobType jobType;
     HiltiStatusCode statusCode;
 
-    switch (notificationDTO.getEventName()) {
+    switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case PICKUP_COMPLETION:
         return getPickupRequestDtos(notificationDTO, addBarcodes);
       case CN_RECEIVED_AT_OU:

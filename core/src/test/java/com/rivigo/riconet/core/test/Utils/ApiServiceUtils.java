@@ -6,7 +6,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
 import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
@@ -104,7 +104,7 @@ public class ApiServiceUtils {
     return NotificationDTO.builder()
         .entityId(PICKUP_ID)
         .metadata(hmap)
-        .eventName(EventName.PICKUP_COMPLETION)
+        .eventName(CnActionEventName.PICKUP_COMPLETION.name())
         .tsMs(DateTime.now().getMillis())
         .build();
   }
@@ -133,14 +133,14 @@ public class ApiServiceUtils {
   }
 
   public static NotificationDTO getDummyCnNotificationDtoForEvent(
-      EventName eventName, String cnote) {
+      CnActionEventName eventName, String cnote) {
     Map<String, String> hmap = new HashMap<>();
     hmap.put(ZoomCommunicationFieldNames.CLIENT_ID.name(), CLIENT_ID.toString());
     hmap.put(ZoomCommunicationFieldNames.CNOTE.name(), cnote);
     return NotificationDTO.builder()
         .entityId(CONSIGNMENT_ID)
         .metadata(hmap)
-        .eventName(eventName)
+        .eventName(eventName.name())
         .tsMs(DateTime.now().getMillis())
         .build();
   }

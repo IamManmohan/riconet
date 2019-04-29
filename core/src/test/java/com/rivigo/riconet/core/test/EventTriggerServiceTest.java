@@ -83,7 +83,7 @@ public class EventTriggerServiceTest {
     metadata.put("STATUS", "LOADED");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
-            .eventName(EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU)
+            .eventName(EventName.CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU.name())
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
@@ -103,7 +103,10 @@ public class EventTriggerServiceTest {
     metadata.put("LOCATION_ID", "12");
     metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.CN_RECEIVED_AT_OU).metadata(metadata).build();
+        NotificationDTO.builder()
+            .eventName(EventName.CN_RECEIVED_AT_OU.name())
+            .metadata(metadata)
+            .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeUnloadingEvent(consignmentBasicDTOArgumentCaptor.capture());
     verify(consignmentService, times(1)).triggerBfCpdCalcualtion(any());
@@ -113,32 +116,13 @@ public class EventTriggerServiceTest {
   }
 
   @Test
-  public void palletCloseTest() {
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("USER_ID", "1234567890");
-    metadata.put("TASK_TYPE", "UNLOADING");
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
-    eventTriggerService.processNotification(notificationDTO);
-  }
-
-  @Test
-  public void taskClosedReassignedTest() {
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put("USER_ID", "1234567890");
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.PALLET_CLOSED).metadata(metadata).build();
-    eventTriggerService.processNotification(notificationDTO);
-  }
-
-  @Test
   public void cnCompletionAllInstancestest() {
     Map<String, String> metadata = new HashMap<>();
     metadata.put("CNOTE", "1234567890");
     metadata.put("CONSIGNMENT_ID", "5");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
-            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES)
+            .eventName(EventName.CN_COMPLETION_ALL_INSTANCES.name())
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
@@ -157,7 +141,7 @@ public class EventTriggerServiceTest {
     metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
-            .eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL)
+            .eventName(EventName.CN_CNOTE_TYPE_CHANGED_FROM_NORMAL.name())
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
@@ -177,7 +161,7 @@ public class EventTriggerServiceTest {
     metadata.put("TO_LOCATION_ID", "13");
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
-            .eventName(EventName.CN_DELIVERY_LOADED)
+            .eventName(EventName.CN_DELIVERY_LOADED.name())
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
@@ -195,7 +179,10 @@ public class EventTriggerServiceTest {
     metadata.put("CNOTE", "1234567890");
     metadata.put("OLD_CNOTE", "9234567890");
     NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.CN_CNOTE_CHANGE).metadata(metadata).build();
+        NotificationDTO.builder()
+            .eventName(EventName.CN_CNOTE_CHANGE.name())
+            .metadata(metadata)
+            .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeCnoteChangeEvent("9234567890", "1234567890");
   }
@@ -206,7 +193,10 @@ public class EventTriggerServiceTest {
     Map<String, String> metadata = new HashMap<>();
     metadata.put("CNOTE", "1234567890");
     NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.CN_DEPS_CREATION).metadata(metadata).build();
+        NotificationDTO.builder()
+            .eventName(EventName.CN_DEPS_CREATION.name())
+            .metadata(metadata)
+            .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeDepsCreationEvent("1234567890", null);
   }
@@ -214,7 +204,7 @@ public class EventTriggerServiceTest {
   @Test
   public void ticketActionEVentTest() {
     NotificationDTO notificationDTO =
-        NotificationDTO.builder().eventName(EventName.TICKET_ACTION).entityId(5l).build();
+        NotificationDTO.builder().eventName(EventName.TICKET_ACTION.name()).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any(), any());
     verify(handoverService, times(1)).consumeHandoverTicketAction(eq(5l), any(), any(), any());
@@ -253,7 +243,7 @@ public class EventTriggerServiceTest {
     NotificationDTO notificationDTO;
     notificationDTO =
         NotificationDTO.builder()
-            .eventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP)
+            .eventName(EventName.CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP.name())
             .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(datastoreService, times(0))
