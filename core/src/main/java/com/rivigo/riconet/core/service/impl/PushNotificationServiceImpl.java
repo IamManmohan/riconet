@@ -6,16 +6,18 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.rivigo.riconet.core.service.PushNotificationService;
+import com.rivigo.zoom.common.enums.ApplicationId;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,9 +33,11 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   @Value("${firebase.server.key}")
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
-  @Autowired
-  @Qualifier("riconetRestTemplate")
-  private RestTemplate riconetRestTemplate;
+  private static final String EXPRESS_APP_SERVER_KEY_STAGING =
+      "AAAAIxD0A1g:APA91bGm99_sxWRYKup5MNxjd9DA4NVkmxjwrzHnAZzLbm-69hyLWegpfQ86mJn4ZIBIyAPQrsShixZXgRe4CKTt6B7JejrIZ4J0YTSWNcUKlveVxwwD-d9JDwdioTKhVKOL55pG0oXd";
+
+  private static final String EXPRESS_APP_SERVER_KEY_PROD =
+      "AAAAmP-QmNg:APA91bFHjJ-pclgU2_5V7DAwH9sO_VY_sLVwbayH2MzQ-qqiwIbOR1SWcW1vSBAoB_6a_ovygokWzvsENmRs-9IIdZrFIo9JS1wyIkbyG2nzQV3QWhxcU7OUpHag1VMnwIeC698hd44y";
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -56,20 +60,32 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   }
 
   @Override
-  public void send(JSONObject jsonObject, String firebaseToken, String priority) {
+  public void send(
+      JSONObject jsonObject, String firebaseToken, String priority, ApplicationId applicationId) {
 
     if (firebaseToken == null) {
       return;
     }
+    Boolean isProd = true;
+    if (!"production"
+        .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
+      isProd = false;
+    }
     // TODO : see why autowired restemplate is giving bad request
     RestTemplate restTemplate = new RestTemplate();
-
     jsonObject.put(PRIORITY, priority);
     jsonObject.put(TO, firebaseToken);
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(firebaseUrl);
     URI uri = builder.build().encode().toUri();
-    HttpEntity entity = getHttpEntity(getHeaders(firebaseServerKey), jsonObject, uri);
-    restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
+    String token;
+    if (ApplicationId.retail_app.equals(applicationId)) {
+      if (isProd) token = EXPRESS_APP_SERVER_KEY_PROD;
+      else token = EXPRESS_APP_SERVER_KEY_STAGING;
+    } else token = firebaseServerKey;
+    log.debug("the notif I am sending is  {} and token is :{}", jsonObject, token);
+    HttpEntity entity = getHttpEntity(getHeaders(token), jsonObject, uri);
+    ResponseEntity<JSONObject> response =
+        restTemplate.exchange(firebaseUrl, HttpMethod.POST, entity, JSONObject.class);
     log.info("Response is {}", jsonObject);
   }
 }

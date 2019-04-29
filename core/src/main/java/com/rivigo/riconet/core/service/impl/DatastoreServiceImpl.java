@@ -3,7 +3,6 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.datastore.EwaybillMetadataDTO;
-import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.service.DatastoreService;
 import com.rivigo.riconet.core.service.ZoomDatastoreAPIClientService;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class DatastoreServiceImpl implements DatastoreService {
   @Override
   public void cleanupAddressesUsingEwaybillMetadata(NotificationDTO notificationDTO) {
 
-    EventName eventName = notificationDTO.getEventName();
+    String eventName = notificationDTO.getEventName();
     log.info("Identified Event : {} ", eventName);
     Map<String, String> metadata = notificationDTO.getMetadata();
     if (MapUtils.isEmpty(notificationDTO.getMetadata())) {

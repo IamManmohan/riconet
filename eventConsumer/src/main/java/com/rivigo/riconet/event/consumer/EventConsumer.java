@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   @Autowired private TopicNameConfig topicNameConfig;
 
-  public abstract List<EventName> eventNamesToBeConsumed();
+  public abstract List<Enum> eventNamesToBeConsumed();
 
   public abstract void doAction(NotificationDTO notificationDTO);
 
@@ -44,7 +44,7 @@ public abstract class EventConsumer extends ConsumerModel {
   @Override
   public void processMessage(String str) {
     log.info("Processing message in {} {}", getConsumerName(), str);
-    NotificationDTO notificationDTO = null;
+    NotificationDTO notificationDTO;
     try {
       notificationDTO = objectMapper.readValue(str, NotificationDTO.class);
     } catch (IOException ex) {
@@ -52,11 +52,15 @@ public abstract class EventConsumer extends ConsumerModel {
       return;
     }
     log.debug("NotificationDTO {}", notificationDTO);
-    if (eventNamesToBeConsumed().contains(notificationDTO.getEventName())) {
+    if (eventNamesToBeConsumed()
+        .stream()
+        .map(Enum::name)
+        .collect(Collectors.toSet())
+        .contains(notificationDTO.getEventName())) {
       doAction(notificationDTO);
     } else {
       log.debug(
-          "NotificationDTO is not consumed by  {} as eventName {} ",
+          "NotificationDTO is not consumed by {} as eventName {} ",
           getConsumerName(),
           notificationDTO.getEventName());
     }

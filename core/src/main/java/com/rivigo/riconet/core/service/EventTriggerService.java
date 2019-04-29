@@ -26,21 +26,18 @@ public class EventTriggerService {
 
   @Autowired private ChequeBounceService chequeBounceService;
 
-  @Autowired private PickupService pickupService;
-
   @Autowired private TicketingService ticketingService;
 
   @Autowired private AppNotificationService appNotificationService;
 
   @Autowired private HandoverService handoverService;
 
-  @Autowired private DatastoreService datastoreService;
-
   public void processNotification(NotificationDTO notificationDTO) {
-    EventName eventName = notificationDTO.getEventName();
+    EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
+        appNotificationService.sendCnDeliveredNotification(notificationDTO);
       case CN_TRIP_DISPATCHED:
       case CN_PAYMENT_HANDOVER_COMPLETED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
@@ -68,6 +65,12 @@ public class EventTriggerService {
             TicketEntityType.PRQ.name(),
             eventName.name());
         break;
+      case PICKUP_ASSIGNMENT:
+        appNotificationService.sendPickUpAssignmentEvent(notificationDTO);
+        break;
+      case PICKUP_REACHED_AT_CLIENT_WAREHOUSE:
+        appNotificationService.sendPickUpReachedAtClientAddress(notificationDTO);
+        break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
         qcService.consumeLoadingEvent(loadingData);
@@ -75,6 +78,11 @@ public class EventTriggerService {
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
         break;
+      case CN_LOADED:
+        appNotificationService.sendCnLoadedEvent(notificationDTO);
+        break;
+      case CN_DRS_DISPATCH:
+        appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
       case CN_DELIVERY_LOADED:
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
         qcService.consumeDeliveryLoadingEvent(deliveryUnloadingData);
@@ -89,24 +97,6 @@ public class EventTriggerService {
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
-        break;
-      case UNLOADING_IN_LOADING:
-        appNotificationService.sendUnloadingInLoadingNotification(notificationDTO);
-        break;
-      case PALLET_CLOSED:
-        appNotificationService.sendPalletClosedNotification(notificationDTO);
-        break;
-      case TASK_CLOSED_OR_REASSIGNED:
-        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
-        break;
-      case CN_TOTAL_BOXES_CHANGE:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
-        break;
-      case CN_LOADING_PLAN_UNPLAN:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
-        break;
-      case CN_UNLOADING_PLAN_UNPLAN:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
       case CN_CNOTE_CHANGE:
         qcService.consumeCnoteChangeEvent(
