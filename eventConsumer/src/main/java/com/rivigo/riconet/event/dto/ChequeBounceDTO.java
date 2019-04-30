@@ -2,7 +2,6 @@ package com.rivigo.riconet.event.dto;
 
 import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +21,6 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 public class ChequeBounceDTO {
 
   @NotBlank private String cnote;
-
-  @NotNull private Long consignmentId;
 
   @NotBlank private String bankName;
 

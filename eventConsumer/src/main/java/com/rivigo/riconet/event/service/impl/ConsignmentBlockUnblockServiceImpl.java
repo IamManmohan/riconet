@@ -92,21 +92,22 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
       log.error("Exception occurred while unblocking cn in zoom tech", e);
     }
   }
-  /** reflect cheque bounced amount in ou_collection_book and user_or_bp_book */
+
+  /**
+   * reflect cheque bounced amount in user/bp_book, ou_collection_book and remove from
+   * ou_out_standing
+   */
   private void markRecoveryPending(NotificationDTO notificationDTO) {
 
     Map<String, String> metadata = notificationDTO.getMetadata();
-
     ChequeBounceDTO chequeBounceDTO =
         ChequeBounceDTO.builder()
             .cnote(metadata.get(ZoomCommunicationFieldNames.CNOTE.name()))
-            .consignmentId(
-                Long.parseLong(metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
             .chequeNumber(metadata.get(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name()))
             .bankName(metadata.get(ZoomCommunicationFieldNames.DRAWEE_BANK.name()))
             .amount(new BigDecimal(metadata.get(ZoomCommunicationFieldNames.AMOUNT.name())))
             .build();
-    log.info("Mark Recovery Pending : {} ", chequeBounceDTO);
+    log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
     try {
       JsonNode responseJson =
           apiClientService.getEntity(
@@ -117,7 +118,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
               zoomBackendBaseUrl);
       log.debug("response {}", responseJson);
     } catch (IOException e) {
-      log.error("Exception occurred while marking recoverying pending cn in zoom tech", e);
+      log.error("Exception occurred while marking recovery pending for cn in zoom tech", e);
     }
   }
 }
