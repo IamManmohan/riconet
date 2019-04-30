@@ -54,6 +54,6 @@ public class UrlConstant {
 
   public static final String ZOOM_DATASTORE_EWAYBILL_METADATA_CLEANUP = "/address/cleanup/ewaybill";
 
-  public static final String ZOOM_BACKEND_MARK_RECOVERY_PENDING =
-      "/payment-detail/markRecoveryPending";
+  public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
+      "/operations/retail/collections/handover/markRecoveryPending";
 }
