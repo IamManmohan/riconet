@@ -14,8 +14,6 @@ public interface ZoomBackendAPIClientService {
 
   void recalculateCpdOfBf(Long consignmentId);
 
-  void triggerPolicyGeneration(Long consignmentId);
-
   void unloadAssetCN(Long cnId);
 
   ClientDTO addClient(ClientDTO clientDTO);
