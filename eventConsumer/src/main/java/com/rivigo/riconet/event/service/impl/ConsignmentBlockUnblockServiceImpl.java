@@ -10,7 +10,6 @@ import com.rivigo.riconet.event.dto.ChequeBounceDTO;
 import com.rivigo.riconet.event.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
-import com.rivigo.zoom.common.enums.PaymentMode;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
   public void processNotification(NotificationDTO notificationDTO) {
     switch (CnBlockUnblockEventName.valueOf(notificationDTO.getEventName())) {
       case COLLECTION_CHEQUE_BOUNCE:
-        blockCn(notificationDTO);
         markRecoveryPending(notificationDTO);
         break;
       case CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED:
@@ -54,19 +52,6 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
 
   private void unblockCn(NotificationDTO notificationDTO) {
     blockUnblockRequest(notificationDTO, ConsignmentBlockerRequestType.UNBLOCK);
-  }
-
-  private void blockCn(NotificationDTO notificationDTO) {
-    if (!PaymentMode.PAID
-        .name()
-        .equalsIgnoreCase(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name()))) {
-      log.info(
-          "Cheque bounce occurred for to pay cn. So cn {} will not be blocked",
-          notificationDTO.getEntityId());
-      return;
-    }
-    blockUnblockRequest(notificationDTO, ConsignmentBlockerRequestType.BLOCK);
   }
 
   private void blockUnblockRequest(
