@@ -3,8 +3,10 @@ package com.rivigo.riconet.core.test;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.TaskDto;
+import com.rivigo.riconet.core.dto.wms.TaskDto;
+import com.rivigo.riconet.core.dto.wms.TaskUserDto;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Wms;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
@@ -24,6 +26,7 @@ import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,14 +78,20 @@ public class AppNotificationServiceTest {
     notificationDTO.setEntityId(1L);
     notificationDTO.setTsMs(DateTime.now().getMillis());
     Map<String, String> metadata = new HashMap<>();
-    metadata.put(ZoomCommunicationFieldNames.USER_ID.name(), "1");
-    metadata.put(ZoomCommunicationFieldNames.PARENT_TASK_ID.name(), "100");
+    metadata.put(Wms.USER_EMAIL_LIST.name(), "test@rivigo.com");
+    metadata.put(Wms.PARENT_TASK_ID.name(), "100");
     notificationDTO.setMetadata(metadata);
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
+    User user = new User();
+    user.setId(1L);
+    Mockito.when(userMasterService.getByEmailIn(Collections.singletonList("test@rivigo.com")))
+        .thenReturn(Collections.singletonList(user));
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(
+                Collections.singletonList(1L), ApplicationId.scan_app))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendTaskUpsertNotification(notificationDTO);
@@ -94,14 +103,20 @@ public class AppNotificationServiceTest {
     notificationDTO.setEntityId(1L);
     notificationDTO.setTsMs(DateTime.now().getMillis());
     Map<String, String> metadata = new HashMap<>();
-    metadata.put(ZoomCommunicationFieldNames.USER_ID.name(), "1");
-    metadata.put(ZoomCommunicationFieldNames.TASK_TYPE.name(), "LOADING");
+    metadata.put(Wms.USER_EMAIL_LIST.name(), "test@rivigo.com");
+    metadata.put(Wms.TASK_TYPE.name(), "LOADING");
     notificationDTO.setMetadata(metadata);
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(deviceAppVersionMapperRepository.findByUserId(1L))
+    User user = new User();
+    user.setId(1L);
+    Mockito.when(userMasterService.getByEmailIn(Collections.singletonList("test@rivigo.com")))
+        .thenReturn(Collections.singletonList(user));
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(
+                Collections.singletonList(1L), ApplicationId.scan_app))
         .thenReturn(deviceAppVersionMappers);
     Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
@@ -133,7 +148,19 @@ public class AppNotificationServiceTest {
     Mockito.when(
             restClientUtilityService.executeRest(
                 Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenReturn(Optional.of(TaskDto.builder().id(1L).taskType(TaskType.LOADING).build()));
+        .thenReturn(
+            Optional.of(
+                TaskDto.builder()
+                    .id(1L)
+                    .taskType(TaskType.LOADING)
+                    .userList(
+                        Collections.singletonList(
+                            TaskUserDto.builder().userEmail("test@rivigo.com").build()))
+                    .build()));
+    User user = new User();
+    user.setId(1L);
+    Mockito.when(userMasterService.getByEmailIn(Collections.singletonList("test@rivigo.com")))
+        .thenReturn(Collections.singletonList(user));
     appNotificationService.sendIBClearEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(

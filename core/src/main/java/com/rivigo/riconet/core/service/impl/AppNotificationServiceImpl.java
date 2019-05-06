@@ -38,9 +38,11 @@ import com.google.common.collect.ImmutableMap;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.TaskDto;
+import com.rivigo.riconet.core.dto.wms.TaskDto;
+import com.rivigo.riconet.core.dto.wms.TaskUserDto;
 import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Wms;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -95,17 +97,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Override
   public void sendTaskUpsertNotification(NotificationDTO notificationDTO) {
-    // Should be in sync with user table in backend
-    Long userId =
-        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
     Long taskId = notificationDTO.getEntityId();
     Long parentTaskId = null;
-    if (notificationDTO
-        .getMetadata()
-        .containsKey(ZoomCommunicationFieldNames.PARENT_TASK_ID.name())) {
-      parentTaskId =
-          Long.valueOf(
-              notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PARENT_TASK_ID.name()));
+    if (notificationDTO.getMetadata().containsKey(Wms.PARENT_TASK_ID.name())) {
+      parentTaskId = Long.valueOf(notificationDTO.getMetadata().get(Wms.PARENT_TASK_ID.name()));
     }
 
     JSONObject pushObject = new JSONObject();
@@ -117,17 +112,18 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, ApplicationId.scan_app);
+    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
+  }
+
+  private List<String> getUserEmailList(NotificationDTO notificationDTO) {
+    return Arrays.asList(notificationDTO.getMetadata().get(Wms.USER_EMAIL_LIST.name()).split(","));
   }
 
   @Override
   public void sendShopFloorStatusUpdateNotifications(NotificationDTO notificationDTO) {
-    String ouCode = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OU_CODE.name());
+    String ouCode = notificationDTO.getMetadata().get(Wms.OU_CODE.name());
     Boolean shopFloorEnabled =
-        Boolean.valueOf(
-            notificationDTO
-                .getMetadata()
-                .get(ZoomCommunicationFieldNames.SHOP_FLOOR_ENABLED.name()));
+        Boolean.valueOf(notificationDTO.getMetadata().get(Wms.SHOP_FLOOR_ENABLED.name()));
 
     JSONObject pushObject = new JSONObject();
 
@@ -148,13 +144,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Override
   public void sendLoadingUnloadingNotification(NotificationDTO notificationDTO) {
-    String userEmail =
-        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_EMAIL.name());
     Long taskId = notificationDTO.getEntityId();
 
-    TaskType taskType =
-        TaskType.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TASK_TYPE.name()));
+    TaskType taskType = TaskType.valueOf(notificationDTO.getMetadata().get(Wms.TASK_TYPE.name()));
 
     JSONObject pushObject = new JSONObject();
 
@@ -164,19 +156,13 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    User user = userMasterService.getByEmail(userEmail);
-    if (user != null) {
-      sendNotification(pushObject, user.getId(), ApplicationId.scan_app);
-    }
+    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
   }
 
   @Override
   public void sendPalletClosedNotification(NotificationDTO notificationDTO) {
-    String userEmail =
-        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_EMAIL.name());
     Long palletId = notificationDTO.getEntityId();
-    Long taskId =
-        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TASK_ID.name()));
+    Long taskId = Long.valueOf(notificationDTO.getMetadata().get(Wms.TASK_ID.name()));
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
 
@@ -185,17 +171,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    User user = userMasterService.getByEmail(userEmail);
-    if (user != null) {
-      sendNotification(pushObject, user.getId(), ApplicationId.scan_app);
-    }
+    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
   }
 
   @Override
   public void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO) {
-    // Should be in sync with user table in backend
-    Long userId =
-        Long.valueOf(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.USER_ID.name()));
     Long taskId = notificationDTO.getEntityId();
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -204,7 +184,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     data.put(TASK_ID, taskId);
 
     pushObject.put(DATA, data);
-    sendNotification(pushObject, userId, ApplicationId.scan_app);
+    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
   }
 
   @Override
@@ -244,10 +224,14 @@ public class AppNotificationServiceImpl implements AppNotificationService {
               data.put(TASK_ID, taskDto.getId());
 
               pushObject.put(DATA, data);
-              User user = userMasterService.getByEmail(taskDto.getUserEmail());
-              if (user != null) {
-                sendNotification(pushObject, user.getId(), ApplicationId.scan_app);
-              }
+              sendNotification(
+                  pushObject,
+                  taskDto
+                      .getUserList()
+                      .stream()
+                      .map(TaskUserDto::getUserEmail)
+                      .collect(Collectors.toList()),
+                  ApplicationId.scan_app);
             });
   }
 
@@ -560,6 +544,19 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     }
   }
 
+  private void sendNotification(
+      JSONObject notificationPayload, List<String> userEmailList, ApplicationId appId) {
+    if (CollectionUtils.isEmpty(userEmailList)) {
+      log.warn("Cannot send notification if userId is null");
+      return;
+    }
+    List<User> userList = userMasterService.getByEmailIn(userEmailList);
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        deviceAppVersionMapperRepository.findByUserIdInAndAppId(
+            userList.stream().map(User::getId).collect(Collectors.toList()), appId);
+    sendNotificationForDeviceAppDetails(notificationPayload, deviceAppVersionMappers, appId);
+  }
+
   private void sendNotification(JSONObject notificationPayload, Long userId, ApplicationId appId) {
     if (userId == null) {
       log.warn("Cannot send notification if userId is null");
@@ -567,10 +564,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     }
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         deviceAppVersionMapperRepository.findByUserIdAndAppId(userId, appId);
-    sendNotification(notificationPayload, deviceAppVersionMappers, appId);
+    sendNotificationForDeviceAppDetails(notificationPayload, deviceAppVersionMappers, appId);
   }
 
-  private void sendNotification(
+  private void sendNotificationForDeviceAppDetails(
       JSONObject notificationPayload,
       List<DeviceAppVersionMapper> deviceAppVersionMappers,
       ApplicationId appId) {
