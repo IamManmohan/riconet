@@ -57,7 +57,7 @@ public class ZoomCommunicationsService {
               zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
       List<String> dndExemptedEvents =
           zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
-      isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName().toString());
+      isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName());
       log.debug("NotificationDTO {}", notificationDTO);
     } catch (IOException ex) {
       log.error(

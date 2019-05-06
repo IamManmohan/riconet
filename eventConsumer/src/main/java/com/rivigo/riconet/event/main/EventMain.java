@@ -5,6 +5,7 @@ import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
@@ -63,111 +64,74 @@ public class EventMain {
 
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("events");
-    final ActorMaterializer materializer = ActorMaterializer.create(system);
     ApplicationContext context =
         new AnnotationConfigApplicationContext(
             ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class);
-    EventMain consumer = context.getBean(EventMain.class);
+    final ActorMaterializer materializer = ActorMaterializer.create(system);
+    EventMain eventMain = context.getBean(EventMain.class);
     Config config = ConfigFactory.load();
+    eventMain.initialize(materializer, system, config);
+  }
+
+  private void initialize(ActorMaterializer materializer, ActorSystem system, Config config) {
     String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
-
-    String zoomEventTriggerConsumerGroupId = config.getString("zoomEventTriggerConsumer.group.id");
-    final ConsumerSettings<String, String> zoomEventTriggerConsumerSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(zoomEventTriggerConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String cnActionConsumerGroupId = config.getString("cnActionConsumer.group.id");
-    final ConsumerSettings<String, String> cnActionConsumerSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(cnActionConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String consignmentblockerGroupId = config.getString("consignmentblocker.group.id");
-    final ConsumerSettings<String, String> consignmentBlockerConsumerSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(consignmentblockerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String financeEventsConsumerGroupId = config.getString("financeEventsConsumer.group.id");
-    final ConsumerSettings<String, String> financeEventsConsumerSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(financeEventsConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String bfPickupChargesGroupId = config.getString("bfPickupCharges.group.id");
-    final ConsumerSettings<String, String> bfPickupChargesConsumerSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(bfPickupChargesGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String wmsEventConsumerGroupId = config.getString("wmsEventConsumer.group.id");
-    final ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(wmsEventConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    String kairosRetailAppEventConsumerGroupId =
-        config.getString("kairosRetailAppEventConsumer.group.id");
-    final ConsumerSettings<String, String> kairosRetailAppEventConsumerGroupIdSettings =
-        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-            .withBootstrapServers(bootstrapServers)
-            .withGroupId(kairosRetailAppEventConsumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
-
-    consumer.load(
+    load(
         materializer,
-        zoomEventTriggerConsumerSettings,
-        cnActionConsumerSettings,
-        consignmentBlockerConsumerSettings,
-        financeEventsConsumerSettings,
-        bfPickupChargesConsumerSettings,
-        wmsEventConsumerGroupIdSettings,
-        kairosRetailAppEventConsumerGroupIdSettings);
+        system,
+        bootstrapServers,
+        config.getString("zoomEventTriggerConsumer.group.id"),
+        zoomEventTriggerConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("cnActionConsumer.group.id"),
+        cnActionConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("consignmentblocker.group.id"),
+        consignmentBlockUnblockConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("financeEventsConsumer.group.id"),
+        financeEventsConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("bfPickupCharges.group.id"),
+        bfPickupChargesActionConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("wmsEventConsumer.group.id"),
+        wmsEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("kairosRetailAppEventConsumer.group.id"),
+        kairosRetailAppEventConsumer);
   }
 
   private void load(
       ActorMaterializer materializer,
-      ConsumerSettings<String, String> zoomEventTriggerConsumerSettings,
-      ConsumerSettings<String, String> cnActionConsumerSettings,
-      ConsumerSettings<String, String> consignmentBlockerConsumerSettings,
-      ConsumerSettings<String, String> financeEventsConsumerSettings,
-      ConsumerSettings<String, String> bfPickupChargesActionConsumerSettings,
-      ConsumerSettings<String, String> wmsEventConsumerGroupIdSettings,
-      ConsumerSettings<String, String> kairosRetailAppEventConsumerGroupIdSettings) {
-    log.info(
-        "Loading zoom event trigger consumer with settings {}",
-        zoomEventTriggerConsumerSettings.toString());
-    zoomEventTriggerConsumer.load(materializer, zoomEventTriggerConsumerSettings);
-    log.info(
-        "Loading event trigger for cn status change with settings {}",
-        cnActionConsumerSettings.toString());
-    cnActionConsumer.load(materializer, cnActionConsumerSettings);
-    log.info(
-        "Loading consignment blocker consumer with settings {}",
-        consignmentBlockerConsumerSettings);
-    consignmentBlockUnblockConsumer.load(materializer, consignmentBlockerConsumerSettings);
-    log.info(
-        "Loading Finance event consumer with settings {}",
-        financeEventsConsumerSettings.toString());
-    financeEventsConsumer.load(materializer, financeEventsConsumerSettings);
-    log.info(
-        "Loading bfPickup event consumer with settings {}",
-        bfPickupChargesActionConsumerSettings.toString());
-    bfPickupChargesActionConsumer.load(materializer, bfPickupChargesActionConsumerSettings);
-    log.info(
-        "Loading wms event consumer with settings {}", wmsEventConsumerGroupIdSettings.toString());
-    wmsEventConsumer.load(materializer, wmsEventConsumerGroupIdSettings);
-    log.info(
-        "Loading kairos retail app event consumer with settings {}",
-        kairosRetailAppEventConsumerGroupIdSettings.toString());
-    kairosRetailAppEventConsumer.load(materializer, kairosRetailAppEventConsumerGroupIdSettings);
+      ActorSystem system,
+      String bootstrapServers,
+      String consumerGroupId,
+      ConsumerModel consumer) {
+    final ConsumerSettings<String, String> consumerSettings =
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(consumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+    log.info("Loading consumer with settings {}", consumerSettings.toString());
+    consumer.load(materializer, consumerSettings);
   }
 }

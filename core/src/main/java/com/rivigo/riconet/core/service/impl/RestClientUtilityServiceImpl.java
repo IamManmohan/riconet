@@ -7,6 +7,8 @@ import static com.rivigo.riconet.core.constants.RestUtilConstants.TOKEN_PREFIX;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
+import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.List;
@@ -166,18 +168,20 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
   private <T> T executeRestApi(
       String url, HttpMethod httpMethod, HttpEntity entity, Class<T> clazz) {
     try {
-      ResponseEntity<T> responseEntity = restTemplate.exchange(url, httpMethod, entity, clazz);
-      if (responseEntity.getStatusCode().is5xxServerError()) {
-        throw new ZoomException(
-            "Unable to connect to server: {%s}", responseEntity.getStatusCode());
+      ResponseEntity<DatastoreResponseDto> responseEntity =
+          restTemplate.exchange(url, httpMethod, entity, DatastoreResponseDto.class);
+      if (responseEntity.getStatusCode().is5xxServerError()
+          || responseEntity.getStatusCode().is4xxClientError()) {
+        throw new ZoomException("Unable to connect to wms: {%s}", responseEntity.getStatusCode());
       }
-      if (responseEntity.getStatusCode().is4xxClientError()) {
-        throw new ZoomException(
-            "Invalid request received:{%s}. Response: {%s}",
-            entity, responseEntity.getStatusCode());
+      DatastoreResponseDto wmsResponse = responseEntity.getBody();
+      if (wmsResponse == null) {
+        throw new ZoomException("Unable to connect to wms");
       }
-
-      return responseEntity.getBody();
+      if (wmsResponse.getStatus() == RequestStatus.FAILURE) {
+        throw new ZoomException("Exception wms:" + wmsResponse.getErrorMessage());
+      }
+      return objectMapper.convertValue(wmsResponse.getPayload(), clazz);
 
     } catch (HttpClientErrorException | HttpServerErrorException e) {
       log.error(e.getMessage(), e);

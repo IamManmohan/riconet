@@ -25,8 +25,6 @@ public class UrlConstant {
 
   public static final String ZOOMBOOK_TRANSACTION_V2 = "/zoombook/transaction/v2";
 
-  public static final String ZOOM_BACKEND_POLICY_GENERATION = "/insurance/policy/";
-
   public static final String ZOOM_BACKEND_CLIENT_SERVICE = "/master/client";
 
   public static final String ZOOM_BACKEND_ORGANIZATION_SERVICE = "/operations/organization";
