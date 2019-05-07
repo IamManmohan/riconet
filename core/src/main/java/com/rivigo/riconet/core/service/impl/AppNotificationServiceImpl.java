@@ -64,6 +64,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
@@ -84,7 +85,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
-  @Autowired private RestClientUtilityService restClientUtilityService;
+  @Autowired
+  @Qualifier("datastoreRestClientUtilityServiceImpl")
+  private RestClientUtilityService restClientUtilityService;
 
   @Autowired private LocationService locationService;
 
