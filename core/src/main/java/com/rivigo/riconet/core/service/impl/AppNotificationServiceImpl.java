@@ -87,7 +87,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired
   @Qualifier("datastoreRestClientUtilityServiceImpl")
-  private RestClientUtilityService restClientUtilityService;
+  private RestClientUtilityService datastoreRestService;
 
   @Autowired private LocationService locationService;
 
@@ -220,9 +220,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         .flatMap(
             cache -> {
               Location location = locationService.getLocationById(locationId);
-              HttpEntity<?> entity = new HttpEntity<>(restClientUtilityService.getHeaders());
-              return restClientUtilityService.executeRest(
-                  restClientUtilityService.buildUrlWithParams(
+              HttpEntity<?> entity = new HttpEntity<>(datastoreRestService.getHeaders());
+              return datastoreRestService.executeRest(
+                  datastoreRestService.buildUrlWithParams(
                       zoomWmsUrl + UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
                       ImmutableMap.of(
                           "tripId",
