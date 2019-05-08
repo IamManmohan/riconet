@@ -64,6 +64,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.http.HttpEntity;
@@ -84,7 +85,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
-  @Autowired private RestClientUtilityService restClientUtilityService;
+  @Autowired
+  @Qualifier("datastoreRestClientUtilityServiceImpl")
+  private RestClientUtilityService datastoreRestService;
 
   @Autowired private LocationService locationService;
 
@@ -217,9 +220,9 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         .flatMap(
             cache -> {
               Location location = locationService.getLocationById(locationId);
-              HttpEntity<?> entity = new HttpEntity<>(restClientUtilityService.getHeaders());
-              return restClientUtilityService.executeRest(
-                  restClientUtilityService.buildUrlWithParams(
+              HttpEntity<?> entity = new HttpEntity<>(datastoreRestService.getHeaders());
+              return datastoreRestService.executeRest(
+                  datastoreRestService.buildUrlWithParams(
                       zoomWmsUrl + UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
                       ImmutableMap.of(
                           "tripId",
