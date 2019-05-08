@@ -58,6 +58,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -91,7 +92,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${flipkart.tenant.id}")
   private String flipkartTenantId;
 
-  @Autowired private RestClientUtilityService restClientUtilityService;
+  @Autowired
+  @Qualifier("defaultRestClientUtilityServiceImpl")
+  private RestClientUtilityService restClientUtilityService;
 
   @Autowired private PickupRepository pickupRepository;
 
