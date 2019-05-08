@@ -7,8 +7,6 @@ import static com.rivigo.riconet.core.constants.RestUtilConstants.TOKEN_PREFIX;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
-import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.List;
@@ -21,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,11 +34,12 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
+@Qualifier("defaultRestClientUtilityServiceImpl")
 public class RestClientUtilityServiceImpl implements RestClientUtilityService {
 
-  private RestTemplate restTemplate = new RestTemplate();
-  @Autowired private ExecutorService executorService;
-  @Autowired private ObjectMapper objectMapper;
+  protected RestTemplate restTemplate = new RestTemplate();
+  @Autowired protected ExecutorService executorService;
+  @Autowired protected ObjectMapper objectMapper;
 
   @Override
   public HttpHeaders getHeaders() {
@@ -165,23 +165,16 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
     return response;
   }
 
-  private <T> T executeRestApi(
+  public <T> T executeRestApi(
       String url, HttpMethod httpMethod, HttpEntity entity, Class<T> clazz) {
     try {
-      ResponseEntity<DatastoreResponseDto> responseEntity =
-          restTemplate.exchange(url, httpMethod, entity, DatastoreResponseDto.class);
+      ResponseEntity<T> responseEntity = restTemplate.exchange(url, httpMethod, entity, clazz);
       if (responseEntity.getStatusCode().is5xxServerError()
           || responseEntity.getStatusCode().is4xxClientError()) {
-        throw new ZoomException("Unable to connect to wms: {%s}", responseEntity.getStatusCode());
+        throw new ZoomException(
+            "Unable to connect to server: {%s}", responseEntity.getStatusCode());
       }
-      DatastoreResponseDto wmsResponse = responseEntity.getBody();
-      if (wmsResponse == null) {
-        throw new ZoomException("Unable to connect to wms");
-      }
-      if (wmsResponse.getStatus() == RequestStatus.FAILURE) {
-        throw new ZoomException("Exception wms:" + wmsResponse.getErrorMessage());
-      }
-      return objectMapper.convertValue(wmsResponse.getPayload(), clazz);
+      return responseEntity.getBody();
 
     } catch (HttpClientErrorException | HttpServerErrorException e) {
       log.error(e.getMessage(), e);
