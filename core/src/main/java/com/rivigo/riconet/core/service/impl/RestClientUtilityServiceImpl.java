@@ -181,29 +181,4 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
       throw e;
     }
   }
-
-  //  private <T> T executeRestApi(
-  //      String url, HttpMethod httpMethod, HttpEntity entity, Class<T> clazz) {
-  //    try {
-  //      ResponseEntity<DatastoreResponseDto> responseEntity =
-  //          restTemplate.exchange(url, httpMethod, entity, DatastoreResponseDto.class);
-  //      if (responseEntity.getStatusCode().is5xxServerError()
-  //          || responseEntity.getStatusCode().is4xxClientError()) {
-  //        throw new ZoomException("Unable to connect to wms: {%s}",
-  // responseEntity.getStatusCode());
-  //      }
-  //      DatastoreResponseDto wmsResponse = responseEntity.getBody();
-  //      if (wmsResponse == null) {
-  //        throw new ZoomException("Unable to connect to wms");
-  //      }
-  //      if (wmsResponse.getStatus() == RequestStatus.FAILURE) {
-  //        throw new ZoomException("Exception wms:" + wmsResponse.getErrorMessage());
-  //      }
-  //      return objectMapper.convertValue(wmsResponse.getPayload(), clazz);
-  //
-  //    } catch (HttpClientErrorException | HttpServerErrorException e) {
-  //      log.error(e.getMessage(), e);
-  //      throw e;
-  //    }
-  //  }
 }
