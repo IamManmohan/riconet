@@ -22,7 +22,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
 
   private final ApiClientService apiClientService;
 
-  @Value("${zoombackend.base.url}")
+  @Value("${zoom.url}")
   private String zoomBackendBaseUrl;
 
   @Autowired
