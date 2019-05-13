@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.config.TopicNameConfig;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.BfPickupChargesEventName;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import java.util.Arrays;
@@ -55,12 +55,8 @@ public class BfPickupChargesActionConsumerTest {
 
   @Test
   public void eventsToBeConsumed() {
-    List<EventName> expected =
-        Arrays.asList(
-            EventName.CN_COMPLETION_ALL_INSTANCES,
-            EventName.CN_DELETED,
-            EventName.PICKUP_COMPLETION);
-    List<EventName> eventNameList = bfPickupChargesActionConsumer.eventNamesToBeConsumed();
+    List<Enum> expected = Arrays.asList(BfPickupChargesEventName.values());
+    List<Enum> eventNameList = bfPickupChargesActionConsumer.eventNamesToBeConsumed();
     Assert.assertEquals(expected, eventNameList);
   }
 

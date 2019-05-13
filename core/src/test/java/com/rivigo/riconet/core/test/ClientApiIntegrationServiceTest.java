@@ -5,7 +5,7 @@ import static java.lang.Thread.sleep;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -143,7 +143,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
@@ -154,7 +154,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_LOADED, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_LOADED, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
@@ -172,7 +172,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_RECEIVED_AT_OU, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
@@ -183,7 +183,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_OUT_FOR_DELIVERY, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_OUT_FOR_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
@@ -194,7 +194,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_DELIVERY, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_DELIVERY, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
@@ -205,7 +205,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              EventName.CN_UNDELIVERY, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_UNDELIVERY, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
