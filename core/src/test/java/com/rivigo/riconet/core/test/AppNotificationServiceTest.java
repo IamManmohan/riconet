@@ -4,6 +4,7 @@ import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_ID
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TaskDto;
+import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -12,6 +13,7 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
+import com.rivigo.riconet.core.test.Utils.TestConstants;
 import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.TaskType;
@@ -157,5 +159,31 @@ public class AppNotificationServiceTest {
     location.setCode("locationCode");
     location.setId(1L);
     return location;
+  }
+
+  @Test
+  public void sendPickupCancellationNotificationTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name(),
+        TestConstants.USER_ID.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.PICKUP_CANCELLATION.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendPickupCancellationNotification(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
   }
 }

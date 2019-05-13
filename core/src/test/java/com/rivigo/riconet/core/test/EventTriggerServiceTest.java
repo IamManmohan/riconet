@@ -26,6 +26,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -238,6 +239,18 @@ public class EventTriggerServiceTest {
   }
 
   @Test
+  public void pickupCancellationNotificationTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.PICKUP_CANCELLATION.name())
+            .entityId(1234L)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(appNotificationService, times(1)).sendPickupCancellationNotification(notificationDTO);
+  }
+
+  @Test
+  @Ignore
   public void ewaybillMetadataBasedCleanupTest() {
 
     NotificationDTO notificationDTO;
