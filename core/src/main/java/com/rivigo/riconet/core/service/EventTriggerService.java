@@ -39,6 +39,16 @@ public class EventTriggerService {
       case CN_DELIVERY:
         appNotificationService.sendCnDeliveredNotification(notificationDTO);
       case CN_TRIP_DISPATCHED:
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        ticketingClientService.autoCloseTicket(
+            entityId, TicketEntityType.CN.name(), eventName.name());
+        Optional.ofNullable(
+                notificationDTO
+                    .getMetadata()
+                    .get(ZoomCommunicationFieldNames.FIRST_RIVIGO_OU.name()))
+            .ifPresent(
+                b -> appNotificationService.sendCnFirstOuDispatchNotification(notificationDTO));
+        break;
       case CN_PAYMENT_HANDOVER_COMPLETED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(
@@ -77,9 +87,6 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
-        break;
-      case CN_LOADED:
-        appNotificationService.sendCnLoadedEvent(notificationDTO);
         break;
       case CN_DRS_DISPATCH:
         appNotificationService.sendCnDrsDispatchEvent(notificationDTO);

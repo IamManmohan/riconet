@@ -21,7 +21,7 @@ public interface AppNotificationService {
 
   void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
 
-  void sendCnLoadedEvent(NotificationDTO notificationDTO);
+  void sendCnFirstOuDispatchNotification(NotificationDTO notificationDTO);
 
   void sendCnDrsDispatchEvent(NotificationDTO notificationDTO);
 
