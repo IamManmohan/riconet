@@ -21,18 +21,23 @@ public class WmsEventTriggerService {
         appNotificationService.sendTaskNotifications(notificationDTO, WmsEventName.IB_CLEAR);
         break;
       case TASK_CLOSED_OR_CANCELLED:
+      case TASK_CLOSED_OR_REASSIGNED:
         appNotificationService.sendTaskNotifications(notificationDTO, eventName);
         appNotificationService.sendTaskNotifications(
             notificationDTO, WmsEventName.TASK_CLOSED_OR_REASSIGNED);
         break;
+      case CN_REMOVED_FROM_UNLOADING:
+      case CN_UNLOADING_PLAN_UNPLAN:
+        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
+        appNotificationService.sendTaskNotifications(
+            notificationDTO, WmsEventName.CN_UNLOADING_PLAN_UNPLAN);
       case MANIFEST_CLOSED:
       case PALLET_CLOSED:
-      case TASK_SUBMITTED:
+      case TASK_SUBMITTED_ANOTHER_USER:
       case TASK_UNASSIGNED:
       case TASK_UPSERT:
       case CN_LOADING_PLAN_UNPLAN:
       case CN_TOTAL_BOXES_CHANGE:
-      case CN_UNLOADING_PLAN_UNPLAN:
         appNotificationService.sendTaskNotifications(notificationDTO, eventName);
         break;
       case SHOP_FLOOR_STATUS_UPDATE:
