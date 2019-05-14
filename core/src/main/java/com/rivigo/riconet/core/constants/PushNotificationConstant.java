@@ -34,9 +34,11 @@ public class PushNotificationConstant {
 
   // notification identifier required for express app
   public static final String NOTIFICATION_IDENTIFIER_KEY = "identifier";
-  public static final String NOTIFICATION_BODY_AND_TITLE_KEY = "notification";
+  public static final String NOTIFICATION = "notification";
+  public static final String NOTIFICATION_DATA = "notificationData";
   public static final String NOTIFICATION_BODY_KEY = "body";
   public static final String NOTIFICATION_TITLE_KEY = "title";
+  public static final String NOTIFICATION_ACTIONS = "actions";
   // identifiers
   public static final String CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE = "Dispatched";
   public static final String CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE = "DISPATCHED";
