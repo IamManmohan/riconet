@@ -392,13 +392,10 @@ public class QcServiceTest {
     ConsignmentCodDod consignmentCodDod = new ConsignmentCodDod();
     consignmentCodDod.setPaymentType(PaymentType.CHEQUE);
     when(consignmentService.getConsignmentById(1l)).thenReturn(consignment);
-    // Following exception shouldn't stop the flow
-    doThrow(new ZoomException()).when(zoomBackendAPIClientService).triggerPolicyGeneration(1l);
     when(consignmentCodDodService.getActiveCodDod(consignment.getId()))
         .thenReturn(consignmentCodDod);
     qcService.consumeCompletionEvent(data);
     verify(smsService, times(1)).sendSms(any(), any());
-    verify(zoomBackendAPIClientService, times(1)).triggerPolicyGeneration(1l);
   }
 
   //  @Test
