@@ -37,6 +37,7 @@ public class PushNotificationConstant {
   public static final String NOTIFICATION = "notification";
   public static final String NOTIFICATION_DATA = "notificationData";
   public static final String NOTIFICATION_BODY_KEY = "body";
+  public static final String NOTIFICATION_URL = "url";
   public static final String NOTIFICATION_TITLE_KEY = "title";
   public static final String NOTIFICATION_ACTIONS = "actions";
   // identifiers
@@ -58,4 +59,18 @@ public class PushNotificationConstant {
   public static final String PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE = "Request cancelled";
   public static final String PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE =
       "We are sorry we could not cater to your pickup request. We hope to serve you again soon.";
+
+  public static final String RETAIL_APP_URL = "https://rivigo.com/express";
+  public static final String RETAIL_APP_LOGIN_PATH = "/login";
+  public static final String RETAIL_APP_TRACK_CN_PATH = "/track-consignment";
+  public static final String RETAIL_APP_TRACK_CALL_PATH = "/track-consignment";
+  public static final String RETAIL_APP_BOOKING_PATH = "/booking";
+  public static final String RETAIL_APP_POD_PATH = "/pod";
+  public static final String RETAIL_APP_TRACK_POD_PATH = "/track-pod";
+  public static final String RETAIL_APP_CREATE_BOOKING_PATH = "/create-booking";
+
+  public static final String RETAIL_APP_NOTIFICATION_ACTION_OPEN = "OPEN";
+  public static final String RETAIL_APP_NOTIFICATION_ACTION_TRACK = "TRACK";
+  public static final String RETAIL_APP_NOTIFICATION_ACTION_CALL = "CALL";
+  public static final String RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD = "VIEW POD";
 }

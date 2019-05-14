@@ -69,7 +69,6 @@ public class EventTriggerService {
             entityId, TicketEntityType.CN.name(), eventName.name());
         break;
       case PICKUP_CANCELLATION:
-        appNotificationService.sendPickupCancellationNotification(notificationDTO);
         ticketingClientService.autoCloseTicket(
             notificationDTO.getEntityId().toString(),
             TicketEntityType.PRQ.name(),
@@ -80,12 +79,6 @@ public class EventTriggerService {
             notificationDTO.getEntityId().toString(),
             TicketEntityType.PRQ.name(),
             eventName.name());
-        break;
-      case PICKUP_ASSIGNMENT:
-        appNotificationService.sendPickUpAssignmentEvent(notificationDTO);
-        break;
-      case PICKUP_REACHED_AT_CLIENT_WAREHOUSE:
-        appNotificationService.sendPickUpReachedAtClientAddress(notificationDTO);
         break;
       case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
         ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);

@@ -11,11 +11,13 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_CN_DELIVERY_DELAYED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_TOPAY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_ACTIONS;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_BODY_KEY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_IDENTIFIER_KEY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TITLE_KEY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_URL;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.OU_CODE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
@@ -32,6 +34,15 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_BOOKING_PATH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_CALL;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_TRACK;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_POD_PATH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_CALL_PATH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_CN_PATH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_POD_PATH;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_URL;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.SHOP_FLOOR_ENABLED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
@@ -61,6 +72,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.DeviceAppVersionMapperRepository;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -258,6 +270,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             });
   }
 
+  // Paused
   @Override
   public void sendPickUpAssignmentEvent(NotificationDTO notificationDTO) {
 
@@ -318,6 +331,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     return pushObject;
   }
 
+  // Paused
   @Override
   public void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO) {
 
@@ -365,6 +379,26 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ApplicationId.retail_app);
   }
 
+  // Paused
+  @Override
+  public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
+    Long pickUpCreatorUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
+    JSONObject notificationData = new JSONObject();
+    notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    notificationData.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
+    JSONObject notification = new JSONObject();
+    notification.put(NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
+    notification.put(NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
+    log.info(
+        "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
+    sendNotification(
+        getJsonObjectForRetailApp(notificationData, notification),
+        pickUpCreatorUserId,
+        ApplicationId.retail_app);
+  }
+
   @Override
   public void sendCnFirstOuDispatchNotification(NotificationDTO notificationDTO) {
     // cnote and consignor/consignee.
@@ -391,6 +425,22 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sb.append(" has been dispatched! ");
     notification.put(NOTIFICATION_BODY_KEY, sb.toString());
     notification.put(NOTIFICATION_TITLE_KEY, CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        NOTIFICATION_URL,
+        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_BOOKING_PATH).toString());
+    List<JSONObject> actions = new ArrayList<>();
+    JSONObject trackObject = new JSONObject();
+    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_TRACK);
+    trackObject.put(
+        NOTIFICATION_URL,
+        new StringBuilder()
+            .append(RETAIL_APP_URL)
+            .append(RETAIL_APP_TRACK_CN_PATH)
+            .append("/")
+            .append(cnote)
+            .toString());
+    actions.add(trackObject);
+    notification.put(NOTIFICATION_ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
@@ -457,6 +507,33 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     notification.put(NOTIFICATION_BODY_KEY, sb.toString());
     notification.put(NOTIFICATION_TITLE_KEY, CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        NOTIFICATION_URL,
+        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_BOOKING_PATH).toString());
+    List<JSONObject> actions = new ArrayList<>();
+    JSONObject trackObject = new JSONObject();
+    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_TRACK);
+    trackObject.put(
+        NOTIFICATION_URL,
+        new StringBuilder()
+            .append(RETAIL_APP_URL)
+            .append(RETAIL_APP_TRACK_CN_PATH)
+            .append("/")
+            .append(cnote)
+            .toString());
+    actions.add(trackObject);
+    JSONObject callObject = new JSONObject();
+    callObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_CALL);
+    callObject.put(
+        NOTIFICATION_URL,
+        new StringBuilder()
+            .append(RETAIL_APP_URL)
+            .append(RETAIL_APP_TRACK_CALL_PATH)
+            .append("/")
+            .append(tpmCaptainPhoneNumber)
+            .toString());
+    actions.add(callObject);
+    notification.put(NOTIFICATION_ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
@@ -504,6 +581,22 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject notification = new JSONObject();
     notification.put(NOTIFICATION_BODY_KEY, sb.toString());
     notification.put(NOTIFICATION_TITLE_KEY, CN_DELIVERED_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        NOTIFICATION_URL,
+        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_POD_PATH).toString());
+    List<JSONObject> actions = new ArrayList<>();
+    JSONObject trackObject = new JSONObject();
+    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD);
+    trackObject.put(
+        NOTIFICATION_URL,
+        new StringBuilder()
+            .append(RETAIL_APP_URL)
+            .append(RETAIL_APP_TRACK_POD_PATH)
+            .append("/")
+            .append(cnote)
+            .toString());
+    actions.add(trackObject);
+    notification.put(NOTIFICATION_ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
@@ -511,25 +604,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consignorUserId,
-        ApplicationId.retail_app);
-  }
-
-  @Override
-  public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
-    Long pickUpCreatorUserId =
-        getFieldAsLongFromNotificationDto(
-            notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
-    JSONObject notificationData = new JSONObject();
-    notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    notificationData.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
-    JSONObject notification = new JSONObject();
-    notification.put(NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
-    notification.put(NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
-    log.info(
-        "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
-    sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
-        pickUpCreatorUserId,
         ApplicationId.retail_app);
   }
 
