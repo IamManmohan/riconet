@@ -17,5 +17,4 @@ import lombok.Setter;
 public class TaskUserDto implements Serializable {
 
   private String userEmail;
-
 }

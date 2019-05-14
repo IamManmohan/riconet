@@ -16,22 +16,27 @@ public class WmsEventTriggerService {
   public void processNotification(NotificationDTO notificationDTO) {
     WmsEventName eventName = WmsEventName.valueOf(notificationDTO.getEventName());
     switch (eventName) {
+      case CN_INBOUND_CLEAR:
+        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
+        appNotificationService.sendTaskNotifications(notificationDTO, WmsEventName.IB_CLEAR);
+        break;
+      case TASK_CLOSED_OR_CANCELLED:
+        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
+        appNotificationService.sendTaskNotifications(
+            notificationDTO, WmsEventName.TASK_CLOSED_OR_REASSIGNED);
+        break;
+      case MANIFEST_CLOSED:
+      case PALLET_CLOSED:
+      case TASK_SUBMITTED:
+      case TASK_UNASSIGNED:
       case TASK_UPSERT:
-        appNotificationService.sendTaskUpsertNotification(notificationDTO);
+      case CN_LOADING_PLAN_UNPLAN:
+      case CN_TOTAL_BOXES_CHANGE:
+      case CN_UNLOADING_PLAN_UNPLAN:
+        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
         break;
       case SHOP_FLOOR_STATUS_UPDATE:
         appNotificationService.sendShopFloorStatusUpdateNotifications(notificationDTO);
-        break;
-      case PALLET_CLOSED:
-        appNotificationService.sendPalletClosedNotification(notificationDTO);
-        break;
-      case TASK_CLOSED_OR_REASSIGNED:
-        appNotificationService.sendTaskClosedOrReassignedNotification(notificationDTO);
-        break;
-      case CN_TOTAL_BOXES_CHANGE:
-      case CN_LOADING_PLAN_UNPLAN:
-      case CN_UNLOADING_PLAN_UNPLAN:
-        appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

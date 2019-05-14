@@ -18,6 +18,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFIC
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.OU_CODE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
+import static com.rivigo.riconet.core.constants.PushNotificationConstant.PALLET_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_MOBILE_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_NAME;
@@ -34,26 +35,18 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_ST
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
-import com.google.common.collect.ImmutableMap;
-import com.rivigo.riconet.core.constants.PushNotificationConstant;
-import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.wms.TaskDto;
-import com.rivigo.riconet.core.dto.wms.TaskUserDto;
 import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Wms;
 import com.rivigo.riconet.core.service.AppNotificationService;
-import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
-import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.PaymentMode;
-import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
@@ -66,11 +59,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -85,157 +74,59 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
-  @Autowired private ConsignmentScheduleService consignmentScheduleService;
-
-  @Autowired
-  @Qualifier("datastoreRestClientUtilityServiceImpl")
-  private RestClientUtilityService datastoreRestService;
-
   @Autowired private LocationService locationService;
 
   @Autowired private UserMasterService userMasterService;
 
-  @Value("${zoom.wms.url}")
-  private String zoomWmsUrl;
-
   @Override
-  public void sendTaskUpsertNotification(NotificationDTO notificationDTO) {
-    Long taskId = notificationDTO.getEntityId();
-    Long parentTaskId = null;
-    if (notificationDTO.getMetadata().containsKey(Wms.PARENT_TASK_ID.name())) {
-      parentTaskId = Long.valueOf(notificationDTO.getMetadata().get(Wms.PARENT_TASK_ID.name()));
-    }
-
-    JSONObject pushObject = new JSONObject();
+  public void sendTaskNotifications(NotificationDTO notificationDTO, WmsEventName eventName) {
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, WmsEventName.TASK_UPSERT.name());
-    data.put(TASK_ID, taskId);
-    data.put(PARENT_TASK_ID, parentTaskId);
+    data.put(NOTIFICATION_TYPE, eventName.name());
+    if (notificationDTO.getMetadata().containsKey(Wms.TASK_ID.name())) {
+      data.put(TASK_ID, Long.valueOf(notificationDTO.getMetadata().get(Wms.TASK_ID.name())));
+    }
+    if (notificationDTO.getMetadata().containsKey(Wms.PARENT_TASK_ID.name())) {
+      data.put(
+          PARENT_TASK_ID,
+          Long.valueOf(notificationDTO.getMetadata().get(Wms.PARENT_TASK_ID.name())));
+    }
+    if (notificationDTO.getMetadata().containsKey(Wms.PALLET_ID.name())) {
+      Long palletId = Long.valueOf(notificationDTO.getMetadata().get(Wms.PALLET_ID.name()));
+      data.put(PALLET_ID, palletId);
+      data.put(ENTITY_ID, palletId); // TODO: Chirag: Remove below after PAN INDIA release
+    }
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
+    JSONObject pushObject = new JSONObject();
     pushObject.put(DATA, data);
-    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
-  }
-
-  private List<String> getUserEmailList(NotificationDTO notificationDTO) {
-    return Arrays.asList(notificationDTO.getMetadata().get(Wms.USER_EMAIL_LIST.name()).split(","));
+    sendNotification(
+        pushObject,
+        Arrays.asList(notificationDTO.getMetadata().get(Wms.USER_EMAIL_LIST.name()).split(",")),
+        ApplicationId.scan_app);
   }
 
   @Override
   public void sendShopFloorStatusUpdateNotifications(NotificationDTO notificationDTO) {
-    String ouCode = notificationDTO.getMetadata().get(Wms.OU_CODE.name());
+    String ouCode = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OU_CODE.name());
     Boolean shopFloorEnabled =
         Boolean.valueOf(notificationDTO.getMetadata().get(Wms.SHOP_FLOOR_ENABLED.name()));
 
     JSONObject pushObject = new JSONObject();
 
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, WmsEventName.SHOP_FLOOR_STATUS_UPDATE.name());
+    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     data.put(OU_CODE, ouCode);
     data.put(SHOP_FLOOR_ENABLED, shopFloorEnabled);
     data.put(TIME_STAMP, notificationDTO.getTsMs());
 
     pushObject.put(DATA, data);
-    // TODO: Uncomment me
-    //    Location locationByCode = locationService.getLocationByCode(ouCode);
-    //    List<DeviceAppVersionMapper> deviceAppVersionMapperList =
-    //        deviceAppVersionMapperRepository.findByAppIdAndLocationId(
-    //            ApplicationId.scan_app.name(), locationByCode.getId());
-    //    sendNotification(pushObject, deviceAppVersionMapperList, ApplicationId.scan_app);
-  }
-
-  @Override
-  public void sendLoadingUnloadingNotification(NotificationDTO notificationDTO) {
-    Long taskId = notificationDTO.getEntityId();
-
-    TaskType taskType = TaskType.valueOf(notificationDTO.getMetadata().get(Wms.TASK_TYPE.name()));
-
-    JSONObject pushObject = new JSONObject();
-
-    JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_TYPE, taskType.name());
-    data.put(TASK_ID, taskId);
-    data.put(TIME_STAMP, notificationDTO.getTsMs());
-
-    pushObject.put(DATA, data);
-    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
-  }
-
-  @Override
-  public void sendPalletClosedNotification(NotificationDTO notificationDTO) {
-    Long palletId = notificationDTO.getEntityId();
-    Long taskId = Long.valueOf(notificationDTO.getMetadata().get(Wms.TASK_ID.name()));
-    JSONObject pushObject = new JSONObject();
-    JSONObject data = new JSONObject();
-
-    data.put(ENTITY_ID, palletId);
-    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put(TASK_ID, taskId);
-
-    pushObject.put(DATA, data);
-    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
-  }
-
-  @Override
-  public void sendTaskClosedOrReassignedNotification(NotificationDTO notificationDTO) {
-    Long taskId = notificationDTO.getEntityId();
-    JSONObject pushObject = new JSONObject();
-    JSONObject data = new JSONObject();
-
-    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put(TASK_ID, taskId);
-
-    pushObject.put(DATA, data);
-    sendNotification(pushObject, getUserEmailList(notificationDTO), ApplicationId.scan_app);
-  }
-
-  @Override
-  public void sendIBClearEvent(NotificationDTO notificationDTO) {
-    Long locationId =
-        Long.valueOf(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.LOCATION_ID.name()));
-    consignmentScheduleService
-        .getCacheForConsignmentAtLocation(notificationDTO.getEntityId(), locationId)
-        .flatMap(
-            cache -> {
-              Location location = locationService.getLocationById(locationId);
-              HttpEntity<?> entity = new HttpEntity<>(datastoreRestService.getHeaders());
-              return datastoreRestService.executeRest(
-                  datastoreRestService.buildUrlWithParams(
-                      zoomWmsUrl + UrlConstant.WMS_TASK_BY_TRIP_LOCATION_AND_TYPE,
-                      ImmutableMap.of(
-                          "tripId",
-                          String.valueOf(cache.getTripId()),
-                          "tripType",
-                          String.valueOf(cache.getTripType()),
-                          "locationCode",
-                          location.getCode(),
-                          "taskType",
-                          String.valueOf(TaskType.LOADING))),
-                  HttpMethod.GET,
-                  entity,
-                  TaskDto.class);
-            })
-        .ifPresent(
-            taskDto -> {
-              log.info("Sending ib clear event for {}", notificationDTO.getEntityId());
-              JSONObject pushObject = new JSONObject();
-              JSONObject data = new JSONObject();
-
-              data.put(NOTIFICATION_TYPE, PushNotificationConstant.IB_CLEAR_EVENT);
-              data.put(TASK_ID, taskDto.getId());
-
-              pushObject.put(DATA, data);
-              sendNotification(
-                  pushObject,
-                  taskDto
-                      .getUserList()
-                      .stream()
-                      .map(TaskUserDto::getUserEmail)
-                      .collect(Collectors.toList()),
-                  ApplicationId.scan_app);
-            });
+    Location locationByCode = locationService.getLocationByCode(ouCode);
+    List<DeviceAppVersionMapper> deviceAppVersionMapperList =
+        deviceAppVersionMapperRepository.findByAppIdAndLocationId(
+            ApplicationId.scan_app.name(), locationByCode.getId());
+    sendNotificationForDeviceAppDetails(
+        pushObject, deviceAppVersionMapperList, ApplicationId.scan_app);
   }
 
   @Override

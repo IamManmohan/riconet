@@ -7,6 +7,7 @@ public enum ZoomCommunicationFieldNames {
   LOCATION_ID,
   TO_LOCATION_ID,
   CONSIGNMENT_ID,
+  OU_CODE,
   STATUS,
   INSTRUMENT_NUMBER,
   DRAWEE_BANK,
@@ -65,10 +66,10 @@ public enum ZoomCommunicationFieldNames {
 
   public enum Wms {
     TASK_ID,
+    PALLET_ID,
     PARENT_TASK_ID,
     TASK_TYPE,
     SHOP_FLOOR_ENABLED,
-    OU_CODE,
     USER_EMAIL_LIST
   }
 }
