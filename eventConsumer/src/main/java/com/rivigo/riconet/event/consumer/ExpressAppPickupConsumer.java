@@ -47,6 +47,6 @@ public class ExpressAppPickupConsumer extends ConsumerModel {
       return;
     }
     log.debug("Event Payload {}", map);
-    expressAppPickupService.processExpressPickupEvent(map);
+    expressAppPickupService.processExpressPickupAutoCancellationEvent(map);
   }
 }

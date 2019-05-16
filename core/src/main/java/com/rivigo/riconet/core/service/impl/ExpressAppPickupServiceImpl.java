@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class ExpressAppPickupServiceImpl implements ExpressAppPickupService {
   @Override
-  public void processExpressPickupEvent(Map<String, String> map) {
+  public void processExpressPickupAutoCancellationEvent(Map<String, String> map) {
     String metadata = map.get(KairosMessageFieldNames.METADATA.name());
     if (metadata != null) {
       Long pickupId = Long.parseLong(metadata);

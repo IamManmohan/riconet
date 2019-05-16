@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface ExpressAppPickupService {
 
-  void processExpressPickupEvent(Map<String, String> map);
+  void processExpressPickupAutoCancellationEvent(Map<String, String> map);
 }
