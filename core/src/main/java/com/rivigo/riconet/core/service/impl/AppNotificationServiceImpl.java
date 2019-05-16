@@ -675,7 +675,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     try {
       return Long.valueOf(notificationDTO.getMetadata().get(field));
     } catch (Exception e) {
-      log.info(
+      log.error(
           "An exception:{} occurred while getting filed: {} from notificationDTO: {}",
           e,
           field,
@@ -705,14 +705,15 @@ public class AppNotificationServiceImpl implements AppNotificationService {
           Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
               .map(Long::valueOf)
               .collect(Collectors.toList());
+
+      deviceAppVersionMappers.addAll(
+          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId));
       log.info(
           "Staging server. Sending notification for users {}",
           deviceAppVersionMappers
               .stream()
               .map(DeviceAppVersionMapper::getUserId)
               .collect(Collectors.toSet()));
-      deviceAppVersionMappers =
-          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId);
     }
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
