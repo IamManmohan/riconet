@@ -610,14 +610,14 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
   @Override
   public void sendCnDelayedNotification(NotificationDTO notificationDTO) {
-    JSONObject pushObject = new JSONObject();
-    JSONObject data = new JSONObject();
-
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
     if (cnote == null) {
       log.warn("Cannot send notification when cnote is null");
       return;
     }
+
+    JSONObject notificationData = new JSONObject();
+    JSONObject notification = new JSONObject();
 
     Long consignorUserId =
         getFieldAsLongFromNotificationDto(
@@ -627,30 +627,45 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
 
-    data.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    data.put(CNOTE, cnote);
+    notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    notificationData.put(CNOTE, cnote);
 
     StringBuilder sb = new StringBuilder();
     sb.append("We're sorry your shipment ");
     sb.append(cnote);
     sb.append(
-        " is late. We're working to get it delivered soon and will let you know once it is out for delivery.");
+        " is expected to be delayed. We're working on getting it delivered soon and will let you know once it is out for delivery.");
 
-    data.put(NOTIFICATION_IDENTIFIER_KEY, "CN_DELAYED");
+    notificationData.put(NOTIFICATION_IDENTIFIER_KEY, "CN_DELAYED");
 
-    JSONObject notificationBodyAndTitle = new JSONObject();
-    notificationBodyAndTitle.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notificationBodyAndTitle.put(NOTIFICATION_TITLE_KEY, CN_DELAYED_NOTIFICATION_TITLE_VALUE);
+    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
+    notification.put(NOTIFICATION_TITLE_KEY, CN_DELAYED_NOTIFICATION_TITLE_VALUE);
 
-    pushObject.put(DATA, data);
+    notification.put(
+        NOTIFICATION_URL,
+        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_BOOKING_PATH).toString());
+    List<JSONObject> actions = new ArrayList<>();
+    JSONObject trackObject = new JSONObject();
+    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_TRACK);
+    trackObject.put(
+        NOTIFICATION_URL,
+        new StringBuilder()
+            .append(RETAIL_APP_URL)
+            .append(RETAIL_APP_TRACK_CN_PATH)
+            .append("/")
+            .append(cnote)
+            .toString());
+    actions.add(trackObject);
+    notification.put(NOTIFICATION_ACTIONS, actions);
 
-    log.info("CN DELAYED: {}", pushObject.toString());
+    log.info("CN DELAYED: {} {}", notificationData.toString(), notification.toString());
+
     sendNotification(
-        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
         ApplicationId.retail_app);
     sendNotification(
-        getJsonObjectForRetailApp(pushObject, notificationBodyAndTitle),
+        getJsonObjectForRetailApp(notificationData, notification),
         consignorUserId,
         ApplicationId.retail_app);
   }
