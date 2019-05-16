@@ -39,6 +39,9 @@ public class TopicNameConfig {
   @Value("${WMS_EVENT_SINK_ERROR}")
   private String wmsEventSinkError;
 
+  @Value("${KAIROS_RETAIL_APP_SINK}")
+  private String kairosRetailAppSinkTopic;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -77,5 +80,9 @@ public class TopicNameConfig {
 
   public String wmsEventSinkError() {
     return wmsEventSinkError;
+  }
+
+  public String kairosRetailAppSinkTopic() {
+    return kairosRetailAppSinkTopic;
   }
 }

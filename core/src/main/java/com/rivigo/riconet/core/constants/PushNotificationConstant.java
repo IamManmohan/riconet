@@ -73,4 +73,5 @@ public class PushNotificationConstant {
   public static final String RETAIL_APP_NOTIFICATION_ACTION_TRACK = "TRACK";
   public static final String RETAIL_APP_NOTIFICATION_ACTION_CALL = "CALL";
   public static final String RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD = "VIEW POD";
+  public static final String CN_DELAYED_NOTIFICATION_TITLE_VALUE = "Consignment Delayed";
 }
