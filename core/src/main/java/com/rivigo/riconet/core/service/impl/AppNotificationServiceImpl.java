@@ -1,55 +1,27 @@
 package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.CNOTE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DELIVERED_NOTIFICATION_TITLE_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.DATA;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ENTITY_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.HIGH;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_CN_DELIVERY_DELAYED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.IS_TOPAY;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_ACTIONS;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_BODY_KEY;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_DATA;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_IDENTIFIER_KEY;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TITLE_KEY;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_TYPE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.NOTIFICATION_URL;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.ONLINE_PAYMENT_LINK;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.OU_CODE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARENT_TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_MOBILE_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PARTNER_NAME;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_IDENTIFIER_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NAME;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_CAPTAIN_NUMBER;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_ID;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_BOOKING_PATH;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_CALL;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_TRACK;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_POD_PATH;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_CALL_PATH;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_CN_PATH;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_TRACK_POD_PATH;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.RETAIL_APP_URL;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.SHOP_FLOOR_ENABLED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
-import static com.rivigo.riconet.core.constants.PushNotificationConstant.TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
 import com.google.common.collect.ImmutableMap;
+import com.rivigo.riconet.core.constants.ExpressAppConstants;
 import com.rivigo.riconet.core.constants.PushNotificationConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -308,13 +280,16 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     notificationData.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     notificationData.put(
-        NOTIFICATION_IDENTIFIER_KEY, PICKUP_ASSIGNED_NOTIFICATION_IDENTIFIER_VALUE);
+        ExpressAppConstants.NotificationKey.IDENTIFIER,
+        ExpressAppConstants.NotificationIdentifier.PICKUP_ASSIGNED);
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     JSONObject notification = new JSONObject();
-    StringBuilder sb = new StringBuilder();
-    sb.append("Your pickup partner has been assigned! ");
-    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notification.put(NOTIFICATION_TITLE_KEY, PICKUP_ASSIGNED_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        ExpressAppConstants.NotificationKey.BODY,
+        ExpressAppConstants.NotificationBody.PICKUP_ASSIGNED);
+    notification.put(
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.PICKUP_ASSIGNED);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         pickUpCreatorUserId,
@@ -325,8 +300,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
       JSONObject notificationData, JSONObject notification) {
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
-    data.put(NOTIFICATION_DATA, notificationData);
-    data.put(NOTIFICATION, notification);
+    data.put(ExpressAppConstants.NotificationKey.NOTIFICATION_DATA, notificationData);
+    data.put(ExpressAppConstants.NotificationKey.NOTIFICATION, notification);
     pushObject.put(DATA, data);
     return pushObject;
   }
@@ -367,12 +342,15 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     notificationData.put(PICKUP_CAPTAIN_NUMBER, pickUpCaptainNumber);
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     notificationData.put(
-        NOTIFICATION_IDENTIFIER_KEY, PICKUP_REACHED_AT_CLIENT_WAREHOUSE_IDENTIFIER_VALUE);
+        ExpressAppConstants.NotificationKey.IDENTIFIER,
+        ExpressAppConstants.NotificationIdentifier.PICKUP_REACHED_AT_CLIENT_WAREHOUSE);
     JSONObject notification = new JSONObject();
-    StringBuilder sb = new StringBuilder();
-    sb.append("Knock, knock! We have reached your location for pickup ");
-    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notification.put(NOTIFICATION_TITLE_KEY, PICKUP_REACHED_AT_LOCATION_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        ExpressAppConstants.NotificationKey.BODY,
+        ExpressAppConstants.NotificationBody.PICKUP_REACHED_AT_CLIENT_WAREHOUSE);
+    notification.put(
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.PICKUP_REACHED_AT_CLIENT_WAREHOUSE);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         pickUpCreatorUserId,
@@ -387,10 +365,16 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
     JSONObject notificationData = new JSONObject();
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
-    notificationData.put(NOTIFICATION_IDENTIFIER_KEY, PICKUP_CANCELLATION_IDENTIFIER_VALUE);
+    notificationData.put(
+        ExpressAppConstants.NotificationKey.IDENTIFIER,
+        ExpressAppConstants.NotificationIdentifier.PICKUP_CANCELLATION);
     JSONObject notification = new JSONObject();
-    notification.put(NOTIFICATION_BODY_KEY, PICKUP_CANCELLATION_NOTIFICATION_BODY_VALUE);
-    notification.put(NOTIFICATION_TITLE_KEY, PICKUP_CANCELLATION_NOTIFICATION_TITLE_VALUE);
+    notification.put(
+        ExpressAppConstants.NotificationKey.BODY,
+        ExpressAppConstants.NotificationBody.PICKUP_CANCELLATION);
+    notification.put(
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.PICKUP_CANCELLATION);
     log.info(
         "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
     sendNotification(
@@ -417,30 +401,34 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject notificationData = new JSONObject();
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     notificationData.put(CNOTE, cnote);
-    notificationData.put(NOTIFICATION_IDENTIFIER_KEY, CN_FIRST_OU_DISPATCH_IDENTIFIER_VALUE);
+    notificationData.put(
+        ExpressAppConstants.NotificationKey.IDENTIFIER,
+        ExpressAppConstants.NotificationIdentifier.CN_FIRST_OU_DISPATCH);
     JSONObject notification = new JSONObject();
-    StringBuilder sb = new StringBuilder();
-    sb.append("Your shipment ");
-    sb.append(cnote);
-    sb.append(" has been dispatched! ");
-    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notification.put(NOTIFICATION_TITLE_KEY, CN_FIRST_OU_DISPATCH_NOTIFICATION_TITLE_VALUE);
     notification.put(
-        NOTIFICATION_URL,
-        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_BOOKING_PATH).toString());
+        ExpressAppConstants.NotificationKey.BODY,
+        String.format(ExpressAppConstants.NotificationBody.CN_FIRST_OU_DISPATCH, cnote));
+    notification.put(
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.CN_FIRST_OU_DISPATCH);
+    notification.put(
+        ExpressAppConstants.NotificationKey.URL,
+        new StringBuilder()
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(ExpressAppConstants.PageUrl.BOOKING)
+            .toString());
     List<JSONObject> actions = new ArrayList<>();
     JSONObject trackObject = new JSONObject();
-    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_TRACK);
     trackObject.put(
-        NOTIFICATION_URL,
+        ExpressAppConstants.NotificationKey.TITLE, ExpressAppConstants.NotificationAction.TRACK);
+    trackObject.put(
+        ExpressAppConstants.NotificationKey.URL,
         new StringBuilder()
-            .append(RETAIL_APP_URL)
-            .append(RETAIL_APP_TRACK_CN_PATH)
-            .append("/")
-            .append(cnote)
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(String.format(ExpressAppConstants.PageUrl.TRACK_CN, cnote))
             .toString());
     actions.add(trackObject);
-    notification.put(NOTIFICATION_ACTIONS, actions);
+    notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
@@ -461,12 +449,10 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     Long consigneeUserId =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
-
     String cnoteType =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE_TYPE.name());
     String paymentMode =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.PAYMENT_MODE.name());
-
     boolean isToPay = false;
     if (cnoteType != null
         && paymentMode != null
@@ -475,16 +461,17 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     JSONObject notificationData = new JSONObject();
     notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
     notificationData.put(CNOTE, cnote);
-
     if (isToPay) {
       notificationData.put(IS_TOPAY, "TRUE");
       notificationData.put(
-          NOTIFICATION_IDENTIFIER_KEY, TO_PAY_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE);
+          ExpressAppConstants.NotificationKey.IDENTIFIER,
+          ExpressAppConstants.NotificationIdentifier.TO_PAY_CN_OUT_FOR_DELIVERY);
     } else {
       notificationData.put(IS_TOPAY, "FALSE");
-      notificationData.put(NOTIFICATION_IDENTIFIER_KEY, PAID_CN_OUT_FOR_DELIVERY_IDENTIFIER_VALUE);
+      notificationData.put(
+          ExpressAppConstants.NotificationKey.IDENTIFIER,
+          ExpressAppConstants.NotificationIdentifier.PAID_CN_OUT_FOR_DELIVERY);
     }
-
     // put captain's number.
     String tpmCaptainPhoneNumber =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.MOBILE_NO.name());
@@ -492,48 +479,47 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.NAME.name());
     String onlinePaymentLink =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.ONLINE_PAYMENT_LINK.name());
-
     if (onlinePaymentLink != null) notificationData.put(ONLINE_PAYMENT_LINK, onlinePaymentLink);
     JSONObject notification = new JSONObject();
     notificationData.put(PARTNER_MOBILE_NUMBER, tpmCaptainPhoneNumber);
     notificationData.put(PARTNER_NAME, tpmCaptainName);
     StringBuilder sb = new StringBuilder();
-    sb.append("Your shipment ");
-    sb.append(cnote);
-    sb.append(" is out for delivery! ");
+    sb.append(String.format(ExpressAppConstants.NotificationBody.CN_DRS_DISPATCHED, cnote));
     if (isToPay && onlinePaymentLink != null) {
       sb.append("Make your payment now ");
     }
-
-    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notification.put(NOTIFICATION_TITLE_KEY, CN_DRS_DISPATCH_NOTIFICATION_TITLE_VALUE);
+    notification.put(ExpressAppConstants.NotificationKey.BODY, sb.toString());
     notification.put(
-        NOTIFICATION_URL,
-        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_BOOKING_PATH).toString());
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.CN_DRS_DISPATCHED);
+    notification.put(
+        ExpressAppConstants.NotificationKey.URL,
+        new StringBuilder()
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(ExpressAppConstants.PageUrl.BOOKING)
+            .toString());
     List<JSONObject> actions = new ArrayList<>();
     JSONObject trackObject = new JSONObject();
-    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_TRACK);
     trackObject.put(
-        NOTIFICATION_URL,
+        ExpressAppConstants.NotificationKey.TITLE, ExpressAppConstants.NotificationAction.TRACK);
+    trackObject.put(
+        ExpressAppConstants.NotificationKey.URL,
         new StringBuilder()
-            .append(RETAIL_APP_URL)
-            .append(RETAIL_APP_TRACK_CN_PATH)
-            .append("/")
-            .append(cnote)
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(String.format(ExpressAppConstants.PageUrl.TRACK_CN, cnote))
             .toString());
     actions.add(trackObject);
     JSONObject callObject = new JSONObject();
-    callObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_CALL);
     callObject.put(
-        NOTIFICATION_URL,
+        ExpressAppConstants.NotificationKey.TITLE, ExpressAppConstants.NotificationAction.CALL);
+    callObject.put(
+        ExpressAppConstants.NotificationKey.URL,
         new StringBuilder()
-            .append(RETAIL_APP_URL)
-            .append(RETAIL_APP_TRACK_CALL_PATH)
-            .append("/")
-            .append(tpmCaptainPhoneNumber)
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(String.format(ExpressAppConstants.PageUrl.CALL, tpmCaptainPhoneNumber))
             .toString());
     actions.add(callObject);
-    notification.put(NOTIFICATION_ACTIONS, actions);
+    notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
@@ -572,31 +558,35 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         && deliveryDateTime > promisedDeliveryDateTime) {
       notificationData.put(IS_CN_DELIVERY_DELAYED, "TRUE");
       sb.append("! We sincerely apologize for any inconvenience due to the delay");
-      notificationData.put(NOTIFICATION_IDENTIFIER_KEY, "DELIVERED_DELAYED");
+      notificationData.put(ExpressAppConstants.NotificationKey.IDENTIFIER, "DELIVERED_DELAYED");
     } else {
       notificationData.put(IS_CN_DELIVERY_DELAYED, "FALSE");
       sb.append(" on time");
-      notificationData.put(NOTIFICATION_IDENTIFIER_KEY, "DELIVERED");
+      notificationData.put(ExpressAppConstants.NotificationKey.IDENTIFIER, "DELIVERED");
     }
     JSONObject notification = new JSONObject();
-    notification.put(NOTIFICATION_BODY_KEY, sb.toString());
-    notification.put(NOTIFICATION_TITLE_KEY, CN_DELIVERED_NOTIFICATION_TITLE_VALUE);
+    notification.put(ExpressAppConstants.NotificationKey.BODY, sb.toString());
     notification.put(
-        NOTIFICATION_URL,
-        new StringBuilder().append(RETAIL_APP_URL).append(RETAIL_APP_POD_PATH).toString());
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.CN_DELIVERED);
+    notification.put(
+        ExpressAppConstants.NotificationKey.URL,
+        new StringBuilder()
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(ExpressAppConstants.PageUrl.POD)
+            .toString());
     List<JSONObject> actions = new ArrayList<>();
     JSONObject trackObject = new JSONObject();
-    trackObject.put(NOTIFICATION_TITLE_KEY, RETAIL_APP_NOTIFICATION_ACTION_VIEW_POD);
     trackObject.put(
-        NOTIFICATION_URL,
+        ExpressAppConstants.NotificationKey.TITLE, ExpressAppConstants.NotificationAction.POD);
+    trackObject.put(
+        ExpressAppConstants.NotificationKey.URL,
         new StringBuilder()
-            .append(RETAIL_APP_URL)
-            .append(RETAIL_APP_TRACK_POD_PATH)
-            .append("/")
-            .append(cnote)
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(String.format(ExpressAppConstants.PageUrl.TRACK_POD, cnote))
             .toString());
     actions.add(trackObject);
-    notification.put(NOTIFICATION_ACTIONS, actions);
+    notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
         getJsonObjectForRetailApp(notificationData, notification),
         consigneeUserId,
