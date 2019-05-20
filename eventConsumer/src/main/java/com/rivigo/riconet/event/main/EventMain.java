@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
+import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
@@ -40,6 +41,8 @@ public class EventMain {
 
   private final WmsEventConsumer wmsEventConsumer;
 
+  private final ExpressAppPickupConsumer expressAppPickupConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -48,13 +51,15 @@ public class EventMain {
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
-      WmsEventConsumer wmsEventConsumer) {
+      WmsEventConsumer wmsEventConsumer,
+      ExpressAppPickupConsumer expressAppPickupConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
+    this.expressAppPickupConsumer = expressAppPickupConsumer;
   }
 
   public static void main(String[] args) {
@@ -107,6 +112,12 @@ public class EventMain {
         bootstrapServers,
         config.getString("wmsEventConsumer.group.id"),
         wmsEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("expressAppPickupConsumer.group.id"),
+        expressAppPickupConsumer);
   }
 
   private void load(
