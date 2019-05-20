@@ -28,4 +28,6 @@ public interface AppNotificationService {
   void sendCnDeliveredNotification(NotificationDTO notificationDTO);
 
   void sendPickupCancellationNotification(NotificationDTO notificationDTO);
+
+  void sendCnDelayedNotification(NotificationDTO notificationDTO);
 }

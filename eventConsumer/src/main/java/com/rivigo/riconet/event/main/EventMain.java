@@ -10,6 +10,7 @@ import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
+import com.rivigo.riconet.event.consumer.KairosRetailAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
@@ -40,6 +41,8 @@ public class EventMain {
 
   private final WmsEventConsumer wmsEventConsumer;
 
+  private final KairosRetailAppEventConsumer kairosRetailAppEventConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -48,13 +51,15 @@ public class EventMain {
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
-      WmsEventConsumer wmsEventConsumer) {
+      WmsEventConsumer wmsEventConsumer,
+      KairosRetailAppEventConsumer kairosRetailAppEventConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
+    this.kairosRetailAppEventConsumer = kairosRetailAppEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -107,6 +112,12 @@ public class EventMain {
         bootstrapServers,
         config.getString("wmsEventConsumer.group.id"),
         wmsEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("kairosRetailAppEventConsumer.group.id"),
+        kairosRetailAppEventConsumer);
   }
 
   private void load(

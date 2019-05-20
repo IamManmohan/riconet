@@ -597,12 +597,76 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ApplicationId.retail_app);
   }
 
+  @Override
+  public void sendCnDelayedNotification(NotificationDTO notificationDTO) {
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    if (cnote == null) {
+      log.warn("Cannot send notification when cnote is null");
+      return;
+    }
+
+    JSONObject notificationData = new JSONObject();
+    JSONObject notification = new JSONObject();
+
+    Long consignorUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name());
+
+    Long consigneeUserId =
+        getFieldAsLongFromNotificationDto(
+            notificationDTO, ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name());
+
+    notificationData.put(NOTIFICATION_TYPE, notificationDTO.getEventName());
+    notificationData.put(CNOTE, cnote);
+
+    notificationData.put(
+        ExpressAppConstants.NotificationKey.IDENTIFIER,
+        ExpressAppConstants.NotificationIdentifier.CN_DELAYED);
+
+    notification.put(
+        ExpressAppConstants.NotificationKey.BODY,
+        String.format(ExpressAppConstants.NotificationBody.CN_DELAYED, cnote));
+    notification.put(
+        ExpressAppConstants.NotificationKey.TITLE,
+        ExpressAppConstants.NotificationTitle.CN_DELAYED);
+
+    notification.put(
+        ExpressAppConstants.NotificationKey.URL,
+        new StringBuilder()
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(ExpressAppConstants.PageUrl.BOOKING)
+            .toString());
+    List<JSONObject> actions = new ArrayList<>();
+    JSONObject trackObject = new JSONObject();
+    trackObject.put(
+        ExpressAppConstants.NotificationKey.TITLE, ExpressAppConstants.NotificationAction.TRACK);
+    trackObject.put(
+        ExpressAppConstants.NotificationKey.URL,
+        new StringBuilder()
+            .append(ExpressAppConstants.PageUrl.APP_URL)
+            .append(String.format(ExpressAppConstants.PageUrl.TRACK_CN, cnote))
+            .toString());
+    actions.add(trackObject);
+    notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
+
+    log.info("CN DELAYED: {} {}", notificationData.toString(), notification.toString());
+
+    sendNotification(
+        getJsonObjectForRetailApp(notificationData, notification),
+        consigneeUserId,
+        ApplicationId.retail_app);
+    sendNotification(
+        getJsonObjectForRetailApp(notificationData, notification),
+        consignorUserId,
+        ApplicationId.retail_app);
+  }
+
   private Long getFieldAsLongFromNotificationDto(
       NotificationDTO notificationDTO, @NonNull String field) {
     try {
       return Long.valueOf(notificationDTO.getMetadata().get(field));
     } catch (Exception e) {
-      log.info(
+      log.error(
           "An exception:{} occurred while getting filed: {} from notificationDTO: {}",
           e,
           field,
@@ -632,14 +696,15 @@ public class AppNotificationServiceImpl implements AppNotificationService {
           Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
               .map(Long::valueOf)
               .collect(Collectors.toList());
+
+      deviceAppVersionMappers.addAll(
+          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId));
       log.info(
           "Staging server. Sending notification for users {}",
           deviceAppVersionMappers
               .stream()
               .map(DeviceAppVersionMapper::getUserId)
               .collect(Collectors.toSet()));
-      deviceAppVersionMappers =
-          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId);
     }
     if (CollectionUtils.isEmpty(deviceAppVersionMappers)) {
       log.info("No device registered to the user. Not sending notifications.");
