@@ -11,7 +11,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class PickupDeleteDTOV2 {
+public class PickupDeleteDtoV2 {
   Long id;
   Long failureReasonId;
   Long parentPRQId; // recurring prq  if null then its not a child prq

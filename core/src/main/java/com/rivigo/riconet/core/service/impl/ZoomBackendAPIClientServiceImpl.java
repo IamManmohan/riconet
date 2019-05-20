@@ -7,7 +7,7 @@ import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
-import com.rivigo.riconet.core.dto.PickupDeleteDTOV2;
+import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
@@ -276,7 +276,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
   @Override
   public Boolean deletePickup(Long pickupId) {
-    PickupDeleteDTOV2 pickupDeleteDto = new PickupDeleteDTOV2();
+    PickupDeleteDtoV2 pickupDeleteDto = new PickupDeleteDtoV2();
     pickupDeleteDto.setId(pickupId);
     JsonNode responseJson;
     log.info(" Cancelling pickup with pickup delete dto {}", pickupDeleteDto);
