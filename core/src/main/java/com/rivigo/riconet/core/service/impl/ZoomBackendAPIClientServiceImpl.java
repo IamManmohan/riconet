@@ -284,7 +284,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       responseJson =
           apiClientService.getEntity(
               pickupDeleteDto,
-              HttpMethod.POST,
+              HttpMethod.PUT,
               UrlConstant.ZOOM_BACKEND_CANCEL_PICKUP,
               null,
               backendBaseUrl);
