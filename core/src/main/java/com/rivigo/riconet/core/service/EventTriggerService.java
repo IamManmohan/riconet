@@ -68,13 +68,8 @@ public class EventTriggerService {
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
         break;
-      case PICKUP_CANCELLATION:
-        ticketingClientService.autoCloseTicket(
-            notificationDTO.getEntityId().toString(),
-            TicketEntityType.PRQ.name(),
-            eventName.name());
-        break;
       case PICKUP_COMPLETION:
+      case PICKUP_CANCELLATION:
         ticketingClientService.autoCloseTicket(
             notificationDTO.getEntityId().toString(),
             TicketEntityType.PRQ.name(),

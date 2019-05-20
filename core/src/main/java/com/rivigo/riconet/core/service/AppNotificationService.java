@@ -17,8 +17,10 @@ public interface AppNotificationService {
 
   void sendIBClearEvent(NotificationDTO notificationDTO);
 
+  // Paused Express app notification
   void sendPickUpAssignmentEvent(NotificationDTO notificationDTO);
 
+  // Paused Express app notification
   void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
 
   void sendCnFirstOuDispatchNotification(NotificationDTO notificationDTO);
@@ -27,6 +29,7 @@ public interface AppNotificationService {
 
   void sendCnDeliveredNotification(NotificationDTO notificationDTO);
 
+  // Paused Express app notification
   void sendPickupCancellationNotification(NotificationDTO notificationDTO);
 
   void sendCnDelayedNotification(NotificationDTO notificationDTO);

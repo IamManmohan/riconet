@@ -242,7 +242,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             });
   }
 
-  // Paused
+  //Paused Express app notification
   @Override
   public void sendPickUpAssignmentEvent(NotificationDTO notificationDTO) {
 
@@ -306,7 +306,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     return pushObject;
   }
 
-  // Paused
+  //Paused Express app notification
   @Override
   public void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO) {
 
@@ -357,7 +357,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ApplicationId.retail_app);
   }
 
-  // Paused
+  //Paused Express app notification
   @Override
   public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
     Long pickUpCreatorUserId =
