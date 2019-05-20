@@ -21,7 +21,7 @@ public class ExpressAppPickupConsumer extends ConsumerModel {
 
   @Autowired private ExpressAppPickupService expressAppPickupService;
 
-  private ExpressAppPickupConsumer() {
+  public ExpressAppPickupConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
