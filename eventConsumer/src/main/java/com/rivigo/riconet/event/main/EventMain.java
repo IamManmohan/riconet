@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
+import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosRetailAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
@@ -43,6 +44,8 @@ public class EventMain {
 
   private final KairosRetailAppEventConsumer kairosRetailAppEventConsumer;
 
+  private final ExpressAppPickupConsumer expressAppPickupConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -52,7 +55,8 @@ public class EventMain {
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
-      KairosRetailAppEventConsumer kairosRetailAppEventConsumer) {
+      KairosRetailAppEventConsumer kairosRetailAppEventConsumer,
+      ExpressAppPickupConsumer expressAppPickupConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
@@ -60,6 +64,7 @@ public class EventMain {
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
     this.kairosRetailAppEventConsumer = kairosRetailAppEventConsumer;
+    this.expressAppPickupConsumer = expressAppPickupConsumer;
   }
 
   public static void main(String[] args) {
@@ -118,6 +123,12 @@ public class EventMain {
         bootstrapServers,
         config.getString("kairosRetailAppEventConsumer.group.id"),
         kairosRetailAppEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("expressAppPickupConsumer.group.id"),
+        expressAppPickupConsumer);
   }
 
   private void load(

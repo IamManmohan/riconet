@@ -42,6 +42,12 @@ public class TopicNameConfig {
   @Value("${KAIROS_RETAIL_APP_SINK}")
   private String kairosRetailAppSinkTopic;
 
+  @Value("${EXPRESS_APP_PICKUP_SINK}")
+  private String expressAppPickupSink;
+
+  @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
+  private String expressAppPickupSinkError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -84,5 +90,13 @@ public class TopicNameConfig {
 
   public String kairosRetailAppSinkTopic() {
     return kairosRetailAppSinkTopic;
+  }
+
+  public String expressAppPickupSink() {
+    return expressAppPickupSink;
+  }
+
+  public String expressAppPickupSinkError() {
+    return expressAppPickupSinkError;
   }
 }
