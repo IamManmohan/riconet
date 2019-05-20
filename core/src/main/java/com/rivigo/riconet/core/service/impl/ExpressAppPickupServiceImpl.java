@@ -20,6 +20,7 @@ public class ExpressAppPickupServiceImpl implements ExpressAppPickupService {
     if (metadata != null) {
       Long pickupId = Long.parseLong(metadata);
       // take action with this pickupId;
+      zoomBackendAPIClientService.deletePickup(pickupId);
     }
   }
 }
