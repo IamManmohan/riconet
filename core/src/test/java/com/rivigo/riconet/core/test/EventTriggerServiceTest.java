@@ -9,6 +9,8 @@ import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.TicketEntityType;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
@@ -248,5 +250,38 @@ public class EventTriggerServiceTest {
     eventTriggerService.processNotification(notificationDTO);
     verify(datastoreService, times(0))
         .cleanupAddressesUsingEwaybillMetadata(Matchers.eq(notificationDTO));
+  }
+
+  @Test
+  public void cnTripDispatchedEventTest() {
+    String entityId = "1234567890";
+    EventName eventName = EventName.CN_TRIP_DISPATCHED;
+    NotificationDTO notificationDTO;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId);
+    notificationDTO =
+        NotificationDTO.builder().eventName(eventName.name()).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(appNotificationService, times(0))
+        .sendCnFirstOuDispatchNotification(Matchers.eq(notificationDTO));
+    verify(ticketingClientService, times(1))
+        .autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName.name());
+  }
+
+  @Test
+  public void cnTripDispatchedEventTest1() {
+    String entityId = "1234567890";
+    EventName eventName = EventName.CN_TRIP_DISPATCHED;
+    NotificationDTO notificationDTO;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId);
+    metadata.put(ZoomCommunicationFieldNames.FIRST_RIVIGO_OU.name(), "TRUE");
+    notificationDTO =
+        NotificationDTO.builder().eventName(eventName.name()).metadata(metadata).build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(appNotificationService, times(1))
+        .sendCnFirstOuDispatchNotification(Matchers.eq(notificationDTO));
+    verify(ticketingClientService, times(1))
+        .autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName.name());
   }
 }
