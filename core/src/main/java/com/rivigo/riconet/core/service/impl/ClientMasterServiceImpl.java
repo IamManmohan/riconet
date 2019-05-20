@@ -104,6 +104,8 @@ public class ClientMasterServiceImpl implements ClientMasterService {
                 billingEntityDTOList.add(billingEntityDTO);
               });
       clientDTO.setBillingEntities(billingEntityDTOList);
+      // rto_applicable is set to true in case of client addition
+      clientDTO.setRtoApplicable(Boolean.TRUE);
       updatedClient = zoomBackendAPIClientService.addClient(clientDTO);
     } else {
       clientDTO.setId(existingClient.getId());
@@ -112,6 +114,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       clientDTO.setBillingEntities(
           getBillingEntityDTOList(
               clientCreateUpdateDTO.getBillingEntities(), existingClient.getId()));
+      clientDTO.setRtoApplicable(existingClient.getRtoApplicable());
       updatedClient = zoomBackendAPIClientService.updateClient(clientDTO);
     }
     if (updatedClient != null) {
@@ -141,7 +144,6 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientDTO.setCbm(dto.getCbm());
     clientDTO.setInsuranceReqd(dto.getInsuranceRequired());
     clientDTO.setFodApplicable(dto.getFodApplicable());
-    clientDTO.setRtoApplicable(dto.getRtoApplicable());
     if (!CollectionUtils.isEmpty(dto.getNotificationToList())) {
       clientDTO.setNotificationToList(dto.getNotificationToList());
     } else {
