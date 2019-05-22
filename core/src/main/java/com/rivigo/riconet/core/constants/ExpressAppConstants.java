@@ -1,7 +1,5 @@
 package com.rivigo.riconet.core.constants;
 
-import com.vdurmont.emoji.EmojiParser;
-
 /** Created by Deepanshu on 19 May, 2019 */
 public final class ExpressAppConstants {
 
@@ -37,7 +35,7 @@ public final class ExpressAppConstants {
     public static final String CN_DRS_DISPATCHED = "Out for delivery! ";
     public static final String CN_DELIVERED = "Delivered";
     public static final String PICKUP_CANCELLATION = "Request cancelled";
-    public static final String CN_DELAYED = "Sorry!! " + EmojiParser.parseToUnicode(":pray:");
+    public static final String CN_DELAYED = "Sorry!!";
   }
 
   public static class NotificationBody {

@@ -1,5 +1,7 @@
 package com.rivigo.riconet.event.consumer;
 
+import static com.rivigo.riconet.core.constants.EventConsumerNameConstants.KAIROS_RETAIL_APP_EVENT_CONSUMER;
+
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.KairosRetailAppEventName;
@@ -35,6 +37,6 @@ public class KairosRetailAppEventConsumer extends EventConsumer {
 
   @Override
   public String getConsumerName() {
-    return "KairosRetailAppEventConsumer";
+    return KAIROS_RETAIL_APP_EVENT_CONSUMER;
   }
 }
