@@ -9,7 +9,7 @@ public final class ExpressAppConstants {
 
   public static class NotificationKey {
     private NotificationKey() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("NotificationKey constants class");
     }
 
     public static final String IDENTIFIER = "identifier";
@@ -23,7 +23,7 @@ public final class ExpressAppConstants {
 
   public static class NotificationIdentifier {
     private NotificationIdentifier() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("NotificationIdentifier constants class");
     }
 
     public static final String CN_FIRST_OU_DISPATCH = "DISPATCHED";
@@ -38,7 +38,7 @@ public final class ExpressAppConstants {
 
   public static class NotificationTitle {
     private NotificationTitle() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("NotificationTitle constants class");
     }
 
     public static final String CN_FIRST_OU_DISPATCH = "Dispatched";
@@ -52,7 +52,7 @@ public final class ExpressAppConstants {
 
   public static class NotificationBody {
     private NotificationBody() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("NotificationBody constants class");
     }
 
     public static final String PICKUP_CANCELLATION =
@@ -68,7 +68,7 @@ public final class ExpressAppConstants {
 
   public static class PageUrl {
     private PageUrl() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("PageUrl constants class");
     }
 
     public static final String APP_URL = "https://rivigo.com/express";
@@ -83,7 +83,7 @@ public final class ExpressAppConstants {
 
   public static class NotificationAction {
     private NotificationAction() {
-      throw new IllegalStateException("Utility class");
+      throw new IllegalStateException("NotificationAction constants class");
     }
 
     public static final String OPEN = "OPEN";
