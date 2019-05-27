@@ -13,6 +13,8 @@ public class WmsEventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
+  @Autowired private RTOService rtoService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     WmsEventName eventName = WmsEventName.valueOf(notificationDTO.getEventName());
     switch (eventName) {
@@ -32,6 +34,9 @@ public class WmsEventTriggerService {
       case CN_LOADING_PLAN_UNPLAN:
       case CN_UNLOADING_PLAN_UNPLAN:
         appNotificationService.sendLoadingUnloadingNotification(notificationDTO);
+        break;
+      case TASK_CLOSED:
+        rtoService.processTaskClosedEvent(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

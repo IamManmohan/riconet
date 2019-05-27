@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.WMSConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
@@ -84,6 +85,58 @@ public class RTOServiceImpl implements RTOService {
     } catch (Exception e) {
       log.error(
           "Exception while consuming notificationDTO {}, cnReceivedAtOuEvent for RTO ",
+          notificationDTO);
+    }
+  }
+
+  public void processTaskClosedEvent(NotificationDTO notificationDTO) {
+    try {
+      Map<String, String> metadata = notificationDTO.getMetadata();
+      String taskType = metadata.get(ZoomCommunicationFieldNames.TASK_TYPE.name());
+      String entityId = metadata.get(ZoomCommunicationFieldNames.ENTITY_ID.name());
+      String entityType = metadata.get(ZoomCommunicationFieldNames.ENTITY_TYPE.name());
+
+      if (taskType == null || entityId == null || entityType == null) {
+        log.debug(
+            "Insufficient data taskType {} entityId {} entityType {} for rtoTicketClosure",
+            taskType,
+            entityId,
+            entityType);
+        return;
+      }
+
+      if (!WMSConstant.RTO_REVERSE_TASK_TYPE.equals(taskType)
+          || !WMSConstant.CNOTE_ENTITY_TYPE.equals(entityType)) {
+        log.debug(
+            "Invalid taskType {} or entityType {} for rtoTicketClosure. entityId {}",
+            taskType,
+            entityType,
+            entityId);
+        return;
+      }
+
+      List<TicketDTO> ticketList =
+          zoomTicketingAPIClientService
+              .getTicketsByCnoteAndType(
+                  entityId,
+                  Collections.singletonList(ZoomTicketingConstant.RTO_TICKET_TYPE_ID.toString()))
+              .stream()
+              .filter(ticketDTO -> ticketDTO.getStatus() != TicketStatus.CLOSED)
+              .collect(Collectors.toList());
+
+      if (CollectionUtils.isEmpty(ticketList)) {
+        log.debug("No open RTO tickets found for cnote {}", entityId);
+        return;
+      }
+
+      ticketList.forEach(
+          ticketDTO -> {
+            ticketDTO.setStatus(TicketStatus.CLOSED);
+            zoomTicketingAPIClientService.editTicket(ticketDTO);
+          });
+    } catch (Exception e) {
+      log.error(
+          "Exception while consuming notificationDTO {}, taskClosedEvent for RTO ",
           notificationDTO);
     }
   }
