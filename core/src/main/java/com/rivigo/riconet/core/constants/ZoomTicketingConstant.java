@@ -71,5 +71,5 @@ public class ZoomTicketingConstant {
   public static final String TICKET_QC_BLOCKER_FAILURE_COMMENT =
       "Ticket action failed because of %s . Reopened now. Please take appropriate action and try again";
 
-  public static final Long RTO_TICKET_TYPE_ID = 711L;
+  public static final Long RTO_TICKET_TYPE_ID = 731L;
 }
