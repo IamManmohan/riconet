@@ -4,7 +4,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 
 public interface RTOService {
 
-  void validateAndCreateRTOForwardTask(NotificationDTO notificationDTO);
+  void processRTOAsigneeChangeEvent(NotificationDTO notificationDTO);
 
   void reassignRTOTicketIfExists(NotificationDTO notificationDTO);
 

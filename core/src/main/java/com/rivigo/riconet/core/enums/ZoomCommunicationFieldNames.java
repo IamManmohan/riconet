@@ -58,6 +58,12 @@ public enum ZoomCommunicationFieldNames {
     DELIVERY_DATE_TIME
   }
 
+  public enum Ticketing {
+    ASSIGNEE_LOCATION_CODE,
+    ASSIGNEE_EMAIL_ID,
+    TICKET_ENTITY_ID
+  }
+
   public enum CpbSummary {
     PROMISED_DELIVERY_DATE_TIME,
     SCHEDULED_TIME,

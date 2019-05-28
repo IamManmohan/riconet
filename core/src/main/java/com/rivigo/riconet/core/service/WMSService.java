@@ -1,6 +1,9 @@
 package com.rivigo.riconet.core.service;
 
+import lombok.NonNull;
+
 public interface WMSService {
 
-  void createRTOForwardTask(String cnote, String userEmailId, String userLocationCode);
+  void createOrReassignRTOForwardTask(
+      @NonNull String cnote, @NonNull String userEmailId, @NonNull String userLocationCode);
 }

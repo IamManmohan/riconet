@@ -136,7 +136,7 @@ public class EventTriggerService {
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case RTO_TICKET_ASSIGNEE_CHANGE:
-        rtoService.validateAndCreateRTOForwardTask(notificationDTO);
+        rtoService.processRTOAsigneeChangeEvent(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:

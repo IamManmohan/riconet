@@ -1,5 +1,9 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketing.ASSIGNEE_EMAIL_ID;
+import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketing.ASSIGNEE_LOCATION_CODE;
+import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketing.TICKET_ENTITY_ID;
+
 import com.rivigo.riconet.core.constants.WMSConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -30,19 +34,19 @@ public class RTOServiceImpl implements RTOService {
   @Autowired private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Override
-  public void validateAndCreateRTOForwardTask(NotificationDTO notificationDTO) {
+  public void processRTOAsigneeChangeEvent(NotificationDTO notificationDTO) {
     log.debug("RTO Forward task request for {}", notificationDTO);
     Map<String, String> hmap = notificationDTO.getMetadata();
-    String userLocationCode = hmap.get("ASSIGNEE_LOCATION_CODE");
-    String userEmailId = hmap.get("ASSIGNEE_EMAIL_ID");
-    String cnote = hmap.get("TICKET_ENTITY_ID");
+    String userLocationCode = hmap.get(ASSIGNEE_LOCATION_CODE.name());
+    String userEmailId = hmap.get(ASSIGNEE_EMAIL_ID.name());
+    String cnote = hmap.get(TICKET_ENTITY_ID.name());
 
     if (userLocationCode == null || userEmailId == null || cnote == null) {
       log.debug(
           "Necessary data not found to trigger RTO Forward Task Creation with data {}",
           notificationDTO);
     }
-    wmsService.createRTOForwardTask(cnote, userEmailId, userLocationCode);
+    wmsService.createOrReassignRTOForwardTask(cnote, userEmailId, userLocationCode);
   }
 
   @Override
@@ -74,7 +78,7 @@ public class RTOServiceImpl implements RTOService {
 
       GroupDTO group =
           zoomTicketingAPIClientService.getGroupId(
-              Long.valueOf(locationId), ZoomTicketingConstant.RTO_GROUP_NAME, LocationType.OU);
+              Long.valueOf(locationId), ZoomTicketingConstant.RTO_GROUP_TYPE_NAME, LocationType.OU);
 
       ticketList.forEach(
           ticketDTO -> {
