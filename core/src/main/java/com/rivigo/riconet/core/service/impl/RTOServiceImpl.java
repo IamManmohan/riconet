@@ -98,39 +98,39 @@ public class RTOServiceImpl implements RTOService {
     try {
       Map<String, String> metadata = notificationDTO.getMetadata();
       String taskType = metadata.get(ZoomCommunicationFieldNames.TASK_TYPE.name());
-      String entityId = metadata.get(ZoomCommunicationFieldNames.ENTITY_ID.name());
-      String entityType = metadata.get(ZoomCommunicationFieldNames.ENTITY_TYPE.name());
+      String parentEntityId = metadata.get(ZoomCommunicationFieldNames.PARENT_ENTITY_ID.name());
+      String parentEntityType = metadata.get(ZoomCommunicationFieldNames.PARENT_ENTITY_TYPE.name());
 
-      if (taskType == null || entityId == null || entityType == null) {
+      if (taskType == null || parentEntityId == null || parentEntityType == null) {
         log.debug(
             "Insufficient data taskType {} entityId {} entityType {} for rtoTicketClosure",
             taskType,
-            entityId,
-            entityType);
+            parentEntityId,
+            parentEntityType);
         return;
       }
 
       if (!WMSConstant.RTO_REVERSE_TASK_TYPE.equals(taskType)
-          || !WMSConstant.CNOTE_ENTITY_TYPE.equals(entityType)) {
+          || !WMSConstant.CNOTE_ENTITY_TYPE.equals(parentEntityType)) {
         log.debug(
             "Invalid taskType {} or entityType {} for rtoTicketClosure. entityId {}",
             taskType,
-            entityType,
-            entityId);
+            parentEntityType,
+            parentEntityId);
         return;
       }
 
       List<TicketDTO> ticketList =
           zoomTicketingAPIClientService
               .getTicketsByCnoteAndType(
-                  entityId,
+                  parentEntityId,
                   Collections.singletonList(ZoomTicketingConstant.RTO_TICKET_TYPE_ID.toString()))
               .stream()
               .filter(ticketDTO -> ticketDTO.getStatus() != TicketStatus.CLOSED)
               .collect(Collectors.toList());
 
       if (CollectionUtils.isEmpty(ticketList)) {
-        log.debug("No open RTO tickets found for cnote {}", entityId);
+        log.debug("No open RTO tickets found for cnote {}", parentEntityId);
         return;
       }
 
