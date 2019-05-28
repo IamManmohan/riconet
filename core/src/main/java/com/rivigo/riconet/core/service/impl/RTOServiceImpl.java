@@ -45,6 +45,7 @@ public class RTOServiceImpl implements RTOService {
       log.debug(
           "Necessary data not found to trigger RTO Forward Task Creation with data {}",
           notificationDTO);
+      return;
     }
     wmsService.createOrReassignRTOForwardTask(cnote, userEmailId, userLocationCode);
   }
