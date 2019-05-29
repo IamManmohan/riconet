@@ -26,7 +26,7 @@ public class WMSServiceImpl implements WMSService {
 
   @Autowired private ApiClientService apiClientService;
 
-  @Value("${wms.url}")
+  @Value("${zoom.wms.url}")
   private String wmsBaseUrl;
 
   @Override
