@@ -15,6 +15,7 @@ import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.HandoverService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
+import com.rivigo.riconet.core.service.RTOService;
 import com.rivigo.riconet.core.service.TicketingClientService;
 import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
@@ -61,6 +62,8 @@ public class EventTriggerServiceTest {
   @Mock private AppNotificationService appNotificationService;
 
   @Mock private HandoverService handoverService;
+
+  @Mock private RTOService rtoService;
 
   @Captor private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
 
