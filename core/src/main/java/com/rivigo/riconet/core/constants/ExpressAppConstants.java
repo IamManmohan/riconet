@@ -1,7 +1,5 @@
 package com.rivigo.riconet.core.constants;
 
-import com.vdurmont.emoji.EmojiParser;
-
 /** Created by Deepanshu on 19 May, 2019 */
 public final class ExpressAppConstants {
 
@@ -10,6 +8,10 @@ public final class ExpressAppConstants {
   }
 
   public static class NotificationKey {
+    private NotificationKey() {
+      throw new IllegalStateException("NotificationKey constants class");
+    }
+
     public static final String IDENTIFIER = "identifier";
     public static final String NOTIFICATION = "notification";
     public static final String NOTIFICATION_DATA = "notificationData";
@@ -20,6 +22,10 @@ public final class ExpressAppConstants {
   }
 
   public static class NotificationIdentifier {
+    private NotificationIdentifier() {
+      throw new IllegalStateException("NotificationIdentifier constants class");
+    }
+
     public static final String CN_FIRST_OU_DISPATCH = "DISPATCHED";
     public static final String PICKUP_ASSIGNED = "PICKUP_ASSIGNED";
     public static final String PICKUP_REACHED_AT_CLIENT_WAREHOUSE =
@@ -31,16 +37,24 @@ public final class ExpressAppConstants {
   }
 
   public static class NotificationTitle {
+    private NotificationTitle() {
+      throw new IllegalStateException("NotificationTitle constants class");
+    }
+
     public static final String CN_FIRST_OU_DISPATCH = "Dispatched";
     public static final String PICKUP_ASSIGNED = "Partner assigned";
     public static final String PICKUP_REACHED_AT_CLIENT_WAREHOUSE = "Partner reached";
     public static final String CN_DRS_DISPATCHED = "Out for delivery! ";
     public static final String CN_DELIVERED = "Delivered";
     public static final String PICKUP_CANCELLATION = "Request cancelled";
-    public static final String CN_DELAYED = "Sorry!! " + EmojiParser.parseToUnicode(":pray:");
+    public static final String CN_DELAYED = "Sorry!!";
   }
 
   public static class NotificationBody {
+    private NotificationBody() {
+      throw new IllegalStateException("NotificationBody constants class");
+    }
+
     public static final String PICKUP_CANCELLATION =
         "We are sorry we could not cater to your pickup request. We hope to serve you again soon.";
     public static final String PICKUP_ASSIGNED = "Your pickup partner has been assigned!";
@@ -53,6 +67,10 @@ public final class ExpressAppConstants {
   }
 
   public static class PageUrl {
+    private PageUrl() {
+      throw new IllegalStateException("PageUrl constants class");
+    }
+
     public static final String APP_URL = "https://rivigo.com/express";
     public static final String LOGIN = "/login";
     public static final String TRACK_CN = "/track-consignment/%s";
@@ -64,6 +82,10 @@ public final class ExpressAppConstants {
   }
 
   public static class NotificationAction {
+    private NotificationAction() {
+      throw new IllegalStateException("NotificationAction constants class");
+    }
+
     public static final String OPEN = "OPEN";
     public static final String TRACK = "TRACK";
     public static final String CALL = "CALL";
