@@ -32,6 +32,8 @@ public class EventTriggerService {
 
   @Autowired private HandoverService handoverService;
 
+  @Autowired private RTOService rtoService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
@@ -77,6 +79,7 @@ public class EventTriggerService {
         break;
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
+        rtoService.reassignRTOTicketIfExists(notificationDTO);
         break;
       case CN_LOADED:
         appNotificationService.sendCnLoadedEvent(notificationDTO);
@@ -131,6 +134,9 @@ public class EventTriggerService {
             getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
+        break;
+      case RTO_TICKET_ASSIGNEE_CHANGE:
+        rtoService.processRTOAsigneeChangeEvent(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
       case TICKET_STATUS_CHANGE:
@@ -191,6 +197,10 @@ public class EventTriggerService {
       NotificationDTO notificationDTO) {
     return ConsignmentCompletionEventDTO.builder()
         .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
+        .isRTOCnote(
+            notificationDTO
+                .getMetadata()
+                .containsKey(ZoomCommunicationFieldNames.FORWARD_CONSIGNMENT_ID.name()))
         .consignmentId(
             Long.parseLong(
                 notificationDTO
