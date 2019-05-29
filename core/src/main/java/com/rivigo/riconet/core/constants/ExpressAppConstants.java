@@ -71,7 +71,7 @@ public final class ExpressAppConstants {
       throw new IllegalStateException("PageUrl constants class");
     }
 
-    public static final String APP_URL = "https://rivigo.com/express";
+    public static final String APP_URL = "rivigo://express";
     public static final String LOGIN = "/login";
     public static final String TRACK_CN = "/track-consignment/%s";
     public static final String BOOKING = "/booking";
