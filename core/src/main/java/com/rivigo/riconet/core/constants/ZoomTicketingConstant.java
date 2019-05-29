@@ -19,7 +19,7 @@ public class ZoomTicketingConstant {
 
   public static final String QC_GROUP_NAME = "QC";
 
-  public static final String RTO_GROUP_TYPE_NAME = "Zoom-RTO";
+  public static final String RTO_GROUP_TYPE_NAME = "RTO_Field";
 
   public static final String QC_ACTION_NAME = "qc";
 
