@@ -34,7 +34,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
   private static final String EXPRESS_APP_SERVER_KEY_STAGING =
-      "AAAANqWYBzY:APA91bEpPEGrFH4SXebidxquJaEHom8fzz4L8WM05rAPO0Q9S-URTHV3fhO0tdvQllcuvcBukoInWlfeSIua7ASmWG445Wa7lstSckr-swF3HOZN_99Nm7BV-ExQ15EQJ51cC6D3V2Rr";
+      "AAAAIxD0A1g:APA91bGm99_sxWRYKup5MNxjd9DA4NVkmxjwrzHnAZzLbm-69hyLWegpfQ86mJn4ZIBIyAPQrsShixZXgRe4CKTt6B7JejrIZ4J0YTSWNcUKlveVxwwD-d9JDwdioTKhVKOL55pG0oXd";
 
   private static final String EXPRESS_APP_SERVER_KEY_PROD =
       "AAAAmP-QmNg:APA91bFHjJ-pclgU2_5V7DAwH9sO_VY_sLVwbayH2MzQ-qqiwIbOR1SWcW1vSBAoB_6a_ovygokWzvsENmRs-9IIdZrFIo9JS1wyIkbyG2nzQV3QWhxcU7OUpHag1VMnwIeC698hd44y";
