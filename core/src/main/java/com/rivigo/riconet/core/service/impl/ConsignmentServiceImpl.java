@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.LocationTag;
@@ -44,8 +43,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
-
-  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(

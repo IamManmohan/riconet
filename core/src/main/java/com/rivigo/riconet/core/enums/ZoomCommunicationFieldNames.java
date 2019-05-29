@@ -43,10 +43,17 @@ public enum ZoomCommunicationFieldNames {
   NAME, // tpm partner name
   MOBILE_NO, // tpm partner mobile number
 
-  ONLINE_PAYMENT_LINK;
+  ONLINE_PAYMENT_LINK,
+  FORWARD_CONSIGNMENT_ID;
 
   public enum Consignment {
     DELIVERY_DATE_TIME
+  }
+
+  public enum Ticketing {
+    ASSIGNEE_LOCATION_CODE,
+    ASSIGNEE_EMAIL_ID,
+    TICKET_ENTITY_ID
   }
 
   public enum CpbSummary {
@@ -70,6 +77,9 @@ public enum ZoomCommunicationFieldNames {
     PARENT_TASK_ID,
     TASK_TYPE,
     SHOP_FLOOR_ENABLED,
-    USER_EMAIL_LIST
+    USER_EMAIL_LIST,
+
+    PARENT_ENTITY_ID,
+    PARENT_ENTITY_TYPE,
   }
 }

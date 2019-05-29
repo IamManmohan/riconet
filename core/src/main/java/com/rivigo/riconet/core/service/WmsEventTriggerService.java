@@ -13,6 +13,8 @@ public class WmsEventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
+  @Autowired private RTOService rtoService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     WmsEventName eventName = WmsEventName.valueOf(notificationDTO.getEventName());
     switch (eventName) {
@@ -42,6 +44,9 @@ public class WmsEventTriggerService {
         break;
       case SHOP_FLOOR_STATUS_UPDATE:
         appNotificationService.sendShopFloorStatusUpdateNotifications(notificationDTO);
+        break;
+      case TASK_CLOSED:
+        rtoService.processTaskClosedEvent(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

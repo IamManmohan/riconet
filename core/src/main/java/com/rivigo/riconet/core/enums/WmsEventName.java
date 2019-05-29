@@ -18,5 +18,6 @@ public enum WmsEventName {
   @Deprecated
   IB_CLEAR,
   @Deprecated
-  CN_UNLOADING_PLAN_UNPLAN
+  CN_UNLOADING_PLAN_UNPLAN,
+  TASK_CLOSED
 }
