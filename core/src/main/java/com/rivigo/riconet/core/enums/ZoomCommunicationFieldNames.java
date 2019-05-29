@@ -30,6 +30,8 @@ public enum ZoomCommunicationFieldNames {
   TICKET_ENTITY_ID,
   PARENT_TASK_ID,
   TASK_TYPE,
+  PARENT_ENTITY_ID,
+  PARENT_ENTITY_TYPE,
   ACTION_NAME,
   ACTION_VALUE,
 
@@ -48,12 +50,18 @@ public enum ZoomCommunicationFieldNames {
   MOBILE_NO, // tpm partner mobile number
 
   ONLINE_PAYMENT_LINK,
-
   SHOP_FLOOR_ENABLED,
-  OU_CODE;
+  OU_CODE,
+  FORWARD_CONSIGNMENT_ID;
 
   public enum Consignment {
     DELIVERY_DATE_TIME
+  }
+
+  public enum Ticketing {
+    ASSIGNEE_LOCATION_CODE,
+    ASSIGNEE_EMAIL_ID,
+    TICKET_ENTITY_ID
   }
 
   public enum CpbSummary {
