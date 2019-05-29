@@ -19,7 +19,6 @@ public class ExpressAppPickupServiceImpl implements ExpressAppPickupService {
     String metadata = map.get(KairosMessageFieldNames.METADATA.name());
     if (metadata != null) {
       Long pickupId = Long.parseLong(metadata);
-      // take action with this pickupId;
       zoomBackendAPIClientService.deletePickup(pickupId);
     }
   }
