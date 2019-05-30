@@ -9,14 +9,8 @@ import org.springframework.context.annotation.Configuration;
 @SuppressWarnings("unused")
 public class TopicNameConfig {
 
-  @Value("${RAW_EVENT_SINK}")
-  private String rawEventSink;
-
   @Value("${ENRICHED_EVENT_SINK}")
   private String enrichedEventSink;
-
-  @Value("${RAW_EVENT_SINK_ERROR}")
-  private String rawEventSinkError;
 
   @Value("${ENRICHED_EVENT_SINK_ERROR}")
   private String enrichedEventSinkError;
@@ -43,16 +37,8 @@ public class TopicNameConfig {
     return enrichedEventSink;
   }
 
-  public String rawEventSinkTopic() {
-    return rawEventSink;
-  }
-
   public String enrichedEventSinkErrorTopic() {
     return enrichedEventSinkError;
-  }
-
-  public String rawEventSinkErrorTopic() {
-    return rawEventSinkError;
   }
 
   public String smsSink() {
