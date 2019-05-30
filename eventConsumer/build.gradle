@@ -1,6 +1,8 @@
+apply plugin: 'application'
+
 mainClassName = "com.rivigo.riconet.event.main.EventMain"
 
-apply plugin: 'application'
+//apply plugin: 'application'
 apply plugin: 'java'
 
 

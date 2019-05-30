@@ -2,13 +2,12 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.FinanceEventService;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /** Created by ashfakh on 4/6/18. */
@@ -22,6 +21,12 @@ public class FinanceEventsConsumer extends ConsumerModel {
 
   @Autowired private TopicNameConfig topicNameConfig;
 
+  @Value("${test_source}")
+  private String test;
+
+  @Value("${test_source_error}")
+  private String testError;
+
   public FinanceEventsConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -29,25 +34,28 @@ public class FinanceEventsConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.financeEventSink();
+    return test;
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.financeEventSinkError();
+    return testError;
   }
 
   @Override
   public void processMessage(String str) {
     log.info("Processing message in Finance Events Consumer {}", str);
-    EventPayload eventPayload = null;
-    try {
-      eventPayload = objectMapper.readValue(str, EventPayload.class);
-    } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", str, ex);
-      return;
+    if (str.equals("Error")) {
+      throw new RuntimeException("blah");
     }
-    log.debug("Event Payload {}", eventPayload);
-    financeEventService.processFinanceEvents(eventPayload);
+    //    EventPayload eventPayload = null;
+    //    try {
+    //      eventPayload = objectMapper.readValue(str, EventPayload.class);
+    //    } catch (IOException ex) {
+    //      log.error("Error occured while processing message {} ", str, ex);
+    //      return;
+    //    }
+    //    log.debug("Event Payload {}", eventPayload);
+    //    financeEventService.processFinanceEvents(eventPayload);
   }
 }
