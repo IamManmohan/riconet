@@ -291,12 +291,12 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ExpressAppConstants.NotificationKey.TITLE,
         ExpressAppConstants.NotificationTitle.PICKUP_ASSIGNED);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         pickUpCreatorUserId,
         ApplicationId.retail_app);
   }
 
-  private JSONObject getJsonObjectForRetailApp(
+  private JSONObject getJsonObjectForExpressApp(
       JSONObject notificationData, JSONObject notification) {
     JSONObject pushObject = new JSONObject();
     JSONObject data = new JSONObject();
@@ -352,7 +352,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ExpressAppConstants.NotificationKey.TITLE,
         ExpressAppConstants.NotificationTitle.PICKUP_REACHED_AT_CLIENT_WAREHOUSE);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         pickUpCreatorUserId,
         ApplicationId.retail_app);
   }
@@ -378,7 +378,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     log.info(
         "Calling send notification for Pickup :{} cancellation", notificationDTO.getEntityId());
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         pickUpCreatorUserId,
         ApplicationId.retail_app);
   }
@@ -430,11 +430,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     actions.add(trackObject);
     notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consigneeUserId,
         ApplicationId.retail_app);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consignorUserId,
         ApplicationId.retail_app);
   }
@@ -521,7 +521,7 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     actions.add(callObject);
     notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consigneeUserId,
         ApplicationId.retail_app);
   }
@@ -588,11 +588,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     actions.add(trackObject);
     notification.put(ExpressAppConstants.NotificationKey.ACTIONS, actions);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consigneeUserId,
         ApplicationId.retail_app);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consignorUserId,
         ApplicationId.retail_app);
   }
@@ -652,11 +652,11 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     log.info("CN DELAYED: {} {}", notificationData.toString(), notification.toString());
 
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consigneeUserId,
         ApplicationId.retail_app);
     sendNotification(
-        getJsonObjectForRetailApp(notificationData, notification),
+        getJsonObjectForExpressApp(notificationData, notification),
         consignorUserId,
         ApplicationId.retail_app);
   }

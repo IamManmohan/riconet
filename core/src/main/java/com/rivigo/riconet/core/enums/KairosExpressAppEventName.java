@@ -1,5 +1,5 @@
 package com.rivigo.riconet.core.enums;
 
-public enum KairosRetailAppEventName {
+public enum KairosExpressAppEventName {
   CN_DELAYED
 }

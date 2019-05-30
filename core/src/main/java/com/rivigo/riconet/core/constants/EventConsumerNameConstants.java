@@ -5,5 +5,5 @@ public class EventConsumerNameConstants {
     throw new IllegalStateException("Utility class");
   }
 
-  public static final String KAIROS_RETAIL_APP_EVENT_CONSUMER = "KairosRetailAppEventConsumer";
+  public static final String KAIROS_EXPRESS_APP_EVENT_CONSUMER = "KairosExpressAppEventConsumer";
 }

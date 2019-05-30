@@ -11,7 +11,7 @@ import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
-import com.rivigo.riconet.event.consumer.KairosRetailAppEventConsumer;
+import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
@@ -42,7 +42,7 @@ public class EventMain {
 
   private final WmsEventConsumer wmsEventConsumer;
 
-  private final KairosRetailAppEventConsumer kairosRetailAppEventConsumer;
+  private final KairosExpressAppEventConsumer kairosExpressAppEventConsumer;
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
 
@@ -55,7 +55,7 @@ public class EventMain {
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
-      KairosRetailAppEventConsumer kairosRetailAppEventConsumer,
+      KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -63,7 +63,7 @@ public class EventMain {
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
-    this.kairosRetailAppEventConsumer = kairosRetailAppEventConsumer;
+    this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
   }
 
@@ -121,8 +121,8 @@ public class EventMain {
         materializer,
         system,
         bootstrapServers,
-        config.getString("kairosRetailAppEventConsumer.group.id"),
-        kairosRetailAppEventConsumer);
+        config.getString("kairosExpressAppEventConsumer.group.id"),
+        kairosExpressAppEventConsumer);
     load(
         materializer,
         system,

@@ -5,7 +5,7 @@ import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_ID
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TaskDto;
 import com.rivigo.riconet.core.enums.EventName;
-import com.rivigo.riconet.core.enums.KairosRetailAppEventName;
+import com.rivigo.riconet.core.enums.KairosExpressAppEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -350,7 +350,7 @@ public class AppNotificationServiceTest {
     metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), RandomStringUtils.randomAlphabetic(10));
     NotificationDTO notificationDTO =
         NotificationDTO.builder()
-            .eventName(KairosRetailAppEventName.CN_DELAYED.name())
+            .eventName(KairosExpressAppEventName.CN_DELAYED.name())
             .metadata(metadata)
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();

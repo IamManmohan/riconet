@@ -39,8 +39,8 @@ public class TopicNameConfig {
   @Value("${WMS_EVENT_SINK_ERROR}")
   private String wmsEventSinkError;
 
-  @Value("${KAIROS_RETAIL_APP_SINK}")
-  private String kairosRetailAppSinkTopic;
+  @Value("${KAIROS_EXPRESS_APP_SINK}")
+  private String kairosExpressAppSinkTopic;
 
   @Value("${EXPRESS_APP_PICKUP_SINK}")
   private String expressAppPickupSink;
@@ -88,8 +88,8 @@ public class TopicNameConfig {
     return wmsEventSinkError;
   }
 
-  public String kairosRetailAppSinkTopic() {
-    return kairosRetailAppSinkTopic;
+  public String kairosExpressAppSinkTopic() {
+    return kairosExpressAppSinkTopic;
   }
 
   public String expressAppPickupSink() {
