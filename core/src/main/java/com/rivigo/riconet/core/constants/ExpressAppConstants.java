@@ -72,12 +72,10 @@ public final class ExpressAppConstants {
     }
 
     public static final String APP_URL = "rivigo://express";
-    public static final String LOGIN = "/login";
     public static final String TRACK_CN = "/track-consignment/%s";
     public static final String BOOKING = "/booking";
-    public static final String POD = "/pod";
-    public static final String TRACK_POD = "/track-pod/%s";
-    public static final String CREATE_BOOKING = "/create-booking";
+    public static final String POD = "/track-pod";
+    public static final String TRACK_POD = "/pod/%s";
     public static final String CALL = "/call/%s";
   }
 
