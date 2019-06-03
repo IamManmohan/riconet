@@ -242,10 +242,8 @@ public class AppNotificationServiceImpl implements AppNotificationService {
             });
   }
 
-  // Paused Express app notification
   @Override
   public void sendPickUpAssignmentEvent(NotificationDTO notificationDTO) {
-
     Long pickUpCreatorUserId =
         getFieldAsLongFromNotificationDto(
             notificationDTO, ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name());
@@ -306,7 +304,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
     return pushObject;
   }
 
-  // Paused Express app notification
   @Override
   public void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO) {
 
@@ -357,7 +354,6 @@ public class AppNotificationServiceImpl implements AppNotificationService {
         ApplicationId.retail_app);
   }
 
-  // Paused Express app notification
   @Override
   public void sendPickupCancellationNotification(NotificationDTO notificationDTO) {
     Long pickUpCreatorUserId =
