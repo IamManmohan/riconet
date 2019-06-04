@@ -28,6 +28,7 @@ public enum ZoomCommunicationFieldNames {
   TICKET_ENTITY_ID,
   ACTION_NAME,
   ACTION_VALUE,
+  FIRST_RIVIGO_OU,
 
   STALE_CATEGORY,
   TYPE_ID,

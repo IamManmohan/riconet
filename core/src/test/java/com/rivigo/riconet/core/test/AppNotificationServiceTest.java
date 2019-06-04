@@ -3,13 +3,17 @@ package com.rivigo.riconet.core.test;
 import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.EventName;
+import com.rivigo.riconet.core.enums.KairosExpressAppEventName;
 import com.rivigo.riconet.core.enums.WmsEventName;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Wms;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PushNotificationService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.AppNotificationServiceImpl;
+import com.rivigo.riconet.core.test.Utils.TestConstants;
 import com.rivigo.zoom.common.enums.ApplicationId;
 import com.rivigo.zoom.common.model.DeviceAppVersionMapper;
 import com.rivigo.zoom.common.model.User;
@@ -100,5 +104,211 @@ public class AppNotificationServiceTest {
     location.setCode("locationCode");
     location.setId(1L);
     return location;
+  }
+
+  @Test
+  public void sendPickupCancellationNotificationTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name(),
+        TestConstants.USER_ID.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.PICKUP_CANCELLATION.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendPickupCancellationNotification(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendCnFirstOuDispatchNotificationTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name(), TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name(), TestConstants.USER_ID_1.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), RandomStringUtils.randomAlphabetic(10));
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CN_TRIP_DISPATCHED.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendCnFirstOuDispatchNotification(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendPickUpAssignmentEventTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name(),
+        TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name(),
+        RandomStringUtils.randomAlphabetic(15));
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name(),
+        RandomStringUtils.randomNumeric(10));
+    metadata.put(
+        ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name(), TestConstants.PICKUP_ID.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.PICKUP_ASSIGNMENT.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendPickUpAssignmentEvent(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendPickUpReachedAtClientAddressTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CREATED_BY_USER_ID.name(),
+        TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CAPTAIN_NAME.name(),
+        RandomStringUtils.randomAlphabetic(15));
+    metadata.put(
+        ZoomCommunicationFieldNames.PICKUP_CAPTAIN_CONTACT_NUMBER.name(),
+        RandomStringUtils.randomNumeric(10));
+    metadata.put(
+        ZoomCommunicationFieldNames.Pickup.PICKUP_ID.name(), TestConstants.PICKUP_ID.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.PICKUP_REACHED_AT_CLIENT_WAREHOUSE.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendPickUpReachedAtClientAddress(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendCnDrsDispatchEventTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name(), TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name(), TestConstants.USER_ID_1.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), RandomStringUtils.randomAlphabetic(10));
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CN_DRS_DISPATCH.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendCnDeliveredNotificationTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name(), TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name(), TestConstants.USER_ID_1.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), RandomStringUtils.randomAlphabetic(10));
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(EventName.CN_DELIVERY.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendCnDeliveredNotification(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
+  }
+
+  @Test
+  public void sendCnDelayedNotificationTest() throws IOException {
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNOR_USER_ID.name(), TestConstants.USER_ID.toString());
+    metadata.put(
+        ZoomCommunicationFieldNames.CONSIGNEE_USER_ID.name(), TestConstants.USER_ID_1.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), RandomStringUtils.randomAlphabetic(10));
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .eventName(KairosExpressAppEventName.CN_DELAYED.name())
+            .metadata(metadata)
+            .build();
+    DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    List<DeviceAppVersionMapper> deviceAppVersionMappers =
+        new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
+    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    appNotificationService.sendCnDelayedNotification(notificationDTO);
+    Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
+        .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
   }
 }
