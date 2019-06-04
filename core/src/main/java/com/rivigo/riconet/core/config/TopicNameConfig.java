@@ -39,6 +39,15 @@ public class TopicNameConfig {
   @Value("${WMS_EVENT_SINK_ERROR}")
   private String wmsEventSinkError;
 
+  @Value("${KAIROS_EXPRESS_APP_SINK}")
+  private String kairosExpressAppSinkTopic;
+
+  @Value("${EXPRESS_APP_PICKUP_SINK}")
+  private String expressAppPickupSink;
+
+  @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
+  private String expressAppPickupSinkError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -77,5 +86,17 @@ public class TopicNameConfig {
 
   public String wmsEventSinkError() {
     return wmsEventSinkError;
+  }
+
+  public String kairosExpressAppSinkTopic() {
+    return kairosExpressAppSinkTopic;
+  }
+
+  public String expressAppPickupSink() {
+    return expressAppPickupSink;
+  }
+
+  public String expressAppPickupSinkError() {
+    return expressAppPickupSinkError;
   }
 }

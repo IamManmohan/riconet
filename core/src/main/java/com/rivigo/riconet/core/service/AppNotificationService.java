@@ -17,13 +17,20 @@ public interface AppNotificationService {
 
   void sendIBClearEvent(NotificationDTO notificationDTO);
 
-  void sendPickUpAssignmentEvent(NotificationDTO notificationDTO);
-
-  void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
-
-  void sendCnLoadedEvent(NotificationDTO notificationDTO);
+  void sendCnFirstOuDispatchNotification(NotificationDTO notificationDTO);
 
   void sendCnDrsDispatchEvent(NotificationDTO notificationDTO);
 
   void sendCnDeliveredNotification(NotificationDTO notificationDTO);
+
+  void sendCnDelayedNotification(NotificationDTO notificationDTO);
+
+  // Express app notification that was introduced in V1 but not being used in its revamp.
+  void sendPickUpAssignmentEvent(NotificationDTO notificationDTO);
+
+  // Express app notification that was introduced in V1 but not being used in its revamp.
+  void sendPickUpReachedAtClientAddress(NotificationDTO notificationDTO);
+
+  // Express app notification that was introduced in V1 but not being used in its revamp.
+  void sendPickupCancellationNotification(NotificationDTO notificationDTO);
 }

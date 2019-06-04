@@ -34,6 +34,7 @@ public enum ZoomCommunicationFieldNames {
   PARENT_ENTITY_TYPE,
   ACTION_NAME,
   ACTION_VALUE,
+  FIRST_RIVIGO_OU,
 
   STALE_CATEGORY,
   TYPE_ID,
