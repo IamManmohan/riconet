@@ -32,7 +32,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
   @Value("${firebase.server.key}")
   private String firebaseServerKey = "AIzaSyD9E1NeCzE_NpCMA6v4zbhhei64yVxiixw";
 
-  @Value(("${express.app.server.key"))
+  @Value(("${express.app.server.key}"))
   private String EXPRESS_APP_SERVER_KEY;
 
   @Autowired private ObjectMapper objectMapper;
