@@ -39,4 +39,6 @@ public interface ZoomBackendAPIClientService {
   ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO);
 
   ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO);
+
+  Boolean deletePickup(Long pickupId);
 }
