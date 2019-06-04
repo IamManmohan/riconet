@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# regex to validate branch name
+branch_regex="^Z[TM]-[0-9]+"
+
+# regex to validate commit msg
+commit_regex="^Z[TM]-[0-9]+\s*.+"  # eg. ZT-1234 null pointer fixed
+merge_commit_regex="^Merge\s*.+" # Merge develop into master for hot-fix no 68(Merge Commit)
+
+#define color for error_msg
+RED="\033[1;31m"
+GREEN="\033[1;32m"
+NOCOLOR="\033[0m"
+
+# error message
+error_msg="${RED}Aborting commit. Your commit message and branch name are missing JIRA Issue${NOCOLOR}
+E.g.
+${GREEN}\t1. ZT-1234 null pointer fixed
+\t2. ZM-1234 null pointer fixed${NOCOLOR}"
+
+# get branch name
+branch_name="$(git rev-parse --abbrev-ref HEAD)"
+
+# getting commit message from argument
+commit_message="$1"
+
+
+# regex validator over commit_message and branch_name
+if !(grep -qE "$commit_regex|$merge_commit_regex" "$commit_message") ; then
+                                                             # checking commit message against commit message regex
+                                                             # and by passing merge commit message
+    if ! ( echo "$branch_name" | grep -qE "$branch_regex" ) ; then   # checking branch regex against branch name
+        echo -e "$error_msg"; # \033[31;7m - to show error message in red color
+        exit 1
+    else # append branch name to commit message if branch name match branch_regex
+        extractedJiraIdFromBranchName=$(echo "$branch_name" | grep -oE "$branch_regex")
+        echo "Appending JIRA id from branch name : $extractedJiraIdFromBranchName"
+        echo "$extractedJiraIdFromBranchName `cat $commit_message`" > $1
+    fi
+fi
