@@ -1,0 +1,37 @@
+#!/bin/sh
+# From gist at https://gist.github.com/chadmaughan/5889802
+# setting alias : allow gradle and gradlew both 
+
+# function gradle-or-gradlew() {
+function gradle() {
+        if [ -f ./gradlew ] ; then
+                echo "executing gradlew instead of gradle";
+                ./gradlew "$@";
+        else
+                gradle "$@";
+        fi
+}
+
+echo "Checking spotless"
+gradle spotlessCheck || {
+  echo "Please format your code by running gradle spotlessApply"
+  exit 1
+}
+echo "SpotlessCheck successful"
+
+gradle clean build  || {
+  echo "Running build failed. Please fix the errors to continue"
+  exit 1
+}
+echo "Build successful"
+
+
+echo "Checking uncommitted changes"
+git diff-index --quiet HEAD -- || {
+    echo "There are uncommitted changes. Please commit your changes first";
+    exit 1
+}
+echo "No uncommitted changes found"
+
+
+echo "Pushing the code"
