@@ -19,7 +19,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.SHOP_FLOOR_ENABLED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
 
 import com.rivigo.riconet.core.constants.ExpressAppConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -576,15 +576,26 @@ public class AppNotificationServiceImpl implements AppNotificationService {
 
     if (!"production"
         .equalsIgnoreCase(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))) {
-      List<Long> userIdList =
-          Arrays.stream(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57").split(","))
+      List<Long> allowedUserIdList =
+          Arrays.stream(
+                  zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57").split(","))
               .map(Long::valueOf)
               .collect(Collectors.toList());
-
-      deviceAppVersionMappers.addAll(
-          deviceAppVersionMapperRepository.findByUserIdInAndAppId(userIdList, appId));
       log.info(
           "Staging server. Sending notification for users {}",
+          deviceAppVersionMappers
+              .stream()
+              .map(DeviceAppVersionMapper::getUserId)
+              .collect(Collectors.toSet()));
+      deviceAppVersionMappers =
+          deviceAppVersionMappers
+              .stream()
+              .filter(
+                  deviceAppVersionMapper ->
+                      allowedUserIdList.contains(deviceAppVersionMapper.getUserId()))
+              .collect(Collectors.toList());
+      log.info(
+          "Staging server. Sending notification to users {}",
           deviceAppVersionMappers
               .stream()
               .map(DeviceAppVersionMapper::getUserId)

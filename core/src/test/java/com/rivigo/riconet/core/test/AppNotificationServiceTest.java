@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.test;
 
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.DEFAULT_APP_USER_IDS;
+import static com.rivigo.riconet.core.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
@@ -89,7 +89,8 @@ public class AppNotificationServiceTest {
             deviceAppVersionMapperRepository.findByUserIdInAndAppId(
                 Collections.singletonList(1L), ApplicationId.scan_app))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn("1");
     appNotificationService.sendTaskNotifications(notificationDTO, WmsEventName.TASK_UPSERT);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(
@@ -119,14 +120,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendPickupCancellationNotification(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -147,14 +150,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendCnFirstOuDispatchNotification(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -181,14 +186,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendPickUpAssignmentEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -215,14 +222,19 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
             deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
+        .thenReturn(deviceAppVersionMappers);
     appNotificationService.sendPickUpReachedAtClientAddress(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -243,14 +255,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -271,14 +285,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendCnDeliveredNotification(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
@@ -299,14 +315,16 @@ public class AppNotificationServiceTest {
             .build();
     DeviceAppVersionMapper deviceAppVersionMapper1 = new DeviceAppVersionMapper();
     deviceAppVersionMapper1.setFirebaseToken(RandomStringUtils.randomAlphanumeric(5));
+    deviceAppVersionMapper1.setUserId(TestConstants.USER_ID);
     DeviceAppVersionMapper deviceAppVersionMapper2 = new DeviceAppVersionMapper();
+    deviceAppVersionMapper2.setUserId(TestConstants.USER_ID_1);
     List<DeviceAppVersionMapper> deviceAppVersionMappers =
         new ArrayList<>(Arrays.asList(deviceAppVersionMapper1, deviceAppVersionMapper2));
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
+    Mockito.when(zoomPropertyService.getString(STG_NOTIF_ALLOWED_APP_USER_IDS, "57"))
+        .thenReturn(TestConstants.USER_ID.toString());
     Mockito.when(
-            deviceAppVersionMapperRepository.findByUserIdInAndAppId(Mockito.any(), Mockito.any()))
+            deviceAppVersionMapperRepository.findByUserIdAndAppId(Mockito.any(), Mockito.any()))
         .thenReturn(deviceAppVersionMappers);
-    Mockito.when(zoomPropertyService.getString(DEFAULT_APP_USER_IDS, "57")).thenReturn("1");
     appNotificationService.sendCnDelayedNotification(notificationDTO);
     Mockito.verify(pushNotificationService, Mockito.atLeastOnce())
         .send(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any());
