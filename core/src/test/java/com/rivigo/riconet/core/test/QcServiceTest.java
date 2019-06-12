@@ -28,6 +28,7 @@ import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
+import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.StockAccumulatorService;
 import com.rivigo.riconet.core.service.UserMasterService;
@@ -112,6 +113,8 @@ public class QcServiceTest {
   @Mock private ConsignmentScheduleService consignmentScheduleService;
 
   @Mock private StockAccumulatorService stockAccumulatorService;
+
+  @Mock private PaymentDetailV2Service paymentDetailV2Service;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -548,6 +551,9 @@ public class QcServiceTest {
 
     completionEventDTO.getUserClusterMetadataDTO().setQcMeasurementTicketProbability(100.0);
     Assert.assertTrue(qcService.isMeasurementQcRequired(completionEventDTO));
+
+    Mockito.when(paymentDetailV2Service.getRetailTypeFromConsignmentId(any())).thenReturn("BIKE");
+    Assert.assertFalse(qcService.isMeasurementQcRequired(completionEventDTO));
   }
 
   @Test
