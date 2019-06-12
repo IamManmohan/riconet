@@ -2,7 +2,7 @@ FROM gradle:5.2 as builder
 COPY --chown=gradle:gradle  .  /home/gradle/src
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources
 RUN echo $PROPERTIES_PATH_EVENT
-ARG ZOOM_VERSION=4.1-SNAPSHOT
+ARG ZOOM_VERSION
 RUN echo $ZOOM_VERSION
 COPY $PROPERTIES_PATH_EVENT/application.properties /home/gradle/src/application_event.properties
 COPY core/src/main/resources/logback.xml /home/gradle/src/logback.xml
