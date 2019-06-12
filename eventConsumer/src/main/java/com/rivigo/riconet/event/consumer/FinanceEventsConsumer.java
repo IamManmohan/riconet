@@ -2,6 +2,7 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.FinanceEventService;
@@ -9,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /** Created by ashfakh on 4/6/18. */
 @Slf4j
@@ -20,12 +23,6 @@ public class FinanceEventsConsumer extends ConsumerModel {
   @Autowired private FinanceEventService financeEventService;
 
   @Autowired private TopicNameConfig topicNameConfig;
-
-  @Value("${test_source}")
-  private String test;
-
-  @Value("${test_source_error}")
-  private String testError;
 
   public FinanceEventsConsumer() {
     objectMapper = new ObjectMapper();
@@ -48,14 +45,14 @@ public class FinanceEventsConsumer extends ConsumerModel {
     if (str.equals("Error")) {
       throw new RuntimeException("blah");
     }
-    //    EventPayload eventPayload = null;
-    //    try {
-    //      eventPayload = objectMapper.readValue(str, EventPayload.class);
-    //    } catch (IOException ex) {
-    //      log.error("Error occured while processing message {} ", str, ex);
-    //      return;
-    //    }
-    //    log.debug("Event Payload {}", eventPayload);
-    //    financeEventService.processFinanceEvents(eventPayload);
+        EventPayload eventPayload = null;
+        try {
+          eventPayload = objectMapper.readValue(str, EventPayload.class);
+        } catch (IOException ex) {
+          log.error("Error occured while processing message {} ", str, ex);
+          return;
+        }
+        log.debug("Event Payload {}", eventPayload);
+        financeEventService.processFinanceEvents(eventPayload);
   }
 }
