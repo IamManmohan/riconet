@@ -20,6 +20,8 @@ ARG LOGIN_PROFILE
 RUN echo $LOGIN_PROFILE
 ENV JAVA_OPTS="-Xms1024m -Xmx1024m -Dspring.config.location=/etc/zoom/event -Dlogin.profiles.active=$LOGIN_PROFILE"
 RUN echo $JAVA_OPTS
+RUN ls -l
 WORKDIR bin
+RUN pwd
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS="-Xms1024m -Xmx1024m -Dspring.config.location=/etc/zoom/event -Dlogin.profiles.active=$LOGIN_PROFILE"%g' eventConsumer
 ENTRYPOINT exec ./eventConsumer
