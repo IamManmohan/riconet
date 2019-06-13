@@ -11,6 +11,7 @@ import com.rivigo.riconet.event.dto.ChequeBounceDTO;
 import com.rivigo.riconet.event.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -105,7 +106,13 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
               zoomBackendBaseUrl);
       log.debug("response {}", responseJson);
     } catch (IOException e) {
-      log.error("Exception occurred while marking recovery pending for cn in zoom tech", e);
+      log.error(
+          "Exception occurred while marking recovery pending for cn in zoom tech: {} ",
+          chequeBounceDTO,
+          e);
+      throw new ZoomException(
+          "Exception occurred while marking recovery pending for cn in zoom tech : %s",
+          chequeBounceDTO);
     }
     TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
     return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
