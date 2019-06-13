@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Created by ashfakh on 28/05/19. */
-
 @Slf4j
 @Service
 public class PaymentDetailV2ServiceImpl implements PaymentDetailV2Service {
