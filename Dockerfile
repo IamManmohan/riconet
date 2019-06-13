@@ -13,7 +13,7 @@ RUN unzip /home/gradle/src/eventConsumer/build/distributions/eventConsumer.zip
 FROM openjdk:jre-alpine
 RUN mkdir -p /etc/zoom/event
 WORKDIR /code/
-COPY ./eventConsumer /code/
+COPY ./eventConsumer/build/distributions/eventConsumer /code/
 COPY ./eventConsumer/src/main/resources/logback.xml /code/logback.xml
 COPY ./eventConsumer/src/main/resources/application.properties /etc/zoom/event/application.properties
 ARG LOGIN_PROFILE
