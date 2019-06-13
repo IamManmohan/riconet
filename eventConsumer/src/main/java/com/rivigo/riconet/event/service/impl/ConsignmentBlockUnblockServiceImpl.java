@@ -1,5 +1,6 @@
 package com.rivigo.riconet.event.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -82,7 +83,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
    * reflect cheque bounced amount in user/bp_book, ou_collection_book and remove from
    * ou_out_standing
    */
-  private void markRecoveryPending(NotificationDTO notificationDTO) {
+  private JsonNode markRecoveryPending(NotificationDTO notificationDTO) {
 
     Map<String, String> metadata = notificationDTO.getMetadata();
     ChequeBounceDTO chequeBounceDTO =
@@ -93,9 +94,9 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
             .amount(new BigDecimal(metadata.get(ZoomCommunicationFieldNames.AMOUNT.name())))
             .build();
     log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
+    JsonNode responseJson = null;
     try {
-      JsonNode responseJson =
-          apiClientService.getEntity(
+      responseJson = apiClientService.getEntity(
               chequeBounceDTO,
               HttpMethod.PUT,
               UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING,
@@ -105,5 +106,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
     } catch (IOException e) {
       log.error("Exception occurred while marking recovery pending for cn in zoom tech", e);
     }
+    TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
+    return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }
