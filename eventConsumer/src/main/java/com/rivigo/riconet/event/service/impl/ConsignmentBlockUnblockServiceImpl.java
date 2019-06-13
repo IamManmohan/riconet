@@ -96,7 +96,8 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
     log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
     JsonNode responseJson = null;
     try {
-      responseJson = apiClientService.getEntity(
+      responseJson =
+          apiClientService.getEntity(
               chequeBounceDTO,
               HttpMethod.PUT,
               UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING,
