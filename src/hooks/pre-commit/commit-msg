@@ -4,19 +4,22 @@
 branch_regex="^Z[TM]-[0-9]+"
 
 # regex to validate commit msg
-commit_regex="^Z[TM]-[0-9]+\s*.+"  # eg. ZT-1234 null pointer fixed
+commit_regex="^(\[)?Z[TM]-[0-9]+(\])?\s+.+"  # eg. ZT-1234 null pointer fixed or [ZT-1234] null pointer fixed
 merge_commit_regex="^Merge\s*.+" # Merge develop into master for hot-fix no 68(Merge Commit)
 
 #define color for error_msg
 RED="\033[1;31m"
 GREEN="\033[1;32m"
+YELLOW='\033[1;33m'
 NOCOLOR="\033[0m"
 
 # error message
 error_msg="${RED}Aborting commit. Your commit message and branch name are missing JIRA Issue${NOCOLOR}
-E.g.
-${GREEN}\t1. ZT-1234 null pointer fixed
-\t2. ZM-1234 null pointer fixed${NOCOLOR}"
+${YELLOW}Example commit messages.${NOCOLOR}
+${GREEN}\t1. ZT-1234 null pointer issue fixed
+\t2. ZM-1234 commit message
+\t3. [ZT-1234] null pointer issue fixed
+\t4. [ZM-1234] <commit message>${NOCOLOR}"
 
 # get branch name
 branch_name="$(git rev-parse --abbrev-ref HEAD)"
@@ -24,6 +27,7 @@ branch_name="$(git rev-parse --abbrev-ref HEAD)"
 # getting commit message from argument
 commit_message="$1"
 
+echo "`cat $commit_message`";
 
 # regex validator over commit_message and branch_name
 if !(grep -qE "$commit_regex|$merge_commit_regex" "$commit_message") ; then
