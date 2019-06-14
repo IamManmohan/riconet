@@ -13,9 +13,9 @@ RUN unzip /home/gradle/src/eventConsumer/build/distributions/eventConsumer.zip
 FROM openjdk:jre-alpine
 RUN mkdir -p /etc/zoom/event
 WORKDIR /code/
-COPY --from=builder ./home/gradle/src/eventConsumer/build/distributions/eventConsumer/bin/eventConsumer /code/
-COPY --from=builder ./home/gradle/src/logback.xml /code/logback.xml
-COPY --from=builder ./home/gradle/src/application_event.properties /etc/zoom/event/application.properties
+COPY --from=builder /home/gradle/src/eventConsumer/build/distributions/eventConsumer/bin/eventConsumer /code/
+COPY --from=builder /home/gradle/src/logback.xml /code/logback.xml
+COPY --from=builder /home/gradle/src/application_event.properties /etc/zoom/event/application.properties
 ARG LOGIN_PROFILE
 RUN echo $LOGIN_PROFILE
 ENV JAVA_OPTS="-Xms1024m -Xmx1024m -Dspring.config.location=/etc/zoom/event -Dlogin.profiles.active=$LOGIN_PROFILE"
