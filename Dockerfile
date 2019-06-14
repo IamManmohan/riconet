@@ -8,6 +8,7 @@ COPY $PROPERTIES_PATH_EVENT/application.properties /home/gradle/src/application_
 COPY core/src/main/resources/logback.xml /home/gradle/src/logback.xml
 WORKDIR /home/gradle/src
 RUN gradle distZip -i -Dzoom.version=$ZOOM_VERSION
+WORKDIR /home/gradle/src/eventConsumer/build/distributions/
 RUN unzip /home/gradle/src/eventConsumer/build/distributions/eventConsumer.zip
 
 
@@ -21,9 +22,6 @@ ARG LOGIN_PROFILE
 RUN echo $LOGIN_PROFILE
 ENV JAVA_OPTS="-Xms1024m -Xmx1024m -Dspring.config.location=/etc/zoom/event -Dlogin.profiles.active=$LOGIN_PROFILE"
 RUN echo $JAVA_OPTS
-RUN ls -l
 WORKDIR bin
-RUN ls -l
-RUN pwd
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS="-Xms1024m -Xmx1024m -Dspring.config.location=/etc/zoom/event -Dlogin.profiles.active=$LOGIN_PROFILE"%g' eventConsumer
 ENTRYPOINT exec ./eventConsumer
