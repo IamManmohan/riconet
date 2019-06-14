@@ -183,4 +183,4 @@ run
 riconet.iml
 gradle/
 gradlew
-git-hooks/
+.git-hooks/
