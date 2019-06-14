@@ -9,8 +9,7 @@ COPY core/src/main/resources/logback.xml /home/gradle/src/logback.xml
 WORKDIR /home/gradle/src
 RUN gradle distZip -i -Dzoom.version=$ZOOM_VERSION
 RUN unzip /home/gradle/src/eventConsumer/build/distributions/eventConsumer.zip
-RUN ls -l /home/gradle/src/eventConsumer/build/distributions/
-RUN ls -l /home/gradle/src/eventConsumer/build/distributions/eventConsumer
+
 
 FROM openjdk:jre-alpine
 RUN mkdir -p /etc/zoom/event
