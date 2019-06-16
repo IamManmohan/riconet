@@ -33,6 +33,7 @@ public class WmsEventTriggerService {
         appNotificationService.sendTaskNotifications(notificationDTO, eventName);
         appNotificationService.sendTaskNotifications(
             notificationDTO, WmsEventName.CN_UNLOADING_PLAN_UNPLAN);
+        break;
       case MANIFEST_CLOSED:
       case PALLET_CLOSED:
       case TASK_SUBMITTED_ANOTHER_USER:
