@@ -223,10 +223,5 @@ public class EventTriggerService {
     } catch (Exception e) {
       log.error("BF CPD calculation failed", e);
     }
-    try {
-      appNotificationService.sendIBClearEvent(notificationDTO);
-    } catch (Exception e) {
-      log.error("IB clear event failed", e);
-    }
   }
 }

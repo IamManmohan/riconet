@@ -82,7 +82,7 @@ public enum ZoomPropertyName {
 
   QC_MODEL_API_TIMEOUT,
 
-  DEFAULT_APP_USER_IDS,
+  STG_NOTIF_ALLOWED_APP_USER_IDS,
 
   // Online Payments
   DND_EXEMPTED_SMS_EVENTS

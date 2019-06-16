@@ -7,6 +7,7 @@ public enum ZoomCommunicationFieldNames {
   LOCATION_ID,
   TO_LOCATION_ID,
   CONSIGNMENT_ID,
+  OU_CODE,
   STATUS,
   INSTRUMENT_NUMBER,
   DRAWEE_BANK,
@@ -22,16 +23,9 @@ public enum ZoomCommunicationFieldNames {
   CONSIGNEE_ADDRESS,
   ORGANIZATION_ID,
   PICK_UP_ID,
-  USER_ID,
-  USER_EMAIL,
-  TASK_ID,
   FROM_LOCATION_ID,
   LAST_UPDATED_BY_ID,
   TICKET_ENTITY_ID,
-  PARENT_TASK_ID,
-  TASK_TYPE,
-  PARENT_ENTITY_ID,
-  PARENT_ENTITY_TYPE,
   ACTION_NAME,
   ACTION_VALUE,
   FIRST_RIVIGO_OU,
@@ -51,8 +45,6 @@ public enum ZoomCommunicationFieldNames {
   MOBILE_NO, // tpm partner mobile number
 
   ONLINE_PAYMENT_LINK,
-  SHOP_FLOOR_ENABLED,
-  OU_CODE,
   FORWARD_CONSIGNMENT_ID;
 
   public enum Consignment {
@@ -78,5 +70,17 @@ public enum ZoomCommunicationFieldNames {
 
   public enum Pickup {
     PICKUP_ID
+  }
+
+  public enum Wms {
+    TASK_ID,
+    PALLET_ID,
+    PARENT_TASK_ID,
+    TASK_TYPE,
+    SHOP_FLOOR_ENABLED,
+    USER_EMAIL_LIST,
+
+    PARENT_ENTITY_ID,
+    PARENT_ENTITY_TYPE,
   }
 }
