@@ -97,9 +97,10 @@ public class RTOServiceImpl implements RTOService {
   public void processTaskClosedEvent(NotificationDTO notificationDTO) {
     try {
       Map<String, String> metadata = notificationDTO.getMetadata();
-      String taskType = metadata.get(ZoomCommunicationFieldNames.TASK_TYPE.name());
-      String parentEntityId = metadata.get(ZoomCommunicationFieldNames.PARENT_ENTITY_ID.name());
-      String parentEntityType = metadata.get(ZoomCommunicationFieldNames.PARENT_ENTITY_TYPE.name());
+      String taskType = metadata.get(ZoomCommunicationFieldNames.Wms.TASK_TYPE.name());
+      String parentEntityId = metadata.get(ZoomCommunicationFieldNames.Wms.PARENT_ENTITY_ID.name());
+      String parentEntityType =
+          metadata.get(ZoomCommunicationFieldNames.Wms.PARENT_ENTITY_TYPE.name());
 
       if (taskType == null || parentEntityId == null || parentEntityType == null) {
         log.debug(
