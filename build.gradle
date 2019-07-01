@@ -42,13 +42,28 @@ allprojects {
             csv.enabled false
         }
     }
+    
+    tasks.create(name: 'gitExecutableHooks') {
+        doLast {
+            Runtime.getRuntime().exec("chmod -R +x .git/hooks/")
+        }
+    }
 
+    task installGitHooks(type: Copy) {
+        from ".git-hooks/src/hooks/pre-push/gradle/pre-push",".git-hooks/src/hooks/pre-commit/commit-msg"
+        into ".git/hooks"
+    }
+    
+    gitExecutableHooks.dependsOn(installGitHooks)
     processResources.dependsOn('spotlessApply')
+    processResources.dependsOn(gitExecutableHooks)
+
 
     task copyToLib(type: Copy) {
         into "$buildDir/libs"
         from configurations.runtime
     }
+
     build.finalizedBy(copyToLib)
 
 

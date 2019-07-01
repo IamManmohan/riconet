@@ -1,0 +1,28 @@
+#!/bin/sh
+
+#define color for error_msg
+RED="\033[1;31m"
+GREEN="\033[1;32m"
+YELLOW='\033[1;33m'
+NOCOLOR="\033[0m"
+
+
+echo "${YELLOW}Checking uncommitted changes.${NOCOLOR}"
+git diff-index --quiet HEAD -- || {
+    echo "${RED}There are uncommitted changes. Please commit your changes first.${NOCOLOR}";
+    exit 1
+}
+
+echo "${GREEN}No uncommitted changes found.${NOCOLOR}"
+
+echo "${YELLOW}Running junits now.${NOCOLOR}"
+yarn test || {
+    echo "${RED}Junits failed. Please fix the junits and then push your code.${NOCOLOR}";
+    exit 1
+}
+
+echo "${GREEN}Junits ran successfully!"
+
+echo "Pushing your changes to remote branch!"
+
+echo "${YELLOW}Please don't forget to generate sonar report for your branch.${NOCOLOR}"
