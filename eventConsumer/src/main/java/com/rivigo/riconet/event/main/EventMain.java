@@ -111,11 +111,10 @@ public class EventMain {
             KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
-    Config config = ConfigFactory.load();
-    eventMain.initialize(materializer, system, config);
+    eventMain.initialize(materializer, system);
   }
 
-  private void initialize(ActorMaterializer materializer, ActorSystem system, Config config) {
+  private void initialize(ActorMaterializer materializer, ActorSystem system) {
     //    String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
     load(materializer, system, bootstrapServers, zoomEventTriggerGroup, zoomEventTriggerConsumer);

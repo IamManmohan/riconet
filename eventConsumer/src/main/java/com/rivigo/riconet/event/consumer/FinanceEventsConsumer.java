@@ -31,20 +31,17 @@ public class FinanceEventsConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return test;
+    return topicNameConfig.financeEventSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return testError;
+    return topicNameConfig.financeEventSinkError();
   }
 
   @Override
   public void processMessage(String str) {
     log.info("Processing message in Finance Events Consumer {}", str);
-    if (str.equals("Error")) {
-      throw new RuntimeException("blah");
-    }
         EventPayload eventPayload = null;
         try {
           eventPayload = objectMapper.readValue(str, EventPayload.class);
