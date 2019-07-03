@@ -3,7 +3,6 @@ package com.rivigo.riconet.notification.consumer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.RetailService;
 import com.rivigo.zoom.common.dto.RetailNotificationDTO;
@@ -36,8 +35,6 @@ public class RetailNotificationConsumer extends ConsumerModel {
   public String getErrorTopic() {
     return Topic.COM_RIVIGO_ZOOM_RETAIL_NOTIFICATION_ERROR.name();
   }
-
-  @Autowired private TopicNameConfig topicNameConfig;
 
   public void processMessage(String str) throws IOException {
     List<RetailNotificationDTO> retailNotificationDTOList = null;

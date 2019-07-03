@@ -17,8 +17,6 @@ import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -132,23 +130,14 @@ public class EventMain {
         bootstrapServers,
         bfPickupChargesGroup,
         bfPickupChargesActionConsumer);
+    load(materializer, system, bootstrapServers, wmsEventGroup, wmsEventConsumer);
     load(
         materializer,
         system,
         bootstrapServers,
-        wmsEventGroup,
-        wmsEventConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-kairosExpressAppGroup,        kairosExpressAppEventConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-        expressAppPickupGroup,
-            expressAppPickupConsumer);
+        kairosExpressAppGroup,
+        kairosExpressAppEventConsumer);
+    load(materializer, system, bootstrapServers, expressAppPickupGroup, expressAppPickupConsumer);
   }
 
   private void load(

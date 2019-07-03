@@ -1,9 +1,9 @@
 package com.rivigo.riconet.event.consumer;
 
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.KairosExpressAppEventName;
 import com.rivigo.riconet.core.service.KairosExpressAppEventTriggerService;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -14,13 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class KairosExpressAppEventConsumer extends EventConsumer {
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   @Autowired private KairosExpressAppEventTriggerService kairosExpressAppEventTriggerService;
 
   @Override
   public String getTopic() {
-    return topicNameConfig.kairosExpressAppSinkTopic();
+    return eventTopicNameConfig.kairosExpressAppSinkTopic();
   }
 
   @Override

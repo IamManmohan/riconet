@@ -2,10 +2,10 @@ package com.rivigo.riconet.notification.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.service.ZoomCommunicationsService;
+import com.rivigo.riconet.notification.config.NotificationTopicNameConfig;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   @Autowired private ZoomCommunicationsService zoomCommunicationsService;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private NotificationTopicNameConfig notificationTopicNameConfig;
 
   public ZoomCommunicationsConsumer() {
     objectMapper = new ObjectMapper();
@@ -29,14 +29,15 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    log.info(" Zoom Communication Consumer topic {}", topicNameConfig.smsSink());
-    return topicNameConfig.smsSink();
+    log.info(" Zoom Communication Consumer topic {}", notificationTopicNameConfig.smsSink());
+    return notificationTopicNameConfig.smsSink();
   }
 
   @Override
   public String getErrorTopic() {
-    log.info(" Zoom Communication Consumer error topic {}", topicNameConfig.smsSinkError());
-    return topicNameConfig.smsSinkError();
+    log.info(
+        " Zoom Communication Consumer error topic {}", notificationTopicNameConfig.smsSinkError());
+    return notificationTopicNameConfig.smsSinkError();
   }
 
   public void processMessage(String str) throws IOException {

@@ -1,9 +1,9 @@
 package com.rivigo.riconet.event.consumer;
 
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.service.WmsEventTriggerService;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +16,16 @@ public class WmsEventConsumer extends EventConsumer {
 
   @Autowired private WmsEventTriggerService wmsEventTriggerService;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   @Override
   public String getTopic() {
-    return topicNameConfig.wmsEventSink();
+    return eventTopicNameConfig.wmsEventSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.wmsEventSinkError();
+    return eventTopicNameConfig.wmsEventSinkError();
   }
 
   @Override

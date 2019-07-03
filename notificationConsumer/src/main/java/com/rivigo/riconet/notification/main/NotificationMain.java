@@ -15,12 +15,9 @@ import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -52,12 +49,12 @@ public class NotificationMain {
   private String notificationConsumerGroup;
 
   public NotificationMain(
-          DEPSNotificationConsumer depsNotificationConsumer,
-          DocIssueNotificationConsumer docIssueNotificationConsumer,
-          PickupNotificationConsumer pickupNotificationConsumer,
-          AppointmentNotificationConsumer appointmentNotificationConsumer,
-          RetailNotificationConsumer retailNotificationConsumer,
-          ZoomCommunicationsConsumer zoomCommunicationsConsumer) {
+      DEPSNotificationConsumer depsNotificationConsumer,
+      DocIssueNotificationConsumer docIssueNotificationConsumer,
+      PickupNotificationConsumer pickupNotificationConsumer,
+      AppointmentNotificationConsumer appointmentNotificationConsumer,
+      RetailNotificationConsumer retailNotificationConsumer,
+      ZoomCommunicationsConsumer zoomCommunicationsConsumer) {
     this.depsNotificationConsumer = depsNotificationConsumer;
     this.docIssueNotificationConsumer = docIssueNotificationConsumer;
     this.pickupNotificationConsumer = pickupNotificationConsumer;
@@ -69,66 +66,69 @@ public class NotificationMain {
   public static void main(String[] args) {
     final ActorSystem system = ActorSystem.create("notifications");
     ApplicationContext context =
-            new AnnotationConfigApplicationContext(
-                    ServiceConfig.class, ZoomConfig.class, ZoomDatabaseConfig.class, AsyncConfig.class, KafkaConfig.class);
+        new AnnotationConfigApplicationContext(
+            ServiceConfig.class,
+            ZoomConfig.class,
+            ZoomDatabaseConfig.class,
+            AsyncConfig.class,
+            KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
 
     NotificationMain notificationMain = context.getBean(NotificationMain.class);
-    notificationMain.initialize(materializer,system);
+    notificationMain.initialize(materializer, system);
   }
 
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
     log.info("Bootstrap servers are: {}", bootstrapServers);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            depsNotificationConsumer);
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        depsNotificationConsumer);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            docIssueNotificationConsumer);
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        docIssueNotificationConsumer);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            pickupNotificationConsumer);
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        pickupNotificationConsumer);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            appointmentNotificationConsumer);
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        appointmentNotificationConsumer);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            retailNotificationConsumer);
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        retailNotificationConsumer);
     load(
-            materializer,
-            system,
-            bootstrapServers,
-            notificationConsumerGroup,
-            zoomCommunicationsConsumer);
-
+        materializer,
+        system,
+        bootstrapServers,
+        notificationConsumerGroup,
+        zoomCommunicationsConsumer);
   }
 
   private void load(
-          ActorMaterializer materializer,
-          ActorSystem system,
-          String bootstrapServers,
-          String consumerGroupId,
-          ConsumerModel consumer) {
+      ActorMaterializer materializer,
+      ActorSystem system,
+      String bootstrapServers,
+      String consumerGroupId,
+      ConsumerModel consumer) {
     final ConsumerSettings<String, String> consumerSettings =
-            ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
-                    .withBootstrapServers(bootstrapServers)
-                    .withGroupId(consumerGroupId)
-                    .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+        ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+            .withBootstrapServers(bootstrapServers)
+            .withGroupId(consumerGroupId)
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }
