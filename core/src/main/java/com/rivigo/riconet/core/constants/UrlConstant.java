@@ -48,8 +48,6 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_WRITE_OFF_REQUEST_ONBOARDING =
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
 
-  public static final String WMS_TASK_BY_TRIP_LOCATION_AND_TYPE = "/enriched/task";
-
   public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 
   public static final String ZOOM_DATASTORE_EWAYBILL_METADATA_CLEANUP = "/address/cleanup/ewaybill";
@@ -58,4 +56,6 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
       "/operations/retail/collections/handover/markRecoveryPending";
+
+  public static final String ZOOM_BACKEND_CANCEL_PICKUP = "/operations/pickup/cancel/V2";
 }

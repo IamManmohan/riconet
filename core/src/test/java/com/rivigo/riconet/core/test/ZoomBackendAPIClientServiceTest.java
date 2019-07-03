@@ -141,6 +141,22 @@ public class ZoomBackendAPIClientServiceTest {
     zoomBackendAPIClientServiceImpl.handleConsignmentBlocker(blocker);
   }
 
+  @Test()
+  public void deletePickupTest1() throws IOException {
+    Long pickupId = 1L;
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.deletePickup(pickupId);
+  }
+
+  @Test()
+  public void deletePickupTest2() throws IOException {
+    Long pickupId = 1L;
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.deletePickup(pickupId);
+  }
+
   private void validateReturnedData(
       JsonNode jsonNode, HttpMethod httpMethod, Boolean verifyConsignmentId) throws IOException {
     verify(apiClientService, times(1))

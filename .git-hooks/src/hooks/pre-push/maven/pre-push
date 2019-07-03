@@ -1,0 +1,12 @@
+#!/bin/sh
+mvn com.coveo:fmt-maven-plugin:check || {
+  echo "Please format your code by running mvn clean install"
+  exit 1
+}
+echo "formatting check successful"
+echo "Checking uncommitted changes"
+git diff-index --quiet HEAD -- || {
+    echo "There are uncommitted changes. Please commit your changes first";
+    exit 1
+}
+echo "No uncommitted changes found"

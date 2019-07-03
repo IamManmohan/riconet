@@ -4,6 +4,8 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 import static com.rivigo.riconet.core.constants.EmailConstant.CE_TEAM_EMAIL_ID;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
 import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
+import static com.rivigo.riconet.core.constants.RetailConstant.BIKE_RETAIL_TYPE;
+import static com.rivigo.riconet.core.constants.RetailConstant.BOXWISE_RETAIL_TYPE;
 import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKET_QC_BLOCKER_FAILURE_COMMENT;
 import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
 
@@ -29,6 +31,7 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EmailService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
+import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.QcModelService;
 import com.rivigo.riconet.core.service.QcService;
@@ -125,6 +128,8 @@ public class QcServiceImpl implements QcService {
   @Autowired private StockAccumulatorService stockAccumulatorService;
 
   @Autowired private QcModelService qcModelService;
+
+  @Autowired private PaymentDetailV2Service paymentDetailV2Service;
 
   public void consumeLoadingEvent(ConsignmentBasicDTO loadingData) {
     if (ConsignmentStatus.DELIVERY_PLANNED.equals(loadingData.getStatus())
@@ -272,6 +277,14 @@ public class QcServiceImpl implements QcService {
 
     if (completionData.getUserClusterMetadataDTO().getQcMeasurementTicketProbability() == null)
       return Boolean.FALSE;
+
+    String retailType =
+        paymentDetailV2Service.getRetailTypeFromConsignmentId(completionData.getConsignmentId());
+
+    if (Arrays.asList(BIKE_RETAIL_TYPE, BOXWISE_RETAIL_TYPE).contains(retailType)) {
+      log.info("QC disabled for Box and Bike type");
+      return Boolean.FALSE;
+    }
 
     log.info(
         "Returning Measurement flag with probability {}",

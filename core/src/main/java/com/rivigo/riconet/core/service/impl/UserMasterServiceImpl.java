@@ -12,6 +12,7 @@ import com.rivigo.zoom.common.repository.mysql.ClientUserRepository;
 import com.rivigo.zoom.common.repository.mysql.StockAccumulatorRepository;
 import com.rivigo.zoom.common.repository.mysql.UserRepository;
 import com.rivigo.zoom.exceptions.SessionUserException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,11 @@ public class UserMasterServiceImpl implements UserMasterService {
   @Override
   public User getByEmail(String email) {
     return userRepository.findByEmail(email);
+  }
+
+  @Override
+  public List<User> getByEmailIn(List<String> emailList) {
+    return userRepository.findByEmailIn(emailList);
   }
 
   @Override

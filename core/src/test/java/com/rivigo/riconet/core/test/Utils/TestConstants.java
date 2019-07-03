@@ -13,4 +13,10 @@ public class TestConstants {
   public static final String FROM_PINCODE = "122001";
 
   public static final String TO_PINCODE = "560011";
+
+  public static final Long USER_ID = 786L;
+
+  public static final Long USER_ID_1 = 316L;
+
+  public static final Long PICKUP_ID = 772L;
 }

@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.dto;
+package com.rivigo.riconet.core.dto.wms;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rivigo.zoom.common.enums.TaskType;
@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 @Getter
 @Setter
@@ -18,12 +17,9 @@ import org.joda.time.DateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TaskDto implements Serializable {
-
-  private Long id;
+public class TaskCreateAssignDto implements Serializable {
   private TaskType taskType;
-  private String userEmail;
+  private List<String> userEmailList;
   private String locationCode;
-  private DateTime scheduledEndTime;
   private Map<String, List<String>> taskEntityMap;
 }

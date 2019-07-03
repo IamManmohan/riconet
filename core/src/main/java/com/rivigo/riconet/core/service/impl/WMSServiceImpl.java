@@ -3,7 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.constants.WMSConstant;
-import com.rivigo.riconet.core.dto.TaskDto;
+import com.rivigo.riconet.core.dto.wms.TaskCreateAssignDto;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.WMSService;
 import com.rivigo.zoom.common.enums.TaskType;
@@ -26,7 +26,7 @@ public class WMSServiceImpl implements WMSService {
 
   @Autowired private ApiClientService apiClientService;
 
-  @Value("${wms.url}")
+  @Value("${zoom.wms.url}")
   private String wmsBaseUrl;
 
   @Override
@@ -36,11 +36,11 @@ public class WMSServiceImpl implements WMSService {
     Map<String, List<String>> hmap = new HashMap<>();
     hmap.put(WMSConstant.CNOTE_ENTITY_TYPE, Collections.singletonList(cnote));
 
-    TaskDto taskDTO =
-        TaskDto.builder()
+    TaskCreateAssignDto taskCreateAssignDto =
+        TaskCreateAssignDto.builder()
             .taskType(TaskType.RTO_FORWARD)
             .locationCode(userLocationCode)
-            .userEmail(userEmailId)
+            .userEmailList(Collections.singletonList(userEmailId))
             .taskEntityMap(hmap)
             .build();
 
@@ -48,17 +48,17 @@ public class WMSServiceImpl implements WMSService {
 
     try {
       JsonNode responseJson =
-          apiClientService.getEntity(taskDTO, HttpMethod.POST, url, null, wmsBaseUrl);
+          apiClientService.getEntity(taskCreateAssignDto, HttpMethod.POST, url, null, wmsBaseUrl);
       log.debug(
-          "Response from wms {} for taskDTO {} baseUrl {} endpoint {}",
+          "Response from wms {} for taskCreateAssignDto {} baseUrl {} endpoint {}",
           responseJson,
-          taskDTO,
+          taskCreateAssignDto,
           wmsBaseUrl,
           url);
 
     } catch (IOException e) {
-      log.error("Error while creating rto task {} , {}", taskDTO, e);
-      throw new ZoomException("Error while creating rto task {}" + taskDTO);
+      log.error("Error while creating rto task {} , {}", taskCreateAssignDto, e);
+      throw new ZoomException("Error while creating rto task {}" + taskCreateAssignDto);
     }
   }
 }
