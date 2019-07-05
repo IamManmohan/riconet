@@ -14,7 +14,7 @@ RUN mkdir -p /etc/zoom/event
 WORKDIR /code/
 COPY --from=builder eventConsumer/build/distributions/eventConsumer.zip /code/
 RUN unzip /code/eventConsumer.zip
-ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources
+ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_EVENT
 COPY --from=builder $PROPERTIES_PATH_EVENT /etc/zoom/event/application.properties
 ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event"
@@ -27,7 +27,7 @@ RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
 COPY --from=builder notificationConsumer/build/distributions/notificationConsumer.zip /code/
 RUN unzip /code/notificationConsumer.zip
-ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources
+ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_NOTIFICATION
 COPY --from=builder $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/application.properties
 ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification"
