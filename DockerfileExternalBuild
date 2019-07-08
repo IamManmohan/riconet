@@ -16,13 +16,14 @@ RUN mkdir -p /etc/zoom/event
 WORKDIR /code/
 COPY eventConsumer/build/distributions/eventConsumer.zip /code/
 RUN unzip /code/eventConsumer.zip
+RUN rm /code/eventConsumer.zip
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_EVENT
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
 ARG LOGBACK_PATH_EVENT=eventConsumer/src/main/resources/logback-stg.xml
 RUN echo $LOGBACK_PATH_EVENT
 COPY $LOGBACK_PATH_EVENT eventConsumer/logback.xml
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties -Dlogging.config=/code/eventConsumer/logback.xml"
+ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' eventConsumer
@@ -31,13 +32,14 @@ RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
 COPY notificationConsumer/build/distributions/notificationConsumer.zip /code/
 RUN unzip /code/notificationConsumer.zip
+RUN rm /code/notificationConsumer.zip
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_NOTIFICATION
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
 ARG LOGBACK_PATH_NOTIFICATION=notificationConsumer/src/main/resources/logback-stg.xml
 RUN echo $LOGBACK_PATH_NOTIFICATION
 COPY $LOGBACK_PATH_NOTIFICATION notificationConsumer/logback.xml
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties -Dlogging.config=/code/notificationConsumer/logback.xml"
+ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' notificationConsumer
