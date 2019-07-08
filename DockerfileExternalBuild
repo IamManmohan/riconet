@@ -3,13 +3,13 @@ WORKDIR /code/
 ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_CORE
 COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
-ARG SPRING_PROFILE=staging
+ARG SPRING_PROFILE=local_docker
 RUN echo $SPRING_PROFILE
 ARG LOGIN_PROFILE=staging
 RUN echo $LOGIN_PROFILE
 ARG XMX_XMS_VALUE=512m
 RUN echo $XMX_XMS_VALUE
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE"
+ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE"
 RUN echo $COMMON_JAVA_OPTS
 
 RUN mkdir -p /etc/zoom/event
@@ -20,13 +20,10 @@ RUN rm /code/eventConsumer.zip
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_EVENT
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
-ARG LOGBACK_PATH_EVENT=eventConsumer/src/main/resources/logback-stg.xml
-RUN echo $LOGBACK_PATH_EVENT
-COPY $LOGBACK_PATH_EVENT eventConsumer/logback.xml
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
-RUN echo $JAVA_OPTS
+ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
+RUN echo $EVENT_JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
-RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' eventConsumer
+RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=$EVENT_JAVA_OPTS%g" eventConsumer
 
 RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
@@ -36,13 +33,12 @@ RUN rm /code/notificationConsumer.zip
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_NOTIFICATION
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
-ARG LOGBACK_PATH_NOTIFICATION=notificationConsumer/src/main/resources/logback-stg.xml
-RUN echo $LOGBACK_PATH_NOTIFICATION
-COPY $LOGBACK_PATH_NOTIFICATION notificationConsumer/logback.xml
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties"
-RUN echo $JAVA_OPTS
+ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties -Dlogging.config=/code/notificationConsumer/logback.xml"
+RUN echo $NOTIFICATION_JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
-RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' notificationConsumer
+RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=$NOTIFICATION_JAVA_OPTS%g" notificationConsumer
 
 WORKDIR /code/
-ENTRYPOINT exec ./eventConsumer/bin/eventConsumer && ./notificationConsumer/bin/notificationConsumer
+RUN apk add supervisor
+COPY supervisord.conf /etc/supervisord.conf
+ENTRYPOINT exec /usr/bin/supervisord
