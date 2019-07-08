@@ -2,10 +2,10 @@ FROM openjdk:jre-alpine
 WORKDIR /code/
 ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_CORE
-COPY --from=builder $PROPERTIES_PATH_CORE /etc/zoom/application.properties
+COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
 ARG LOGBACK_PATH=core/src/main/resources/logback.xml
 RUN echo $LOGBACK_PATH
-COPY --from=builder $LOGBACK_PATH /code/logback.xml
+COPY $LOGBACK_PATH /code/logback.xml
 ARG SPRING_PROFILE=staging
 RUN echo $SPRING_PROFILE
 ARG XMX_XMS_VALUE=512m
@@ -15,11 +15,11 @@ RUN echo $COMMON_JAVA_OPTS
 
 RUN mkdir -p /etc/zoom/event
 WORKDIR /code/
-COPY --from=builder eventConsumer/build/distributions/eventConsumer.zip /code/
+COPY eventConsumer/build/distributions/eventConsumer.zip /code/
 RUN unzip /code/eventConsumer.zip
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_EVENT
-COPY --from=builder $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
+COPY $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
 ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
@@ -28,11 +28,11 @@ ENTRYPOINT exec ./eventConsumer
 
 RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
-COPY --from=builder notificationConsumer/build/distributions/notificationConsumer.zip /code/
+COPY notificationConsumer/build/distributions/notificationConsumer.zip /code/
 RUN unzip /code/notificationConsumer.zip
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_NOTIFICATION
-COPY --from=builder $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
+COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
 ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
