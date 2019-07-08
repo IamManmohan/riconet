@@ -1,6 +1,5 @@
 FROM openjdk:jre-alpine
 WORKDIR /code/
-COPY wrapper.sh wrapper.sh
 ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_CORE
 COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
@@ -39,4 +38,4 @@ WORKDIR /code/notificationConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' notificationConsumer
 
 WORKDIR /code/
-ENTRYPOINT exec ./wrapper.sh
+ENTRYPOINT exec ./eventConsumer/bin/eventConsumer && ./notificationConsumer/bin/notificationConsumer

@@ -1,8 +1,10 @@
 package com.rivigo.riconet.event.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 /** Created by ashfakh on 03/07/19. */
+@Configuration
 public class EventTopicNameConfig {
   @Value("${ENRICHED_EVENT_SINK}")
   private String enrichedEventSink;
