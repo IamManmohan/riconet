@@ -12,6 +12,7 @@ import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
+import com.rivigo.riconet.event.consumer.VendorOnboardingEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
@@ -46,6 +47,8 @@ public class EventMain {
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
 
+  private final VendorOnboardingEventConsumer vendorOnboardingEventConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   public EventMain(
@@ -56,7 +59,8 @@ public class EventMain {
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
-      ExpressAppPickupConsumer expressAppPickupConsumer) {
+      ExpressAppPickupConsumer expressAppPickupConsumer,
+      VendorOnboardingEventConsumer vendorOnboardingEventConsumer) {
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
@@ -65,6 +69,7 @@ public class EventMain {
     this.wmsEventConsumer = wmsEventConsumer;
     this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
+    this.vendorOnboardingEventConsumer = vendorOnboardingEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -129,6 +134,12 @@ public class EventMain {
         bootstrapServers,
         config.getString("expressAppPickupConsumer.group.id"),
         expressAppPickupConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        config.getString("vendorOnboardingEventConsumer.group.id"),
+        vendorOnboardingEventConsumer);
   }
 
   private void load(
