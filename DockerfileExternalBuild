@@ -1,5 +1,6 @@
 FROM openjdk:jre-alpine
 WORKDIR /code/
+COPY wrapper.sh wrapper.sh
 ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
 RUN echo $PROPERTIES_PATH_CORE
 COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
@@ -24,7 +25,6 @@ ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.
 RUN echo $JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' eventConsumer
-ENTRYPOINT exec ./eventConsumer
 
 RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
@@ -37,4 +37,6 @@ ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.
 RUN echo $JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' notificationConsumer
-ENTRYPOINT exec ./notificationConsumer
+
+WORKDIR /code/
+ENTRYPOINT exec ./wrapper.sh
