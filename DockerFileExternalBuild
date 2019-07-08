@@ -1,5 +1,8 @@
 FROM openjdk:jre-alpine
 WORKDIR /code/
+ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
+RUN echo PROPERTIES_PATH_CORE
+COPY --from=builder $PROPERTIES_PATH_CORE /etc/zoom/application.properties
 ARG LOGBACK_PATH=core/src/main/resources/logback.xml
 RUN echo $LOGBACK_PATH
 COPY --from=builder $LOGBACK_PATH /code/logback.xml
@@ -16,8 +19,8 @@ COPY --from=builder eventConsumer/build/distributions/eventConsumer.zip /code/
 RUN unzip /code/eventConsumer.zip
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_EVENT
-COPY --from=builder $PROPERTIES_PATH_EVENT /etc/zoom/event/application.properties
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event"
+COPY --from=builder $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
+ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' eventConsumer
@@ -29,8 +32,8 @@ COPY --from=builder notificationConsumer/build/distributions/notificationConsume
 RUN unzip /code/notificationConsumer.zip
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/application.properties
 RUN echo PROPERTIES_PATH_NOTIFICATION
-COPY --from=builder $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/application.properties
-ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification"
+COPY --from=builder $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
+ENV JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties"
 RUN echo $JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
 RUN sed -i 's%DEFAULT_JVM_OPTS=""%DEFAULT_JVM_OPTS=$JAVA_OPTS%g' notificationConsumer

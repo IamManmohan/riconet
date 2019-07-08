@@ -1,6 +1,6 @@
 <configuration>
     <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>/var/log/event/app.log</file>
+        <file>/var/log/event-app.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36}.%M - [%X{mdcData}] [%X{X-B3-TraceId:-} %X{X-B3-SpanId:-} %X{X-Span-Export:-}] %msg%n
             </Pattern>
