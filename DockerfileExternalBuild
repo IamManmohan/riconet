@@ -23,7 +23,7 @@ COPY $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
 ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties"
 RUN echo $EVENT_JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
-RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=$EVENT_JAVA_OPTS%g" eventConsumer
+RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$EVENT_JAVA_OPTS\"%g" eventConsumer
 
 RUN mkdir -p /etc/zoom/notification
 WORKDIR /code/
@@ -36,7 +36,7 @@ COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
 ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties -Dlogging.config=/code/notificationConsumer/logback.xml"
 RUN echo $NOTIFICATION_JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
-RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=$NOTIFICATION_JAVA_OPTS%g" notificationConsumer
+RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"%g" notificationConsumer
 
 WORKDIR /code/
 RUN apk add supervisor
