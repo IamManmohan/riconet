@@ -2,36 +2,46 @@
 # From gist at https://gist.github.com/chadmaughan/5889802
 # setting alias : allow gradle and gradlew both 
 
-# function gradle-or-gradlew() {
-function gradle() {
+function gradle_or_gradlew() {
         if [ -f ./gradlew ] ; then
-                echo "executing gradlew instead of gradle";
+                echo "Executing gradlew instead of gradle...";
                 ./gradlew "$@";
         else
                 gradle "$@";
         fi
 }
 
-echo "Checking spotless"
-gradle spotlessCheck || {
-  echo "Please format your code by running gradle spotlessApply"
+function echo() {
+	Black='\033[1;30m'
+	Red='\033[1;31m'
+	Green='\033[1;32m'
+	Yellow='\033[1;33m'
+	Blue='\033[1;34m'
+	Purple='\033[1;35m'
+	Cyan='\033[1;36m'
+	White='\033[1;37m'
+	NC='\033[0m'
+	printf "${!1}${2} ${NC}\n"
+}
+
+echo "Yellow" "1. Checking spotless..."
+gradle_or_gradlew spotlessCheck || {
+  echo "Red" "Please format your code by running gradle spotlessApply"
   exit 1
 }
-echo "SpotlessCheck successful"
+echo "Green" "Spotless check successful.\n"
 
-gradle clean build  || {
-  echo "Running build failed. Please fix the errors to continue"
+echo "Yellow" "2. Building project..."
+gradle_or_gradlew clean build || {
+  echo "Red" "Running clean build failed. Please fix the errors to continue!"
   exit 1
 }
-echo "Build successful"
+echo "Green" "Build successful.\n"
 
-
-echo "Checking uncommitted changes"
+echo "Yellow" "3. Checking uncommitted changes..."
 git diff-index --quiet HEAD -- || {
-    echo "There are uncommitted changes. Please commit your changes first";
+    echo "Red" "There are uncommitted changes. Please commit your changes first!";
     exit 1
 }
-echo "No uncommitted changes found"
+echo "Green" "No uncommitted changes found. Pushing the code..."
 
-
-echo "Pushing the code"
