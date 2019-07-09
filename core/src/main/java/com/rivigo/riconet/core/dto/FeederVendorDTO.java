@@ -6,25 +6,24 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 public class FeederVendorDTO {
-    private Long id;
+  private Long id;
 
-    private String vendorName;
+  private String vendorName;
 
-    private String vendorCode;
+  private String vendorCode;
 
-    private String email;
+  private String email;
 
-    private String personName;
+  private String personName;
 
-    private Long contactNumber;
+  private Long contactNumber;
 
-    private Long clusterId;
+  private Long clusterId;
 
-    private VendorType vendorType;
+  private VendorType vendorType;
 
-    private String vendorStatus;
+  private String vendorStatus;
 
-    private String clusterCode;
+  private String clusterCode;
 }

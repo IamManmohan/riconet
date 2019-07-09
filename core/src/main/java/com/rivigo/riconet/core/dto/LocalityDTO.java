@@ -10,13 +10,13 @@ import lombok.ToString;
 @ToString
 public class LocalityDTO {
 
-    private Long id;
-    private String code;
-    private OperationalStatus status;
-    private Double latitude;
-    private Double longitude;
-    private String geofencing;
-    private String pincode;
-    private Long pincodeId;
-    private String localityName;
+  private Long id;
+  private String code;
+  private OperationalStatus status;
+  private Double latitude;
+  private Double longitude;
+  private String geofencing;
+  private String pincode;
+  private Long pincodeId;
+  private String localityName;
 }

@@ -4,6 +4,5 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 
 public interface BusinessPartnerService {
 
-    BusinessPartnerDTO addBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
+  BusinessPartnerDTO addBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
 }
-
