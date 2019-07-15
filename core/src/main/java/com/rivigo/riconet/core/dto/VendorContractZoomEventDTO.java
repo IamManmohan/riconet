@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class VendorContractZoomEventDTO {
   private String vendorCode;
-  private ExpenseType expenseType;
+  private String expenseType;
   private String serviceRequestType;
-  private VendorContractStatus vendorContractStatus;
+  private String vendorContractStatus;
   private Boolean siteExpenseActive;
 }

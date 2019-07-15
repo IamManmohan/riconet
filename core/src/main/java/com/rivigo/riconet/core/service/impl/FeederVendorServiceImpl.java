@@ -1,13 +1,9 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.dto.ExpenseType.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
-import com.rivigo.riconet.core.dto.VendorContractStatus;
 import com.rivigo.riconet.core.dto.VendorContractZoomEventDTO;
-import com.rivigo.riconet.core.service.BusinessPartnerService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.enums.OperationalStatus;
@@ -24,10 +20,6 @@ public class FeederVendorServiceImpl implements FeederVendorService {
 
   @Autowired FeederVendorRepository feederVendorRepository;
 
-  @Autowired private FeederVendorConverter feederVendorConverter;
-
-  @Autowired private BusinessPartnerService businessPartnerService;
-
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private ObjectMapper objectMapper;
@@ -43,11 +35,11 @@ public class FeederVendorServiceImpl implements FeederVendorService {
         getVendorContractZoomEventDTO(feederVendor);
     // based on the expense type we determine the data is for a vendor or a BP
     switch (vendorContractZoomEventDTO.getExpenseType()) {
-      case BP:
-      case RP:
+      case "BP":
+      case "RP":
         createBP(vendorContractZoomEventDTO);
         break;
-      case RLH_FEEDER:
+      case "RLH_FEEDER":
         createVendor(vendorContractZoomEventDTO);
         break;
     }
@@ -58,24 +50,22 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
 
-    if (vendorContractZoomEventDTO.getExpenseType().equals(VendorContractStatus.ACTIVE)) {
+    if (vendorContractZoomEventDTO.getExpenseType().equals("ACTIVE")) {
       dto.setVendorStatus(OperationalStatus.ACTIVE.toString());
     } else {
       dto.setVendorStatus(OperationalStatus.INACTIVE.toString());
     }
-    //    feederVendorConverter.convertFrom(feederVendorRepository.save(dto));
     zoomBackendAPIClientService.addFeederVendor(dto);
   }
 
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    if (vendorContractZoomEventDTO.getExpenseType().equals(VendorContractStatus.ACTIVE)) {
+    if (vendorContractZoomEventDTO.getExpenseType().equals("ACTIVE")) {
       dto.setStatus(OperationalStatus.ACTIVE.toString());
     } else {
       dto.setStatus(OperationalStatus.INACTIVE.toString());
     }
-    businessPartnerService.addBusinessPartner(dto);
     zoomBackendAPIClientService.addBusinessPartner(dto);
   }
 
