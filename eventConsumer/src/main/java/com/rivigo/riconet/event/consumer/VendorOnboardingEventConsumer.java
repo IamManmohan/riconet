@@ -28,7 +28,7 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.financeEventSink();
+    return topicNameConfig.VendorOnboardingEventSink();
   }
 
   @Override

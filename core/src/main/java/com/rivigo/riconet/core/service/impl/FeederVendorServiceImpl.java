@@ -1,9 +1,9 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
-import com.rivigo.riconet.core.dto.VendorContractZoomEventDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.enums.OperationalStatus;

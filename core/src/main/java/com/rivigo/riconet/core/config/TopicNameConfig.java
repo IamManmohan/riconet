@@ -48,6 +48,9 @@ public class TopicNameConfig {
   @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
   private String expressAppPickupSinkError;
 
+  @Value("${COMPASS_TO_ZOOM_CONTRACT_EVENT}")
+  private String vendorOnboardingEventSink;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -98,5 +101,9 @@ public class TopicNameConfig {
 
   public String expressAppPickupSinkError() {
     return expressAppPickupSinkError;
+  }
+
+  public String VendorOnboardingEventSink() {
+    return vendorOnboardingEventSink;
   }
 }

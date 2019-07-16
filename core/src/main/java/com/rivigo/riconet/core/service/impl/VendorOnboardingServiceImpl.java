@@ -22,7 +22,7 @@ public class VendorOnboardingServiceImpl implements VendorOnboardingService {
   public void processVendorOnboardingEvent(EventPayload eventPayload) {
     ZoomEventType eventType = eventPayload.getEventType();
     switch (eventType) {
-      case CMS_CLIENT_UPSERT:
+      case VENDOR_ACTIVE_EVENT:
         feederVendorService.createFeederVendor(eventPayload.getPayload());
         break;
       default:
