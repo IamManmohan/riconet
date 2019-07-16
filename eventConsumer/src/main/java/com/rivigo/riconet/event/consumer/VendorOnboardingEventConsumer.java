@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
-import com.rivigo.riconet.core.service.VendorOnboardingService;
+import com.rivigo.riconet.core.service.FeederVendorService;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired private VendorOnboardingService vendorOnboardingService;
+  @Autowired private FeederVendorService feederVendorService;
 
   @Autowired private TopicNameConfig topicNameConfig;
 
@@ -47,6 +47,6 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
       return;
     }
     log.debug("Event Payload {}", eventPayload);
-    vendorOnboardingService.processVendorOnboardingEvent(eventPayload);
+    feederVendorService.processVendorOnboardingEvent(eventPayload);
   }
 }

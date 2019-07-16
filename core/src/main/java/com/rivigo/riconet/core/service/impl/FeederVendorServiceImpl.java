@@ -2,6 +2,9 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
+import com.rivigo.compass.vendorcontractapi.enums.VendorContractStatus;
+import com.rivigo.finance.zoom.dto.EventPayload;
+import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
@@ -24,6 +27,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
 
   @Autowired private ObjectMapper objectMapper;
 
+  @Autowired private FeederVendorService feederVendorService;
+
   @Override
   public FeederVendor getFeederVendorById(Long id) {
     return (feederVendorRepository.findById(id));
@@ -32,14 +37,14 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   @Override
   public void createFeederVendor(String feederVendor) {
     VendorContractZoomEventDTO vendorContractZoomEventDTO =
-        getVendorContractZoomEventDTO(feederVendor);
+        getVendorContractZoomEventDTOFromEventPayLoad(feederVendor);
     // based on the expense type we determine the data is for a vendor or a BP
     switch (vendorContractZoomEventDTO.getExpenseType()) {
-      case "BP":
-      case "RP":
+      case BP:
+      case RP:
         createBP(vendorContractZoomEventDTO);
         break;
-      case "RLH_FEEDER":
+      case RLH_FEEDER:
         createVendor(vendorContractZoomEventDTO);
         break;
     }
@@ -50,7 +55,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
 
-    if (vendorContractZoomEventDTO.getExpenseType().equals("ACTIVE")) {
+    if (vendorContractZoomEventDTO.getVendorContractStatus().equals(VendorContractStatus.ACTIVE)) {
       dto.setVendorStatus(OperationalStatus.ACTIVE.toString());
     } else {
       dto.setVendorStatus(OperationalStatus.INACTIVE.toString());
@@ -61,7 +66,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    if (vendorContractZoomEventDTO.getExpenseType().equals("ACTIVE")) {
+    if (vendorContractZoomEventDTO.getVendorContractStatus().equals(VendorContractStatus.ACTIVE)) {
       dto.setStatus(OperationalStatus.ACTIVE.toString());
     } else {
       dto.setStatus(OperationalStatus.INACTIVE.toString());
@@ -69,7 +74,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     zoomBackendAPIClientService.addBusinessPartner(dto);
   }
 
-  private VendorContractZoomEventDTO getVendorContractZoomEventDTO(String feederVendor) {
+  private VendorContractZoomEventDTO getVendorContractZoomEventDTOFromEventPayLoad(
+      String feederVendor) {
     VendorContractZoomEventDTO vendorContractZoomEventDTO;
     try {
       vendorContractZoomEventDTO =
@@ -79,5 +85,16 @@ public class FeederVendorServiceImpl implements FeederVendorService {
       return null;
     }
     return vendorContractZoomEventDTO;
+  }
+
+  public void processVendorOnboardingEvent(EventPayload eventPayload) {
+    ZoomEventType eventType = eventPayload.getEventType();
+    switch (eventType) {
+      case VENDOR_ACTIVE_EVENT:
+        feederVendorService.createFeederVendor(eventPayload.getPayload());
+        break;
+      default:
+        log.info("Event does not trigger anything {}", eventType);
+    }
   }
 }
