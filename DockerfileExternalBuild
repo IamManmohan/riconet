@@ -1,6 +1,6 @@
 FROM openjdk:jre-alpine
 WORKDIR /code/
-ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
+ARG PROPERTIES_PATH_CORE=core/src/main/resources/application_core.properties
 RUN echo $PROPERTIES_PATH_CORE
 COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
 ARG SPRING_PROFILE=local_docker
