@@ -12,7 +12,6 @@ public class AdministrativeEntityMasterServiceImpl implements AdministrativeEnti
 
   @Override
   public List<AdministrativeEntity> findByIdIn(List<Long> ids) {
-    List<AdministrativeEntity> ae = administrativeEntityRepository.findByIdIn(ids);
-    return ae;
+    return (administrativeEntityRepository.findByIdIn(ids));
   }
 }

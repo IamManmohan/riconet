@@ -319,7 +319,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public Boolean addBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
+  public Boolean addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
     try {
@@ -339,7 +339,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
-  public Boolean addFeederVendor(FeederVendorDTO feederVendorDTO) {
+  public Boolean addUpdateFeederVendor(FeederVendorDTO feederVendorDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", feederVendorDTO);
     try {

@@ -60,7 +60,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     } else {
       dto.setVendorStatus(OperationalStatus.INACTIVE.toString());
     }
-    zoomBackendAPIClientService.addFeederVendor(dto);
+    zoomBackendAPIClientService.addUpdateFeederVendor(dto);
   }
 
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
@@ -71,7 +71,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     } else {
       dto.setStatus(OperationalStatus.INACTIVE.toString());
     }
-    zoomBackendAPIClientService.addBusinessPartner(dto);
+    zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
   }
 
   private VendorContractZoomEventDTO getVendorContractZoomEventDTOFromEventPayLoad(

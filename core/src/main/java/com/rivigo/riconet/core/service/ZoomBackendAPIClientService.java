@@ -44,7 +44,7 @@ public interface ZoomBackendAPIClientService {
 
   Boolean deletePickup(Long pickupId);
 
-  Boolean addBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
+  Boolean addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
 
-  Boolean addFeederVendor(FeederVendorDTO feederVendorDTO);
+  Boolean addUpdateFeederVendor(FeederVendorDTO feederVendorDTO);
 }
