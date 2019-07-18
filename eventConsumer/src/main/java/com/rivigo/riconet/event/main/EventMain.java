@@ -24,14 +24,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /** Created by ashfakh on 12/05/18. */
 @Component
 @Slf4j
 @Configuration
-@PropertySource("classpath:application.properties")
 public class EventMain {
 
   private final ZoomEventTriggerConsumer zoomEventTriggerConsumer;
@@ -76,7 +74,7 @@ public class EventMain {
   @Value("${kairosExpressAppEventConsumer.group.id}")
   private String kairosExpressAppGroup;
 
-  @Value("${expressAppPickupConsumer.group.idd}")
+  @Value("${expressAppPickupConsumer.group.id}")
   private String expressAppPickupGroup;
 
   public EventMain(
