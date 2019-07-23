@@ -319,7 +319,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public Boolean addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
+  public void addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
     try {
@@ -330,16 +330,15 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_CREATE_BP,
               null,
               backendBaseUrl);
+      log.info("Business Partner Created {}", responseJson);
 
     } catch (IOException e) {
       log.error("Error while creating BP with dto {}", businessPartnerDTO);
       throw new ZoomException("Error while creating BP with dtoo %s", businessPartnerDTO);
     }
-    TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-    return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
-  public Boolean addUpdateFeederVendor(FeederVendorDTO feederVendorDTO) {
+  public void addUpdateFeederVendor(FeederVendorDTO feederVendorDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", feederVendorDTO);
     try {
@@ -350,12 +349,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_CREATE_VENDOR,
               null,
               backendBaseUrl);
+      log.info("Feeder Vendor Created {}", responseJson);
 
     } catch (IOException e) {
       log.error("Error while creating vendor with dto {}", feederVendorDTO);
       throw new ZoomException("Error while creating vendor with dto %s", feederVendorDTO);
     }
-    TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-    return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
   }
 }
