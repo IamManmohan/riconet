@@ -33,7 +33,7 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.financeEventSinkError();
+    return topicNameConfig.VendorOnboardingEventSinkError();
   }
 
   @Override

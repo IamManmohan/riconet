@@ -51,6 +51,9 @@ public class TopicNameConfig {
   @Value("${COMPASS_TO_ZOOM_CONTRACT_EVENT}")
   private String vendorOnboardingEventSink;
 
+  @Value("${COMPASS_TO_ZOOM_CONTRACT_EVENT_SINK_ERROR}")
+  private String vendorOnboardingEventSinkError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -105,5 +108,9 @@ public class TopicNameConfig {
 
   public String VendorOnboardingEventSink() {
     return vendorOnboardingEventSink;
+  }
+
+  public String VendorOnboardingEventSinkError() {
+    return vendorOnboardingEventSinkError;
   }
 }
