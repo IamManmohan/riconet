@@ -3,13 +3,14 @@ package com.rivigo.riconet.event.consumer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.EventPayload;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.FeederVendorService;
-import java.io.IOException;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -19,7 +20,7 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   @Autowired private FeederVendorService feederVendorService;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   public VendorOnboardingEventConsumer() {
     objectMapper = new ObjectMapper();
@@ -28,12 +29,12 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.VendorOnboardingEventSink();
+    return eventTopicNameConfig.VendorOnboardingEventSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.VendorOnboardingEventSinkError();
+    return eventTopicNameConfig.VendorOnboardingEventSinkError();
   }
 
   @Override
