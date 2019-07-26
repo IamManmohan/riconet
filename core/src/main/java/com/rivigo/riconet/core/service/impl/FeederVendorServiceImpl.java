@@ -2,20 +2,19 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
-import com.rivigo.compass.vendorcontractapi.enums.VendorContractStatus;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Slf4j
 @Service
@@ -54,23 +53,14 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     FeederVendorDTO dto = new FeederVendorDTO();
     dto.setVendorCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
-
-    if (vendorContractZoomEventDTO.getVendorContractStatus().equals(VendorContractStatus.ACTIVE)) {
-      dto.setVendorStatus(OperationalStatus.ACTIVE.toString());
-    } else {
-      dto.setVendorStatus(OperationalStatus.INACTIVE.toString());
-    }
+    dto.setVendorStatus("ACTIVE");
     zoomBackendAPIClientService.addUpdateFeederVendor(dto);
   }
 
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    if (vendorContractZoomEventDTO.getVendorContractStatus().equals(VendorContractStatus.ACTIVE)) {
-      dto.setStatus(OperationalStatus.ACTIVE.toString());
-    } else {
-      dto.setStatus(OperationalStatus.INACTIVE.toString());
-    }
+    dto.setStatus("ACTIVE");
     zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
   }
 
