@@ -149,7 +149,6 @@ public class EventMain {
         bootstrapServers,
         vendorOnboardingEventGroup,
         vendorOnboardingEventConsumer);
-    load(materializer, system, bootstrapServers, expressAppPickupGroup, expressAppPickupConsumer);
   }
 
   private void load(
