@@ -3,9 +3,9 @@ package com.rivigo.riconet.event.consumer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.EventPayload;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.FinanceEventService;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class FinanceEventsConsumer extends ConsumerModel {
 
   @Autowired private FinanceEventService financeEventService;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   public FinanceEventsConsumer() {
     objectMapper = new ObjectMapper();
@@ -29,12 +29,12 @@ public class FinanceEventsConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.financeEventSink();
+    return eventTopicNameConfig.financeEventSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.financeEventSinkError();
+    return eventTopicNameConfig.financeEventSinkError();
   }
 
   @Override

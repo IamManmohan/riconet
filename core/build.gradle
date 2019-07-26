@@ -1,9 +1,9 @@
 group 'com.core'
 version '1.0-SNAPSHOT'
 
-mainClassName = "core"
-
 apply plugin: 'java'
+
+//mainClassName = "core"
 
 sourceCompatibility = 1.8
 
