@@ -18,6 +18,10 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +29,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -322,16 +321,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Override
   public void addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
     JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("isvalidationRequired", Collections.singletonList("false"));
     log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
     try {
       responseJson =
           apiClientService.getEntity(
               businessPartnerDTO,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_CREATE_BP,
-              valuesMap,
+              UrlConstant.ZOOM_BACKEND_CREATE_BP + "?" + "isvalidationRequired=false",
+              null,
               backendBaseUrl);
       log.info("Business Partner Created {}", responseJson);
 
