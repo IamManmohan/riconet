@@ -15,6 +15,8 @@ public class FeederVendorDTO {
 
   private String email;
 
+  private String legalName;
+
   private String personName;
 
   private Long contactNumber;

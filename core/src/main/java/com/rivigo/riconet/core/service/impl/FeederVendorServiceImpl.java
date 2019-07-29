@@ -53,6 +53,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
     dto.setVendorStatus("ACTIVE");
+    dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     zoomBackendAPIClientService.addUpdateFeederVendor(dto);
   }
 
@@ -60,6 +61,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setType(vendorContractZoomEventDTO.getExpenseType().getName());
+    dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     dto.setStatus("ACTIVE");
     zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
   }

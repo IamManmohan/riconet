@@ -15,6 +15,7 @@ public class BusinessPartnerDTO {
   private String code;
   private String status;
   private String name;
+  private String legalName;
   private AvailabilityStatus availabilityStatus;
   private TacticalCreditStatus tacticalCreditStatus;
   private BigDecimal tacticalCreditMinimumBalance;
