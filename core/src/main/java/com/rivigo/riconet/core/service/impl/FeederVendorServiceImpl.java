@@ -10,11 +10,10 @@ import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Slf4j
 @Service
@@ -60,6 +59,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
+    dto.setType(vendorContractZoomEventDTO.getExpenseType().getName());
     dto.setStatus("ACTIVE");
     zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
   }
