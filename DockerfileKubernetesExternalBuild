@@ -19,7 +19,9 @@ ARG MONGO_HOST=host.docker.internal
 RUN echo $MONGO_HOST
 ARG MONGO_PORT=27017
 RUN echo $MONGO_PORT
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE  -Dzoom.neo4j.url=$NEO4J_URL -Dzoom.mongo.hostname=$MONGO_HOST -Dzoom.mongo.port=$MONGO_PORT -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL -Dzoom.mysql.url=$BACKEND_WRITE_JDBC_URL"
+ARG MONGO_DB=rivigo_zoom
+RUN echo $MONGO_DB
+ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE  -Dzoom.neo4j.url=$NEO4J_URL -Dzoom.mongo.hostname=$MONGO_HOST -Dzoom.mongo.port=$MONGO_PORT -Dzoom.mongo.db=$MONGO_DB -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL -Dzoom.mysql.url=$BACKEND_WRITE_JDBC_URL"
 RUN echo $COMMON_JAVA_OPTS
 
 RUN mkdir -p /etc/zoom/event
