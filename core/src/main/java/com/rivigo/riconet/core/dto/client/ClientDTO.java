@@ -51,4 +51,5 @@ public class ClientDTO {
   private Set<String> notificationToList;
   private Set<String> notificationCcList;
   private Set<String> clientNotificationList;
+  private boolean isOnlineEnabled;
 }
