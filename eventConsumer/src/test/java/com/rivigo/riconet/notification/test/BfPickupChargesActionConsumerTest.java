@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.enums.BfPickupChargesEventName;
 import com.rivigo.riconet.core.service.PickupService;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +28,7 @@ public class BfPickupChargesActionConsumerTest {
 
   @Spy private ObjectMapper objectMapper;
 
-  @Mock private TopicNameConfig topicNameConfig;
+  @Mock private EventTopicNameConfig eventTopicNameConfig;
 
   @Mock private PickupService pickupService;
 
@@ -40,7 +40,7 @@ public class BfPickupChargesActionConsumerTest {
   @Test
   public void getTopicTest() {
     String topic = "tempTopic";
-    when(topicNameConfig.enrichedEventSinkTopic()).thenReturn(topic);
+    when(eventTopicNameConfig.enrichedEventSinkTopic()).thenReturn(topic);
     String result = bfPickupChargesActionConsumer.getTopic();
     Assert.assertEquals(topic, result);
   }
@@ -48,7 +48,7 @@ public class BfPickupChargesActionConsumerTest {
   @Test
   public void getErrorTopicTest() {
     String topic = "tempTopic";
-    when(topicNameConfig.enrichedEventSinkErrorTopic()).thenReturn(topic);
+    when(eventTopicNameConfig.enrichedEventSinkErrorTopic()).thenReturn(topic);
     String result = bfPickupChargesActionConsumer.getErrorTopic();
     Assert.assertEquals(topic, result);
   }

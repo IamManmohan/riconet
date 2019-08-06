@@ -62,7 +62,7 @@
       </plugin>
       ```
       
-* andoid gradle
+* android gradle
 
     ``` 
         tasks.create(name: 'gitExecutableHooks') {
@@ -71,7 +71,7 @@
             }
         }
        task installGitHooks(type: Copy) {
-           from new File(rootProject.rootDir, '.git-hooks/src/hooks/pre-push/gradle/pre-push')
+           from new File(rootProject.rootDir, '.git-hooks/src/hooks/pre-push/android/pre-push')
                 into { new File(rootProject.rootDir, '.git/hooks') }
         
            from new File(rootProject.rootDir, '.git-hooks/src/hooks/pre-commit/commit-msg')
@@ -80,6 +80,7 @@
        gitExecutableHooks.dependsOn(installGitHooks)
        tasks.getByPath(':app:preBuild').dependsOn gitExecutableHooks
        ```
+
 * Node
     - install husky plugin: https://www.npmjs.com/package/husky
     - install pretty-quick plugin: https://www.npmjs.com/package/pretty-quick 
@@ -95,10 +96,21 @@
         ```    
     -  Run the following command on terminal:  ```chmod -R +x .git/hooks/```
 
+* Python
+    - Install yapf: ```pip install ypaf```
+    - Add the following snippet in your package's main ```__init__.py```:
+        ```
+        from subprocess import call
+        call(['cp', '.git-hooks/src/hooks/pre-push/python/pre-push', '.git/hooks/pre-push'])
+        call(['cp', '.git-hooks/src/hooks/pre-commit/commit-msg', '.git/hooks/commit-msg'])
+        ``` 
+     - Add ```.yapfignore``` to add files/directories to ignore yapf formatting.
+
 ### Who do I talk to?
 * [Ramesh Chandra](https://bitbucket.org/ramesh_rivigo)
 * [Palash Goel](https://bitbucket.org/palashgoel7/)
 * [JaiPrakash](https://bitbucket.org/jaiprakash_rivigo/)
+* [Abhishek Tripathi](https://bitbucket.org/abhishektripathi_rivigo/)
 
 ### References
 * https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree
