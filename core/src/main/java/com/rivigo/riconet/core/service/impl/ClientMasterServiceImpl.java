@@ -204,7 +204,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       industryTypeDTO.setType(dto.getIndustryType());
     }
     clientDTO.setIndustryType(industryTypeDTO);
-    clientDTO.setOnlineEnabled(dto.getOODEnabled());
+    clientDTO.setIsOnlineEnabled(dto.getOODEnabled());
     return clientDTO;
   }
 
