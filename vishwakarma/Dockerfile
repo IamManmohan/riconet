@@ -52,5 +52,5 @@ RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"
 
 WORKDIR /code/
 RUN apk add supervisor
-COPY ../core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
+COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 ENTRYPOINT exec /usr/bin/supervisord
