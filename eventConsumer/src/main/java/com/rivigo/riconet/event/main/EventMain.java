@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.KafkaConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
@@ -48,10 +49,15 @@ public class EventMain {
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
 
+  private final HealthCheckConsumer healthCheckConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
+
+  @Value("${healthCheckConsumer.group.id}")
+  private String healthCheckConsumerGroup;
 
   @Value("${zoomEventTriggerConsumer.group.id}")
   private String zoomEventTriggerGroup;
@@ -78,6 +84,7 @@ public class EventMain {
   private String expressAppPickupGroup;
 
   public EventMain(
+      HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
@@ -86,6 +93,7 @@ public class EventMain {
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer) {
+    this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
@@ -113,6 +121,7 @@ public class EventMain {
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
     //    String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
+    load(materializer, system, bootstrapServers, healthCheckConsumerGroup, healthCheckConsumer);
     load(materializer, system, bootstrapServers, zoomEventTriggerGroup, zoomEventTriggerConsumer);
     load(materializer, system, bootstrapServers, cnActionGroup, cnActionConsumer);
     load(
