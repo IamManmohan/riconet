@@ -1,4 +1,4 @@
-FROM openjdk:jre-alpine
+FROM palashgoel/supervisord-jre
 WORKDIR /code/
 ARG SPRING_PROFILE=vishwakarma
 RUN echo $SPRING_PROFILE
@@ -48,6 +48,5 @@ WORKDIR /code/notificationConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"%g" notificationConsumer
 
 WORKDIR /code/
-RUN apk add supervisor
 COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 ENTRYPOINT exec /usr/bin/supervisord
