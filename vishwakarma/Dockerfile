@@ -29,7 +29,7 @@ RUN rm /code/eventConsumer.zip
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/vishwakarma/
 RUN echo $PROPERTIES_PATH_EVENT
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
-ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event/ -Dexternal.property.resource=/etc/zoom/event/ "
+ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event/db.properties,/etc/zoom/event/application.properties,/etc/zoom/event/application_core.properties"
 RUN echo $EVENT_JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$EVENT_JAVA_OPTS\"%g" eventConsumer
@@ -42,7 +42,7 @@ RUN rm /code/notificationConsumer.zip
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/vishwakarma/
 RUN echo $PROPERTIES_PATH_NOTIFICATION
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
-ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification/ -Dexternal.property.resource=/etc/zoom/notification/ "
+ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification/db.properties,/etc/zoom/notification/application.properties,/etc/zoom/notification/application_core.properties"
 RUN echo $NOTIFICATION_JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"%g" notificationConsumer
