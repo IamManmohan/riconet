@@ -1,5 +1,5 @@
 # Ignore everything
-../DockerfileExternalBuild
+**
 # Allow files and directories
 #!/file.txt
 !/build/libs/communications-0.0.1-SNAPSHOT.jar
