@@ -1,8 +1,5 @@
 FROM openjdk:jre-alpine
 WORKDIR /code/
-ARG PROPERTIES_PATH_CORE=core/src/main/resources/vishwakarma/application.properties
-RUN echo $PROPERTIES_PATH_CORE
-COPY $PROPERTIES_PATH_CORE /etc/zoom/application.properties
 ARG SPRING_PROFILE=vishwakarma
 RUN echo $SPRING_PROFILE
 ARG LOGIN_PROFILE=staging
@@ -29,10 +26,10 @@ WORKDIR /code/
 COPY eventConsumer/build/distributions/eventConsumer.zip /code/
 RUN unzip /code/eventConsumer.zip
 RUN rm /code/eventConsumer.zip
-ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/vishwakarma/application.properties
+ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/vishwakarma/
 RUN echo $PROPERTIES_PATH_EVENT
-COPY $PROPERTIES_PATH_EVENT /etc/zoom/application_event.properties
-ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_event.properties "
+COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
+ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event/ "
 RUN echo $EVENT_JAVA_OPTS
 WORKDIR /code/eventConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$EVENT_JAVA_OPTS\"%g" eventConsumer
@@ -42,10 +39,10 @@ WORKDIR /code/
 COPY notificationConsumer/build/distributions/notificationConsumer.zip /code/
 RUN unzip /code/notificationConsumer.zip
 RUN rm /code/notificationConsumer.zip
-ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/vishwakarma/application.properties
+ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/vishwakarma/
 RUN echo $PROPERTIES_PATH_NOTIFICATION
-COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/application_notification.properties
-ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/application.properties,/etc/zoom/application_notification.properties"
+COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
+ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification/ "
 RUN echo $NOTIFICATION_JAVA_OPTS
 WORKDIR /code/notificationConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"%g" notificationConsumer
