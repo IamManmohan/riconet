@@ -27,10 +27,12 @@ ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
     -Dzoom.mongo.port=$MONGO_PORT \
     -Dzoom.mongo.db=$MONGO_DB \
     -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
-    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL" \
-    EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
-    -Dspring.config.location=file:/etc/zoom/event/core/application_core.properties,file:/etc/zoom/event/application.properties,file:/etc/zoom/event/core/db.properties" \
-    NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL"
+
+ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+    -Dspring.config.location=file:/etc/zoom/event/core/application_core.properties,file:/etc/zoom/event/application.properties,file:/etc/zoom/event/core/db.properties"
+
+ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
     -Dspring.config.location=file:/etc/zoom/notification/core/application_core.properties,file:/etc/zoom/notification/application.properties,file:/etc/zoom/notification/core/db.properties"
 
 
