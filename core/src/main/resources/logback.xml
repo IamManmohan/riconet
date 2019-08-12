@@ -11,14 +11,17 @@
             <maxFileSize>5MB</maxFileSize>
         </triggeringPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36}.%M - [%X{mdcData}] [%X{X-B3-TraceId:-} %X{X-B3-SpanId:-} %X{X-Span-Export:-}] %msg%n
+            <Pattern>
+                [%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36}.%M - [%X{mdcData}] [traceId:%X{X-B3-TraceId:-} | spanId:%X{X-B3-SpanId:-} | spanExport:%X{X-Span-Export:-}] %msg%n
             </Pattern>
         </encoder>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36}.%M - %msg%n</Pattern>
+            <Pattern>
+                [%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36}.%M - [%X{mdcData}] [traceId:%X{X-B3-TraceId:-} | spanId:%X{X-B3-SpanId:-} | spanExport:%X{X-Span-Export:-}] %msg%n
+            </Pattern>
         </encoder>
     </appender>
     <logger name="com.rivigo" level="debug" additivity="false">
