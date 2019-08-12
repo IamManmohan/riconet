@@ -18,9 +18,20 @@ COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
 
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE  -Dzoom.neo4j.url=$NEO4J_URL -Dzoom.mongo.hostname=$MONGO_HOST -Dzoom.mongo.port=$MONGO_PORT -Dzoom.mongo.db=$MONGO_DB -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL" \
-    EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event/core/db.properties,/etc/zoom/event/application.properties,/etc/zoom/event/core/application_core.properties" \
-    NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification/core/db.properties,/etc/zoom/notification/application.properties,/etc/zoom/notification/core/application_core.properties"
+ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
+    -Xmx$XMX_XMS_VALUE \
+    -Dlogin.profiles.active=$LOGIN_PROFILE \
+    -Dspring.profiles.active=$SPRING_PROFILE  \
+    -Dzoom.neo4j.url=$NEO4J_URL \
+    -Dzoom.mongo.hostname=$MONGO_HOST \
+    -Dzoom.mongo.port=$MONGO_PORT \
+    -Dzoom.mongo.db=$MONGO_DB \
+    -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
+    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL" \
+    EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+    -Dspring.config.location=/etc/zoom/event/core/db.properties,/etc/zoom/event/application.properties,/etc/zoom/event/core/application_core.properties" \
+    NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+    -Dspring.config.location=/etc/zoom/notification/core/db.properties,/etc/zoom/notification/application.properties,/etc/zoom/notification/core/application_core.properties"
 
 RUN unzip /code/eventConsumer.zip \
     && rm /code/eventConsumer.zip \
