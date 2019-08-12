@@ -34,7 +34,9 @@ ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
     -Dspring.config.location=file:/etc/zoom/notification/core/application_core.properties,file:/etc/zoom/notification/application.properties,file:/etc/zoom/notification/core/db.properties"
 
 
-RUN printenv | grep JAVA_OPTS && $COMMON_JAVA_OPTS unzip -q /code/eventConsumer.zip \
+RUN echo $EVENT_JAVA_OPTS \
+    && echo $NOTIFICATION_JAVA_OPTS \
+    && unzip -q /code/eventConsumer.zip \
     && rm /code/eventConsumer.zip \
     && unzip -q /code/notificationConsumer.zip \
     && rm /code/notificationConsumer.zip \
