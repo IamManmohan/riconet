@@ -3,7 +3,7 @@ WORKDIR /code/
 ARG SPRING_PROFILE=vishwakarma
 ARG LOGIN_PROFILE=staging
 ARG XMX_XMS_VALUE=512m
-ARG BACKEND_WRITE_JDBC_URL=jdbc:mysql://host.docker.internal:3306/rivigo_zoom
+ARG BACKEND_READ_JDBC_URL=jdbc:mysql://host.docker.internal:3306/rivigo_zoom
 ARG OUT_TOPIC_PREFIX=local
 ARG NEO4J_URL=http://host.docker.internal:7474
 ARG MONGO_HOST=host.docker.internal
@@ -18,7 +18,7 @@ COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
 
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE  -Dzoom.neo4j.url=$NEO4J_URL -Dzoom.mongo.hostname=$MONGO_HOST -Dzoom.mongo.port=$MONGO_PORT -Dzoom.mongo.db=$MONGO_DB -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL -Dzoom.mysql.url=$BACKEND_WRITE_JDBC_URL" \
+ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE -Dlogin.profiles.active=$LOGIN_PROFILE -Dspring.profiles.active=$SPRING_PROFILE  -Dzoom.neo4j.url=$NEO4J_URL -Dzoom.mongo.hostname=$MONGO_HOST -Dzoom.mongo.port=$MONGO_PORT -Dzoom.mongo.db=$MONGO_DB -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL" \
     EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/event/core//db.properties,/etc/zoom/event/application.properties,/etc/zoom/event/core/application_core.properties" \
     NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" -Dspring.config.location=/etc/zoom/notification/core/db.properties,/etc/zoom/notification/application.properties,/etc/zoom/notification/core/application_core.properties"
 
