@@ -30,10 +30,10 @@ ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
     -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL"
 
 ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
-    -Dspring.config.location=/etc/zoom/event/application_core.properties,/etc/zoom/event/application.properties,/etc/zoom/event/db.properties"
+    -Dspring.config.location=/etc/zoom/event/"
 
 ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
-    -Dspring.config.location=file:/etc/zoom/notification/application_core.properties,file:/etc/zoom/notification/application.properties,file:/etc/zoom/notification/db.properties"
+    -Dspring.config.location=/etc/zoom/notification/"
 
 
 RUN sh -c "printenv | grep JAVA_OPTS" \
