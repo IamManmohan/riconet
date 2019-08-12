@@ -101,7 +101,7 @@
     - Add the following snippet in your package's main ```__init__.py```:
         ```
         from subprocess import call
-        call(['cp', '.git-hooks/src/hooks/pre-push/python/pre-push', '.git/hooks/pre-push'])
+        call(['cp', '.git-hooks/src/hooks/pre-push/python/<autopep8/ypaf>/pre-push', '.git/hooks/pre-push'])
         call(['cp', '.git-hooks/src/hooks/pre-commit/commit-msg', '.git/hooks/commit-msg'])
         ``` 
      - Add ```.yapfignore``` to add files/directories to ignore yapf formatting.
