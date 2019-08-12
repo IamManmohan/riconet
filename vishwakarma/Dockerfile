@@ -29,9 +29,9 @@ ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
     -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
     -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL" \
     EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
-    -Dspring.config.location=/etc/zoom/event/core/db.properties,/etc/zoom/event/application.properties,/etc/zoom/event/core/application_core.properties" \
+    -Dspring.config.location=file:/etc/zoom/event/core/application_core.properties,file:/etc/zoom/event/application.properties,file:/etc/zoom/event/core/db.properties" \
     NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
-    -Dspring.config.location=/etc/zoom/notification/core/db.properties,/etc/zoom/notification/application.properties,/etc/zoom/notification/core/application_core.properties"
+    -Dspring.config.location=file:/etc/zoom/notification/core/application_core.properties,file:/etc/zoom/notification/application.properties,file:/etc/zoom/notification/core/db.properties"
 
 RUN unzip /code/eventConsumer.zip \
     && rm /code/eventConsumer.zip \
