@@ -18,6 +18,7 @@ import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -56,7 +57,22 @@ public class EventMain {
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
 
-  @Value("${healthCheckConsumer.group.id}")
+  @Value("${akka.kafka.consumer.poll-interval}")
+  private Long pollInterval;
+
+  @Value("${akka.kafka.consumer.poll-timeout}")
+  private Long pollTimeOut;
+
+  @Value("${akka.kafka.consumer.stop-timeout}")
+  private Long stopTimeout;
+
+  @Value("${akka.kafka.consumer.commit-timeout}")
+  private Long commitTimeout;
+
+  @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
+  private String autoCommitEnabled;
+
+  @Value("${event.healthCheckConsumer.group.id}")
   private String healthCheckConsumerGroup;
 
   @Value("${zoomEventTriggerConsumer.group.id}")
@@ -157,7 +173,12 @@ public class EventMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+            .withPollInterval(Duration.ofMillis(pollInterval))
+            .withPollTimeout(Duration.ofMillis(pollTimeOut))
+            .withStopTimeout(Duration.ofMillis(stopTimeout))
+            .withCommitTimeout(Duration.ofMillis(commitTimeout))
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG)
+            .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommitEnabled);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }
