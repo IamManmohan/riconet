@@ -18,7 +18,8 @@ COPY eventConsumer/build/distributions/eventConsumer.zip /code/
 COPY notificationConsumer/build/distributions/notificationConsumer.zip /code/
 COPY supervisord.conf /etc/supervisord.conf
 
-RUN mkdir -p /etc/zoom/event \
+RUN sh -c "printenv | grep JAVA_OPTS" \
+    && mkdir -p /etc/zoom/event \
     && unzip /code/eventConsumer.zip \
     && rm /code/eventConsumer.zip \
     && sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$EVENT_JAVA_OPTS\"%g" /code/eventConsumer/bin/eventConsumer \
