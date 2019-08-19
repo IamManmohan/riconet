@@ -14,6 +14,7 @@ import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
+import com.rivigo.zoom.common.config.TracingConfig;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,7 @@ public class NotificationMain {
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
             ZoomConfig.class,
+                TracingConfig.class,
             ZoomDatabaseConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
