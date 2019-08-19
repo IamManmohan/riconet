@@ -1,4 +1,4 @@
-FROM openjdk:jre-alpine
+FROM rivigotech/openjdk-supervisor:8-jre-alpine
 WORKDIR /code/
 ARG PROPERTIES_PATH_CORE=core/src/main/resources/application_core.properties
 RUN echo $PROPERTIES_PATH_CORE
@@ -39,6 +39,5 @@ WORKDIR /code/notificationConsumer/bin
 RUN sed -i "s%DEFAULT_JVM_OPTS=\"\"%DEFAULT_JVM_OPTS=\"$NOTIFICATION_JAVA_OPTS\"%g" notificationConsumer
 
 WORKDIR /code/
-RUN apk add supervisor
 COPY supervisord.conf /etc/supervisord.conf
 ENTRYPOINT exec /usr/bin/supervisord
