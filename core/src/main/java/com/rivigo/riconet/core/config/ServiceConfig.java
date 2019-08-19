@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
     "com.rivigo.riconet.notification",
     "com.rivigo.riconet.event",
     "com.rivigo.riconet.core.service",
+    "com.rivigo.riconet.core.consumer",
     "com.rivigo.riconet.core.test.consumer",
     "com.rivigo.oauth2.resource.service",
     "com.rivigo.riconet.ruleengine",
