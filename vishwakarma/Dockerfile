@@ -1,4 +1,4 @@
-FROM palashgoel/supervisord-jre
+FROM rivigotech/openjdk-supervisor:8-jre-alpine
 WORKDIR /code/
 ARG SPRING_PROFILE=vishwakarma
 ARG LOGIN_PROFILE=staging
