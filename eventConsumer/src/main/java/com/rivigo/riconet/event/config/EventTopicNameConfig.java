@@ -12,12 +12,6 @@ public class EventTopicNameConfig {
   @Value("${ENRICHED_EVENT_SINK_ERROR}")
   private String enrichedEventSinkError;
 
-  //    @Value("${SMS_SINK}")
-  //    private String smsSink;
-  //
-  //    @Value("${SMS_SINK_ERROR}")
-  //    private String smsSinkError;
-
   @Value("${FINANCE_EVENT_SINK}")
   private String financeEventSink;
 
@@ -46,14 +40,6 @@ public class EventTopicNameConfig {
   public String enrichedEventSinkErrorTopic() {
     return enrichedEventSinkError;
   }
-
-  //    public String smsSink() {
-  //        return smsSink;
-  //    }
-  //
-  //    public String smsSinkError() {
-  //        return smsSinkError;
-  //    }
 
   public String financeEventSink() {
     return financeEventSink;
