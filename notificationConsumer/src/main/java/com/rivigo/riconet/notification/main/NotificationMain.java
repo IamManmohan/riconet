@@ -49,17 +49,17 @@ public class NotificationMain {
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
 
-  @Value("${akka.kafka.consumer.poll-interval}")
-  private Long pollInterval;
+  @Value("${akka.kafka.consumer.poll-interval-ms}")
+  private Long pollIntervalMillis;
 
-  @Value("${akka.kafka.consumer.poll-timeout}")
-  private Long pollTimeOut;
+  @Value("${akka.kafka.consumer.poll-timeout-ms}")
+  private Long pollTimeOutMillis;
 
-  @Value("${akka.kafka.consumer.stop-timeout}")
-  private Long stopTimeout;
+  @Value("${akka.kafka.consumer.stop-timeout-ms}")
+  private Long stopTimeoutMillis;
 
-  @Value("${akka.kafka.consumer.commit-timeout}")
-  private Long commitTimeout;
+  @Value("${akka.kafka.consumer.commit-timeout-ms}")
+  private Long commitTimeoutMillis;
 
   @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
   private String autoCommitEnabled;
@@ -153,10 +153,10 @@ public class NotificationMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
-            .withPollInterval(Duration.ofMillis(pollInterval))
-            .withPollTimeout(Duration.ofMillis(pollTimeOut))
-            .withStopTimeout(Duration.ofMillis(stopTimeout))
-            .withCommitTimeout(Duration.ofMillis(commitTimeout))
+            .withPollInterval(Duration.ofMillis(pollIntervalMillis))
+            .withPollTimeout(Duration.ofMillis(pollTimeOutMillis))
+            .withStopTimeout(Duration.ofMillis(stopTimeoutMillis))
+            .withCommitTimeout(Duration.ofMillis(commitTimeoutMillis))
             .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG)
             .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommitEnabled);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
