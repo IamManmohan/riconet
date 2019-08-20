@@ -78,7 +78,7 @@ public class NotificationMain {
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
             ZoomConfig.class,
-                TracingConfig.class,
+            TracingConfig.class,
             ZoomDatabaseConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
