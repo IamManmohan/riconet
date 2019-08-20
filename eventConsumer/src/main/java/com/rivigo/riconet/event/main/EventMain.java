@@ -132,6 +132,7 @@ public class EventMain {
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
     eventMain.initialize(materializer, system);
+    log.info("Loaded all consumers with respective settings");
   }
 
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
