@@ -25,13 +25,25 @@ public class EventTopicNameConfig {
   private String wmsEventSinkError;
 
   @Value("${KAIROS_EXPRESS_APP_SINK}")
-  private String kairosExpressAppSinkTopic;
+  private String kairosExpressAppSink;
+
+  @Value("${KAIROS_EXPRESS_APP_SINK_ERROR}")
+  private String kairosExpressAppSinkError;
 
   @Value("${EXPRESS_APP_PICKUP_SINK}")
   private String expressAppPickupSink;
 
   @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
   private String expressAppPickupSinkError;
+
+  @Value("${BF_PICKUP_CHARGES_ACTION_ERROR}")
+  private String bfPickupChargesActionError;
+
+  @Value("${CN_ACTION_ERROR}")
+  private String cnActionError;
+
+  @Value("${CONSIGNMENT_BLOCK_UNBLOCK_ERROR}")
+  private String consignmentBlockUnblockError;
 
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
@@ -57,8 +69,12 @@ public class EventTopicNameConfig {
     return wmsEventSinkError;
   }
 
-  public String kairosExpressAppSinkTopic() {
-    return kairosExpressAppSinkTopic;
+  public String kairosExpressAppSink() {
+    return kairosExpressAppSink;
+  }
+
+  public String kairosExpressAppSinkError() {
+    return kairosExpressAppSinkError;
   }
 
   public String expressAppPickupSink() {
@@ -67,5 +83,17 @@ public class EventTopicNameConfig {
 
   public String expressAppPickupSinkError() {
     return expressAppPickupSinkError;
+  }
+
+  public String bfPickupChargesActionError() {
+    return bfPickupChargesActionError;
+  }
+
+  public String cnActionError() {
+    return cnActionError;
+  }
+
+  public String consignmentBlockUnblockError() {
+    return consignmentBlockUnblockError;
   }
 }

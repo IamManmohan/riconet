@@ -20,7 +20,12 @@ public class KairosExpressAppEventConsumer extends EventConsumer {
 
   @Override
   public String getTopic() {
-    return eventTopicNameConfig.kairosExpressAppSinkTopic();
+    return eventTopicNameConfig.kairosExpressAppSink();
+  }
+
+  @Override
+  public String getErrorTopic() {
+    return eventTopicNameConfig.kairosExpressAppSinkError();
   }
 
   @Override
