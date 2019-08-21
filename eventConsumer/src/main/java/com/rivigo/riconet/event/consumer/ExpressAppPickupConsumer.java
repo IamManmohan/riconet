@@ -2,9 +2,9 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.ExpressAppPickupService;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.io.IOException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class ExpressAppPickupConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   @Autowired private ExpressAppPickupService expressAppPickupService;
 
@@ -28,12 +28,12 @@ public class ExpressAppPickupConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.expressAppPickupSink();
+    return eventTopicNameConfig.expressAppPickupSink();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.expressAppPickupSinkError();
+    return eventTopicNameConfig.expressAppPickupSinkError();
   }
 
   @Override

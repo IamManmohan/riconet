@@ -1,11 +1,18 @@
-mainClassName = "com.rivigo.riconet.event.main.EventMain"
-
 apply plugin: 'application'
 apply plugin: 'java'
 
+mainClassName = "com.rivigo.riconet.event.main.EventMain"
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.rivigo.riconet.event.main.EventMain'
+        )
+    }
 }
 
 dependencies {
