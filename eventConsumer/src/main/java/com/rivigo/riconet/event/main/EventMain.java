@@ -19,6 +19,7 @@ import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.TracingConfig;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -57,7 +58,22 @@ public class EventMain {
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
 
-  @Value("${healthCheckConsumer.group.id}")
+  @Value("${akka.kafka.consumer.poll-interval-ms}")
+  private Long pollIntervalMillis;
+
+  @Value("${akka.kafka.consumer.poll-timeout-ms}")
+  private Long pollTimeOutMillis;
+
+  @Value("${akka.kafka.consumer.stop-timeout-ms}")
+  private Long stopTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.commit-timeout-ms}")
+  private Long commitTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
+  private String autoCommitEnabled;
+
+  @Value("${event.healthCheckConsumer.group.id}")
   private String healthCheckConsumerGroup;
 
   @Value("${zoomEventTriggerConsumer.group.id}")
@@ -118,6 +134,7 @@ public class EventMain {
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
     eventMain.initialize(materializer, system);
+    log.info("Loaded all consumers with respective settings");
   }
 
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
@@ -159,7 +176,12 @@ public class EventMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+            .withPollInterval(Duration.ofMillis(pollIntervalMillis))
+            .withPollTimeout(Duration.ofMillis(pollTimeOutMillis))
+            .withStopTimeout(Duration.ofMillis(stopTimeoutMillis))
+            .withCommitTimeout(Duration.ofMillis(commitTimeoutMillis))
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG)
+            .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommitEnabled);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }

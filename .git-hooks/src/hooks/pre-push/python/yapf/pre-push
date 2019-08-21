@@ -24,7 +24,7 @@ echo "Running static analysis..."
 # Code formatter
 echo "Running code-formatter..."
 yapf -ir --style='{based_on_style: google, indent_width: 4}' .
-echo "Code Formatting check successful!"
+echo "Yapf check successful!"
 
 # Uncommitted changes check
 if [[ "$(git status --porcelain)" ]]; then
