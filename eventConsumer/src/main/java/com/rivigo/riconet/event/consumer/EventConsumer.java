@@ -2,9 +2,9 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.config.TopicNameConfig;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired private TopicNameConfig topicNameConfig;
+  @Autowired private EventTopicNameConfig eventTopicNameConfig;
 
   public abstract List<Enum> eventNamesToBeConsumed();
 
@@ -33,12 +33,12 @@ public abstract class EventConsumer extends ConsumerModel {
 
   @Override
   public String getTopic() {
-    return topicNameConfig.enrichedEventSinkTopic();
+    return eventTopicNameConfig.enrichedEventSinkTopic();
   }
 
   @Override
   public String getErrorTopic() {
-    return topicNameConfig.enrichedEventSinkErrorTopic();
+    return eventTopicNameConfig.enrichedEventSinkErrorTopic();
   }
 
   @Override

@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
@@ -119,7 +120,8 @@ public abstract class ConsumerModel {
   String processFirstTimeError(String str, String errorMsg) {
     log.error(" Processing first time error" + errorMsg);
     ConsumerMessages consumerMessage = new ConsumerMessages();
-    consumerMessage.setId(getTopic() + DateTime.now().getMillis());
+    String uuid = UUID.randomUUID().toString().replace("-", "");
+    consumerMessage.setId(getTopic() + uuid);
     consumerMessage.setMessage(str);
     consumerMessage.setRetryCount(1L);
     consumerMessage.setTopic(getTopic());
