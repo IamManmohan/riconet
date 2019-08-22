@@ -12,13 +12,12 @@ import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Service
