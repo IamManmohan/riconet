@@ -8,19 +8,25 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.FeederVendor;
+import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class FeederVendorServiceImpl implements FeederVendorService {
 
   @Autowired FeederVendorRepository feederVendorRepository;
+
+  @Autowired BusinessPartnerRepository businessPartnerRepository;
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
@@ -56,10 +62,12 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorStatus("ACTIVE");
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     FeederVendor feederVendor =
-        feederVendorRepository.findByVendorCode(vendorContractZoomEventDTO.getVendorCode());
-    if (feederVendor.getId() != null) {
+        Optional.ofNullable(
+                feederVendorRepository.findByVendorCode(vendorContractZoomEventDTO.getVendorCode()))
+            .orElse(null);
+    if (feederVendor != null) {
       dto.setId(feederVendor.getId());
-      zoomBackendAPIClientService.addUpdateFeederVendor(dto, HttpMethod.PUT);
+      log.info("vendor details are already present");
     } else zoomBackendAPIClientService.addUpdateFeederVendor(dto, HttpMethod.POST);
   }
 
@@ -69,7 +77,14 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setType(vendorContractZoomEventDTO.getExpenseType().getName());
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     dto.setStatus("ACTIVE");
-    zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
+    BusinessPartner businessPartner =
+        Optional.ofNullable(
+                businessPartnerRepository.findByCode(vendorContractZoomEventDTO.getVendorCode()))
+            .orElse(null);
+    if (businessPartner != null) {
+      dto.setId(businessPartner.getId());
+      log.info("BP/RP details are already present");
+    } else zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
   }
 
   private VendorContractZoomEventDTO getVendorContractZoomEventDTOFromEventPayLoad(
