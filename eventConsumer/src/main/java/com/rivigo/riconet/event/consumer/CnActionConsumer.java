@@ -46,6 +46,6 @@ public class CnActionConsumer extends EventConsumer {
 
   @Override
   public String getErrorTopic() {
-    return eventTopicNameConfig.bfPickupChargesActionError();
+    return eventTopicNameConfig.cnActionError();
   }
 }
