@@ -16,6 +16,7 @@ import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
+import com.rivigo.zoom.common.config.TracingConfig;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import java.time.Duration;
@@ -126,6 +127,7 @@ public class EventMain {
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
             ZoomConfig.class,
+            TracingConfig.class,
             ZoomDatabaseConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
