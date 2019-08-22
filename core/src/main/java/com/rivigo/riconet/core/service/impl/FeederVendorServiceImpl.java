@@ -13,6 +13,7 @@ import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -54,7 +55,12 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
     dto.setVendorStatus("ACTIVE");
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
-    zoomBackendAPIClientService.addUpdateFeederVendor(dto);
+    FeederVendor feederVendor =
+        feederVendorRepository.findByVendorCode(vendorContractZoomEventDTO.getVendorCode());
+    if (feederVendor.getId() != null) {
+      dto.setId(feederVendor.getId());
+      zoomBackendAPIClientService.addUpdateFeederVendor(dto, HttpMethod.PUT);
+    } else zoomBackendAPIClientService.addUpdateFeederVendor(dto, HttpMethod.POST);
   }
 
   private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {

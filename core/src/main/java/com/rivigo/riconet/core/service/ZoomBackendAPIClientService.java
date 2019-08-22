@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import org.springframework.http.HttpMethod;
 
 public interface ZoomBackendAPIClientService {
 
@@ -46,5 +47,5 @@ public interface ZoomBackendAPIClientService {
 
   void addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
 
-  void addUpdateFeederVendor(FeederVendorDTO feederVendorDTO);
+  void addUpdateFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method);
 }
