@@ -116,8 +116,7 @@ public class EventMain {
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer,
-      VendorOnboardingEventConsumer vendorOnboardingEventConsumer,
-      ExpressAppPickupConsumer expressAppPickupConsumer) {
+      VendorOnboardingEventConsumer vendorOnboardingEventConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
