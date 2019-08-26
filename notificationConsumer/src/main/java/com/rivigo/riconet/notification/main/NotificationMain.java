@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.KafkaConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.notification.consumer.AppointmentNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.DEPSNotificationConsumer;
@@ -13,8 +14,10 @@ import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
+import com.rivigo.zoom.common.config.TracingConfig;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -40,21 +43,43 @@ public class NotificationMain {
 
   private final ZoomCommunicationsConsumer zoomCommunicationsConsumer;
 
+  private final HealthCheckConsumer healthCheckConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
 
+  @Value("${akka.kafka.consumer.poll-interval-ms}")
+  private Long pollIntervalMillis;
+
+  @Value("${akka.kafka.consumer.poll-timeout-ms}")
+  private Long pollTimeOutMillis;
+
+  @Value("${akka.kafka.consumer.stop-timeout-ms}")
+  private Long stopTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.commit-timeout-ms}")
+  private Long commitTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
+  private String autoCommitEnabled;
+
+  @Value("${notification.healthCheckConsumer.group.id}")
+  private String healthCheckConsumerGroup;
+
   @Value("${notification.group.id}")
   private String notificationConsumerGroup;
 
   public NotificationMain(
+      HealthCheckConsumer healthCheckConsumer,
       DEPSNotificationConsumer depsNotificationConsumer,
       DocIssueNotificationConsumer docIssueNotificationConsumer,
       PickupNotificationConsumer pickupNotificationConsumer,
       AppointmentNotificationConsumer appointmentNotificationConsumer,
       RetailNotificationConsumer retailNotificationConsumer,
       ZoomCommunicationsConsumer zoomCommunicationsConsumer) {
+    this.healthCheckConsumer = healthCheckConsumer;
     this.depsNotificationConsumer = depsNotificationConsumer;
     this.docIssueNotificationConsumer = docIssueNotificationConsumer;
     this.pickupNotificationConsumer = pickupNotificationConsumer;
@@ -69,6 +94,7 @@ public class NotificationMain {
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
             ZoomConfig.class,
+            TracingConfig.class,
             ZoomDatabaseConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
@@ -80,6 +106,7 @@ public class NotificationMain {
 
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
     log.info("Bootstrap servers are: {}", bootstrapServers);
+    load(materializer, system, bootstrapServers, healthCheckConsumerGroup, healthCheckConsumer);
     load(
         materializer,
         system,
@@ -128,7 +155,12 @@ public class NotificationMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+            .withPollInterval(Duration.ofMillis(pollIntervalMillis))
+            .withPollTimeout(Duration.ofMillis(pollTimeOutMillis))
+            .withStopTimeout(Duration.ofMillis(stopTimeoutMillis))
+            .withCommitTimeout(Duration.ofMillis(commitTimeoutMillis))
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG)
+            .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommitEnabled);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }

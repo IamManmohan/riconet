@@ -6,6 +6,7 @@ import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.KafkaConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
@@ -16,8 +17,10 @@ import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.VendorOnboardingEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
+import com.rivigo.zoom.common.config.TracingConfig;
 import com.rivigo.zoom.common.config.ZoomConfig;
 import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -51,10 +54,30 @@ public class EventMain {
 
   private final VendorOnboardingEventConsumer vendorOnboardingEventConsumer;
 
+  private final HealthCheckConsumer healthCheckConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   @Value("${bootstrap.servers}")
   private String bootstrapServers;
+
+  @Value("${akka.kafka.consumer.poll-interval-ms}")
+  private Long pollIntervalMillis;
+
+  @Value("${akka.kafka.consumer.poll-timeout-ms}")
+  private Long pollTimeOutMillis;
+
+  @Value("${akka.kafka.consumer.stop-timeout-ms}")
+  private Long stopTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.commit-timeout-ms}")
+  private Long commitTimeoutMillis;
+
+  @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
+  private String autoCommitEnabled;
+
+  @Value("${event.healthCheckConsumer.group.id}")
+  private String healthCheckConsumerGroup;
 
   @Value("${zoomEventTriggerConsumer.group.id}")
   private String zoomEventTriggerGroup;
@@ -84,6 +107,7 @@ public class EventMain {
   private String vendorOnboardingEventGroup;
 
   public EventMain(
+      HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
       BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
@@ -92,7 +116,9 @@ public class EventMain {
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer,
-      VendorOnboardingEventConsumer vendorOnboardingEventConsumer) {
+      VendorOnboardingEventConsumer vendorOnboardingEventConsumer,
+      ExpressAppPickupConsumer expressAppPickupConsumer) {
+    this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
     this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
@@ -110,17 +136,20 @@ public class EventMain {
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
             ZoomConfig.class,
+            TracingConfig.class,
             ZoomDatabaseConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
     eventMain.initialize(materializer, system);
+    log.info("Loaded all consumers with respective settings");
   }
 
   private void initialize(ActorMaterializer materializer, ActorSystem system) {
     //    String bootstrapServers = config.getString("bootstrap.servers");
     log.info("Bootstrap servers are: {}", bootstrapServers);
+    load(materializer, system, bootstrapServers, healthCheckConsumerGroup, healthCheckConsumer);
     load(materializer, system, bootstrapServers, zoomEventTriggerGroup, zoomEventTriggerConsumer);
     load(materializer, system, bootstrapServers, cnActionGroup, cnActionConsumer);
     load(
@@ -161,7 +190,12 @@ public class EventMain {
         ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
             .withBootstrapServers(bootstrapServers)
             .withGroupId(consumerGroupId)
-            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG);
+            .withPollInterval(Duration.ofMillis(pollIntervalMillis))
+            .withPollTimeout(Duration.ofMillis(pollTimeOutMillis))
+            .withStopTimeout(Duration.ofMillis(stopTimeoutMillis))
+            .withCommitTimeout(Duration.ofMillis(commitTimeoutMillis))
+            .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUMER_OFFSET_CONFIG)
+            .withProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, autoCommitEnabled);
     log.info("Loading consumer with settings {}", consumerSettings.toString());
     consumer.load(materializer, consumerSettings);
   }
