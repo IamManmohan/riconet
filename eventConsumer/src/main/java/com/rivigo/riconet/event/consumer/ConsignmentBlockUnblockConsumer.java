@@ -42,4 +42,9 @@ public class ConsignmentBlockUnblockConsumer extends EventConsumer {
   public String getConsumerName() {
     return "ConsignmentBlockUnblockConsumer";
   }
+
+  @Override
+  public String getErrorTopic() {
+    return eventTopicNameConfig.consignmentBlockUnblockError();
+  }
 }
