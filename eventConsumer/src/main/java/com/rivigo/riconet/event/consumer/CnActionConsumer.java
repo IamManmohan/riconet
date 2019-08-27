@@ -43,4 +43,9 @@ public class CnActionConsumer extends EventConsumer {
   public String getConsumerName() {
     return "CnActionConsumer";
   }
+
+  @Override
+  public String getErrorTopic() {
+    return eventTopicNameConfig.cnActionError();
+  }
 }
