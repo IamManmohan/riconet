@@ -29,4 +29,9 @@ public class BfPickupChargesActionConsumer extends EventConsumer {
   public String getConsumerName() {
     return "BfPickupChargesActionConsumer";
   }
+
+  @Override
+  public String getErrorTopic() {
+    return eventTopicNameConfig.bfPickupChargesActionError();
+  }
 }
