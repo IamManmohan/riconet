@@ -48,7 +48,7 @@ public class BfPickupChargesActionConsumerTest {
   @Test
   public void getErrorTopicTest() {
     String topic = "tempTopic";
-    when(eventTopicNameConfig.enrichedEventSinkErrorTopic()).thenReturn(topic);
+    when(eventTopicNameConfig.bfPickupChargesActionError()).thenReturn(topic);
     String result = bfPickupChargesActionConsumer.getErrorTopic();
     Assert.assertEquals(topic, result);
   }

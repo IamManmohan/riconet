@@ -30,4 +30,9 @@ public class ZoomEventTriggerConsumer extends EventConsumer {
   public String getConsumerName() {
     return "ZoomEventTriggerConsumer";
   }
+
+  @Override
+  public String getErrorTopic() {
+    return eventTopicNameConfig.enrichedEventSinkErrorTopic();
+  }
 }

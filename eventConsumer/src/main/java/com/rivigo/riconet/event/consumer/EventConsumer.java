@@ -18,7 +18,7 @@ public abstract class EventConsumer extends ConsumerModel {
 
   private ObjectMapper objectMapper;
 
-  @Autowired private EventTopicNameConfig eventTopicNameConfig;
+  @Autowired protected EventTopicNameConfig eventTopicNameConfig;
 
   public abstract List<Enum> eventNamesToBeConsumed();
 
@@ -36,10 +36,7 @@ public abstract class EventConsumer extends ConsumerModel {
     return eventTopicNameConfig.enrichedEventSinkTopic();
   }
 
-  @Override
-  public String getErrorTopic() {
-    return eventTopicNameConfig.enrichedEventSinkErrorTopic();
-  }
+  public abstract String getErrorTopic();
 
   @Override
   public void processMessage(String str) {
