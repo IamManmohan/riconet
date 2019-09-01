@@ -190,4 +190,21 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenThrow(new IOException());
   }
+
+  @Test
+  public void addUpdateBusinessPartnerTest() throws IOException {
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
+    validateReturnedData(jsonNode, HttpMethod.PUT, false);
+  }
+
+  @Test
+  public void addUpdateBusinessPartnerExceptionTest() throws IOException {
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage(
+        "Error while handling QcBlocker ticket closure with ticketId: 5");
+    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
+  }
 }

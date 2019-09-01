@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.finance.zoom.dto.EventPayload;
@@ -39,22 +40,21 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   }
 
   @Override
-  public void createFeederVendor(String feederVendor) {
+  public JsonNode createFeederVendor(String feederVendor) {
     VendorContractZoomEventDTO vendorContractZoomEventDTO =
         getVendorContractZoomEventDTOFromEventPayLoad(feederVendor);
     // based on the expense type we determine the data is for a vendor or a BP
     switch (vendorContractZoomEventDTO.getExpenseType()) {
       case BP:
       case RP:
-        createBP(vendorContractZoomEventDTO);
-        break;
+        return createBP(vendorContractZoomEventDTO);
       case RLH_FEEDER:
-        createVendor(vendorContractZoomEventDTO);
-        break;
+        return createVendor(vendorContractZoomEventDTO);
     }
+    return null;
   }
 
-  private void createVendor(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
+  private JsonNode createVendor(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     FeederVendorDTO dto = new FeederVendorDTO();
     dto.setVendorCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
@@ -67,10 +67,12 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     if (feederVendor != null) {
       dto.setId(feederVendor.getId());
       log.info("vendor details are already present");
-    } else zoomBackendAPIClientService.addUpdateFeederVendor(dto, HttpMethod.POST);
+      return null;
+    }
+    return zoomBackendAPIClientService.addFeederVendor(dto, HttpMethod.POST);
   }
 
-  private void createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
+  private JsonNode createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
     dto.setType(vendorContractZoomEventDTO.getExpenseType().getName());
@@ -83,7 +85,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     if (businessPartner != null) {
       dto.setId(businessPartner.getId());
       log.info("BP/RP details are already present");
-    } else zoomBackendAPIClientService.addUpdateBusinessPartner(dto);
+      return null;
+    } else return zoomBackendAPIClientService.addBusinessPartner(dto);
   }
 
   private VendorContractZoomEventDTO getVendorContractZoomEventDTOFromEventPayLoad(
@@ -103,7 +106,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     ZoomEventType eventType = eventPayload.getEventType();
     switch (eventType) {
       case VENDOR_ACTIVE_EVENT:
-        feederVendorService.createFeederVendor(eventPayload.getPayload());
+        JsonNode response = feederVendorService.createFeederVendor(eventPayload.getPayload());
+        log.info("Vendor created {}", response);
         break;
       default:
         log.info("Event does not trigger anything {}", eventType);

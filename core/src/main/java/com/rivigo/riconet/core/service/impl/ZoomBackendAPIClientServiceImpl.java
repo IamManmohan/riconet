@@ -319,7 +319,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
+  public JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
     try {
@@ -331,6 +331,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               null,
               backendBaseUrl);
       log.info("Business Partner Created {}", responseJson);
+      return responseJson;
 
     } catch (IOException e) {
       log.error("Error while creating BP with dto {}", businessPartnerDTO);
@@ -338,7 +339,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
-  public void addUpdateFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method) {
+  public JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", feederVendorDTO);
     try {
@@ -350,6 +351,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               null,
               backendBaseUrl);
       log.info("Feeder Vendor Created {}", responseJson);
+      return responseJson;
 
     } catch (IOException e) {
       log.error("Error while creating vendor with dto {}", feederVendorDTO);
