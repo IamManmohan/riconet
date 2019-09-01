@@ -36,6 +36,12 @@ public class EventTopicNameConfig {
   @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
   private String expressAppPickupSinkError;
 
+  @Value("${COMPASS_TO_ZOOM_CONTRACT_EVENT}")
+  private String vendorOnboardingEventSink;
+
+  @Value("${COMPASS_TO_ZOOM_CONTRACT_EVENT_SINK_ERROR}")
+  private String vendorOnboardingEventSinkError;
+
   @Value("${BF_PICKUP_CHARGES_ACTION_ERROR}")
   private String bfPickupChargesActionError;
 
@@ -83,6 +89,14 @@ public class EventTopicNameConfig {
 
   public String expressAppPickupSinkError() {
     return expressAppPickupSinkError;
+  }
+
+  public String VendorOnboardingEventSink() {
+    return vendorOnboardingEventSink;
+  }
+
+  public String VendorOnboardingEventSinkError() {
+    return vendorOnboardingEventSinkError;
   }
 
   public String bfPickupChargesActionError() {

@@ -14,6 +14,7 @@ import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
+import com.rivigo.riconet.event.consumer.VendorOnboardingEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.common.config.TracingConfig;
@@ -50,6 +51,8 @@ public class EventMain {
   private final KairosExpressAppEventConsumer kairosExpressAppEventConsumer;
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
+
+  private final VendorOnboardingEventConsumer vendorOnboardingEventConsumer;
 
   private final HealthCheckConsumer healthCheckConsumer;
 
@@ -100,6 +103,9 @@ public class EventMain {
   @Value("${expressAppPickupConsumer.group.id}")
   private String expressAppPickupGroup;
 
+  @Value("${vendorOnboardingEventConsumer.group.id}")
+  private String vendorOnboardingEventGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -109,7 +115,8 @@ public class EventMain {
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
-      ExpressAppPickupConsumer expressAppPickupConsumer) {
+      ExpressAppPickupConsumer expressAppPickupConsumer,
+      VendorOnboardingEventConsumer vendorOnboardingEventConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -119,6 +126,7 @@ public class EventMain {
     this.wmsEventConsumer = wmsEventConsumer;
     this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
+    this.vendorOnboardingEventConsumer = vendorOnboardingEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -163,7 +171,12 @@ public class EventMain {
         bootstrapServers,
         kairosExpressAppGroup,
         kairosExpressAppEventConsumer);
-    load(materializer, system, bootstrapServers, expressAppPickupGroup, expressAppPickupConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        vendorOnboardingEventGroup,
+        vendorOnboardingEventConsumer);
   }
 
   private void load(

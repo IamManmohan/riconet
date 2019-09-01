@@ -1,12 +1,15 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import org.springframework.http.HttpMethod;
 
 public interface ZoomBackendAPIClientService {
 
@@ -41,4 +44,8 @@ public interface ZoomBackendAPIClientService {
   ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO);
 
   Boolean deletePickup(Long pickupId);
+
+  void addUpdateBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
+
+  void addUpdateFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method);
 }
