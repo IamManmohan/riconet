@@ -335,7 +335,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
     } catch (IOException e) {
       log.error("Error while creating BP with dto {}", businessPartnerDTO);
-      throw new ZoomException("Error while creating BP with dtoo %s", businessPartnerDTO);
+      throw new ZoomException("Error while creating BP with dto %s", businessPartnerDTO);
     }
   }
 
