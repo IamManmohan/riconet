@@ -6,10 +6,11 @@ import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -38,12 +39,12 @@ public class VendorOnboardingEventConsumer extends ConsumerModel {
 
   @Override
   public void processMessage(String str) {
-    log.info("Processing message in Finance Events Consumer {}", str);
+    log.info("Processing message in Compass Contract Events to Zoom Consumer {}", str);
     EventPayload eventPayload = null;
     try {
       eventPayload = objectMapper.readValue(str, EventPayload.class);
     } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", str, ex);
+      log.error("Error while processing message {} ", str, ex);
       return;
     }
     log.debug("Event Payload {}", eventPayload);
