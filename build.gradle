@@ -97,6 +97,8 @@ subprojects {
 
         compile "com.fasterxml.jackson.core:jackson-databind:2.9.0"
         compile "org.jboss.netty:netty:3.2.10.Final"
+        compile('com.rivigo.compass:vendor-contract-api:1.0.7-SNAPSHOT')
+        compile('com.rivigo:rivigo-finance-external-api:0.0.13-SNAPSHOT')
 
         compile group: 'junit', name: 'junit', version: '4.12'
 
