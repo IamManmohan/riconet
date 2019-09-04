@@ -13,6 +13,7 @@ import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +51,9 @@ public class FeederVendorServiceImpl implements FeederVendorService {
         return createBP(vendorContractZoomEventDTO);
       case RLH_FEEDER:
         return createVendor(vendorContractZoomEventDTO);
+      default:
+        throw new ZoomException("Vendor Contract DTO cannot be null");
     }
-    return null;
   }
 
   private JsonNode createVendor(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
