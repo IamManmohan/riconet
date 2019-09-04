@@ -51,8 +51,6 @@ public class EventMain {
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
 
-  private final VendorOnboardingEventConsumer vendorOnboardingEventConsumer;
-
   private final HealthCheckConsumer healthCheckConsumer;
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
@@ -114,8 +112,7 @@ public class EventMain {
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
-      ExpressAppPickupConsumer expressAppPickupConsumer,
-      VendorOnboardingEventConsumer vendorOnboardingEventConsumer) {
+      ExpressAppPickupConsumer expressAppPickupConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -125,7 +122,6 @@ public class EventMain {
     this.wmsEventConsumer = wmsEventConsumer;
     this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
-    this.vendorOnboardingEventConsumer = vendorOnboardingEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -170,12 +166,6 @@ public class EventMain {
         bootstrapServers,
         kairosExpressAppGroup,
         kairosExpressAppEventConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-        vendorOnboardingEventGroup,
-        vendorOnboardingEventConsumer);
   }
 
   private void load(

@@ -7,8 +7,10 @@ import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
+import com.rivigo.riconet.core.service.FinanceEventService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.impl.FeederVendorServiceImpl;
+import com.rivigo.riconet.core.service.impl.FinanceEventServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.vms.enums.ExpenseType;
 import com.rivigo.zoom.common.model.FeederVendor;
@@ -37,6 +39,10 @@ public class FeederVendorServiceImplTest {
   @Mock FeederVendorRepository feederVendorRepository;
 
   @Mock BusinessPartnerRepository businessPartnerRepository;
+
+  @Mock FinanceEventServiceImpl financeEventServiceImpl;
+
+  @Mock FinanceEventService financeEventService;
 
   @Before
   public void setUp() {
