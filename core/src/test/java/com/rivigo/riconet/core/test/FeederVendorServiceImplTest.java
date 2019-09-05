@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.finance.zoom.dto.EventPayload;
@@ -16,6 +17,7 @@ import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import java.io.IOException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -74,7 +76,8 @@ public class FeederVendorServiceImplTest {
     Mockito.when(feederVendorRepository.findByVendorCode(Mockito.any())).thenReturn(null);
     Mockito.when(zoomBackendAPIClientServiceImpl.addFeederVendor(Mockito.any(), Mockito.any()))
         .thenReturn(null);
-    feederVendorServiceImpl.createFeederVendor(s);
+    JsonNode jsnode = feederVendorServiceImpl.createFeederVendor(s);
+    Assert.assertNull(jsnode);
   }
 
   @Test
@@ -90,7 +93,8 @@ public class FeederVendorServiceImplTest {
     Mockito.when(businessPartnerRepository.findByCode((Mockito.any()))).thenReturn(null);
     Mockito.when(zoomBackendAPIClientServiceImpl.addBusinessPartner(Mockito.any()))
         .thenReturn(null);
-    feederVendorServiceImpl.createFeederVendor(s);
+    JsonNode jsnode = feederVendorServiceImpl.createFeederVendor(s);
+    Assert.assertNull(jsnode);
   }
 
   @Test
