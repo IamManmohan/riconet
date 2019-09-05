@@ -11,6 +11,7 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.impl.FeederVendorServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.vms.enums.ExpenseType;
+import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
@@ -97,7 +98,7 @@ public class FeederVendorServiceImplTest {
     FeederVendorDTO dto = new FeederVendorDTO();
     dto.setVendorCode("V111");
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
-    dto.setVendorStatus("ACTIVE");
+    dto.setVendorStatus(OperationalStatus.ACTIVE);
     dto.setLegalName("LEGAL");
     Mockito.when(zoomBackendAPIClientService.addFeederVendor(Mockito.any(), Mockito.any()))
         .thenReturn(null);

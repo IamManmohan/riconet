@@ -163,6 +163,7 @@ public class EventMain {
         bootstrapServers,
         kairosExpressAppGroup,
         kairosExpressAppEventConsumer);
+    load(materializer, system, bootstrapServers, expressAppPickupGroup, expressAppPickupConsumer);
   }
 
   private void load(

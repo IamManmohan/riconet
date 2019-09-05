@@ -8,6 +8,7 @@ import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.neo4j.AdministrativeEntityRepository;
 import java.util.Arrays;
 import java.util.Collections;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +40,7 @@ public class AdministrativeEntityMasterServiceImplTest {
     when(administrativeEntityRepository.findParentCluster(Mockito.any()))
         .thenReturn(administrativeEntity);
     aemService.findParentCluster(12L);
+    Assert.assertEquals("111", administrativeEntity.getCode());
   }
 
   @Test
@@ -48,5 +50,6 @@ public class AdministrativeEntityMasterServiceImplTest {
     when(administrativeEntityRepository.findByIdIn(Mockito.anyList()))
         .thenReturn(Arrays.asList(administrativeEntity));
     aemasterService.findByIdIn(Collections.singletonList(12L));
+    Assert.assertEquals("111", administrativeEntity.getCode());
   }
 }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.dto;
 
+import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.FeederVendor.VendorType;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,13 +20,13 @@ public class FeederVendorDTO {
 
   private String personName;
 
-  private Long contactNumber;
+  private String contactNumber;
 
   private Long clusterId;
 
   private VendorType vendorType;
 
-  private String vendorStatus;
+  private OperationalStatus vendorStatus;
 
   private String clusterCode;
 }

@@ -11,6 +11,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
+import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -235,7 +236,7 @@ public class ZoomBackendAPIClientServiceTest {
     FeederVendorDTO dto = new FeederVendorDTO();
     dto.setVendorCode("V111");
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
-    dto.setVendorStatus("ACTIVE");
+    dto.setVendorStatus(OperationalStatus.ACTIVE);
     dto.setLegalName("LEGAL");
     Mockito.when(
             apiClientService.getEntity(
@@ -253,7 +254,7 @@ public class ZoomBackendAPIClientServiceTest {
     FeederVendorDTO dto = new FeederVendorDTO();
     dto.setVendorCode("V111");
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
-    dto.setVendorStatus("ACTIVE");
+    dto.setVendorStatus(OperationalStatus.ACTIVE);
     dto.setLegalName("LEGAL");
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
