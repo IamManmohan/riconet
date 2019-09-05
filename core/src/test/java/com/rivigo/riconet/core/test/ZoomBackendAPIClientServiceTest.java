@@ -211,8 +211,9 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.anyObject(),
                 Mockito.anyObject(),
                 Mockito.anyObject()))
-        .thenReturn(null);
-    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+        .thenReturn(jsonNode);
+    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+    Assert.assertEquals(jsonNode, actual_jsonNode);
   }
 
   @Test
@@ -245,8 +246,10 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.anyObject(),
                 Mockito.anyObject(),
                 Mockito.anyObject()))
-        .thenReturn(null);
-    zoomBackendAPIClientServiceImpl.addFeederVendor(dto, HttpMethod.POST);
+        .thenReturn(jsonNode);
+    JsonNode actual_jsonNode =
+        zoomBackendAPIClientServiceImpl.addFeederVendor(dto, HttpMethod.POST);
+    Assert.assertEquals(jsonNode, actual_jsonNode);
   }
 
   @Test

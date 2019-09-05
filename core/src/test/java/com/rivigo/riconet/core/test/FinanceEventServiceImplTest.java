@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.finance.zoom.dto.EventPayload;
@@ -9,10 +10,12 @@ import com.rivigo.riconet.core.service.FinanceEventService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.impl.FinanceEventServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
+import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.vms.enums.ExpenseType;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import java.io.IOException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -53,9 +56,11 @@ public class FinanceEventServiceImplTest {
     eventPayload.setEventType(ZoomEventType.VENDOR_ACTIVE_EVENT);
     eventPayload.setPayload(
         "{\\\"vendorCode\\\":\\\"V-BP0019\\\",\\\"legalEntityName\\\":\\\"W Vendor\\\",\\\"expenseType\\\":\\\"RP\\\"}\"}");
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     Mockito.when(feederVendorService.createFeederVendor(eventPayload.getPayload()))
-        .thenReturn(null);
+        .thenReturn(jsonNode);
     financeEventServiceImpl.processFinanceEvents(eventPayload);
+    Assert.assertNotNull(jsonNode);
   }
 
   @Test
@@ -68,8 +73,10 @@ public class FinanceEventServiceImplTest {
     eventPayload.setEventType(ZoomEventType.CMS_CLIENT_DEACTIVATE);
     eventPayload.setPayload(
         "{\\\"vendorCode\\\":\\\"V-BP0019\\\",\\\"legalEntityName\\\":\\\"W Vendor\\\",\\\"expenseType\\\":\\\"RP\\\"}\"}");
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     Mockito.when(feederVendorService.createFeederVendor(eventPayload.getPayload()))
-        .thenReturn(null);
+        .thenReturn(jsonNode);
     financeEventServiceImpl.processFinanceEvents(eventPayload);
+    Assert.assertNotNull(jsonNode);
   }
 }
