@@ -27,7 +27,8 @@ ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
     -Dzoom.mongo.port=$MONGO_PORT \
     -Dzoom.mongo.db=$MONGO_DB \
     -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
-    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL"
+    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL \
+    -Dtopic.prefix.out=$OUT_TOPIC_PREFIX"
 
 ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
     -Dspring.config.location=/etc/zoom/event/application_core.properties,/etc/zoom/event/application_event.properties,/etc/zoom/event/db.properties"
