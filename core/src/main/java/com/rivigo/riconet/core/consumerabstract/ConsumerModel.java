@@ -6,8 +6,9 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.ConsumerMessage;
 import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
-import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -51,9 +52,9 @@ public abstract class ConsumerModel {
 
   @Autowired private ExecutorService executorService;
 
-  @Autowired private ConsumerMessagesRepository consumerMessagesRepository;
-
   @Autowired private KafkaTemplate kafkaTemplate;
+
+  @Autowired private ObjectMapper objectMapper;
 
   private Timer timer = new HashedWheelTimer();
 
@@ -79,12 +80,13 @@ public abstract class ConsumerModel {
     } else if (record.topic().equals(getErrorTopic())) {
       executorService.submit(
           () -> {
-            ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
+            ConsumerMessage consumerMessage = null;
             try {
-              processMessage(consumerMessages.getMessage());
+              consumerMessage = objectMapper.readValue(record.value(), ConsumerMessage.class);
+              processMessage(consumerMessage.getMessage());
             } catch (Exception e) {
               String errorMsg = getStackTrace(e);
-              processError(consumerMessages, errorMsg);
+              processError(consumerMessage, errorMsg);
               log.error("error", e);
             }
           });
@@ -94,7 +96,7 @@ public abstract class ConsumerModel {
 
   public abstract void processMessage(String str) throws IOException;
 
-  String processError(ConsumerMessages consumerMessage, String errorMsg) {
+  private void processError(ConsumerMessage consumerMessage, String errorMsg) {
     log.error(
         "processing error:"
             + consumerMessage.getId()
@@ -109,15 +111,13 @@ public abstract class ConsumerModel {
               + consumerMessage.getRetryCount().toString()
               + " "
               + errorMsg);
-      consumerMessagesRepository.save(consumerMessage);
       ConsumerTimer task =
           new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
       timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
     }
-    return consumerMessage.getMessage();
   }
 
-  String processFirstTimeError(String str, String errorMsg) {
+  private void processFirstTimeError(String str, String errorMsg) {
     log.error(" Processing first time error" + errorMsg);
     ConsumerMessages consumerMessage = new ConsumerMessages();
     String uuid = UUID.randomUUID().toString().replace("-", "");
@@ -128,12 +128,8 @@ public abstract class ConsumerModel {
     consumerMessage.setCreatedAt(DateTime.now().getMillis());
     consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
     consumerMessage.setErrorMsg("1" + errorMsg);
-
-    consumerMessagesRepository.save(consumerMessage);
-    ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
+    ConsumerTimer task = new ConsumerTimer(consumerMessage.toString(), getErrorTopic(), kafkaTemplate);
     timer.newTimeout(task, 5, TimeUnit.MINUTES);
-
-    return str;
   }
 
   public void load(
