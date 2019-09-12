@@ -91,7 +91,7 @@ subprojects {
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
 
-        compile("com.rivigo:rivigo-finance-external-api:0.0.14") {
+        compile("com.rivigo:rivigo-finance-external-api:0.0.16-SNAPSHOT") {
             exclude module: 'cms-external-api'
         }
 
