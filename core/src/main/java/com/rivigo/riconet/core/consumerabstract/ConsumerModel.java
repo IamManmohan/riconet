@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.consumerabstract;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import akka.Done;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
@@ -8,7 +10,6 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.ConsumerMessage;
-import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,7 +35,9 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class ConsumerModel {
 
-  public static final Long NUM_RETRIES = 5l;
+  private static final Long TIME = 5L;
+  private static final TimeUnit TIME_UNIT = MINUTES;
+  private static final Long NUM_RETRIES = 5L;
 
   public abstract String getTopic();
 
@@ -74,7 +77,6 @@ public abstract class ConsumerModel {
             } catch (Exception e) {
               String errorMsg = getStackTrace(e);
               processFirstTimeError(record.value(), errorMsg);
-              log.error("First time error", e);
             }
           });
     } else if (record.topic().equals(getErrorTopic())) {
@@ -118,8 +120,8 @@ public abstract class ConsumerModel {
   }
 
   private void processFirstTimeError(String str, String errorMsg) {
-    log.error(" Processing first time error" + errorMsg);
-    ConsumerMessages consumerMessage = new ConsumerMessages();
+    log.error("Processing first time error: {}", errorMsg);
+    ConsumerMessage consumerMessage = new ConsumerMessage();
     String uuid = UUID.randomUUID().toString().replace("-", "");
     consumerMessage.setId(getTopic() + uuid);
     consumerMessage.setMessage(str);
@@ -128,8 +130,15 @@ public abstract class ConsumerModel {
     consumerMessage.setCreatedAt(DateTime.now().getMillis());
     consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
     consumerMessage.setErrorMsg("1" + errorMsg);
-    ConsumerTimer task = new ConsumerTimer(consumerMessage.toString(), getErrorTopic(), kafkaTemplate);
-    timer.newTimeout(task, 5, TimeUnit.MINUTES);
+    try {
+      String consumerMessageString = objectMapper.writeValueAsString(consumerMessage);
+      log.info(
+          "Creating a timer task of {} {} for payload: {}", TIME, TIME_UNIT, consumerMessageString);
+      ConsumerTimer task = new ConsumerTimer(consumerMessageString, getErrorTopic(), kafkaTemplate);
+      timer.newTimeout(task, TIME, TIME_UNIT);
+    } catch (Exception e) {
+      log.error("Error in creating and pushing ConsumerTimer object to kafka: {}", e);
+    }
   }
 
   public void load(

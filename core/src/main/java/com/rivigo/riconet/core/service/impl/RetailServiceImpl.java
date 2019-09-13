@@ -32,7 +32,6 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mongo.RetailNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -78,8 +77,6 @@ public class RetailServiceImpl implements RetailService {
 
   @Autowired private ZoomBookAPIClientService zoomBookAPIClientService;
 
-  @Autowired private RetailNotificationRepository retailNotificationRepository;
-
   private static final DateTimeZone IST = DateTimeZone.forID("Asia/Kolkata");
 
   @Override
@@ -98,7 +95,6 @@ public class RetailServiceImpl implements RetailService {
             .stream()
             .map(this::processSingleNotification)
             .collect(Collectors.toList());
-    retailNotificationRepository.save(retailNotifications);
   }
 
   private void processDRSdispatch(List<RetailNotificationDTO> retailNotificationDTOList) {
@@ -140,7 +136,6 @@ public class RetailServiceImpl implements RetailService {
         .get(0)
         .getSmsList()
         .add(new SmsDTO(retailNotificationDTOList.get(0).getDrsUserMobile(), sb.toString()));
-    retailNotificationRepository.save(retailNotifications);
   }
 
   private void processCnCreateUpdateNotification(

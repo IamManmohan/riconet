@@ -48,7 +48,6 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mongo.DEPSNotificationRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -103,8 +102,6 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
   @Autowired private OrganizationService organizationService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
-
-  @Autowired private DEPSNotificationRepository depsNotificationRepository;
 
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
@@ -178,7 +175,6 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
           updateLastScanDetails(dto, consignmentId, consignmentIdToLatestHistoryMap);
           dtoList.add(dto);
         });
-    depsNotificationRepository.save(dtoList);
     return dtoList;
   }
 
