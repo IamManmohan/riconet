@@ -18,7 +18,7 @@ COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
 
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
+ENV COMMON_JAVA_OPTS="-XX:+UseG1GC -Xms$XMX_XMS_VALUE \
     -Xmx$XMX_XMS_VALUE \
     -Dlogin.profiles.active=$LOGIN_PROFILE \
     -Dspring.profiles.active=$SPRING_PROFILE  \
