@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class ConsumerModel {
 
-  private static final Long TIME = 5L;
+  private static final Long DELAY_VALUE = 5L;
   private static final TimeUnit TIME_UNIT = MINUTES;
   private static final Long NUM_RETRIES = 5L;
 
@@ -99,11 +99,7 @@ public abstract class ConsumerModel {
   public abstract void processMessage(String str) throws IOException;
 
   private void processError(ConsumerMessage consumerMessage, String errorMsg) {
-    log.error(
-        "processing error:"
-            + consumerMessage.getId()
-            + (consumerMessage.getRetryCount() + 1L)
-            + errorMsg);
+    log.error("Processing error for payload {}", consumerMessage.toString());
     if (consumerMessage.getRetryCount() < getNumRetries()) {
       consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
       consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
@@ -113,29 +109,38 @@ public abstract class ConsumerModel {
               + consumerMessage.getRetryCount().toString()
               + " "
               + errorMsg);
-      ConsumerTimer task =
-          new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
-      timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
+      createTimerTask(consumerMessage);
     }
   }
 
-  private void processFirstTimeError(String str, String errorMsg) {
+  private void processFirstTimeError(String message, String errorMsg) {
     log.error("Processing first time error: {}", errorMsg);
     ConsumerMessage consumerMessage = new ConsumerMessage();
     String uuid = UUID.randomUUID().toString().replace("-", "");
     consumerMessage.setId(getTopic() + uuid);
-    consumerMessage.setMessage(str);
+    consumerMessage.setMessage(message);
     consumerMessage.setRetryCount(1L);
     consumerMessage.setTopic(getTopic());
     consumerMessage.setCreatedAt(DateTime.now().getMillis());
     consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
     consumerMessage.setErrorMsg("1" + errorMsg);
+    createTimerTask(consumerMessage);
+  }
+
+  /**
+   * NOTE: This method creates an in-memory timer task which doesn't guarantee retries for the given
+   * no. of times.
+   */
+  private void createTimerTask(ConsumerMessage consumerMessage) {
     try {
       String consumerMessageString = objectMapper.writeValueAsString(consumerMessage);
       log.info(
-          "Creating a timer task of {} {} for payload: {}", TIME, TIME_UNIT, consumerMessageString);
+          "Creating a timer task for a delay of {} {} for payload: {}",
+          DELAY_VALUE,
+          TIME_UNIT,
+          consumerMessageString);
       ConsumerTimer task = new ConsumerTimer(consumerMessageString, getErrorTopic(), kafkaTemplate);
-      timer.newTimeout(task, TIME, TIME_UNIT);
+      timer.newTimeout(task, DELAY_VALUE * (consumerMessage.getRetryCount()), TIME_UNIT);
     } catch (Exception e) {
       log.error("Error in creating and pushing ConsumerTimer object to kafka: {}", e);
     }
