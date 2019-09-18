@@ -1,13 +1,15 @@
 package com.rivigo.riconet.core.consumerabstract;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import akka.Done;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
-import com.rivigo.zoom.common.model.mongo.ConsumerMessages;
-import com.rivigo.zoom.common.repository.mongo.ConsumerMessagesRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.ConsumerMessage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,7 +35,9 @@ import org.springframework.stereotype.Component;
 @Component
 public abstract class ConsumerModel {
 
-  public static final Long NUM_RETRIES = 5l;
+  private static final Long DELAY_VALUE = 5L;
+  private static final TimeUnit TIME_UNIT = MINUTES;
+  private static final Long NUM_RETRIES = 5L;
 
   public abstract String getTopic();
 
@@ -51,9 +55,9 @@ public abstract class ConsumerModel {
 
   @Autowired private ExecutorService executorService;
 
-  @Autowired private ConsumerMessagesRepository consumerMessagesRepository;
-
   @Autowired private KafkaTemplate kafkaTemplate;
+
+  @Autowired private ObjectMapper objectMapper;
 
   private Timer timer = new HashedWheelTimer();
 
@@ -73,18 +77,18 @@ public abstract class ConsumerModel {
             } catch (Exception e) {
               String errorMsg = getStackTrace(e);
               processFirstTimeError(record.value(), errorMsg);
-              log.error("First time error", e);
             }
           });
     } else if (record.topic().equals(getErrorTopic())) {
       executorService.submit(
           () -> {
-            ConsumerMessages consumerMessages = consumerMessagesRepository.findById(record.value());
+            ConsumerMessage consumerMessage = null;
             try {
-              processMessage(consumerMessages.getMessage());
+              consumerMessage = objectMapper.readValue(record.value(), ConsumerMessage.class);
+              processMessage(consumerMessage.getMessage());
             } catch (Exception e) {
               String errorMsg = getStackTrace(e);
-              processError(consumerMessages, errorMsg);
+              processError(consumerMessage, errorMsg);
               log.error("error", e);
             }
           });
@@ -94,12 +98,8 @@ public abstract class ConsumerModel {
 
   public abstract void processMessage(String str) throws IOException;
 
-  String processError(ConsumerMessages consumerMessage, String errorMsg) {
-    log.error(
-        "processing error:"
-            + consumerMessage.getId()
-            + (consumerMessage.getRetryCount() + 1L)
-            + errorMsg);
+  private void processError(ConsumerMessage consumerMessage, String errorMsg) {
+    log.error("Processing error for payload {}", consumerMessage.toString());
     if (consumerMessage.getRetryCount() < getNumRetries()) {
       consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
       consumerMessage.setRetryCount(consumerMessage.getRetryCount() + 1L);
@@ -109,31 +109,41 @@ public abstract class ConsumerModel {
               + consumerMessage.getRetryCount().toString()
               + " "
               + errorMsg);
-      consumerMessagesRepository.save(consumerMessage);
-      ConsumerTimer task =
-          new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
-      timer.newTimeout(task, 5 * (consumerMessage.getRetryCount()), TimeUnit.MINUTES);
+      createTimerTask(consumerMessage);
     }
-    return consumerMessage.getMessage();
   }
 
-  String processFirstTimeError(String str, String errorMsg) {
-    log.error(" Processing first time error" + errorMsg);
-    ConsumerMessages consumerMessage = new ConsumerMessages();
+  private void processFirstTimeError(String message, String errorMsg) {
+    log.error("Processing first time error: {}", errorMsg);
+    ConsumerMessage consumerMessage = new ConsumerMessage();
     String uuid = UUID.randomUUID().toString().replace("-", "");
     consumerMessage.setId(getTopic() + uuid);
-    consumerMessage.setMessage(str);
+    consumerMessage.setMessage(message);
     consumerMessage.setRetryCount(1L);
     consumerMessage.setTopic(getTopic());
     consumerMessage.setCreatedAt(DateTime.now().getMillis());
     consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
     consumerMessage.setErrorMsg("1" + errorMsg);
+    createTimerTask(consumerMessage);
+  }
 
-    consumerMessagesRepository.save(consumerMessage);
-    ConsumerTimer task = new ConsumerTimer(consumerMessage.getId(), getErrorTopic(), kafkaTemplate);
-    timer.newTimeout(task, 5, TimeUnit.MINUTES);
-
-    return str;
+  /**
+   * NOTE: This method creates an in-memory timer task which doesn't guarantee retries for the given
+   * no. of times.
+   */
+  private void createTimerTask(ConsumerMessage consumerMessage) {
+    try {
+      String consumerMessageString = objectMapper.writeValueAsString(consumerMessage);
+      log.info(
+          "Creating a timer task for a delay of {} {} for payload: {}",
+          DELAY_VALUE,
+          TIME_UNIT,
+          consumerMessageString);
+      ConsumerTimer task = new ConsumerTimer(consumerMessageString, getErrorTopic(), kafkaTemplate);
+      timer.newTimeout(task, DELAY_VALUE * (consumerMessage.getRetryCount()), TIME_UNIT);
+    } catch (Exception e) {
+      log.error("Error in creating and pushing ConsumerTimer object to kafka: {}", e);
+    }
   }
 
   public void load(

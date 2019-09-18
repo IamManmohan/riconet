@@ -112,11 +112,7 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
             + notification.getScenario()
             + "|"
             + notification.getReporter().getEmail());
-    if (documentIssueNotificationRepository.findOne(notification.getId()) == null) {
-      documentIssueNotificationRepository.save(notification);
-      return notification;
-    }
-    return null;
+    return notification;
   }
 
   private DocumentIssueNotification.NotificationUserDTO getUserDTO(User user) {
