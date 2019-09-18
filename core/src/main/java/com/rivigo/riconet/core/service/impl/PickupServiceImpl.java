@@ -38,7 +38,6 @@ import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.PickupNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mongo.PickupNotificationRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.utils.ZoomUtilFunctions;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -71,8 +70,6 @@ public class PickupServiceImpl implements PickupService {
   @Autowired private ClientMasterService clientMasterService;
 
   @Autowired private StockAccumulatorService stockAccumulatorService;
-
-  @Autowired private PickupNotificationRepository pickupNotificationRepository;
 
   @Autowired private ZoomUserMasterService zoomUserMasterService;
 
@@ -136,7 +133,6 @@ public class PickupServiceImpl implements PickupService {
                   || locationCodes.contains(pickupNotification.getLocationCode())) {
                 sendSms(pickupNotification, getSmsTemplate(pickupNotification));
               }
-              pickupNotificationRepository.save(pickupNotification);
             });
   }
 
@@ -183,10 +179,6 @@ public class PickupServiceImpl implements PickupService {
       throw new ZoomException("Pickup is not saved properly");
     }
     String id = getUniqueId(pickup, type);
-    if (pickupNotificationRepository.findOne(id) != null) {
-      log.info("Duplicate message ignored ");
-      return null;
-    }
     pickupNotification.setId(id);
     pickupNotification.setPickupId(pickup.getId());
     pickupNotification.setStatus(pickup.getPickupStatus());
