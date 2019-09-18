@@ -134,13 +134,14 @@ public abstract class ConsumerModel {
   private void createTimerTask(ConsumerMessage consumerMessage) {
     try {
       String consumerMessageString = objectMapper.writeValueAsString(consumerMessage);
+      long delay = DELAY_VALUE * consumerMessage.getRetryCount();
       log.info(
-          "Creating a timer task for a delay of {} {} for payload: {}",
-          DELAY_VALUE,
+          "Creating timer task for a delay of {} {} for payload: {}",
+          delay,
           TIME_UNIT,
           consumerMessageString);
       ConsumerTimer task = new ConsumerTimer(consumerMessageString, getErrorTopic(), kafkaTemplate);
-      timer.newTimeout(task, DELAY_VALUE * (consumerMessage.getRetryCount()), TIME_UNIT);
+      timer.newTimeout(task, delay, TIME_UNIT);
     } catch (Exception e) {
       log.error("Error in creating and pushing ConsumerTimer object to kafka: {}", e);
     }
