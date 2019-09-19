@@ -3,8 +3,6 @@ package com.rivigo.riconet.core.test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
-import com.rivigo.finance.zoom.dto.EventPayload;
-import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
@@ -44,23 +42,6 @@ public class FeederVendorServiceImplTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-  }
-
-  @Test
-  public void processVendorOnboardingEventTest() throws IOException {
-    VendorContractZoomEventDTO vendorContractZoomEventDTO = new VendorContractZoomEventDTO();
-    vendorContractZoomEventDTO.setExpenseType(ExpenseType.RLH_FEEDER);
-    vendorContractZoomEventDTO.setVendorCode("V-1001");
-    vendorContractZoomEventDTO.setLegalEntityName("NEW VENDOR");
-    EventPayload eventPayload = new EventPayload();
-    eventPayload.setEventType(ZoomEventType.VENDOR_ACTIVE_EVENT);
-    eventPayload.setPayload(
-        "{\\\"vendorCode\\\":\\\"V-BP0019\\\",\\\"legalEntityName\\\":\\\"W Vendor\\\",\\\"expenseType\\\":\\\"RP\\\"}\"}");
-    Mockito.when(objectMapper.readValue(Mockito.anyString(), (Class<Object>) Mockito.any()))
-        .thenReturn(vendorContractZoomEventDTO);
-    Mockito.when(feederVendorService.createFeederVendor(eventPayload.getPayload()))
-        .thenReturn(null);
-    feederVendorServiceImpl.processVendorOnboardingEvent(eventPayload);
   }
 
   @Test
