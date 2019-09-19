@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -79,7 +78,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
           feederVendor.get().getId());
       return null;
     }
-    return zoomBackendAPIClientService.addFeederVendor(dto, HttpMethod.POST);
+    return zoomBackendAPIClientService.addFeederVendor(dto);
   }
 
   @Nullable

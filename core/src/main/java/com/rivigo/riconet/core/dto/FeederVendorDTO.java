@@ -4,9 +4,11 @@ import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.FeederVendor.VendorType;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class FeederVendorDTO {
   private Long id;
 

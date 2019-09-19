@@ -247,8 +247,7 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.anyObject(),
                 Mockito.anyObject()))
         .thenReturn(jsonNode);
-    JsonNode actual_jsonNode =
-        zoomBackendAPIClientServiceImpl.addFeederVendor(dto, HttpMethod.POST);
+    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
     Assert.assertEquals(jsonNode, actual_jsonNode);
   }
 
@@ -262,6 +261,6 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while creating vendor with dto");
-    zoomBackendAPIClientServiceImpl.addFeederVendor(dto, HttpMethod.POST);
+    zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
   }
 }
