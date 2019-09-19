@@ -339,14 +339,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
-  public JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method) {
+  public JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", feederVendorDTO);
     try {
       responseJson =
           apiClientService.getEntity(
               feederVendorDTO,
-              method,
+              HttpMethod.POST,
               UrlConstant.ZOOM_BACKEND_CREATE_VENDOR,
               null,
               backendBaseUrl);

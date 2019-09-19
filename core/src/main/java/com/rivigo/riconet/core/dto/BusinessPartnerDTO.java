@@ -5,9 +5,11 @@ import com.rivigo.zoom.common.enums.TacticalCreditStatus;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class BusinessPartnerDTO {
 
   private Long id;
