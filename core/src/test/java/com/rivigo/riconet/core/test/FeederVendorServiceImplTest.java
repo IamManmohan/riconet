@@ -55,8 +55,7 @@ public class FeederVendorServiceImplTest {
     Mockito.when(objectMapper.readValue(Mockito.anyString(), (Class<Object>) Mockito.any()))
         .thenReturn(vendorContractZoomEventDTO);
     Mockito.when(feederVendorRepository.findByVendorCode(Mockito.any())).thenReturn(null);
-    Mockito.when(zoomBackendAPIClientServiceImpl.addFeederVendor(Mockito.any(), Mockito.any()))
-        .thenReturn(null);
+    Mockito.when(zoomBackendAPIClientServiceImpl.addFeederVendor(Mockito.any())).thenReturn(null);
     JsonNode jsnode = feederVendorServiceImpl.createFeederVendor(s);
     Assert.assertNull(jsnode);
   }
@@ -85,9 +84,8 @@ public class FeederVendorServiceImplTest {
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
     dto.setVendorStatus(OperationalStatus.ACTIVE);
     dto.setLegalName("LEGAL");
-    Mockito.when(zoomBackendAPIClientService.addFeederVendor(Mockito.any(), Mockito.any()))
-        .thenReturn(null);
-    zoomBackendAPIClientServiceImpl.addFeederVendor(Mockito.any(), Mockito.any());
+    Mockito.when(zoomBackendAPIClientService.addFeederVendor(Mockito.any())).thenReturn(null);
+    zoomBackendAPIClientServiceImpl.addFeederVendor(Mockito.any());
   }
 
   @Test
