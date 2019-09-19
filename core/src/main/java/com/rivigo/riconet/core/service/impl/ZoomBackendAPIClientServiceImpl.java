@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
+import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
@@ -314,5 +316,45 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
     return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
+    JsonNode responseJson;
+    log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              businessPartnerDTO,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_CREATE_BP + "?" + "isvalidationRequired=false",
+              null,
+              backendBaseUrl);
+      log.info("Business Partner Created {}", responseJson);
+      return responseJson;
+
+    } catch (IOException e) {
+      log.error("Error while creating BP with dto {}", businessPartnerDTO);
+      throw new ZoomException("Error while creating BP with dto %s", businessPartnerDTO);
+    }
+  }
+
+  public JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO, HttpMethod method) {
+    JsonNode responseJson;
+    log.info(" Creating a new vendor with dto {}", feederVendorDTO);
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              feederVendorDTO,
+              method,
+              UrlConstant.ZOOM_BACKEND_CREATE_VENDOR,
+              null,
+              backendBaseUrl);
+      log.info("Feeder Vendor Created {}", responseJson);
+      return responseJson;
+    } catch (IOException e) {
+      log.error("Error while creating vendor with dto {}", feederVendorDTO);
+      throw new ZoomException("Error while creating vendor with dto %s", feederVendorDTO);
+    }
   }
 }

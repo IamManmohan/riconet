@@ -91,13 +91,13 @@ subprojects {
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
 
-        compile("com.rivigo:rivigo-finance-external-api:0.0.17") {
+        compile("com.rivigo:rivigo-finance-external-api:0.0.18") {
             exclude module: 'cms-external-api'
         }
 
         compile "com.fasterxml.jackson.core:jackson-databind:2.9.0"
         compile "org.jboss.netty:netty:3.2.10.Final"
-
+        
         compile group: 'junit', name: 'junit', version: '4.12'
 
 

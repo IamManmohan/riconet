@@ -58,4 +58,8 @@ public class UrlConstant {
       "/operations/retail/collections/handover/markRecoveryPending";
 
   public static final String ZOOM_BACKEND_CANCEL_PICKUP = "/operations/pickup/cancel/V2";
+
+  public static final String ZOOM_BACKEND_CREATE_BP = "/master/partner";
+
+  public static final String ZOOM_BACKEND_CREATE_VENDOR = "/master/feeder_vendor";
 }
