@@ -1,9 +1,11 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
+import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private ClientMasterService clientMasterService;
 
+  @Autowired private FeederVendorService feederVendorService;
+
   @Autowired private ConsignmentInvoiceService consignmentInvoiceService;
 
   @Override
@@ -27,6 +31,10 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         break;
       case INVOICE_DOCUMENT_PREPARED:
         consignmentInvoiceService.saveInvoiceDetails(eventPayload.getPayload());
+        break;
+      case VENDOR_ACTIVE_EVENT:
+        JsonNode response = feederVendorService.createFeederVendor(eventPayload.getPayload());
+        log.info("Vendor created {}", response);
         break;
       default:
         log.info("Event does not trigger anything {}", eventType);
