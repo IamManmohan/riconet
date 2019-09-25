@@ -9,14 +9,14 @@ import org.springframework.kafka.core.KafkaTemplate;
 @AllArgsConstructor
 public class ConsumerTimer implements TimerTask {
 
-  private final String msgId;
+  private final String msgPayload;
 
   private final String topic;
 
   private KafkaTemplate kafkaTemplate;
 
   @Override
-  public void run(Timeout timeout) throws Exception {
-    kafkaTemplate.send(topic, msgId);
+  public void run(Timeout timeout) {
+    kafkaTemplate.send(topic, msgPayload);
   }
 }

@@ -4,12 +4,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
+import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
+import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import org.junit.Assert;
@@ -189,5 +193,74 @@ public class ZoomBackendAPIClientServiceTest {
             apiClientService.getEntity(
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
         .thenThrow(new IOException());
+  }
+
+  @Test
+  public void addBusinessPartnerTest() throws IOException {
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    BusinessPartnerDTO dto = new BusinessPartnerDTO();
+    dto.setCode("V111");
+    dto.setType("BP");
+    dto.setStatus("ACTIVE");
+    dto.setLegalName("LEGAL");
+    Mockito.when(
+            apiClientService.getEntity(
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject()))
+        .thenReturn(jsonNode);
+    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+    Assert.assertEquals(jsonNode, actual_jsonNode);
+  }
+
+  @Test
+  public void addBusinessPartnerExceptionTest() throws IOException {
+
+    BusinessPartnerDTO dto = new BusinessPartnerDTO();
+    dto.setCode("V111");
+    dto.setType("BP");
+    dto.setStatus("ACTIVE");
+    dto.setLegalName("LEGAL");
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage("Error while creating BP with dto");
+    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+  }
+
+  @Test
+  public void addFeederVendorTest() throws IOException {
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    FeederVendorDTO dto = new FeederVendorDTO();
+    dto.setVendorCode("V111");
+    dto.setVendorType(FeederVendor.VendorType.VENDOR);
+    dto.setVendorStatus(OperationalStatus.ACTIVE);
+    dto.setLegalName("LEGAL");
+    Mockito.when(
+            apiClientService.getEntity(
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject(),
+                Mockito.anyObject()))
+        .thenReturn(jsonNode);
+    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
+    Assert.assertEquals(jsonNode, actual_jsonNode);
+  }
+
+  @Test
+  public void addFeederVendorExceptionTest() throws IOException {
+    FeederVendorDTO dto = new FeederVendorDTO();
+    dto.setVendorCode("V111");
+    dto.setVendorType(FeederVendor.VendorType.VENDOR);
+    dto.setVendorStatus(OperationalStatus.ACTIVE);
+    dto.setLegalName("LEGAL");
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    expectedException.expectMessage("Error while creating vendor with dto");
+    zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
   }
 }

@@ -33,7 +33,6 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.common.repository.mongo.DocumentIssueNotificationRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,8 +77,6 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
 
   @Autowired private ClientMasterService clientMasterService;
 
-  @Autowired private DocumentIssueNotificationRepository documentIssueNotificationRepository;
-
   @Override
   public DocumentIssueNotification createNotificationData(
       Long consignmentId, Long userId, String subReason, ConsignmentStatus status) {
@@ -112,11 +109,7 @@ public class DocumentIssueNotificationServiceImpl implements DocumentIssueNotifi
             + notification.getScenario()
             + "|"
             + notification.getReporter().getEmail());
-    if (documentIssueNotificationRepository.findOne(notification.getId()) == null) {
-      documentIssueNotificationRepository.save(notification);
-      return notification;
-    }
-    return null;
+    return notification;
   }
 
   private DocumentIssueNotification.NotificationUserDTO getUserDTO(User user) {
