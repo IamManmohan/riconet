@@ -11,6 +11,7 @@ ARG MONGO_PORT=27017
 ARG MONGO_DB=rivigo_zoom
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/vishwakarma/
 ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/vishwakarma/
+ARG EXTRA_ARGS="-XX:+UseG1GC"
 
 COPY eventConsumer/build/distributions/eventConsumer.zip /code/
 COPY notificationConsumer/build/distributions/notificationConsumer.zip /code/
@@ -18,7 +19,7 @@ COPY core/src/main/resources/vishwakarma/supervisord.conf /etc/supervisord.conf
 COPY $PROPERTIES_PATH_EVENT /etc/zoom/event/
 COPY $PROPERTIES_PATH_NOTIFICATION /etc/zoom/notification/
 
-ENV COMMON_JAVA_OPTS="-Xms$XMX_XMS_VALUE \
+ENV COMMON_JAVA_OPTS="$EXTRA_ARGS -Xms$XMX_XMS_VALUE \
     -Xmx$XMX_XMS_VALUE \
     -Dlogin.profiles.active=$LOGIN_PROFILE \
     -Dspring.profiles.active=$SPRING_PROFILE  \
