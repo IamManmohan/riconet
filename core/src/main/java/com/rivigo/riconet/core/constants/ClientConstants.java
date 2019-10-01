@@ -8,6 +8,7 @@ public class ClientConstants {
 
   public static final String HILTI_CLIENT_ID = "619";
   public static final String HILTI_CLIENT_ID_DEP = "2187";
+  public static final String HILTI_CLIENT_ID_CD = "2870";
   public static final String FLIPKART_SELLER_CLIENT = "2253";
   public static final String FLIPKART_INDIA_CLIENT = "4128";
 }
