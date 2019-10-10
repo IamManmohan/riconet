@@ -1,7 +1,10 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
@@ -41,4 +44,8 @@ public interface ZoomBackendAPIClientService {
   ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO);
 
   Boolean deletePickup(Long pickupId);
+
+  JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
+
+  JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO);
 }
