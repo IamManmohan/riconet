@@ -1,10 +1,10 @@
 package com.rivigo.riconet.notification.consumer;
 
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
+import com.rivigo.riconet.core.dto.notification.DocumentIssueNotification;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.Topic;
-import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

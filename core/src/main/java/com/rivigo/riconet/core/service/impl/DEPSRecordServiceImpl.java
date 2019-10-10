@@ -8,6 +8,7 @@ import static com.rivigo.zoom.common.enums.ConsignmentStatus.STOCK_CHECK_DONE;
 import static com.rivigo.zoom.common.enums.ZoomTripType.BF;
 
 import com.rivigo.riconet.core.constants.EmailConstant;
+import com.rivigo.riconet.core.dto.notification.DEPSNotification;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
@@ -46,7 +47,6 @@ import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.Trip;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import java.util.ArrayList;
 import java.util.Arrays;

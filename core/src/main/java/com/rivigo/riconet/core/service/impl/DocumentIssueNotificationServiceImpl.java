@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.EmailConstant;
+import com.rivigo.riconet.core.dto.notification.DocumentIssueNotification;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
@@ -31,7 +32,6 @@ import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Collections;
