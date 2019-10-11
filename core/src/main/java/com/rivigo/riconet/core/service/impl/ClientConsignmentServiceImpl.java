@@ -7,6 +7,7 @@ import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import com.rivigo.zoom.common.repository.mongo.ClientConsignmentMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,10 +28,11 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   public Map<String, ClientConsignmentMetadata> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    return clientConsignmentMetadataRepository
-        .findByConsignmentIdIn(new ArrayList<>(idToCnoteMap.keySet()))
-        .stream()
-        .collect(Collectors.toMap(v -> idToCnoteMap.get(v.getConsignmentId()), v -> v));
+    return new HashMap<>();
+    //    return clientConsignmentMetadataRepository
+    //        .findByConsignmentIdIn(new ArrayList<>(idToCnoteMap.keySet()))
+    //        .stream()
+    //        .collect(Collectors.toMap(v -> idToCnoteMap.get(v.getConsignmentId()), v -> v));
   }
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
