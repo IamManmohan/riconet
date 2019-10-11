@@ -36,7 +36,6 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
-import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
@@ -377,7 +376,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                 .stream()
                 .map(HiltiRequestDto::getReferenceNumber)
                 .collect(Collectors.toList());
-        Map<String, ClientConsignmentMetadata> cnoteToConsignmentMetadataMap =
+        Map<String, Map<String, String>> cnoteToConsignmentMetadataMap =
             clientConsignmentService.getCnoteToConsignmentMetadataMapFromCnoteList(cnoteList);
 
         List<FlipkartRequestDTO> clientIntegrationRequestDTOList = new ArrayList<>();
@@ -387,7 +386,6 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
           clientIntegrationRequestDto.setMetaData(
               Optional.ofNullable(
                       cnoteToConsignmentMetadataMap.get(hiltiRequestDto.getReferenceNumber()))
-                  .map(ClientConsignmentMetadata::getMetadata)
                   .orElse(Collections.emptyMap()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
