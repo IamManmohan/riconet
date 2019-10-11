@@ -15,5 +15,7 @@ public interface TicketingService {
 
   void closeTicket(TicketDTO ticketDTO, String reasonOfClosure);
 
-  TicketDTO getTicketByTicketId(Long ticketId);
+  TicketDTO getById(Long ticketId);
+
+  void closeTicketIfRequired(TicketDTO ticketDTO, String actionClosureMessage);
 }

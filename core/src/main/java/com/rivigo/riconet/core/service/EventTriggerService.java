@@ -30,7 +30,7 @@ public class EventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
-  @Autowired private HandoverService handoverService;
+  @Autowired private WriteOffFactory writeOffFactory;
 
   @Autowired private RTOService rtoService;
 
@@ -120,7 +120,7 @@ public class EventTriggerService {
                 .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
                 .orElse(null));
-        handoverService.consumeHandoverTicketAction(
+        writeOffFactory.consume(
             notificationDTO.getEntityId(),
             getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
                 .orElse(null),

@@ -128,7 +128,7 @@ public class PickupServiceTest {
     pickup.setPickupStatus(PickupStatus.COMPLETE);
     pickup.setId(23l);
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
-    when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
+    when(consignmentReadOnlyService.findConsignmentsByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
@@ -155,7 +155,7 @@ public class PickupServiceTest {
     pickup.setPickupStatus(PickupStatus.COMPLETE);
     pickup.setId(23l);
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
-    when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
+    when(consignmentReadOnlyService.findConsignmentsByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
     when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
     when(zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0))
@@ -205,7 +205,7 @@ public class PickupServiceTest {
     when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
     when(pickupRepository.findOne(23l)).thenReturn(pickup);
     when(clientMasterService.getClientById(pickup.getClientId())).thenReturn(client);
-    when(consignmentReadOnlyService.findConsignmentByPickupId(23l))
+    when(consignmentReadOnlyService.findConsignmentsByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
 
     when(zoomPropertyService.getDouble(ZoomPropertyName.MINIMUM_PICKUP_CHARGES_FOR_BF, 100.0))

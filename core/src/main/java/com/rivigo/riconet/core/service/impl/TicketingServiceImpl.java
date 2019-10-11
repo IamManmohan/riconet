@@ -18,6 +18,8 @@ import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +87,17 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
   @Override
-  public TicketDTO getTicketByTicketId(Long ticketId) {
-    return zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+  public TicketDTO getById(Long ticketId) {
+    return Optional.ofNullable(zoomTicketingAPIClientService.getTicketByTicketId(ticketId))
+        .orElseThrow(() -> new ZoomException("Error occured while fetching ticket {}", ticketId));
+  }
+
+  @Override
+  public void closeTicketIfRequired(TicketDTO ticketDTO, String actionClosureMessage) {
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Auto closing ticket");
+      closeTicket(ticketDTO, actionClosureMessage);
+    }
   }
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {

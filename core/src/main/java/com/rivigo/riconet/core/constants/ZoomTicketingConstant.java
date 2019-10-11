@@ -17,6 +17,8 @@ public class ZoomTicketingConstant {
 
   public static final Long WRITEOFF_TYPE_ID = 539L;
 
+  public static final Long PICKUP_WRITE_OFF_TYPE_ID = 829L;
+
   public static final String QC_GROUP_NAME = "QC";
 
   public static final String RTO_GROUP_TYPE_NAME = "RTO_Field";
@@ -24,6 +26,7 @@ public class ZoomTicketingConstant {
   public static final String QC_ACTION_NAME = "qc";
 
   public static final String WRITE_OFF_ACTION_NAME = "write_off";
+  public static final String PICKUP_WRITE_OFF_ACTION_NAME = "pickup_write_off";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";
 
