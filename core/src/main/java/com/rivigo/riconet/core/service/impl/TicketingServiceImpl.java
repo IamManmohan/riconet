@@ -15,11 +15,10 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

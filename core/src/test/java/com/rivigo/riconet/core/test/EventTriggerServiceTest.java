@@ -14,11 +14,11 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
-import com.rivigo.riconet.core.service.WriteOffFactory;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.RTOService;
 import com.rivigo.riconet.core.service.TicketingClientService;
+import com.rivigo.riconet.core.service.WriteOffFactory;
 import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
@@ -212,7 +212,7 @@ public class EventTriggerServiceTest {
         NotificationDTO.builder().eventName(EventName.TICKET_ACTION.name()).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any(), any());
-    verify(writeOffFactory, times(1)).consumeBankTransferTicketAction(eq(5l), any(), any(), any());
+    verify(writeOffFactory, times(1)).consume(eq(5l), any(), any(), any());
   }
 
   @Test
