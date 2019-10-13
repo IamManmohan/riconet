@@ -8,11 +8,15 @@ public class UrlConstant {
 
   public static final String ZOOM_TICKETING_GET_BY_CNOTE_AND_TYPE = "/ticket/entityandtype";
 
+  public static final String ZOOM_TICKETING_GET_BY_ENTITY_IN_AND_TYPE = "/ticket/entityinandtype";
+
   public static final String ZOOM_TICKETING_POST_PUT_TICKET = "/ticket";
 
   public static final String ZOOM_TICKETING_GET_GROUP_ID = "/group/locationandgroupname";
 
   public static final String ZOOM_TICKETING_POST_COMMENT = "/comment";
+
+  public static final String ZOOM_TICKETING_TICKET_ACTION = "/ticket-action";
 
   public static final String ZOOM_BACKEND_UPDATE_QC_CHECK =
       "/operations/consignments/qc/updateQcCheck";
@@ -48,8 +52,8 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_WRITE_OFF_REQUEST_ONBOARDING =
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
 
-  public static final String ZOOM_BACKEND_PICKUP_WRITE_OFF_REQUEST_ONBOARDING =
-      "/operations/retail/collections/pickup/{pickupId}/writeOff/{requestAction}";
+  public static final String ZOOM_BACKEND_KNOCK_OFF_REQUEST =
+      "/operations/retail/collections/{cnote}/knockoff/{requestAction}";
 
   public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 

@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.service;
 
-/** Created by ashfakh on 23/11/18. */
-public interface WriteOffFactory {
+public interface TicketActionFactory {
 
   void consume(Long ticketId, String entityId, String actionName, String actionValue);
 }

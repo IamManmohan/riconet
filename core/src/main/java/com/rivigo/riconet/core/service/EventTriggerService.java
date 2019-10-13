@@ -30,9 +30,11 @@ public class EventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
-  @Autowired private WriteOffFactory writeOffFactory;
+  @Autowired private TicketActionFactory ticketActionFactory;
 
   @Autowired private RTOService rtoService;
+
+  @Autowired private BankTransferService bankTransferService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
@@ -120,13 +122,16 @@ public class EventTriggerService {
                 .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
                 .orElse(null));
-        writeOffFactory.consume(
+        ticketActionFactory.consume(
             notificationDTO.getEntityId(),
             getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
                 .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
+        break;
+      case BANK_TRANSFER_INITIATED:
+        bankTransferService.createBankTransferTicket(notificationDTO.getMetadata());
         break;
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(

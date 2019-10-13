@@ -99,7 +99,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handleApproveRejectRequest(
+  public void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction) {
     JsonNode responseJson;
     String url =
@@ -116,18 +116,17 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handlePickupWriteOffApproveRejectRequest(
-      String pickupId, WriteOffRequestAction writeOffRequestAction) {
+  public void handleKnockOffApproveRejectRequest(String cnote, String actionValue) {
     JsonNode responseJson;
     String url =
-        UrlConstant.ZOOM_BACKEND_PICKUP_WRITE_OFF_REQUEST_ONBOARDING
-            .replace("{pickupId}", pickupId)
-            .replace("{requestAction}", writeOffRequestAction.name());
+        UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST
+            .replace("{cnote}", cnote)
+            .replace("{requestAction}", actionValue);
     try {
       responseJson = apiClientService.getEntity(null, HttpMethod.PUT, url, null, backendBaseUrl);
     } catch (IOException e) {
-      log.error("Error while handling Writeoff request with pickup: {} ", pickupId, e);
-      throw new ZoomException("Error while handling Writeoff request with pickup: %s", pickupId);
+      log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
+      throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
     }
     apiClientService.parseJsonNode(responseJson, null);
   }

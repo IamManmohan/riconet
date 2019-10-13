@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -52,6 +54,29 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     } catch (IOException e) {
       log.error("Error while getting qc tickets with cnote {}", cnote, e);
       throw new ZoomException("Error while getting qc tickets with cnote " + cnote);
+    }
+
+    TypeReference<List<TicketDTO>> mapType = new TypeReference<List<TicketDTO>>() {};
+
+    return (List<TicketDTO>) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public List<TicketDTO> getTicketsByEntityInAndType(List<String> entityIdList, String typeId) {
+    if (CollectionUtils.isEmpty(entityIdList)) {
+      throw new ZoomException("Please provide a valid ticket entities");
+    }
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    entityIdList.forEach(v -> valuesMap.add("entityId", v));
+    valuesMap.add("typeId", typeId);
+    String url = UrlConstant.ZOOM_TICKETING_GET_BY_ENTITY_IN_AND_TYPE;
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting tickets {}", entityIdList);
+      throw new ZoomException("Error while getting tickets: " + entityIdList);
     }
 
     TypeReference<List<TicketDTO>> mapType = new TypeReference<List<TicketDTO>>() {};
@@ -163,6 +188,26 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     TypeReference<List<TicketCommentDTO>> mapType = new TypeReference<List<TicketCommentDTO>>() {};
 
     return (List<TicketCommentDTO>) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public void performTicketAction(TicketActionDTO ticketActionDTO) {
+    String url = UrlConstant.ZOOM_TICKETING_TICKET_ACTION;
+    try {
+      apiClientService.getEntity(ticketActionDTO, HttpMethod.POST, url, null, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error(
+          "Error while performing ticketAction with ticketId: {}, actionName: {}, actionValue: {} ",
+          ticketActionDTO.getTicketId(),
+          ticketActionDTO.getActionName(),
+          ticketActionDTO.getActionValue(),
+          e);
+      throw new ZoomException(
+          "Error while performing ticketAction with ticketId: %s, actionName: %s, actionValue: %s ",
+          ticketActionDTO.getTicketId(),
+          ticketActionDTO.getActionName(),
+          ticketActionDTO.getActionValue());
+    }
   }
 
   @Override

@@ -17,9 +17,6 @@ public interface ZoomBackendAPIClientService {
 
   void recalculateCpdOfBf(Long consignmentId);
 
-  void handlePickupWriteOffApproveRejectRequest(
-      String pickupId, WriteOffRequestAction writeOffRequestAction);
-
   void unloadAssetCN(Long cnId);
 
   ClientDTO addClient(ClientDTO clientDTO);
@@ -36,7 +33,9 @@ public interface ZoomBackendAPIClientService {
 
   void handleQcBlockerClosure(Long ticketId);
 
-  void handleApproveRejectRequest(String cnote, WriteOffRequestAction writeOffRequestAction);
+  void handleWriteOffApproveRejectRequest(String cnote, WriteOffRequestAction writeOffRequestAction);
+
+  void handleKnockOffApproveRejectRequest(String cnote, String actionValue);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 

@@ -18,7 +18,7 @@ import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.RTOService;
 import com.rivigo.riconet.core.service.TicketingClientService;
-import com.rivigo.riconet.core.service.WriteOffFactory;
+import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
@@ -63,7 +63,7 @@ public class EventTriggerServiceTest {
 
   @Mock private AppNotificationService appNotificationService;
 
-  @Mock private WriteOffFactory writeOffFactory;
+  @Mock private TicketActionFactory ticketActionFactory;
 
   @Mock private RTOService rtoService;
 
@@ -212,7 +212,7 @@ public class EventTriggerServiceTest {
         NotificationDTO.builder().eventName(EventName.TICKET_ACTION.name()).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any(), any());
-    verify(writeOffFactory, times(1)).consume(eq(5l), any(), any(), any());
+    verify(ticketActionFactory, times(1)).consume(eq(5l), any(), any(), any());
   }
 
   @Test
