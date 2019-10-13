@@ -5,19 +5,20 @@ import com.rivigo.zoom.common.enums.DEPSScenario;
 import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.model.User;
-import java.util.HashSet;
+import com.rivigo.zoom.common.pojo.AbstractMailNotificationEntity;
 import java.util.List;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DEPSNotification {
+@ToString(callSuper = true)
+public class DEPSNotification extends AbstractMailNotificationEntity {
   private String id;
   private List<Long> depsIdList;
   private Long taskId;
@@ -42,9 +43,6 @@ public class DEPSNotification {
   private DEPSScenario scenario;
   private DEPSLocationDTO lastScannedAtLocation;
   private DEPSUserDTO lastScannedByUser;
-  private Set<String> emailIdList = new HashSet<>();
-  private Set<String> ccList = new HashSet<>();
-  private Set<String> bccList = new HashSet<>();
 
   @Getter
   @Setter

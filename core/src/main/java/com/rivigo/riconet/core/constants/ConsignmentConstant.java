@@ -23,4 +23,5 @@ public class ConsignmentConstant {
   public static final String CNOTE = "cnote";
   public static final String SHORT_URL = "shortUrl";
   public static final String URL = "url";
+  public static final String METADATA = "metadata";
 }
