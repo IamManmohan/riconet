@@ -18,7 +18,6 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
-import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,11 +73,11 @@ public class ApiServiceUtils {
         }
       };
 
-  public static final Map<String, ClientConsignmentMetadata> CNOTE_TO_METADATA_MAP =
-      new HashMap<String, ClientConsignmentMetadata>() {
+  public static final Map<String, Map<String, String>> CNOTE_TO_METADATA_MAP =
+      new HashMap<String, Map<String, String>>() {
         {
-          put("2000120001", new ClientConsignmentMetadata());
-          put("2000220002", new ClientConsignmentMetadata());
+          put("2000120001", new HashMap<>());
+          put("2000220002", new HashMap<>());
         }
       };
 
@@ -220,16 +219,6 @@ public class ApiServiceUtils {
       idToCnoteMap.put(id, cnoteList.get(ids.indexOf(id)));
     }
     return idToCnoteMap;
-  }
-
-  public static List<ClientConsignmentMetadata> getDummyMetadataList(List<Long> ids) {
-    List<ClientConsignmentMetadata> metadataList = new ArrayList<>();
-    for (Long id : ids) {
-      ClientConsignmentMetadata metadata = new ClientConsignmentMetadata();
-      metadata.setConsignmentId(id);
-      metadataList.add(metadata);
-    }
-    return metadataList;
   }
 
   public static List<Box> getDummyBoxList(List<Long> Ids, List<String> Cnotes) {

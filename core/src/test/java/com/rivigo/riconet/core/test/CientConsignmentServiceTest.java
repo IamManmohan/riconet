@@ -1,12 +1,18 @@
 package com.rivigo.riconet.core.test;
 
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
+
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.impl.ClientConsignmentServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.common.model.mongo.ClientConsignmentMetadata;
-import com.rivigo.zoom.common.repository.mongo.ClientConsignmentMetadataRepository;
+import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
+import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
+import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
+import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
+import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
@@ -27,7 +33,9 @@ public class CientConsignmentServiceTest {
 
   @Mock private ConsignmentService consignmentService;
 
-  @Mock private ClientConsignmentMetadataRepository clientConsignmentMetadataRepository;
+  @Mock private ConsignmentCustomFieldMetadataRepository consignmentCustomFieldMetadataRepository;
+
+  @Mock private ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
 
   @InjectMocks private ClientConsignmentServiceImpl clientConsignmentService;
 
@@ -37,8 +45,14 @@ public class CientConsignmentServiceTest {
     Mockito.when(consignmentService.getIdToCnoteMap(CNOTES))
         .thenReturn(ApiServiceUtils.getDummyIdToCnoteMap(CNOTES, Ids));
 
-    Mockito.when(clientConsignmentMetadataRepository.findByConsignmentIdIn(Ids))
-        .thenReturn(ApiServiceUtils.getDummyMetadataList(Ids));
+    ConsignmentCustomFieldMetadata consignmentCustomFieldMetadata =
+        new ConsignmentCustomFieldMetadata();
+    consignmentCustomFieldMetadata.setId(12L);
+    Mockito.when(
+            consignmentCustomFieldMetadataRepository
+                .findByCustomFieldsMetadataIdentifierAndFieldName(
+                    CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, METADATA))
+        .thenReturn(consignmentCustomFieldMetadata);
 
     Mockito.when(boxRepository.findByConsignmentIdIn(Ids))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
@@ -49,14 +63,23 @@ public class CientConsignmentServiceTest {
 
   @Test
   public void getCnoteToConsignmentMetadataMapFromCnoteListTest() {
-    Map<String, ClientConsignmentMetadata> cnoteToMetadataMapOriginal =
-        ApiServiceUtils.CNOTE_TO_METADATA_MAP;
-    Map<String, ClientConsignmentMetadata> cnoteToMetadataMapActual =
-        clientConsignmentService.getCnoteToConsignmentMetadataMapFromCnoteList(CNOTES);
+    Map<String, String> map = new HashMap<>();
+    map.put("key", "val");
+    ConsignmentCustomFieldValue consignmentCustomFieldValue = new ConsignmentCustomFieldValue();
+    consignmentCustomFieldValue.setConsignmentId(1L);
+    consignmentCustomFieldValue.setJsonValue(map);
+    ConsignmentCustomFieldValue consignmentCustomFieldValue1 = new ConsignmentCustomFieldValue();
+    consignmentCustomFieldValue1.setConsignmentId(2L);
+    consignmentCustomFieldValue1.setJsonValue(map);
+    Mockito.when(
+            consignmentCustomFieldValueRepository.findByConsignmentIdInAndMetadataIdAndIsActiveTrue(
+                Mockito.any(), Mockito.any()))
+        .thenReturn(Arrays.asList(consignmentCustomFieldValue, consignmentCustomFieldValue1));
 
-    Assert.assertEquals(cnoteToMetadataMapOriginal.size(), cnoteToMetadataMapActual.size());
-    Assert.assertEquals(
-        cnoteToMetadataMapOriginal.keySet().size(), cnoteToMetadataMapActual.keySet().size());
+    Map<String, Map<String, String>> cnoteToMetadataMapOriginal =
+        clientConsignmentService.getCnoteToConsignmentMetadataMapFromCnoteList(CNOTES);
+    Assert.assertEquals("val", cnoteToMetadataMapOriginal.get(CNOTES.get(0)).get("key"));
+    Assert.assertEquals("val", cnoteToMetadataMapOriginal.get(CNOTES.get(1)).get("key"));
   }
 
   @Test
