@@ -1,19 +1,19 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.rivigo.riconet.core.constants.ReasonConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
-import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
+import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
-import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
+import com.rivigo.zoom.common.model.PaymentDetailV2;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,8 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
   private final ConsignmentService consignmentService;
 
   private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+
+  private final PaymentDetailV2Service paymentDetailV2Service;
 
   private void consumeHandoverTicketAction(
       TicketDTO ticketDTO, String cnote, String requestAction) {
@@ -122,14 +124,15 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
       // knock off
       zoomBackendAPIClientService.handleKnockOffRequest(entityId);
     } else {
-      // Add delivery blocker
-      zoomBackendAPIClientService.handleConsignmentBlocker(
-          ConsignmentBlockerRequestDTO.builder()
-              .consignmentId(consignmentService.getIdByCnote(entityId))
-              .requestType(ConsignmentBlockerRequestType.BLOCK)
-              .reason(ReasonConstant.BANK_TRANSFER_BLOCKER_REASON)
-              .subReason(ReasonConstant.BANK_TRANSFER_BLOCKER_SUB_REASON)
-              .isActive(Boolean.TRUE)
+      // Mark recovery
+      PaymentDetailV2 paymentDetailV2 =
+          paymentDetailV2Service.getByConsignmentId(consignmentService.getIdByCnote(entityId));
+      zoomBackendAPIClientService.markRecoveryPending(
+          ChequeBounceDTO.builder()
+              .amount(paymentDetailV2.getTotalAmount())
+              .bankName(paymentDetailV2.getBankName())
+              .chequeNumber(paymentDetailV2.getTransactionReferenceNo())
+              .cnote(entityId)
               .build());
     }
   }

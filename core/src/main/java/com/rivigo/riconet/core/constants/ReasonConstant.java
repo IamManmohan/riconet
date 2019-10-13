@@ -20,6 +20,4 @@ public class ReasonConstant {
       "Consignment Qc measurement is not complete";
   public static final String QC_MEASUREMENT_BLOCKER_SUB_REASON =
       "Consignment Qc measurement is not complete";
-  public static final String BANK_TRANSFER_BLOCKER_REASON = "Bank Transfer Payment issue";
-  public static final String BANK_TRANSFER_BLOCKER_SUB_REASON = "Rejected in audit";
 }

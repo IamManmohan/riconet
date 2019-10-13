@@ -1,4 +1,4 @@
-package com.rivigo.riconet.event.dto;
+package com.rivigo.riconet.core.dto;
 
 import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;

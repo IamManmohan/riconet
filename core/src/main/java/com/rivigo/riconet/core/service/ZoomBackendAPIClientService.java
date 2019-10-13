@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
+import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
@@ -51,4 +52,6 @@ public interface ZoomBackendAPIClientService {
   JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO);
 
   JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO);
+
+  JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
 }

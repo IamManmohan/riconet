@@ -24,7 +24,7 @@ public class ConsignmentBlockUnblockConsumerTest {
 
   @InjectMocks
   private ConsignmentBlockUnblockService consignmentBlockUnblockService =
-      new ConsignmentBlockUnblockServiceImpl(apiClientService);
+      new ConsignmentBlockUnblockServiceImpl(apiClientService, zoomBackendAPIClientService);
 
   @InjectMocks
   private ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer =
