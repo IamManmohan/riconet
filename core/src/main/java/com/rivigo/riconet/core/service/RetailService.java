@@ -1,9 +1,9 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.notification.RetailNotification;
 import com.rivigo.zoom.common.dto.RetailNotificationDTO;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
-import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;

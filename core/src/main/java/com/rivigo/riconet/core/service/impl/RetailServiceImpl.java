@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.notification.RetailNotification;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -30,7 +31,6 @@ import com.rivigo.zoom.common.model.StockAccumulator;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.model.mongo.RetailNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -258,7 +258,6 @@ public class RetailServiceImpl implements RetailService {
           processCnCreateUpdateNotification(
               notification, consigneeSmsTemplate, consignorSmsTemplate);
         } else {
-
           String consignorSmsTemplate =
               zoomPropertyService.getString(
                   ZoomPropertyName.RETAIL_PREPAID_CN_CREATION_CONSIGNOR_SMS_STRING);

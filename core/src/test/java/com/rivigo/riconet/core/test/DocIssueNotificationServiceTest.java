@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.test;
 
+import com.rivigo.riconet.core.dto.notification.DocumentIssueNotification;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
@@ -9,7 +10,6 @@ import com.rivigo.zoom.common.enums.PartnerType;
 import com.rivigo.zoom.common.enums.ZoomTripType;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
-import com.rivigo.zoom.common.model.mongo.DocumentIssueNotification;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleRepository;
 import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
 import com.rivigo.zoom.exceptions.ZoomException;

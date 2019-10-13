@@ -1,8 +1,8 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.notification.DEPSNotification;
 import com.rivigo.zoom.common.dto.DEPSNotificationContext;
 import com.rivigo.zoom.common.dto.DEPSNotificationDTO;
-import com.rivigo.zoom.common.model.mongo.DEPSNotification;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

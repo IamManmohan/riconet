@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.EmailConstant;
+import com.rivigo.riconet.core.dto.notification.AppointmentNotification;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentAppointmentService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
@@ -23,7 +24,6 @@ import com.rivigo.zoom.common.model.ConsignmentHistory;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
-import com.rivigo.zoom.common.model.mongo.AppointmentNotification;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentAppointmentRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
