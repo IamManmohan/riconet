@@ -25,7 +25,5 @@ public interface ZoomTicketingAPIClientService {
 
   void performTicketAction(TicketActionDTO ticketActionDTO);
 
-  void performTicketAction(TicketActionDTO ticketActionDTO);
-
   TicketDTO getTicketByTicketId(Long ticketId);
 }
