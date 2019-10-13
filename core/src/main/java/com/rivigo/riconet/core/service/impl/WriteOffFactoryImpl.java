@@ -2,10 +2,10 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
-import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.WriteOffFactory;
-import com.rivigo.riconet.core.service.WriteOffService;
+import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +16,23 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WriteOffFactoryImpl implements WriteOffFactory {
 
-  private final WriteOffService writeOffService;
-
   private final TicketingService ticketingService;
 
-  private final ConsignmentReadOnlyService consignmentService;
+  private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  private void consumeHandoverTicketAction(TicketDTO ticketDTO, String cnote, String actionValue) {
+  private void consumeHandoverTicketAction(
+      TicketDTO ticketDTO, String cnote, WriteOffRequestAction writeOffRequestAction) {
     if (!ZoomTicketingConstant.WRITEOFF_TYPE_ID.equals(ticketDTO.getTypeId())) {
       log.info("Ticket is not write-off ticket");
       return;
     }
-    writeOffService.writeOff(cnote, actionValue, ticketDTO);
+    log.info("Initiating write off for {}, request status : {}", cnote, writeOffRequestAction);
+    zoomBackendAPIClientService.handleApproveRejectRequest(cnote, writeOffRequestAction);
     ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
   }
 
   private void consumePickupWriteOffAction(
-      TicketDTO ticketDTO, String pickupId, String actionValue) {
+      TicketDTO ticketDTO, String pickupId, WriteOffRequestAction writeOffRequestAction) {
 
     // Validate ticket type
     if (!ZoomTicketingConstant.PICKUP_WRITE_OFF_TYPE_ID.equals(ticketDTO.getTypeId())) {
@@ -40,12 +40,21 @@ public class WriteOffFactoryImpl implements WriteOffFactory {
       return;
     }
 
-    // Move this to backend when writeoff API can accept multiple cnotes
-    consignmentService
-        .findConsignmentsByPickupId(Long.valueOf(pickupId))
-        .forEach(cn -> writeOffService.writeOff(cn.getCnote(), actionValue, ticketDTO));
-
+    log.info(
+        "Initiating pickup write off for {}, request status : {}", pickupId, writeOffRequestAction);
+    zoomBackendAPIClientService.handlePickupWriteOffApproveRejectRequest(
+        pickupId, writeOffRequestAction);
     ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
+  }
+
+  private WriteOffRequestAction getWriteOffRequestActionFromTicketAction(String actionValue) {
+    WriteOffRequestAction writeOffRequestAction;
+    if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
+      writeOffRequestAction = WriteOffRequestAction.APPROVE;
+    } else {
+      writeOffRequestAction = WriteOffRequestAction.REJECT;
+    }
+    return writeOffRequestAction;
   }
 
   @Override
@@ -55,10 +64,16 @@ public class WriteOffFactoryImpl implements WriteOffFactory {
     }
     switch (String.valueOf(actionName)) {
       case ZoomTicketingConstant.WRITE_OFF_ACTION_NAME:
-        consumeHandoverTicketAction(ticketingService.getById(ticketId), entityId, actionValue);
+        consumeHandoverTicketAction(
+            ticketingService.getById(ticketId),
+            entityId,
+            getWriteOffRequestActionFromTicketAction(actionValue));
         break;
       case ZoomTicketingConstant.PICKUP_WRITE_OFF_ACTION_NAME:
-        consumePickupWriteOffAction(ticketingService.getById(ticketId), entityId, actionValue);
+        consumePickupWriteOffAction(
+            ticketingService.getById(ticketId),
+            entityId,
+            getWriteOffRequestActionFromTicketAction(actionValue));
         break;
       default:
         log.info("Action ignored since it is not related to Write Off - {}", actionName);

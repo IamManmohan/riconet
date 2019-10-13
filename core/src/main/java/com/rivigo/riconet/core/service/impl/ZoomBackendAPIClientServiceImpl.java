@@ -116,6 +116,23 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
+  public void handlePickupWriteOffApproveRejectRequest(
+      String pickupId, WriteOffRequestAction writeOffRequestAction) {
+    JsonNode responseJson;
+    String url =
+        UrlConstant.ZOOM_BACKEND_PICKUP_WRITE_OFF_REQUEST_ONBOARDING
+            .replace("{pickupId}", pickupId)
+            .replace("{requestAction}", writeOffRequestAction.name());
+    try {
+      responseJson = apiClientService.getEntity(null, HttpMethod.PUT, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while handling Writeoff request with pickup: {} ", pickupId, e);
+      throw new ZoomException("Error while handling Writeoff request with pickup: %s", pickupId);
+    }
+    apiClientService.parseJsonNode(responseJson, null);
+  }
+
+  @Override
   public void unloadAssetCN(Long cnId) {
     String url = UrlConstant.ZOOM_BACKEND_ASSET_ONBOARDING.replace("{cnId}", cnId.toString());
     try {

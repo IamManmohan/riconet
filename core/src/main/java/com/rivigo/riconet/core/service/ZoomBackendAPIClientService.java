@@ -17,6 +17,9 @@ public interface ZoomBackendAPIClientService {
 
   void recalculateCpdOfBf(Long consignmentId);
 
+  void handlePickupWriteOffApproveRejectRequest(
+      String pickupId, WriteOffRequestAction writeOffRequestAction);
+
   void unloadAssetCN(Long cnId);
 
   ClientDTO addClient(ClientDTO clientDTO);
