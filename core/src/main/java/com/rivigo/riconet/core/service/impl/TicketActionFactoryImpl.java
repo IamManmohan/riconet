@@ -8,19 +8,18 @@ import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentService;
-import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.TicketActionFactory;
+import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -121,7 +120,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     log.info("Initiating knock off for {}, request status : {}", entityId, actionValue);
     if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
       // knock off
-      zoomBackendAPIClientService.handleKnockOffApproveRejectRequest(entityId, actionValue);
+      zoomBackendAPIClientService.handleKnockOffRequest(entityId);
     } else {
       // Add delivery blocker
       zoomBackendAPIClientService.handleConsignmentBlocker(

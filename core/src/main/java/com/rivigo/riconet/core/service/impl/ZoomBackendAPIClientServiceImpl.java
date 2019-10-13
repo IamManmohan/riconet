@@ -116,12 +116,9 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handleKnockOffApproveRejectRequest(String cnote, String actionValue) {
+  public void handleKnockOffRequest(String cnote) {
     JsonNode responseJson;
-    String url =
-        UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST
-            .replace("{cnote}", cnote)
-            .replace("{requestAction}", actionValue);
+    String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
     try {
       responseJson = apiClientService.getEntity(null, HttpMethod.PUT, url, null, backendBaseUrl);
     } catch (IOException e) {

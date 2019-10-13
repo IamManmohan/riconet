@@ -33,9 +33,10 @@ public interface ZoomBackendAPIClientService {
 
   void handleQcBlockerClosure(Long ticketId);
 
-  void handleWriteOffApproveRejectRequest(String cnote, WriteOffRequestAction writeOffRequestAction);
+  void handleWriteOffApproveRejectRequest(
+      String cnote, WriteOffRequestAction writeOffRequestAction);
 
-  void handleKnockOffApproveRejectRequest(String cnote, String actionValue);
+  void handleKnockOffRequest(String cnote);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 

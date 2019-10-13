@@ -91,7 +91,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Nullable
   @Override
   public Long getIdByCnote(String cnote) {
-    return Optional.ofNullable(consignmentRepo.findIdByCnote(cnote)).map(BigInteger::longValue).orElse(null);
+    return Optional.ofNullable(consignmentRepo.findIdByCnote(cnote))
+        .map(BigInteger::longValue)
+        .orElse(null);
   }
 
   @Override

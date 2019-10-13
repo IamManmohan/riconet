@@ -7,7 +7,6 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
 import java.util.List;
 import java.util.Map;
-
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
