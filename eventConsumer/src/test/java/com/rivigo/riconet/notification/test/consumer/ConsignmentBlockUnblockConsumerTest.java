@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
+import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import com.rivigo.riconet.event.service.impl.ConsignmentBlockUnblockServiceImpl;
@@ -21,6 +22,9 @@ public class ConsignmentBlockUnblockConsumerTest {
   private ObjectMapper objectMapper = new ObjectMapper();
 
   private ApiClientService apiClientService = Mockito.mock(ApiClientService.class);
+
+  private ZoomBackendAPIClientService zoomBackendAPIClientService =
+      Mockito.mock(ZoomBackendAPIClientService.class);
 
   @InjectMocks
   private ConsignmentBlockUnblockService consignmentBlockUnblockService =
