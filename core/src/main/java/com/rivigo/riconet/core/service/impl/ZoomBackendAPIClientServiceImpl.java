@@ -117,11 +117,16 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handleKnockOffRequest(String cnote) {
+  public void handleKnockOffRequest(
+      String cnote, String bankAccountReference, String transactionReferenceNo) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+    queryParams.add("transactionReferenceNo", transactionReferenceNo);
+    queryParams.add("bankAccountReference", bankAccountReference);
     try {
-      responseJson = apiClientService.getEntity(null, HttpMethod.PUT, url, null, backendBaseUrl);
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.PUT, url, queryParams, backendBaseUrl);
     } catch (IOException e) {
       log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
       throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);

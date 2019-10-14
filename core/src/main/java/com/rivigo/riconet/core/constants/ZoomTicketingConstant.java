@@ -77,7 +77,6 @@ public class ZoomTicketingConstant {
   public static final String UNDERSCORE = "_";
 
   public static final String TICKET_ACTION_VALUE_APPROVE = "approve";
-  public static final String TICKET_ACTION_VALUE_REJECT = "reject";
 
   public static final String TICKET_QC_BLOCKER_FAILURE_COMMENT =
       "Ticket action failed because of %s . Reopened now. Please take appropriate action and try again";

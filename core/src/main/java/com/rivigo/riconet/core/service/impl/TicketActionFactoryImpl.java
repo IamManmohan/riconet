@@ -12,14 +12,16 @@ import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
+import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -99,40 +101,51 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     }
     switch (String.valueOf(actionName)) {
       case ZoomTicketingConstant.WRITE_OFF_ACTION_NAME:
-        consumeHandoverTicketAction(ticketingService.getById(ticketId), entityId, actionValue);
+        consumeHandoverTicketAction(
+            ticketingService.getRequiredById(ticketId), entityId, actionValue);
         break;
       case ZoomTicketingConstant.PICKUP_BANK_TRANSFER_ACTION_NAME:
-        consumePickupBankTransferAction(ticketingService.getById(ticketId), entityId, actionValue);
+        consumePickupBankTransferAction(
+            ticketingService.getRequiredById(ticketId), entityId, actionValue);
         break;
       case ZoomTicketingConstant.BANK_TRANSFER_ACTION_NAME:
-        consumeBankTransferAction(ticketingService.getById(ticketId), entityId, actionValue);
+        consumeBankTransferAction(
+            ticketingService.getRequiredById(ticketId), entityId, actionValue);
         break;
       default:
         log.info("Action ignored since it is not related to Write Off - {}", actionName);
     }
   }
 
-  private void consumeBankTransferAction(TicketDTO ticketDTO, String entityId, String actionValue) {
+  private void consumeBankTransferAction(TicketDTO ticketDTO, String cnote, String actionValue) {
     // Validate ticket type
     if (!ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.equals(ticketDTO.getTypeId())) {
       log.info("Ticket {} is not bank-transfer ticket", ticketDTO.getId());
       return;
     }
 
-    log.info("Initiating knock off for {}, request status : {}", entityId, actionValue);
+    PaymentDetailV2 paymentDetailV2 =
+        paymentDetailV2Service.getByConsignmentId(consignmentService.getIdByCnote(cnote));
+
+    if (paymentDetailV2.getPaymentType() != PaymentType.BANK_TRANSFER) {
+      log.info(
+          "Current payment type for cn: {} is not bank transfer. Will not trigger auto knock-off/recovery",
+          cnote);
+      return;
+    }
+
+    log.info("Initiating knock off for {}, request status : {}", cnote, actionValue);
     if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
       // knock off
-      zoomBackendAPIClientService.handleKnockOffRequest(entityId);
+      zoomBackendAPIClientService.handleKnockOffRequest(cnote, paymentDetailV2.getBankAccountReference(), paymentDetailV2.getTransactionReferenceNo());
     } else {
       // Mark recovery
-      PaymentDetailV2 paymentDetailV2 =
-          paymentDetailV2Service.getByConsignmentId(consignmentService.getIdByCnote(entityId));
       zoomBackendAPIClientService.markRecoveryPending(
           ChequeBounceDTO.builder()
               .amount(paymentDetailV2.getTotalAmount())
               .bankName(paymentDetailV2.getBankName())
               .chequeNumber(paymentDetailV2.getTransactionReferenceNo())
-              .cnote(entityId)
+              .cnote(cnote)
               .build());
     }
   }
