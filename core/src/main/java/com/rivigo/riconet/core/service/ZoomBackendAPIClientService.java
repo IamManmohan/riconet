@@ -37,7 +37,8 @@ public interface ZoomBackendAPIClientService {
   void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction);
 
-  void handleKnockOffRequest(String cnote, String bankAccountReference, String transactionReferenceNo);
+  void handleKnockOffRequest(
+      String cnote, String bankAccountReference, String transactionReferenceNo);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 
