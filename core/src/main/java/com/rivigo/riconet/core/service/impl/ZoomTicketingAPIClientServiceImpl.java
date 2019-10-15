@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
@@ -12,9 +11,6 @@ import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +21,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @Slf4j
 public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClientService {
-
-  @Autowired private ObjectMapper objectMapper;
 
   @Value("${zoom.ticketing.url}")
   private String ticketingBaseUrl;
@@ -39,7 +37,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   private static final String TICKET_ID = "ticketId";
 
   @Override
-  public List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId) {
+  public List<TicketDTO> getByCnoteAndType(String cnote, List<String> typeId) {
     if (StringUtils.isEmpty(cnote)) {
       throw new ZoomException("Please provide a valid cnote");
     }
@@ -62,7 +60,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   }
 
   @Override
-  public List<TicketDTO> getTicketsByEntityInAndType(List<String> entityIdList, String typeId) {
+  public List<TicketDTO> getByEntityInAndType(List<String> entityIdList, String typeId) {
     if (CollectionUtils.isEmpty(entityIdList)) {
       throw new ZoomException("Please provide a valid ticket entities");
     }
@@ -121,6 +119,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     return (TicketDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
+  @Override
   public void makeComment(Long ticketId, String comment) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
@@ -191,7 +190,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   }
 
   @Override
-  public void performTicketAction(TicketActionDTO ticketActionDTO) {
+  public void performAction(TicketActionDTO ticketActionDTO) {
     String url = UrlConstant.ZOOM_TICKETING_TICKET_ACTION;
     try {
       apiClientService.getEntity(ticketActionDTO, HttpMethod.POST, url, null, ticketingBaseUrl);
@@ -211,7 +210,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   }
 
   @Override
-  public TicketDTO getTicketByTicketId(Long ticketId) {
+  public TicketDTO getById(Long ticketId) {
     if (null == ticketId) {
       throw new ZoomException("null ticketId cannot be processed");
     }

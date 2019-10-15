@@ -68,7 +68,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     List<ConsignmentReadOnly> consignments =
         consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId));
     zoomTicketingAPIClientService
-        .getTicketsByEntityInAndType(
+        .getByEntityInAndType(
             consignments.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()),
             ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
         .stream()
@@ -79,7 +79,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
                     .actionValue(actionValue)
                     .ticketId(t.getId())
                     .build())
-        .forEach(zoomTicketingAPIClientService::performTicketAction);
+        .forEach(zoomTicketingAPIClientService::performAction);
     ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
   }
 

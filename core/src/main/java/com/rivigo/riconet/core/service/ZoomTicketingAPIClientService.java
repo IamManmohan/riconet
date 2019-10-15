@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ZoomTicketingAPIClientService {
 
-  List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId);
+  List<TicketDTO> getByCnoteAndType(String cnote, List<String> typeId);
 
-  List<TicketDTO> getTicketsByEntityInAndType(List<String> entityIdList, String typeId);
+  List<TicketDTO> getByEntityInAndType(List<String> entityIdList, String typeId);
 
   TicketDTO createTicket(TicketDTO ticketDTO);
 
@@ -23,7 +23,7 @@ public interface ZoomTicketingAPIClientService {
 
   List<TicketCommentDTO> getComments(Long ticketId);
 
-  void performTicketAction(TicketActionDTO ticketActionDTO);
+  void performAction(TicketActionDTO ticketActionDTO);
 
-  TicketDTO getTicketByTicketId(Long ticketId);
+  TicketDTO getById(Long ticketId);
 }
