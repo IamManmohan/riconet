@@ -11,6 +11,9 @@ import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +23,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 @Service
 @Slf4j

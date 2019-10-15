@@ -712,8 +712,7 @@ public class QcServiceImpl implements QcService {
         consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
     List<TicketDTO> tickets =
-        zoomTicketingAPIClientService.getByCnoteAndType(
-            consignment.getCnote(), getQcTicketTypes());
+        zoomTicketingAPIClientService.getByCnoteAndType(consignment.getCnote(), getQcTicketTypes());
     tickets.forEach(
         ticketDTO -> {
           if (!TicketStatus.CLOSED.equals(ticketDTO.getStatus())) {
