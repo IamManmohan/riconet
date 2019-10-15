@@ -131,7 +131,7 @@ public class EventTriggerService {
                 .orElse(null));
         break;
       case BANK_TRANSFER_INITIATED:
-        bankTransferService.createBankTransferTicket(notificationDTO.getMetadata());
+        bankTransferService.createTicket(notificationDTO.getMetadata());
         break;
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(

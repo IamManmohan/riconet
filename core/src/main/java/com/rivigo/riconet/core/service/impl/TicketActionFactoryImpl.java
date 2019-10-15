@@ -66,7 +66,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         pickupId,
         actionValue);
     List<ConsignmentReadOnly> consignments =
-        consignmentReadOnlyService.findConsignmentsByPickupId(Long.parseLong(pickupId));
+        consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId));
     zoomTicketingAPIClientService
         .getTicketsByEntityInAndType(
             consignments.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()),

@@ -21,7 +21,7 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
   }
 
   @Override
-  public List<ConsignmentReadOnly> findConsignmentsByPickupId(Long pickupId) {
+  public List<ConsignmentReadOnly> findByPickupId(Long pickupId) {
     return consignmentRepo.findByPickupIdAndIsActive(pickupId, 1);
   }
 }

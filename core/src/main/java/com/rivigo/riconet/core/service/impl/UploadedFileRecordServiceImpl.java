@@ -21,7 +21,7 @@ public class UploadedFileRecordServiceImpl implements UploadedFileRecordService 
 
   @Override
   @Transactional(readOnly = true)
-  public List<UploadedFileRecord> getUploadedFileRecordByEntityAndFileType(
+  public List<UploadedFileRecord> getByEntityAndFileType(
       EntityType entityType, String entityId, FileTypes fileTypes) {
     return uploadedFileRecordRepository.findByEntityTypeAndEntityIdAndFileTypeAndIsActiveTrue(
         entityType, entityId, fileTypes);

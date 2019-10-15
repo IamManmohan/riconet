@@ -74,7 +74,7 @@ public class ClientApiIntegrationServiceTest {
     ReflectionTestUtils.setField(clientApiIntegrationService, "objectMapper", objectMapper);
     Mockito.when(pickupRepository.findOne(ApiServiceUtils.PICKUP_ID))
         .thenReturn(ApiServiceUtils.getDummyPickup());
-    Mockito.when(consignmentReadOnlyService.findConsignmentsByPickupId(ApiServiceUtils.PICKUP_ID))
+    Mockito.when(consignmentReadOnlyService.findByPickupId(ApiServiceUtils.PICKUP_ID))
         .thenReturn(
             CNOTES
                 .stream()

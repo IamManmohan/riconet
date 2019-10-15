@@ -41,7 +41,7 @@ public class BankTransferServiceImpl implements BankTransferService {
   private final UploadedFileRecordService uploadedFileRecordService;
 
   @Override
-  public void createBankTransferTicket(Map<String, String> metadata) {
+  public void createTicket(Map<String, String> metadata) {
     PaymentDetailV2 paymentDetailV2 = objectMapper.convertValue(metadata, PaymentDetailV2.class);
     ConsignmentReadOnly consignment =
         consignmentReadOnlyService
@@ -54,11 +54,11 @@ public class BankTransferServiceImpl implements BankTransferService {
 
   private String getS3Url(ConsignmentReadOnly consignment) {
     List<UploadedFileRecord> uploadedFiles =
-        uploadedFileRecordService.getUploadedFileRecordByEntityAndFileType(
+        uploadedFileRecordService.getByEntityAndFileType(
             EntityType.CONSIGNMENT, consignment.getCnote(), FileTypes.BANK_TRANSFER);
     if (CollectionUtils.isEmpty(uploadedFiles)) {
       uploadedFiles =
-          uploadedFileRecordService.getUploadedFileRecordByEntityAndFileType(
+          uploadedFileRecordService.getByEntityAndFileType(
               EntityType.PICKUP,
               String.valueOf(consignment.getPickupId()),
               FileTypes.BANK_TRANSFER);

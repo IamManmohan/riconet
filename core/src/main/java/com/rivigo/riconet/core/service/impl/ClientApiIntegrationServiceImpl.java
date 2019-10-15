@@ -167,7 +167,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
       NotificationDTO notificationDTO, Boolean addBarcodes) {
     Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
     List<ConsignmentReadOnly> cnList =
-        consignmentReadOnlyService.findConsignmentsByPickupId(notificationDTO.getEntityId());
+        consignmentReadOnlyService.findByPickupId(notificationDTO.getEntityId());
     Map<String, List<String>> cnoteToBarcodesMap =
         clientConsignmentService.getCnoteToBarcodeMapFromCnoteList(
             cnList.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()));

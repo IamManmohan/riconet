@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface UploadedFileRecordService {
 
-  List<UploadedFileRecord> getUploadedFileRecordByEntityAndFileType(
+  List<UploadedFileRecord> getByEntityAndFileType(
       EntityType entityType, String entityId, FileTypes fileTypes);
 }
