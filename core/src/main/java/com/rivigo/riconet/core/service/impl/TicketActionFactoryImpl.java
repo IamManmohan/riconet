@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
+import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
@@ -15,12 +16,13 @@ import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -138,8 +140,9 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
       // knock off
       zoomBackendAPIClientService.handleKnockOffRequest(
           cnote,
-          paymentDetailV2.getBankAccountReference(),
-          paymentDetailV2.getTransactionReferenceNo());
+          new BankTransferRequestDTO(
+              paymentDetailV2.getBankAccountReference(),
+              paymentDetailV2.getTransactionReferenceNo()));
     } else {
       // Mark recovery
       zoomBackendAPIClientService.markRecoveryPending(

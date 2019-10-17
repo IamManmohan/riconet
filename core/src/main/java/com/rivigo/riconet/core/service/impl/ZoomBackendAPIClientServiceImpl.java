@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
+import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
@@ -112,24 +113,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       log.error("Error while handling Writeoff request with cnote: {} ", cnote, e);
       throw new ZoomException("Error while handling Writeoff request with cnote: %s", cnote);
-    }
-    apiClientService.parseJsonNode(responseJson, null);
-  }
-
-  @Override
-  public void handleKnockOffRequest(
-      String cnote, String bankAccountReference, String transactionReferenceNo) {
-    JsonNode responseJson;
-    String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
-    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-    queryParams.add("transactionReferenceNo", transactionReferenceNo);
-    queryParams.add("bankAccountReference", bankAccountReference);
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.PUT, url, queryParams, backendBaseUrl);
-    } catch (IOException e) {
-      log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
-      throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
     }
     apiClientService.parseJsonNode(responseJson, null);
   }
@@ -401,5 +384,20 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
     return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              bankTransferRequestDTO, HttpMethod.PUT, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
+      throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
+    }
+    apiClientService.parseJsonNode(responseJson, null);
   }
 }

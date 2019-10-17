@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
@@ -37,9 +38,6 @@ public interface ZoomBackendAPIClientService {
   void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction);
 
-  void handleKnockOffRequest(
-      String cnote, String bankAccountReference, String transactionReferenceNo);
-
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 
   void setPriorityMapping(String cnote, PriorityReasonType reason);
@@ -55,4 +53,6 @@ public interface ZoomBackendAPIClientService {
   JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO);
 
   JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
+
+  void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 }
