@@ -31,20 +31,21 @@ ENV COMMON_JAVA_OPTS="$EXTRA_ARGS -Xms$XMX_XMS_VALUE \
     -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL \
     -Dtopic.prefix.out=$OUT_TOPIC_PREFIX"
 
-# JMX Args
-ENV COMMON_JAVA_OPTS=" $COMMON_JAVA_OPTS \
--Dcom.sun.management.jmxremote.rmi.port=9090 \
--Dcom.sun.management.jmxremote=true \
--Dcom.sun.management.jmxremote.port=9090 \
--Dcom.sun.management.jmxremote.ssl=false \
--Dcom.sun.management.jmxremote.authenticate=false \
--Dcom.sun.management.jmxremote.local.only=false \
--Djava.rmi.server.hostname=10.8.77.29 "
 
 ENV EVENT_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+                -Dcom.sun.management.jmxremote.authenticate=false \
+                -Dcom.sun.management.jmxremote.ssl=false \
+                -Dcom.sun.management.jmxremote.port=9090 \
+                -Dcom.sun.management.jmxremote.rmi.port=9090 \
+                -Djava.rmi.server.hostname=127.0.0.1 \
     -Dspring.config.location=/etc/zoom/event/application_core.properties,/etc/zoom/event/application_event.properties,/etc/zoom/event/db.properties"
 
 ENV NOTIFICATION_JAVA_OPTS=$COMMON_JAVA_OPTS" \
+                -Dcom.sun.management.jmxremote.authenticate=false \
+                -Dcom.sun.management.jmxremote.ssl=false \
+                -Dcom.sun.management.jmxremote.port=9091 \
+                -Dcom.sun.management.jmxremote.rmi.port=9091 \
+                -Djava.rmi.server.hostname=127.0.0.1 \
     -Dspring.config.location=/etc/zoom/notification/application_core.properties,/etc/zoom/notification/application_notification.properties,/etc/zoom/notification/db.properties"
 
 
