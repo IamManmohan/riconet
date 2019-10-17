@@ -16,13 +16,12 @@ import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
