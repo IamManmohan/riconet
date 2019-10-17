@@ -44,9 +44,7 @@ public class BankTransferServiceImpl implements BankTransferService {
   public void createTicket(Map<String, String> metadata) {
     PaymentDetailV2 paymentDetailV2 = objectMapper.convertValue(metadata, PaymentDetailV2.class);
     ConsignmentReadOnly consignment =
-        consignmentReadOnlyService
-            .findConsignmentById(paymentDetailV2.getConsignmentId())
-            .orElseThrow(() -> new ZoomException("No consignment found with given id"));
+        consignmentReadOnlyService.findRequiredById(paymentDetailV2.getConsignmentId());
     String s3Url = getS3Url(consignment);
     zoomTicketingAPIClientService.createTicket(
         getTicketDTOForBankTransfer(consignment.getCnote(), paymentDetailV2, s3Url));

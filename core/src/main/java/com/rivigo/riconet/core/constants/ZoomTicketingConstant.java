@@ -19,7 +19,7 @@ public class ZoomTicketingConstant {
 
   public static final Long BANK_TRANSFER_TYPE_ID = 829L;
 
-  public static final Long PICKUP_BANK_TRANSFER_TICKET_TYPE_ID = 829L; // TODO: Get new Id
+  public static final Long PICKUP_BANK_TRANSFER_TICKET_TYPE_ID = 830L;
 
   public static final Long HQTR_LOCATION_ID = 9L;
 
@@ -33,7 +33,7 @@ public class ZoomTicketingConstant {
 
   public static final String PICKUP_BANK_TRANSFER_ACTION_NAME = "pickup_bank_transfer";
 
-  public static final String BANK_TRANSFER_ACTION_NAME = "bank_transfer";
+  public static final String BANK_TRANSFER_ACTION_NAME = "cnote_bank_transfer";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";
 

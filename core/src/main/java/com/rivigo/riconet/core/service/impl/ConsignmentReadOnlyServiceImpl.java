@@ -5,6 +5,8 @@ import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentReadOnlyRepository;
 import java.util.List;
 import java.util.Optional;
+
+import com.rivigo.zoom.exceptions.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,12 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
   @Override
   public Optional<ConsignmentReadOnly> findConsignmentById(Long id) {
     return Optional.ofNullable(consignmentRepo.findOne(id));
+  }
+
+  @Override
+  public ConsignmentReadOnly findRequiredById(Long id) {
+    return findConsignmentById(id)
+        .orElseThrow(() -> new ZoomException("No consignment found with id: %s", id));
   }
 
   @Override
