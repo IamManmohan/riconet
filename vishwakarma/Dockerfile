@@ -49,8 +49,8 @@ ENV NOTIFICATION_JAVA_OPTS=" $COMMON_JAVA_OPTS \
     -Dcom.sun.management.jmxremote.authenticate=false \
     -Dcom.sun.management.jmxremote.ssl=false \
     -Dcom.sun.management.jmxremote.local.only=false \
-    -Dcom.sun.management.jmxremote.port=1098 \
-    -Dcom.sun.management.jmxremote.rmi.port=1098 \
+    -Dcom.sun.management.jmxremote.port=1097 \
+    -Dcom.sun.management.jmxremote.rmi.port=1097 \
     -Djava.rmi.server.hostname=127.0.0.1 \
     -Dspring.config.location=/etc/zoom/notification/application_core.properties,/etc/zoom/notification/application_notification.properties,/etc/zoom/notification/db.properties"
 
