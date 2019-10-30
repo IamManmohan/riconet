@@ -2,16 +2,17 @@ package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.TemplateDTO;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 /** Created by aditya on 22/2/18. */
 @Slf4j
@@ -51,10 +52,19 @@ public class ZoomCommunicationsService {
     // fail
     // and exemption will not work by adding new events only to zoom property.
     // Best solution: Single common list be maintained in a communications commons
+
+    TemplateDTO template = null;
+    Boolean isTemplateV2 = false;
     try {
       NotificationDTO notificationDTO =
           objectMapper.readValue(
               zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
+      String templateString = zoomCommunicationsSMSDTO.getTemplateV2();
+      template =
+          StringUtils.isBlank(templateString)
+              ? null
+              : objectMapper.readValue(zoomCommunicationsSMSDTO.getTemplateV2(), TemplateDTO.class);
+      isTemplateV2 = notificationDTO.getIsTemplateV2();
       List<String> dndExemptedEvents =
           zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
       isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName());
@@ -79,10 +89,14 @@ public class ZoomCommunicationsService {
     int millisOfDay =
         DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
     if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
-      String returnValue =
-          smsService.sendSms(
-              zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
-      log.info("Return value from notificationService {}", returnValue);
+      if (Boolean.TRUE.equals(isTemplateV2)) {
+        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), template);
+      } else {
+        String returnValue =
+            smsService.sendSms(
+                zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
+        log.info("Return value from notificationService {}", returnValue);
+      }
     } else {
       log.info("Can not send sms as the current time is dnd time");
     }
