@@ -1,9 +1,10 @@
 package com.rivigo.riconet.core.dto;
 
-import java.util.HashMap;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -12,9 +13,11 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class TemplateDTO {
   private String name;
   private Integer version;
   private String language;
-  private Map<String, String> params = new HashMap<>();
+  private Map<String, String> params;
 }
