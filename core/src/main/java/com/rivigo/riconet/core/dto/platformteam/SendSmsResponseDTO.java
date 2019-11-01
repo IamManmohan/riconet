@@ -1,5 +1,6 @@
-package com.rivigo.riconet.core.dto;
+package com.rivigo.riconet.core.dto.platformteam;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ import lombok.ToString;
 public class SendSmsResponseDTO {
   private Long Code;
   private String Message;
+  private List<SmsIndividualResponseDTO> bulkResponse;
 }

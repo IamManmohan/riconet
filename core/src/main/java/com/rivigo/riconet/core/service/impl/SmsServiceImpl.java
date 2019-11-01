@@ -2,8 +2,9 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.rivigo.riconet.core.dto.SendSmsResponseDTO;
 import com.rivigo.riconet.core.dto.TemplateDTO;
+import com.rivigo.riconet.core.dto.platformteam.SendSmsRequestDTO;
+import com.rivigo.riconet.core.dto.platformteam.SendSmsResponseDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.SmsService;
@@ -43,9 +44,6 @@ public class SmsServiceImpl implements SmsService {
   @Value("${notification.root.url}")
   private String rootUrl;
 
-  @Value("${notification.root.url.v2}")
-  private String rootUrlV2;
-
   @Value("${notification.sms.api}")
   private String smsApi;
 
@@ -58,12 +56,17 @@ public class SmsServiceImpl implements SmsService {
   @Value("${notification.client.code}")
   private String notificationClientCode;
 
+  @Value("${notification.client.code.v2}")
+  private String notificationClientCodeV2;
+
   private final ZoomPropertyService zoomPropertyService;
   private final ObjectMapper objectMapper;
 
   @Qualifier("defaultRestClientUtilityServiceImpl")
   private final RestClientUtilityService restClientUtilityService;
 
+  @Override
+  @Deprecated
   public String sendSms(String mobileNo, String message) {
     Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
     if (Boolean.FALSE.equals(validateResponse.getFirst())) {
@@ -104,7 +107,7 @@ public class SmsServiceImpl implements SmsService {
 
   @Override
   public Boolean sendSmsV2(String mobileNo, TemplateDTO template) {
-    Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrlV2);
+    Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
     if (Boolean.FALSE.equals(validateResponse.getFirst())) {
       log.error("sms cannot be sent due to reason: {}", validateResponse.getSecond());
       return false;
@@ -114,15 +117,17 @@ public class SmsServiceImpl implements SmsService {
     }
 
     List<String> phoneNumbers = getPhoneNumbersBasedOnProfile(mobileNo);
-    HttpHeaders httpHeaders = restClientUtilityService.getHeaders();
+    SendSmsRequestDTO requestDto =
+        SendSmsRequestDTO.builder()
+            .client(notificationClientCodeV2)
+            .phoneNumbers(phoneNumbers)
+            .template(template)
+            .build();
+    HttpEntity httpEntity = new HttpEntity<>(requestDto, restClientUtilityService.getHeaders());
     SendSmsResponseDTO response =
         objectMapper.convertValue(
             restClientUtilityService
-                .executeRest(
-                    rootUrlV2 + smsApiV2,
-                    HttpMethod.POST,
-                    new HttpEntity(httpHeaders),
-                    Object.class)
+                .executeRest(rootUrl + smsApiV2, HttpMethod.POST, httpEntity, Object.class)
                 .orElseThrow(
                     () ->
                         new ZoomException(
@@ -131,20 +136,22 @@ public class SmsServiceImpl implements SmsService {
                             template.getName())),
             SendSmsResponseDTO.class);
 
-    if (StringUtils.isEmpty(response.getMessage()) && response.getCode() == 0L) {
-      log.debug(
-          "sms sent successfully to phoneNumbers: {}, templateName: {}",
+    if (response.getBulkResponse() == null) {
+      log.error(
+          "send sms failed for phoneNumbers: {}, templateName: {}, errorCode: {}, exceptionMessage: {}",
           phoneNumbers,
-          template.getName());
-      return true;
+          template.getName(),
+          response.getCode(),
+          response.getMessage());
+      return false;
     }
-    log.error(
-        "send sms failed for phoneNumbers: {}, templateName: {}, errorCode: {}, exceptionMessage: {}",
+    log.debug(
+        "sms sent successfully to phoneNumbers: {}, templateName: {}, Code: {}, bulkResponse: {}",
         phoneNumbers,
         template.getName(),
         response.getCode(),
-        response.getMessage());
-    return false;
+        response.getBulkResponse());
+    return true;
   }
 
   private Pair<Boolean, String> validateSendSms(String mobileNo, String rootUrl) {
