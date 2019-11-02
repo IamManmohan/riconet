@@ -67,6 +67,10 @@ public class SmsServiceImpl implements SmsService {
 
   @Override
   @Deprecated
+  /**
+   * use `sendSmsV2` for sending any new messages, as sendSms support sending messages only via
+   * message.
+   */
   public String sendSms(String mobileNo, String message) {
     Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
     if (Boolean.FALSE.equals(validateResponse.getFirst())) {
@@ -106,6 +110,10 @@ public class SmsServiceImpl implements SmsService {
   }
 
   @Override
+  /**
+   * this is the new send sms flow implementation and supports sending messages via template as well
+   * as via message.
+   */
   public Boolean sendSmsV2(String mobileNo, TemplateDTO template) {
     Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
     if (Boolean.FALSE.equals(validateResponse.getFirst())) {

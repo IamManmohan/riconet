@@ -53,23 +53,23 @@ public class ZoomCommunicationsService {
     // and exemption will not work by adding new events only to zoom property.
     // Best solution: Single common list be maintained in a communications commons
 
-    TemplateDTO templateV2 = null;
+    TemplateDTO template = null;
     Boolean isTemplateV2 = false;
     try {
       NotificationDTO notificationDTO =
           objectMapper.readValue(
               zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
       String templateString = zoomCommunicationsSMSDTO.getTemplateV2();
-      templateV2 =
+      template =
           StringUtils.isBlank(templateString)
               ? null
-              : objectMapper.readValue(zoomCommunicationsSMSDTO.getTemplateV2(), TemplateDTO.class);
+              : objectMapper.readValue(templateString, TemplateDTO.class);
       isTemplateV2 = notificationDTO.getIsTemplateV2();
       List<String> dndExemptedEvents =
           zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
       isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName());
       log.debug("NotificationDTO {}", notificationDTO);
-      log.debug("TemplateV2 is {}", templateV2);
+      log.debug("Template is {}", template);
     } catch (IOException ex) {
       log.error(
           "Error occured while processing NotificationDTO for {} ",
@@ -93,7 +93,7 @@ public class ZoomCommunicationsService {
     if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
       log.info("Value of IsTemplateV2 flag is {}", isTemplateV2);
       if (Boolean.TRUE.equals(isTemplateV2)) {
-        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), templateV2);
+        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), template);
       } else {
         String returnValue =
             smsService.sendSms(
