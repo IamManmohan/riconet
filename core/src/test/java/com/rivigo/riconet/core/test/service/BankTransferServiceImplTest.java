@@ -10,6 +10,9 @@ import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.UploadedFileRecord;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,10 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BankTransferServiceImplTest {
 

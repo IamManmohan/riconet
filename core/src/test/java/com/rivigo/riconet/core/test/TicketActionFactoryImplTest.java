@@ -12,6 +12,9 @@ import com.rivigo.riconet.core.service.impl.TicketActionFactoryImpl;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,10 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
 
 public class TicketActionFactoryImplTest {
 

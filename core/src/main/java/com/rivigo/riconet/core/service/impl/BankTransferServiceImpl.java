@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
