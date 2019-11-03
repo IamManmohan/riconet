@@ -24,6 +24,8 @@ public class ChequeBounceDTO {
 
   @NotBlank private String bankName;
 
+  private String bankAccountReference;
+
   @NotBlank private String chequeNumber;
 
   @NonNull private BigDecimal amount;

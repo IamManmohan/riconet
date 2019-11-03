@@ -148,6 +148,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
           ChequeBounceDTO.builder()
               .amount(paymentDetailV2.getTotalAmount())
               .bankName(paymentDetailV2.getBankName())
+              .bankAccountReference(paymentDetailV2.getBankAccountReference())
               .chequeNumber(paymentDetailV2.getTransactionReferenceNo())
               .cnote(cnote)
               .build());
