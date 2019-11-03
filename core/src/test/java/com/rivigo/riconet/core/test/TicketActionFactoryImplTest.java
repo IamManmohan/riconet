@@ -119,4 +119,34 @@ public class TicketActionFactoryImplTest {
 
     Mockito.verify(zoomBackendAPIClientService).markRecoveryPending(Mockito.any());
   }
+
+  @Test
+  public void shouldConsumeHandoverTicketWriteOffReject() {
+    Mockito.when(ticketingService.getRequiredById(Mockito.anyLong()))
+        .thenReturn(TicketDTO.builder().typeId(ZoomTicketingConstant.WRITEOFF_TYPE_ID).build());
+
+    ticketActionFactory.consume(1L, "1", ZoomTicketingConstant.WRITE_OFF_ACTION_NAME, "reject");
+
+    Mockito.verify(zoomBackendAPIClientService)
+        .handleWriteOffApproveRejectRequest(Mockito.anyString(), Mockito.any());
+
+    Mockito.verify(ticketingService).closeTicketIfRequired(Mockito.any(), Mockito.anyString());
+  }
+
+  @Test
+  public void shouldConsumeHandoverTicketWriteOffAccept() {
+    Mockito.when(ticketingService.getRequiredById(Mockito.anyLong()))
+        .thenReturn(TicketDTO.builder().typeId(ZoomTicketingConstant.WRITEOFF_TYPE_ID).build());
+
+    ticketActionFactory.consume(
+        1L,
+        "1",
+        ZoomTicketingConstant.WRITE_OFF_ACTION_NAME,
+        ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE);
+
+    Mockito.verify(zoomBackendAPIClientService)
+        .handleWriteOffApproveRejectRequest(Mockito.anyString(), Mockito.any());
+
+    Mockito.verify(ticketingService).closeTicketIfRequired(Mockito.any(), Mockito.anyString());
+  }
 }
