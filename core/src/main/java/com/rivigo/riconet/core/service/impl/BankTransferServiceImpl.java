@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.AssigneeType;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketSource;
@@ -14,7 +15,6 @@ import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
-import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.model.UploadedFileRecord;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Comparator;
@@ -32,8 +32,6 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BankTransferServiceImpl implements BankTransferService {
 
-  private final ObjectMapper objectMapper;
-
   private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
@@ -42,12 +40,13 @@ public class BankTransferServiceImpl implements BankTransferService {
 
   @Override
   public void createTicket(Map<String, String> metadata) {
-    PaymentDetailV2 paymentDetailV2 = objectMapper.convertValue(metadata, PaymentDetailV2.class);
-    ConsignmentReadOnly consignment =
-        consignmentReadOnlyService.findRequiredById(paymentDetailV2.getConsignmentId());
+
+    Long consignmentId =
+        Long.parseLong(metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name()));
+    ConsignmentReadOnly consignment = consignmentReadOnlyService.findRequiredById(consignmentId);
     String s3Url = getS3Url(consignment);
     zoomTicketingAPIClientService.createTicket(
-        getTicketDTOForBankTransfer(consignment.getCnote(), paymentDetailV2, s3Url));
+        getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url));
   }
 
   private String getS3Url(ConsignmentReadOnly consignment) {
@@ -74,12 +73,12 @@ public class BankTransferServiceImpl implements BankTransferService {
    * Create a bank transfer ticket for single CN
    *
    * @param cnote cnote
-   * @param paymentDetails paymentdetails with bankname, utr no, transferredAmount
+   * @param metadata paymentdetails with bankname, utr no, transferredAmount
    * @param s3URL s3 url
    * @return TicketDto
    */
   private TicketDTO getTicketDTOForBankTransfer(
-      @NotNull String cnote, PaymentDetailV2 paymentDetails, String s3URL) {
+      @NotNull String cnote, Map<String, String> metadata, String s3URL) {
     GroupDTO group =
         zoomTicketingAPIClientService.getGroupId(
             ZoomTicketingConstant.HQTR_LOCATION_ID,
@@ -93,11 +92,15 @@ public class BankTransferServiceImpl implements BankTransferService {
             String.format(
                 ZoomTicketingConstant.BANK_TRANSFER_MESSAGE,
                 cnote,
-                paymentDetails.getBankName(),
-                paymentDetails.getTransactionReferenceNo(),
+                metadata.getOrDefault(
+                    ZoomCommunicationFieldNames.PaymentDetails.BANK_NAME.name(), ""),
+                metadata.getOrDefault(
+                    ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), ""),
                 s3URL,
-                paymentDetails.getTransferredAmount(),
-                paymentDetails.getTotalAmount()))
+                metadata.getOrDefault(
+                    ZoomCommunicationFieldNames.PaymentDetails.TRANSFERRED_AMOUNT.name(), ""),
+                metadata.getOrDefault(
+                    ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")))
         .title(String.format(ZoomTicketingConstant.BANK_TRANSFER_TICKET_TITLE, cnote))
         .assigneeId(group == null ? null : group.getId())
         .assigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP)
