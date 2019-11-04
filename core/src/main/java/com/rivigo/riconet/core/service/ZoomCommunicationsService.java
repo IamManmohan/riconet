@@ -2,7 +2,7 @@ package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.dto.TemplateDTO;
+import com.rivigo.riconet.core.dto.TemplateV2DTO;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import java.io.IOException;
@@ -53,23 +53,23 @@ public class ZoomCommunicationsService {
     // and exemption will not work by adding new events only to zoom property.
     // Best solution: Single common list be maintained in a communications commons
 
-    TemplateDTO template = null;
+    TemplateV2DTO templateV2 = null;
     Boolean isTemplateV2 = false;
     try {
       NotificationDTO notificationDTO =
           objectMapper.readValue(
               zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
       String templateString = zoomCommunicationsSMSDTO.getTemplateV2();
-      template =
+      templateV2 =
           StringUtils.isBlank(templateString)
               ? null
-              : objectMapper.readValue(templateString, TemplateDTO.class);
+              : objectMapper.readValue(templateString, TemplateV2DTO.class);
       isTemplateV2 = notificationDTO.getIsTemplateV2();
       List<String> dndExemptedEvents =
           zoomPropertyService.getStringValues(ZoomPropertyName.DND_EXEMPTED_SMS_EVENTS);
       isDndExempted = dndExemptedEvents.contains(notificationDTO.getEventName());
       log.debug("NotificationDTO {}", notificationDTO);
-      log.debug("Template is {}", template);
+      log.debug("TemplateV2 is {}", templateV2);
     } catch (IOException ex) {
       log.error(
           "Error occured while processing NotificationDTO for {} ",
@@ -93,7 +93,7 @@ public class ZoomCommunicationsService {
     if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
       log.info("Value of IsTemplateV2 flag is {}", isTemplateV2);
       if (Boolean.TRUE.equals(isTemplateV2)) {
-        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), template);
+        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), templateV2);
       } else {
         String returnValue =
             smsService.sendSms(

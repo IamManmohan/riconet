@@ -1,10 +1,13 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.EnvironmentVariableConstants.ACTIVE_SPRING_PROFILE_PRODUCTION;
+import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.rivigo.riconet.core.dto.TemplateDTO;
-import com.rivigo.riconet.core.dto.platformteam.SendSmsRequestDTO;
-import com.rivigo.riconet.core.dto.platformteam.SendSmsResponseDTO;
+import com.rivigo.riconet.core.dto.TemplateV2DTO;
+import com.rivigo.riconet.core.dto.platformteam.SendSmsV2RequestDTO;
+import com.rivigo.riconet.core.dto.platformteam.SendSmsV2ResponseDTO;
 import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.SmsService;
@@ -61,6 +64,7 @@ public class SmsServiceImpl implements SmsService {
 
   private final ZoomPropertyService zoomPropertyService;
   private final ObjectMapper objectMapper;
+  private final RestTemplate restTemplate;
 
   @Qualifier("defaultRestClientUtilityServiceImpl")
   private final RestClientUtilityService restClientUtilityService;
@@ -85,19 +89,17 @@ public class SmsServiceImpl implements SmsService {
     log.info(mobileNo + "-------" + smsString);
 
     log.info("root url from properties {}", rootUrl);
-    RestTemplate restTemplate = new RestTemplate();
-
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
     headers.setContentType(MediaType.APPLICATION_JSON);
-
     log.info("notificationClientCode from properties {}", notificationClientCode);
     headers.set(X_USER_AGENT_HEADER, notificationClientCode);
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode jsonObject = mapper.createObjectNode();
+
+    ObjectNode jsonObject = objectMapper.createObjectNode();
     jsonObject.putPOJO("phoneNumbers", phoneNumbers);
     jsonObject.put("message", smsString);
     jsonObject.put("confidential", false);
+
     HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
     log.info("sms api from properties {}", smsApi);
     String url = rootUrl.concat(smsApi);
@@ -114,25 +116,25 @@ public class SmsServiceImpl implements SmsService {
    * this is the new send sms flow implementation and supports sending messages via template as well
    * as via message.
    */
-  public Boolean sendSmsV2(String mobileNo, TemplateDTO template) {
+  public Boolean sendSmsV2(String mobileNo, TemplateV2DTO templateV2) {
     Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
     if (Boolean.FALSE.equals(validateResponse.getFirst())) {
       log.error("sms cannot be sent due to reason: {}", validateResponse.getSecond());
       return false;
-    } else if (template == null) {
-      log.error("sms cannot be sent as the template is null");
+    } else if (templateV2 == null) {
+      log.error("sms cannot be sent as the templateV2 is null");
       return false;
     }
 
     List<String> phoneNumbers = getPhoneNumbersBasedOnProfile(mobileNo);
-    SendSmsRequestDTO requestDto =
-        SendSmsRequestDTO.builder()
+    SendSmsV2RequestDTO requestDto =
+        SendSmsV2RequestDTO.builder()
             .client(notificationClientCodeV2)
             .phoneNumbers(phoneNumbers)
-            .template(template)
+            .template(templateV2)
             .build();
     HttpEntity httpEntity = new HttpEntity<>(requestDto, restClientUtilityService.getHeaders());
-    SendSmsResponseDTO response =
+    SendSmsV2ResponseDTO response =
         objectMapper.convertValue(
             restClientUtilityService
                 .executeRest(rootUrl + smsApiV2, HttpMethod.POST, httpEntity, Object.class)
@@ -141,14 +143,14 @@ public class SmsServiceImpl implements SmsService {
                         new ZoomException(
                             "send sms failed for phoneNumbers: {}, templateName: {}",
                             phoneNumbers,
-                            template.getName())),
-            SendSmsResponseDTO.class);
+                            templateV2.getName())),
+            SendSmsV2ResponseDTO.class);
 
     if (response.getBulkResponse() == null) {
       log.error(
           "send sms failed for phoneNumbers: {}, templateName: {}, errorCode: {}, exceptionMessage: {}",
           phoneNumbers,
-          template.getName(),
+          templateV2.getName(),
           response.getCode(),
           response.getMessage());
       return false;
@@ -156,7 +158,7 @@ public class SmsServiceImpl implements SmsService {
     log.debug(
         "sms sent successfully to phoneNumbers: {}, templateName: {}, Code: {}, bulkResponse: {}",
         phoneNumbers,
-        template.getName(),
+        templateV2.getName(),
         response.getCode(),
         response.getBulkResponse());
     return true;
@@ -177,7 +179,8 @@ public class SmsServiceImpl implements SmsService {
 
   private List<String> getPhoneNumbersBasedOnProfile(String mobileNo) {
     List<String> phoneNumbers = new ArrayList<>();
-    if ("production".equalsIgnoreCase(System.getProperty("spring.profiles.active"))) {
+    if (ACTIVE_SPRING_PROFILE_PRODUCTION.equalsIgnoreCase(
+        System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
       phoneNumbers.add(mobileNo);
     } else {
       String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "");
@@ -193,8 +196,9 @@ public class SmsServiceImpl implements SmsService {
   }
 
   private String getSmsStringBasedOnProfile(String message, String mobileNo) {
-    if (!("production".equalsIgnoreCase(System.getProperty("spring.profiles.active")))) {
-      return (mobileNo + " - " + message);
+    if (!(ACTIVE_SPRING_PROFILE_PRODUCTION.equalsIgnoreCase(
+        System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME)))) {
+      return String.format("%s - %s", mobileNo, message);
     }
     return message;
   }

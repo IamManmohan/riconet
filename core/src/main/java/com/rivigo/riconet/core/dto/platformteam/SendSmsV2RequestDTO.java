@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.dto.platformteam;
 
-import com.rivigo.riconet.core.dto.TemplateDTO;
+import com.rivigo.riconet.core.dto.TemplateV2DTO;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +11,8 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class SendSmsRequestDTO {
+public class SendSmsV2RequestDTO {
   private String client;
   private List<String> phoneNumbers;
-  private TemplateDTO template;
+  private TemplateV2DTO template;
 }

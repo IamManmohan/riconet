@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class SmsIndividualResponseDTO {
+public class SmsV2IndividualResponseDTO {
   private String phoneNumber;
   private String response;
 }

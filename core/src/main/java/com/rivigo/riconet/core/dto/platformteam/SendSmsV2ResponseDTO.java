@@ -13,8 +13,8 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendSmsResponseDTO {
+public class SendSmsV2ResponseDTO {
   private Long Code;
   private String Message;
-  private List<SmsIndividualResponseDTO> bulkResponse;
+  private List<SmsV2IndividualResponseDTO> bulkResponse;
 }
