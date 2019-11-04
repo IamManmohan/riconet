@@ -169,7 +169,11 @@ public class ApiClientServiceImpl implements ApiClientService {
           httpMethod,
           objectMapper.writeValueAsString(entity));
       ResponseEntity<JsonNode> response =
-          riconetRestTemplate.exchange(uri.toString(), httpMethod, entity, JsonNode.class);
+          riconetRestTemplate.exchange(
+              restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams),
+              httpMethod,
+              entity,
+              JsonNode.class);
       log.info("response: {}", response);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
@@ -180,7 +184,11 @@ public class ApiClientServiceImpl implements ApiClientService {
         HttpEntity retryEntity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
         try {
           ResponseEntity<JsonNode> response =
-              riconetRestTemplate.exchange(uri.toString(), httpMethod, retryEntity, JsonNode.class);
+              riconetRestTemplate.exchange(
+                  restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams),
+                  httpMethod,
+                  retryEntity,
+                  JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
           log.error("Invalid response from API  while calling {}", DateTime.now(), e2);
