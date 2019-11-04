@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
 import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
+import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -41,6 +42,10 @@ public class ApiClientServiceImpl implements ApiClientService {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private SsoService ssoService;
+
+  @Autowired
+  @Qualifier("defaultRestClientUtilityServiceImpl")
+  private RestClientUtilityService restClientUtilityService;
 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
@@ -147,7 +152,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     if (queryParams != null) {
       builder = builder.queryParams(queryParams);
     }
-    URI uri = builder.build(true).toUri();
+    URI uri = builder.build().toUri();
     log.debug("Calling  {} ", uri);
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
