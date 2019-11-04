@@ -147,7 +147,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     if (queryParams != null) {
       builder = builder.queryParams(queryParams);
     }
-    URI uri = builder.build().encode().toUri();
+    URI uri = builder.build(true).encode().toUri();
     log.debug("Calling  {} ", uri);
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
