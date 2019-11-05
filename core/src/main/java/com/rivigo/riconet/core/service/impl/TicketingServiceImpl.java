@@ -86,6 +86,17 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
   @Override
+  public void reopenTicketIfClosed(TicketDTO ticketDTO, String reason) {
+    zoomTicketingAPIClientService.makeComment(ticketDTO.getId(), reason);
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Not closing ticket {} as status is not closed", ticketDTO);
+      return;
+    }
+    ticketDTO.setStatus(TicketStatus.REOPENED);
+    zoomTicketingAPIClientService.editTicket(ticketDTO);
+  }
+
+  @Override
   public TicketDTO getRequiredById(Long ticketId) {
     return Optional.ofNullable(zoomTicketingAPIClientService.getById(ticketId))
         .orElseThrow(() -> new ZoomException("Error occured while fetching ticket {}", ticketId));

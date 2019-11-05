@@ -134,24 +134,29 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
       return;
     }
 
-    log.info("Initiating knock off for {}, request status : {}", cnote, actionValue);
-    if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
-      // knock off
-      zoomBackendAPIClientService.handleKnockOffRequest(
-          cnote,
-          new BankTransferRequestDTO(
-              paymentDetailV2.getBankAccountReference(),
-              paymentDetailV2.getTransactionReferenceNo()));
-    } else {
-      // Mark recovery
-      zoomBackendAPIClientService.markRecoveryPending(
-          ChequeBounceDTO.builder()
-              .amount(paymentDetailV2.getTotalAmount())
-              .bankName(paymentDetailV2.getBankName())
-              .bankAccountReference(paymentDetailV2.getBankAccountReference())
-              .chequeNumber(paymentDetailV2.getTransactionReferenceNo())
-              .cnote(cnote)
-              .build());
+    log.info("Initiating knock off/recovery for {}, request status : {}", cnote, actionValue);
+
+    try {
+      if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
+        // knock off
+        zoomBackendAPIClientService.handleKnockOffRequest(
+            cnote,
+            new BankTransferRequestDTO(
+                paymentDetailV2.getBankAccountReference(),
+                paymentDetailV2.getTransactionReferenceNo()));
+      } else {
+        // Mark recovery
+        zoomBackendAPIClientService.markRecoveryPending(
+            ChequeBounceDTO.builder()
+                .amount(paymentDetailV2.getTotalAmount())
+                .bankName(paymentDetailV2.getBankName())
+                .bankAccountReference(paymentDetailV2.getBankAccountReference())
+                .chequeNumber(paymentDetailV2.getTransactionReferenceNo())
+                .cnote(cnote)
+                .build());
+      }
+    } catch (Exception e) {
+      ticketingService.reopenTicketIfClosed(ticketDTO, e.getMessage());
     }
   }
 }
