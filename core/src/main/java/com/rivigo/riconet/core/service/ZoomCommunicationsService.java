@@ -98,7 +98,7 @@ public class ZoomCommunicationsService {
         String returnValue =
             smsService.sendSms(
                 zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
-        log.info("Return value from notificationService {}", returnValue);
+        log.info("send sms response is {}", returnValue);
       }
     } else {
       log.info("Can not send sms as the current time is dnd time");

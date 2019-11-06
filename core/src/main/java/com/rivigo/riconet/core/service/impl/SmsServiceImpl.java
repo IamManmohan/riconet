@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.EnvironmentVariableConstants.ACTIVE_SPRING_PROFILE_PRODUCTION;
+import static com.rivigo.riconet.core.predicates.EnvironmentPredicate.isActiveSpringProfileProduction;
 import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,6 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +26,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
@@ -64,7 +60,6 @@ public class SmsServiceImpl implements SmsService {
 
   private final ZoomPropertyService zoomPropertyService;
   private final ObjectMapper objectMapper;
-  private final RestTemplate restTemplate;
 
   @Qualifier("defaultRestClientUtilityServiceImpl")
   private final RestClientUtilityService restClientUtilityService;
@@ -72,7 +67,7 @@ public class SmsServiceImpl implements SmsService {
   @Override
   @Deprecated
   /**
-   * use `sendSmsV2` for sending any new messages, as sendSms support sending messages only via
+   * use `sendSmsV2` for sending any new messages, as this function supports sending sms only via
    * message.
    */
   public String sendSms(String mobileNo, String message) {
@@ -89,9 +84,7 @@ public class SmsServiceImpl implements SmsService {
     log.info(mobileNo + "-------" + smsString);
 
     log.info("root url from properties {}", rootUrl);
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpHeaders headers = restClientUtilityService.getHeaders();
     log.info("notificationClientCode from properties {}", notificationClientCode);
     headers.set(X_USER_AGENT_HEADER, notificationClientCode);
 
@@ -103,18 +96,18 @@ public class SmsServiceImpl implements SmsService {
     HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
     log.info("sms api from properties {}", smsApi);
     String url = rootUrl.concat(smsApi);
-    ResponseEntity responseEng = restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
 
-    if (responseEng == null) {
-      throw new ZoomException("SMS is not sent properly");
-    }
-    return responseEng.toString();
+    Object response =
+        restClientUtilityService
+            .executeRest(url, HttpMethod.POST, entity, Object.class)
+            .orElseThrow(() -> new ZoomException("SMS is not sent properly"));
+    return response.toString();
   }
 
   @Override
   /**
-   * this is the new send sms flow implementation and supports sending messages via template as well
-   * as via message.
+   * this is the new send sms flow implementation and supports sending sms via template as well as
+   * via message.
    */
   public Boolean sendSmsV2(String mobileNo, TemplateV2DTO templateV2) {
     Pair<Boolean, String> validateResponse = validateSendSms(mobileNo, rootUrl);
@@ -179,8 +172,7 @@ public class SmsServiceImpl implements SmsService {
 
   private List<String> getPhoneNumbersBasedOnProfile(String mobileNo) {
     List<String> phoneNumbers = new ArrayList<>();
-    if (ACTIVE_SPRING_PROFILE_PRODUCTION.equalsIgnoreCase(
-        System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
+    if (isActiveSpringProfileProduction().test(System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
       phoneNumbers.add(mobileNo);
     } else {
       String defaultPhone = zoomPropertyService.getString(ZoomPropertyName.DEFAULT_SMS_NUMBER, "");
@@ -196,8 +188,9 @@ public class SmsServiceImpl implements SmsService {
   }
 
   private String getSmsStringBasedOnProfile(String message, String mobileNo) {
-    if (!(ACTIVE_SPRING_PROFILE_PRODUCTION.equalsIgnoreCase(
-        System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME)))) {
+    if (isActiveSpringProfileProduction()
+        .negate()
+        .test(System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
       return String.format("%s - %s", mobileNo, message);
     }
     return message;
