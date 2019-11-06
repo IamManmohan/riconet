@@ -53,7 +53,7 @@ public class UrlConstant {
       "/operations/retail/collections/{cnote}/writeOff/{requestAction}";
 
   public static final String ZOOM_BACKEND_KNOCK_OFF_REQUEST =
-      "/operations/retail/collections/{cnote}/knockoff";
+      "/operations/retail/collections/{cnote}/knockOff";
 
   public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 
