@@ -142,8 +142,8 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         zoomBackendAPIClientService.handleKnockOffRequest(
             cnote,
             new BankTransferRequestDTO(
-                paymentDetailV2.getBankAccountReference(),
-                paymentDetailV2.getTransactionReferenceNo()));
+                paymentDetailV2.getTransactionReferenceNo(),
+                paymentDetailV2.getBankAccountReference()));
       } else {
         // Mark recovery
         zoomBackendAPIClientService.markRecoveryPending(
