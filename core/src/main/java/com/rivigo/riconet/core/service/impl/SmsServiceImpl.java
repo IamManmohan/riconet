@@ -159,7 +159,7 @@ public class SmsServiceImpl implements SmsService {
 
   private Pair<Boolean, String> validateSendSms(String mobileNo, String rootUrl) {
     log.info("Call to send sms with smsEnable {}", smsEnable);
-    if (!smsEnable) {
+    if (!Boolean.TRUE.equals(smsEnable)) {
       log.info("SMS is disabled");
       return Pair.of(false, SMS_DISABLED);
     } else if (StringUtils.isBlank(mobileNo)) {
