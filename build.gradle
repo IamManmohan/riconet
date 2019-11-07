@@ -6,6 +6,7 @@ buildscript {
         maven { url 'http://repo.spring.io/milestone' }
         maven { url "https://maven.eveoh.nl/content/repositories/releases" }
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'https://packages.confluent.io/maven/' }
     }
     dependencies {
         classpath "com.diffplug.spotless:spotless-plugin-gradle:3.12.0"
@@ -26,6 +27,7 @@ allprojects {
         maven { url "https://repo.maven.apache.org/maven2" }
         maven { url "http://artifactory.rivigo.com/artifactory/libs-release-local" }
         maven { url "http://artifactory.rivigo.com/artifactory/libs-snapshot-local" }
+        maven { url 'https://packages.confluent.io/maven/' }
     }
     dependencies {
         annotationProcessor("org.projectlombok:lombok:1.18.4")
@@ -87,7 +89,7 @@ subprojects {
             exclude module: 'cms-external-api'
             exclude module: 'rivigo-finance-external-api'
             exclude module: 'aws-java-sdk'
-            exclude module: 'kafka'
+            exclude module: 'scala-library'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
@@ -100,7 +102,6 @@ subprojects {
         compile "org.jboss.netty:netty:3.2.10.Final"
         
         compile group: 'junit', name: 'junit', version: '4.12'
-
 
         testCompile "org.mockito:mockito-core:1.+"
     }
