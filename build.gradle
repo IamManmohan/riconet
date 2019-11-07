@@ -84,6 +84,7 @@ subprojects {
             exclude module: 'cms-external-api'
             exclude module: 'rivigo-finance-external-api'
             exclude module: 'aws-java-sdk'
+            exclude module: 'kafka'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:2.2.0')
