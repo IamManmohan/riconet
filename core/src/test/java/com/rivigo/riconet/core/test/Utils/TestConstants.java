@@ -19,4 +19,7 @@ public class TestConstants {
   public static final Long USER_ID_1 = 316L;
 
   public static final Long PICKUP_ID = 772L;
+
+  public static final String phoneNumber = "9898912345";
+  public static final String eventName = "TEST_EVENT";
 }
