@@ -86,7 +86,6 @@ public class ZoomTicketingConstant {
           + "<br>Bank Name: %s"
           + "<br>UTR No: %s"
           + "<br>Receipt URL: <a href=\"%s\">Click here</a>"
-          + "<br>Amount Transferred: %s"
           + "<br>Amount to be paid: %s";
 
   public static final String BANK_TRANSFER_GROUP_NAME = "Finance Bank Transfer";

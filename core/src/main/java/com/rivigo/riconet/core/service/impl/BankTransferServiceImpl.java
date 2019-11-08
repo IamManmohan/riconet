@@ -97,8 +97,6 @@ public class BankTransferServiceImpl implements BankTransferService {
                     ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), ""),
                 s3URL,
                 metadata.getOrDefault(
-                    ZoomCommunicationFieldNames.PaymentDetails.TRANSFERRED_AMOUNT.name(), ""),
-                metadata.getOrDefault(
                     ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")))
         .title(String.format(ZoomTicketingConstant.BANK_TRANSFER_TICKET_TITLE, cnote))
         .assigneeId(group == null ? null : group.getId())
