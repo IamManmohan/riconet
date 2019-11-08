@@ -156,7 +156,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
                 .build());
       }
     } catch (Exception e) {
-      ticketingService.reopenTicketIfClosed(ticketDTO, e.getMessage());
+      ticketingService.reopenTicketIfClosed(ticketDTO, e.getMessage().replace("=", ":"));
     }
   }
 }
