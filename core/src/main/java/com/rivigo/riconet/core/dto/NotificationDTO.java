@@ -42,6 +42,8 @@ public class NotificationDTO {
    */
   private List<String> conditions;
 
+  private Boolean isTemplateV2;
+
   public static NotificationDTO copy(NotificationDTO input) {
     return NotificationDTO.builder()
         .eventUID(input.getEventUID())
@@ -50,6 +52,7 @@ public class NotificationDTO {
         .metadata(input.getMetadata())
         .tsMs(input.getTsMs())
         .conditions(input.getConditions())
+        .isTemplateV2(input.getIsTemplateV2())
         .entityId(input.getEntityId())
         .entityName(input.getEntityName())
         .build();
