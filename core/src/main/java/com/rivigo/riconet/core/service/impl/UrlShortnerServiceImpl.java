@@ -44,7 +44,10 @@ public class UrlShortnerServiceImpl implements UrlShortnerService {
 
   @Override
   public String shortenUrl(String longUrl) {
-    if (!Boolean.valueOf(shortenerEnabled)) return longUrl;
+    if (!Boolean.valueOf(shortenerEnabled)) {
+      log.info("skipping url shortening, longUrl: {}", longUrl);
+      return longUrl;
+    }
     try {
 
       RestTemplate restTemplate = new RestTemplate();
