@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rivigo.riconet.core.service.UrlShortnerService;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -38,9 +39,15 @@ public class UrlShortnerServiceImpl implements UrlShortnerService {
   @Value("${shortener.enabled}")
   private String shortenerEnabled;
 
+  @Value("${shortener.prefix}")
+  private String shortenerPrefix;
+
   @Override
   public String shortenUrl(String longUrl) {
-    if (!Boolean.valueOf(shortenerEnabled)) return longUrl;
+    if (!Boolean.valueOf(shortenerEnabled)) {
+      log.info("skipping url shortening, longUrl: {}", longUrl);
+      return longUrl;
+    }
     try {
 
       RestTemplate restTemplate = new RestTemplate();
@@ -50,7 +57,7 @@ public class UrlShortnerServiceImpl implements UrlShortnerService {
       headers.setContentType(MediaType.APPLICATION_JSON);
 
       ObjectNode jsonObject = objectMapper.createObjectNode();
-      jsonObject.put("longUrl", longUrl);
+      jsonObject.put("longDynamicLink", shortenerPrefix + URLEncoder.encode(longUrl, "UTF-8"));
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
 
       List<NameValuePair> params = new ArrayList<>();
@@ -66,7 +73,7 @@ public class UrlShortnerServiceImpl implements UrlShortnerService {
       }
 
       log.info(String.valueOf(responseEng));
-      Object url = ((LinkedHashMap) responseEng.getBody()).get("id");
+      Object url = ((LinkedHashMap) responseEng.getBody()).get("shortLink");
       String str = url.toString();
       log.info("Short url from google {}", str);
       return str;
