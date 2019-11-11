@@ -23,22 +23,22 @@ public class KafkaConfig {
   @Value("${bootstrap.servers}")
   private String bootstrapServersConfig;
 
-  @Value("${retries.config}")
+  @Value("${retries}")
   private int retriesConfig;
 
-  @Value("${batch.size.config}")
+  @Value("${batch.size}")
   private int batchSizeConfig;
 
-  @Value("${linger.ms.config}")
+  @Value("${linger.ms}")
   private int lingerMsConfig;
 
-  @Value("${buffer.memory.config}")
+  @Value("${buffer.memory}")
   private int bufferMemoryConfig;
 
-  @Value("${request.timeout.ms.config}")
+  @Value("${request.timeout.ms}")
   private int requestTimeoutMsConfig;
 
-  @Value("${max.block.ms.config}")
+  @Value("${max.block.ms}")
   private int maxBlockMsConfig;
 
   @Bean
