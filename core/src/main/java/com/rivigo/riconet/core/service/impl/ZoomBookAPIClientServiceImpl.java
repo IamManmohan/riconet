@@ -192,7 +192,8 @@ public class ZoomBookAPIClientServiceImpl implements ZoomBookAPIClientService {
       log.error(
           "Unknown exception while trying to get data from zoom-book for url {} with params: {}",
           requestUrl,
-          queryParams.toString());
+          queryParams,
+          e);
       throw new ZoomException("Unknown exception while trying to get data from zoom-book");
     }
   }
