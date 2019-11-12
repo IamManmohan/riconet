@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
@@ -26,8 +25,6 @@ import org.springframework.util.StringUtils;
 @Service
 @Slf4j
 public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClientService {
-
-  @Autowired private ObjectMapper objectMapper;
 
   @Value("${zoom.ticketing.url}")
   private String ticketingBaseUrl;

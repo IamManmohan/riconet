@@ -192,7 +192,7 @@ public class ZoomBackendAPIClientServiceTest {
     Mockito.when(
             apiClientService.getEntity(
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenThrow(new IOException());
+        .thenThrow(new IOException("Test Exception"));
   }
 
   @Test

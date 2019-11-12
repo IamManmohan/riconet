@@ -15,7 +15,6 @@ import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -38,8 +37,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   private String backendBaseUrl;
 
   @Autowired private ApiClientService apiClientService;
-
-  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
   public void setPriorityMapping(String cnote, PriorityReasonType reason) {

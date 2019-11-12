@@ -56,12 +56,12 @@ public class TicketingServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    EmailSenderService emailSenderService = new EmailSenderServiceImpl(zoomPropertyService);
+    EmailSenderService emailSenderService = new EmailSenderServiceImpl(this.zoomPropertyService);
     ticketingService =
         new TicketingServiceImpl(
             emailSenderService,
             zoomBackendAPIClientService,
-            zoomPropertyService,
+            this.zoomPropertyService,
             zoomTicketingAPIClientService);
     //    RestTemplate restTemplate = new RestTemplate();
     ZoomPropertyService zoomPropertyService = new ZoomPropertyServiceImpl();

@@ -181,6 +181,5 @@ Temporary Items
 run
 .scannerwork/
 riconet.iml
-gradle/
 gradlew
 .git-hooks/
