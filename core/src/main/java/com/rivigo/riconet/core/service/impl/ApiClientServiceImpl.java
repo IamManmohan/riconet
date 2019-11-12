@@ -140,6 +140,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     }
   }
 
+  //TODO: Clean me up
   @Override
   public JsonNode getEntity(
       Object dto,
@@ -163,17 +164,16 @@ public class ApiClientServiceImpl implements ApiClientService {
     HttpEntity entity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
 
     try {
+      String urlWithParams =
+          restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams);
       log.info(
-          "uri: {}, httpMethod: {}, entity: {}",
+          "uri: {}, httpMethod: {}, entity: {}, url: {}",
           uri,
           httpMethod,
-          objectMapper.writeValueAsString(entity));
+          objectMapper.writeValueAsString(entity),
+          urlWithParams);
       ResponseEntity<JsonNode> response =
-          riconetRestTemplate.exchange(
-              restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams),
-              httpMethod,
-              entity,
-              JsonNode.class);
+          riconetRestTemplate.exchange(urlWithParams, httpMethod, entity, JsonNode.class);
       log.info("response: {}", response);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
