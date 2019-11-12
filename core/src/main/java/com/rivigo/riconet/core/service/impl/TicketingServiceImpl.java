@@ -99,7 +99,7 @@ public class TicketingServiceImpl implements TicketingService {
   @Override
   public TicketDTO getRequiredById(Long ticketId) {
     return Optional.ofNullable(zoomTicketingAPIClientService.getById(ticketId))
-        .orElseThrow(() -> new ZoomException("Error occured while fetching ticket {}", ticketId));
+        .orElseThrow(() -> new ZoomException("Error occured while fetching ticket %s", ticketId));
   }
 
   @Override

@@ -43,7 +43,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
   private void consumeHandoverTicketAction(
       TicketDTO ticketDTO, String cnote, String requestAction) {
     if (!ZoomTicketingConstant.WRITEOFF_TYPE_ID.equals(ticketDTO.getTypeId())) {
-      log.info("Ticket is not write-off ticket");
+      log.info("Ticket is not write-off ticket: TicketType: %s", ticketDTO.getTypeId());
       return;
     }
     WriteOffRequestAction writeOffRequestAction =
