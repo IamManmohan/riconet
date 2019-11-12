@@ -1,6 +1,6 @@
 FROM rivigotech/openjdk-supervisor:8-jre-alpine
 WORKDIR /code/
-ARG PROPERTIES_PATH_CORE=core/src/main/resources/application_core.properties
+ARG PROPERTIES_PATH_CORE=core/src/main/resources/application.properties
 ARG SPRING_PROFILE=local_docker
 ARG LOGIN_PROFILE=staging
 ARG XMX_XMS_VALUE=512m
