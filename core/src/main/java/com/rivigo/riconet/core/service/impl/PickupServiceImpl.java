@@ -451,7 +451,7 @@ public class PickupServiceImpl implements PickupService {
     }
     List<ConsignmentReadOnly> consignments =
         consignmentReadOnlyService
-            .findConsignmentByPickupId(pickup.getId())
+            .findByPickupId(pickup.getId())
             .stream()
             .filter(
                 consignmentReadOnly ->

@@ -28,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -71,6 +72,20 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
     return url
         + params
             .stream()
+            .map(p -> p.getFirst() + "=" + p.getSecond())
+            .reduce((p1, p2) -> p1 + "&" + p2)
+            .map(s -> "?" + s)
+            .orElse("");
+  }
+
+  @Override
+  public String buildUrlWithParams(String url, MultiValueMap<String, String> params) {
+    if (CollectionUtils.isEmpty(params)) return url;
+    return url
+        + params
+            .entrySet()
+            .stream()
+            .flatMap(e -> e.getValue().stream().map(v -> Pair.of(e.getKey(), v)))
             .map(p -> p.getFirst() + "=" + p.getSecond())
             .reduce((p1, p2) -> p1 + "&" + p2)
             .map(s -> "?" + s)

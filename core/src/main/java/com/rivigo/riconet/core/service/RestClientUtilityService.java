@@ -7,6 +7,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.util.MultiValueMap;
 
 public interface RestClientUtilityService {
 
@@ -15,6 +16,8 @@ public interface RestClientUtilityService {
   HttpHeaders getHeaders(String token);
 
   String buildUrlWithParams(String url, List<Pair<String, String>> params);
+
+  String buildUrlWithParams(String url, MultiValueMap<String, String> params);
 
   String buildUrlWithParams(String url, Map<String, String> params);
 

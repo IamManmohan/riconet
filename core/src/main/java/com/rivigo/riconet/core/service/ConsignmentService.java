@@ -7,6 +7,7 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +23,9 @@ public interface ConsignmentService {
       List<Long> consignmentIdList, List<ConsignmentStatus> statusList);
 
   List<Consignment> getConsignmentsByIds(List<Long> consignmentIds);
+
+  @Nullable
+  Long getIdByCnote(String cnote);
 
   String getCnoteByIdAndIsActive(Long id);
 
