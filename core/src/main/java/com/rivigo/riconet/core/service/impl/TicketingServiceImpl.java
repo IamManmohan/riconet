@@ -15,6 +15,7 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,8 +86,28 @@ public class TicketingServiceImpl implements TicketingService {
   }
 
   @Override
-  public TicketDTO getTicketByTicketId(Long ticketId) {
-    return zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+  public void reopenTicketIfClosed(TicketDTO ticketDTO, String reason) {
+    zoomTicketingAPIClientService.makeComment(ticketDTO.getId(), reason);
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Not closing ticket {} as status is not closed", ticketDTO);
+      return;
+    }
+    ticketDTO.setStatus(TicketStatus.REOPENED);
+    zoomTicketingAPIClientService.editTicket(ticketDTO);
+  }
+
+  @Override
+  public TicketDTO getRequiredById(Long ticketId) {
+    return Optional.ofNullable(zoomTicketingAPIClientService.getById(ticketId))
+        .orElseThrow(() -> new ZoomException("Error occured while fetching ticket %s", ticketId));
+  }
+
+  @Override
+  public void closeTicketIfRequired(TicketDTO ticketDTO, String actionClosureMessage) {
+    if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
+      log.info("Auto closing ticket");
+      closeTicket(ticketDTO, actionClosureMessage);
+    }
   }
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {

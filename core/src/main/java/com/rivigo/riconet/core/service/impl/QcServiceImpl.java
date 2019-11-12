@@ -138,7 +138,7 @@ public class QcServiceImpl implements QcService {
     }
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService
-            .getTicketsByCnoteAndType(loadingData.getCnote(), getQcTicketTypes())
+            .getByCnoteAndType(loadingData.getCnote(), getQcTicketTypes())
             .stream()
             .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
             .collect(Collectors.toList());
@@ -178,7 +178,7 @@ public class QcServiceImpl implements QcService {
     }
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService
-            .getTicketsByCnoteAndType(loadingData.getCnote(), getQcTicketTypes())
+            .getByCnoteAndType(loadingData.getCnote(), getQcTicketTypes())
             .stream()
             .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
             .collect(Collectors.toList());
@@ -205,7 +205,7 @@ public class QcServiceImpl implements QcService {
   public void consumeUnloadingEvent(ConsignmentBasicDTO unloadingData) {
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService
-            .getTicketsByCnoteAndType(unloadingData.getCnote(), getQcTicketTypes())
+            .getByCnoteAndType(unloadingData.getCnote(), getQcTicketTypes())
             .stream()
             .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
             .collect(Collectors.toList());
@@ -349,7 +349,7 @@ public class QcServiceImpl implements QcService {
     }
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService
-            .getTicketsByCnoteAndType(completionData.getCnote(), getQcTicketTypes())
+            .getByCnoteAndType(completionData.getCnote(), getQcTicketTypes())
             .stream()
             .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
             .collect(Collectors.toList());
@@ -647,7 +647,7 @@ public class QcServiceImpl implements QcService {
   public void consumeCnoteTypeChangeEvent(ConsignmentBasicDTO consignment) {
     List<TicketDTO> ticketList =
         zoomTicketingAPIClientService
-            .getTicketsByCnoteAndType(consignment.getCnote(), getQcTicketTypes())
+            .getByCnoteAndType(consignment.getCnote(), getQcTicketTypes())
             .stream()
             .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
             .collect(Collectors.toList());
@@ -668,7 +668,7 @@ public class QcServiceImpl implements QcService {
   @Override
   public void consumeCnoteChangeEvent(String oldCnote, String cnote) {
     List<TicketDTO> tickets =
-        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+        zoomTicketingAPIClientService.getByCnoteAndType(
             oldCnote,
             Arrays.asList(
                 ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
@@ -712,8 +712,7 @@ public class QcServiceImpl implements QcService {
         consignment.getId(), ConsignmentBlockerRequestType.UNBLOCK, QcType.MEASUREMENT);
     zoomBackendAPIClientService.updateQcCheck(consignment.getId(), false);
     List<TicketDTO> tickets =
-        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
-            consignment.getCnote(), getQcTicketTypes());
+        zoomTicketingAPIClientService.getByCnoteAndType(consignment.getCnote(), getQcTicketTypes());
     tickets.forEach(
         ticketDTO -> {
           if (!TicketStatus.CLOSED.equals(ticketDTO.getStatus())) {
@@ -732,7 +731,7 @@ public class QcServiceImpl implements QcService {
       log.info("Action ignored since it is not related to QC");
       return;
     }
-    TicketDTO ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+    TicketDTO ticketDTO = zoomTicketingAPIClientService.getById(ticketId);
     if (ticketDTO == null) {
       throw new ZoomException("Error occured while fetching ticket {}", ticketId);
     }
@@ -745,7 +744,7 @@ public class QcServiceImpl implements QcService {
     try {
       zoomBackendAPIClientService.handleQcBlockerClosure(ticketId);
     } catch (ZoomException zoomException) {
-      ticketDTO = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+      ticketDTO = zoomTicketingAPIClientService.getById(ticketId);
       ticketDTO.setStatus(TicketStatus.REOPENED);
       zoomTicketingAPIClientService.editTicket(ticketDTO);
       zoomTicketingAPIClientService.makeComment(
@@ -762,7 +761,7 @@ public class QcServiceImpl implements QcService {
     Consignment consignment = consignmentService.getConsignmentByCnote(cnote);
     if (CollectionUtils.isEmpty(consignment.getClient().getClientNotificationList())
         || CollectionUtils.isEmpty(getToRecepients(consignment))) {
-      TicketDTO qcBlockerTicket = zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+      TicketDTO qcBlockerTicket = zoomTicketingAPIClientService.getById(ticketId);
       closeTicket(qcBlockerTicket, ZoomTicketingConstant.QC_BLOCKER_AUTO_CLOSURE_MESSAGE);
       zoomBackendAPIClientService.handleConsignmentBlocker(
           ConsignmentBlockerRequestDTO.builder()
@@ -775,7 +774,7 @@ public class QcServiceImpl implements QcService {
       return;
     }
     List<TicketDTO> ticketList =
-        zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+        zoomTicketingAPIClientService.getByCnoteAndType(
             cnote,
             Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString()));
     if (CollectionUtils.isEmpty(ticketList)) {

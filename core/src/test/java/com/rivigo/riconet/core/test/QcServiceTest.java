@@ -136,7 +136,7 @@ public class QcServiceTest {
     data.setConsignmentId(1l);
     data.setCnote("1234567890");
     data.setLocationId(15l);
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Collections.emptyList());
     qcService.consumeLoadingEvent(data);
   }
@@ -197,7 +197,7 @@ public class QcServiceTest {
 
     when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
         .thenReturn(consignmentSchedules);
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2, ticket3, ticket4, ticket5));
     Location location = new Location();
     location.setId(2L);
@@ -249,7 +249,7 @@ public class QcServiceTest {
 
     when(consignmentScheduleService.getActivePlan(Mockito.anyLong()))
         .thenReturn(consignmentSchedules);
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2));
     Location location = new Location();
     location.setId(2L);
@@ -270,7 +270,7 @@ public class QcServiceTest {
     data.setConsignmentId(1l);
     data.setCnote("1234567890");
     data.setLocationId(15l);
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Collections.emptyList());
     qcService.consumeUnloadingEvent(data);
   }
@@ -316,7 +316,7 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2, ticket3, ticket4));
     when(zoomTicketingAPIClientService.getGroupId(
             data.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU))
@@ -361,7 +361,7 @@ public class QcServiceTest {
             .status(TicketStatus.IN_PROGRESS)
             .id(4l)
             .build();
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq(data.getCnote()), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq(data.getCnote()), any()))
         .thenReturn(Arrays.asList(ticket1, ticket2));
     Location location = new Location();
     location.setOrganizationId(1l);
@@ -559,7 +559,7 @@ public class QcServiceTest {
   @Test
   public void consumeCnoteChangeEventTest() {
     TicketDTO ticketDTO = new TicketDTO();
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(eq("1234567890"), any()))
+    when(zoomTicketingAPIClientService.getByCnoteAndType(eq("1234567890"), any()))
         .thenReturn(Collections.singletonList(ticketDTO));
     qcService.consumeCnoteChangeEvent("1234567890", "9234567890");
     verify(zoomTicketingAPIClientService, times(1)).editTicket(any());
@@ -568,7 +568,7 @@ public class QcServiceTest {
 
   @Test
   public void qcActionNonBlockerTest() {
-    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+    when(zoomTicketingAPIClientService.getById(5l))
         .thenReturn(
             TicketDTO.builder()
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID + 1)
@@ -580,7 +580,7 @@ public class QcServiceTest {
 
   @Test
   public void qcBlockerActionTest() {
-    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+    when(zoomTicketingAPIClientService.getById(5l))
         .thenReturn(
             TicketDTO.builder()
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
@@ -592,7 +592,7 @@ public class QcServiceTest {
 
   @Test
   public void qcBlockerActionExceptionTest() {
-    when(zoomTicketingAPIClientService.getTicketByTicketId(5l))
+    when(zoomTicketingAPIClientService.getById(5l))
         .thenReturn(
             TicketDTO.builder()
                 .typeId(ZoomTicketingConstant.QC_BLOCKER_TYPE_ID)
@@ -602,7 +602,7 @@ public class QcServiceTest {
     qcService.consumeQcBlockerTicketClosedEvent(5l, 10l, "qc");
     verify(zoomBackendAPIClientService, times(1)).handleQcBlockerClosure(5l);
     verify(zoomTicketingAPIClientService, times(1)).editTicket(any());
-    verify(zoomTicketingAPIClientService, times(2)).getTicketByTicketId(any());
+    verify(zoomTicketingAPIClientService, times(2)).getById(any());
     verify(zoomTicketingAPIClientService, times(1)).makeComment(any(), any());
   }
 
@@ -610,7 +610,7 @@ public class QcServiceTest {
   public void consumeDepsCreationEventChildCnoteTest() {
     TicketDTO ticketDTO1 = TicketDTO.builder().status(TicketStatus.IN_PROGRESS).build();
     TicketDTO ticketDTO2 = TicketDTO.builder().status(TicketStatus.CLOSED).build();
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+    when(zoomTicketingAPIClientService.getByCnoteAndType(
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
     Consignment consignment = new Consignment();
@@ -625,7 +625,7 @@ public class QcServiceTest {
   public void consumeDepsCreationEventTest() {
     TicketDTO ticketDTO1 = TicketDTO.builder().status(TicketStatus.IN_PROGRESS).build();
     TicketDTO ticketDTO2 = TicketDTO.builder().status(TicketStatus.CLOSED).build();
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+    when(zoomTicketingAPIClientService.getByCnoteAndType(
             "1234567890", qcService.getQcTicketTypes()))
         .thenReturn(Arrays.asList(ticketDTO1, ticketDTO2));
     Consignment consignment = new Consignment();
@@ -663,7 +663,7 @@ public class QcServiceTest {
 
   @Test
   public void consumeQcBlockerTicketCreationEventTest() {
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+    when(zoomTicketingAPIClientService.getByCnoteAndType(
             "1234567890",
             Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
         .thenReturn(Collections.singletonList(new TicketDTO()));
@@ -685,7 +685,7 @@ public class QcServiceTest {
 
   @Test
   public void consumeRetailQcBlockerTicketCreationEventTest() {
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+    when(zoomTicketingAPIClientService.getByCnoteAndType(
             "1234567890",
             Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
         .thenReturn(Collections.singletonList(new TicketDTO()));
@@ -718,7 +718,7 @@ public class QcServiceTest {
 
   @Test
   public void consumeRetailQcBlockerTicketCreationNoUserEventTest() {
-    when(zoomTicketingAPIClientService.getTicketsByCnoteAndType(
+    when(zoomTicketingAPIClientService.getByCnoteAndType(
             "1234567890",
             Collections.singletonList(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString())))
         .thenReturn(Collections.singletonList(new TicketDTO()));
@@ -740,10 +740,10 @@ public class QcServiceTest {
     when(userMasterService.getById(any())).thenReturn(new User());
     TicketDTO ticketDTO = new TicketDTO();
     ticketDTO.setStatus(TicketStatus.NEW);
-    when(zoomTicketingAPIClientService.getTicketByTicketId(5l)).thenReturn(ticketDTO);
+    when(zoomTicketingAPIClientService.getById(5l)).thenReturn(ticketDTO);
     qcService.consumeQcBlockerTicketCreationEvent(
         5l, "1234567890", ZoomTicketingConstant.QC_BLOCKER_TYPE_ID);
-    verify(zoomTicketingAPIClientService, times(1)).getTicketByTicketId(any());
+    verify(zoomTicketingAPIClientService, times(1)).getById(any());
     verify(zoomTicketingAPIClientService, times(2)).editTicket(any());
     verify(zoomBackendAPIClientService, times(1)).handleConsignmentBlocker(any());
   }

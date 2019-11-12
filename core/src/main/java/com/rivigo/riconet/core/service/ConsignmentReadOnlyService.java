@@ -10,5 +10,7 @@ public interface ConsignmentReadOnlyService {
 
   Optional<ConsignmentReadOnly> findConsignmentById(Long id);
 
-  List<ConsignmentReadOnly> findConsignmentByPickupId(Long pickupId);
+  ConsignmentReadOnly findRequiredById(Long id);
+
+  List<ConsignmentReadOnly> findByPickupId(Long pickupId);
 }
