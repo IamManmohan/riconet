@@ -140,7 +140,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     }
   }
 
-  //TODO: Clean me up
+  // TODO: Clean me up
   @Override
   public JsonNode getEntity(
       Object dto,
