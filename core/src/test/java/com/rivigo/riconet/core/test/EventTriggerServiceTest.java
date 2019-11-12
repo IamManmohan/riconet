@@ -14,10 +14,10 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EventTriggerService;
-import com.rivigo.riconet.core.service.HandoverService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.QcService;
 import com.rivigo.riconet.core.service.RTOService;
+import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingClientService;
 import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
@@ -63,7 +63,7 @@ public class EventTriggerServiceTest {
 
   @Mock private AppNotificationService appNotificationService;
 
-  @Mock private HandoverService handoverService;
+  @Mock private TicketActionFactory ticketActionFactory;
 
   @Mock private RTOService rtoService;
 
@@ -212,7 +212,7 @@ public class EventTriggerServiceTest {
         NotificationDTO.builder().eventName(EventName.TICKET_ACTION.name()).entityId(5l).build();
     eventTriggerService.processNotification(notificationDTO);
     verify(qcService, times(1)).consumeQcBlockerTicketClosedEvent(eq(5l), any(), any());
-    verify(handoverService, times(1)).consumeHandoverTicketAction(eq(5l), any(), any(), any());
+    verify(ticketActionFactory, times(1)).consume(eq(5l), any(), any(), any());
   }
 
   @Test

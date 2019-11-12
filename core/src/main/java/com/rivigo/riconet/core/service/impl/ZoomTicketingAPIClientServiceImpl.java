@@ -2,9 +2,9 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
+import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -26,8 +27,6 @@ import org.springframework.util.StringUtils;
 @Service
 @Slf4j
 public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClientService {
-
-  @Autowired private ObjectMapper objectMapper;
 
   @Value("${zoom.ticketing.url}")
   private String ticketingBaseUrl;
@@ -37,7 +36,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   private static final String TICKET_ID = "ticketId";
 
   @Override
-  public List<TicketDTO> getTicketsByCnoteAndType(String cnote, List<String> typeId) {
+  public List<TicketDTO> getByCnoteAndType(String cnote, List<String> typeId) {
     if (StringUtils.isEmpty(cnote)) {
       throw new ZoomException("Please provide a valid cnote");
     }
@@ -52,6 +51,29 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     } catch (IOException e) {
       log.error("Error while getting qc tickets with cnote {}", cnote, e);
       throw new ZoomException("Error while getting qc tickets with cnote " + cnote);
+    }
+
+    TypeReference<List<TicketDTO>> mapType = new TypeReference<List<TicketDTO>>() {};
+
+    return (List<TicketDTO>) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public List<TicketDTO> getByEntityInAndType(List<String> entityIdList, String typeId) {
+    if (CollectionUtils.isEmpty(entityIdList)) {
+      throw new ZoomException("Please provide a valid ticket entities");
+    }
+    JsonNode responseJson;
+    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
+    entityIdList.forEach(v -> valuesMap.add("entityId", v));
+    valuesMap.add("typeId", typeId);
+    String url = UrlConstant.ZOOM_TICKETING_GET_BY_ENTITY_IN_AND_TYPE;
+    try {
+      responseJson =
+          apiClientService.getEntity(null, HttpMethod.GET, url, valuesMap, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while getting tickets {}", entityIdList);
+      throw new ZoomException("Error while getting tickets: " + entityIdList);
     }
 
     TypeReference<List<TicketDTO>> mapType = new TypeReference<List<TicketDTO>>() {};
@@ -96,6 +118,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
     return (TicketDTO) apiClientService.parseJsonNode(responseJson, mapType);
   }
 
+  @Override
   public void makeComment(Long ticketId, String comment) {
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
@@ -166,7 +189,27 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   }
 
   @Override
-  public TicketDTO getTicketByTicketId(Long ticketId) {
+  public void performAction(TicketActionDTO ticketActionDTO) {
+    String url = UrlConstant.ZOOM_TICKETING_TICKET_ACTION;
+    try {
+      apiClientService.getEntity(ticketActionDTO, HttpMethod.POST, url, null, ticketingBaseUrl);
+    } catch (IOException e) {
+      log.error(
+          "Error while performing ticketAction with ticketId: {}, actionName: {}, actionValue: {} ",
+          ticketActionDTO.getTicketId(),
+          ticketActionDTO.getActionName(),
+          ticketActionDTO.getActionValue(),
+          e);
+      throw new ZoomException(
+          "Error while performing ticketAction with ticketId: %s, actionName: %s, actionValue: %s ",
+          ticketActionDTO.getTicketId(),
+          ticketActionDTO.getActionName(),
+          ticketActionDTO.getActionValue());
+    }
+  }
+
+  @Override
+  public TicketDTO getById(Long ticketId) {
     if (null == ticketId) {
       throw new ZoomException("null ticketId cannot be processed");
     }

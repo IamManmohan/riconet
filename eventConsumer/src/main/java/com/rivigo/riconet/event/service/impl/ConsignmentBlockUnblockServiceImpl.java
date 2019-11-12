@@ -1,20 +1,19 @@
 package com.rivigo.riconet.event.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.riconet.core.constants.UrlConstant;
+import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
-import com.rivigo.riconet.event.dto.ChequeBounceDTO;
+import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.event.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
-import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,17 +22,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblockService {
 
   private final ApiClientService apiClientService;
 
+  private final ZoomBackendAPIClientService zoomBackendAPIClientService;
+
   @Value("${zoom.url}")
   private String zoomBackendBaseUrl;
-
-  @Autowired
-  public ConsignmentBlockUnblockServiceImpl(ApiClientService apiClientService) {
-    this.apiClientService = apiClientService;
-  }
 
   @Override
   public void processNotification(NotificationDTO notificationDTO) {
@@ -94,27 +91,6 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
             .bankName(metadata.get(ZoomCommunicationFieldNames.DRAWEE_BANK.name()))
             .amount(new BigDecimal(metadata.get(ZoomCommunicationFieldNames.AMOUNT.name())))
             .build();
-    log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
-    JsonNode responseJson = null;
-    try {
-      responseJson =
-          apiClientService.getEntity(
-              chequeBounceDTO,
-              HttpMethod.PUT,
-              UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING,
-              null,
-              zoomBackendBaseUrl);
-      log.debug("response {}", responseJson);
-    } catch (IOException e) {
-      log.error(
-          "Exception occurred while marking recovery pending for cn in zoom tech: {} ",
-          chequeBounceDTO,
-          e);
-      throw new ZoomException(
-          "Exception occurred while marking recovery pending for cn in zoom tech : %s",
-          chequeBounceDTO);
-    }
-    TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
-    return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
+    return zoomBackendAPIClientService.markRecoveryPending(chequeBounceDTO);
   }
 }

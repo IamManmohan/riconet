@@ -83,4 +83,15 @@ public enum ZoomCommunicationFieldNames {
     PARENT_ENTITY_ID,
     PARENT_ENTITY_TYPE,
   }
+
+  public enum PaymentDetails {
+    PAYMENT_MODE,
+    PAYMENT_TYPE,
+    TOTAL_AMOUNT,
+    BEFORE_TOTAL_AMOUNT,
+    TOTAL_AMOUNT_DIFF, // TOTAL_AMOUNT - BEFORE_TOTAL_AMOUNT
+    BANK_NAME,
+    TRANSACTION_REFERENCE_NO,
+    TRANSFERRED_AMOUNT
+  }
 }
