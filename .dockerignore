@@ -1,0 +1,18 @@
+# Ignore everything
+**
+# Allow files and directories
+#!/file.txt
+!/src/main/resources/**
+!/core/src/main/resources
+!/eventConsumer/src/main/resources
+!/notificationConsumer/src/main/resources/
+!/eventConsumer/build/distributions/eventConsumer.zip
+!/notificationConsumer/build/distributions/notificationConsumer.zip
+!supervisord.conf
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+#**/*~
+#**/*.log
+#**/.DS_Store
+#**/Thumbs.db
