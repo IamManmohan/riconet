@@ -5,7 +5,11 @@ import akka.kafka.ConsumerSettings;
 import akka.stream.ActorMaterializer;
 import com.rivigo.riconet.core.config.AsyncConfig;
 import com.rivigo.riconet.core.config.KafkaConfig;
+import com.rivigo.riconet.core.config.RiconetRedisConfig;
 import com.rivigo.riconet.core.config.ServiceConfig;
+import com.rivigo.riconet.core.config.ZoomBackendDatabaseConfig;
+import com.rivigo.riconet.core.config.ZoomBackendNeo4jReadConfig;
+import com.rivigo.riconet.core.config.ZoomRiconetConfig;
 import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
@@ -16,9 +20,6 @@ import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
-import com.rivigo.zoom.common.config.TracingConfig;
-import com.rivigo.zoom.common.config.ZoomConfig;
-import com.rivigo.zoom.common.config.ZoomDatabaseConfig;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -126,9 +127,10 @@ public class EventMain {
     ApplicationContext context =
         new AnnotationConfigApplicationContext(
             ServiceConfig.class,
-            ZoomConfig.class,
-            TracingConfig.class,
-            ZoomDatabaseConfig.class,
+            ZoomRiconetConfig.class,
+            ZoomBackendDatabaseConfig.class,
+            ZoomBackendNeo4jReadConfig.class,
+            RiconetRedisConfig.class,
             AsyncConfig.class,
             KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);

@@ -272,7 +272,7 @@ public class ZoomTicketingApiClientServiceTest {
     Mockito.when(
             apiClientService.getEntity(
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenThrow(new IOException());
+        .thenThrow(new IOException("Test Exception"));
   }
 
   private TicketDTO getTicketDTO() {

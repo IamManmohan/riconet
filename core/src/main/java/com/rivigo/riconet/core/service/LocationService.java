@@ -16,7 +16,5 @@ public interface LocationService {
 
   Location getPcOrReportingPc(Location l);
 
-  List<Location> getAllRegionSiblingsOfLocation(String fromLocationCode);
-
   Map<Long, Location> getLocationMap();
 }

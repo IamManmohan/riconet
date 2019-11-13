@@ -53,16 +53,6 @@ public class LocationServiceImpl implements LocationService {
     }
   }
 
-  public List<Location> getAllRegionSiblingsOfLocation(String fromLocationCode) {
-    Location fromLocation = getLocationByCode(fromLocationCode);
-    List<Organization> organization =
-        organizationService.getByOrganizationTypeAndOperationalStatus(
-            OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
-    List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
-    return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
-        fromLocation.getId(), orgIds, LocationType.REGION.name());
-  }
-
   public Map<Long, Location> getLocationMap() {
     return locationRepository
         .findByStatus(OperationalStatus.ACTIVE.name())
