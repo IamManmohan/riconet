@@ -12,7 +12,6 @@ import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
@@ -35,8 +34,6 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
   private final ConsignmentService consignmentService;
-
-  private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   private final PaymentDetailV2Service paymentDetailV2Service;
 
@@ -68,7 +65,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         actionValue);
     List<ConsignmentReadOnly> consignments =
         consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId));
-    zoomTicketingAPIClientService
+    ticketingService
         .getByEntityInAndType(
             consignments.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()),
             ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
@@ -80,7 +77,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
                     .actionValue(actionValue)
                     .ticketId(t.getId())
                     .build())
-        .forEach(zoomTicketingAPIClientService::performAction);
+        .forEach(ticketingService::performAction);
     ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
   }
 

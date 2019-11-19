@@ -31,7 +31,8 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Service
-public class TicketingServiceImpl implements TicketingService {
+public class TicketingServiceImpl extends ZoomTicketingAPIClientServiceImpl
+    implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 
@@ -89,7 +90,7 @@ public class TicketingServiceImpl implements TicketingService {
   public void reopenTicketIfClosed(TicketDTO ticketDTO, String reason) {
     zoomTicketingAPIClientService.makeComment(ticketDTO.getId(), reason);
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      log.info("Not closing ticket {} as status is not closed", ticketDTO);
+      log.info("Not reopening ticket {} as status is not closed", ticketDTO);
       return;
     }
     ticketDTO.setStatus(TicketStatus.REOPENED);
