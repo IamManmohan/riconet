@@ -115,9 +115,6 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
             .reference(String.valueOf(handoverCollectionEventPayload.getCollectionId()))
             .build();
 
-    // Can this be null?
-    // TODO : HOW TO GET THIS
-
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
   }
@@ -248,7 +245,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   private ZoomBookTransactionHeader getTransactionHeader(
       HandoverCollectionEventPayload paymentDetail) {
     ZoomBookTransactionHeader a = null;
-    // TODO
+    // TODO This needs to come in some form in the payload
     return a;
   }
 
