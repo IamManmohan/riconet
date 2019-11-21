@@ -11,6 +11,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -22,6 +23,7 @@ import redis.clients.jedis.JedisPoolConfig;
 @Slf4j
 @Configuration
 @ComponentScan({"com.rivigo.zoom.common.repository.redis"})
+@Import(com.rivigo.zoom.common.config.ZoomBackendCacheConfig.class)
 public class RiconetRedisConfig {
 
   @Value("${redis.hostname}")
