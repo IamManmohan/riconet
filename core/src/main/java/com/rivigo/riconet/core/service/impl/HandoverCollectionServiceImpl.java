@@ -207,11 +207,11 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
     consignmentIDs.forEach(
         cnId -> {
-          PaymentDetailV2 byConsignmentId = paymentDetailV2Service.getByConsignmentId(cnId);
+          PaymentDetailV2 paymentDetail = paymentDetailV2Service.getByConsignmentId(cnId);
           // Filter by bankName and ChequeNumber
-          if (byConsignmentId.getTransactionReferenceNo().equals(chequeNumber)
-              && byConsignmentId.getBankName().equals(bankName))
-            cnIdToPaymentDetailV2Map.put(cnId, byConsignmentId);
+          if (paymentDetail.getTransactionReferenceNo().equals(chequeNumber)
+              && paymentDetail.getBankName().equals(bankName))
+            cnIdToPaymentDetailV2Map.put(cnId, paymentDetail);
         });
 
     return cnIdToPaymentDetailV2Map
