@@ -39,7 +39,7 @@ public class RiconetRedisConfig {
   private Integer redisMaxPoolSize;
 
   @Getter
-  @Value("${redis.pub.sub.topic:rivigo-cache}")
+  @Value("${redis.pub.sub.topic:zoom-cache}")
   private String redisPubSubTopic;
 
   @Autowired private ObjectMapper objectMapper;
