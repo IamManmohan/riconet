@@ -33,11 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class HandoverCollectionServiceImpl implements HandoverCollectionService {
 
@@ -60,25 +62,6 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   @Value("${retail.collection.dispute.topic}")
   private String retailCollectionDisputeTopic;
 
-  public HandoverCollectionServiceImpl(
-      ObjectMapper objectMapper,
-      ZoomBookAPIClientService zoomBookAPIClientService,
-      LocationService locationService,
-      DepositSlipService depositSlipService,
-      ConsignmentDepositSlipRepository consignmentDepositSlipRepository,
-      PaymentDetailV2Service paymentDetailV2Service,
-      ZoomBackendAPIClientService zoomBackendAPIClientService,
-      ConsignmentReadOnlyService consignmentReadOnlyService) {
-    this.objectMapper = objectMapper;
-    this.zoomBookAPIClientService = zoomBookAPIClientService;
-    this.locationService = locationService;
-    this.depositSlipService = depositSlipService;
-    this.consignmentDepositSlipRepository = consignmentDepositSlipRepository;
-    this.paymentDetailV2Service = paymentDetailV2Service;
-    this.zoomBackendAPIClientService = zoomBackendAPIClientService;
-    this.consignmentReadOnlyService = consignmentReadOnlyService;
-  }
-
   @Override
   public void handleHandoverCollectionPostUnpostEvent(String payload) {
     // TODO : potential Error Handling
@@ -91,10 +74,9 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
       handoverCollectionEventPayload =
           objectMapper.readValue(payload, HandoverCollectionEventPayload.class);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("Failed to parse HandoverCollectionEventPayload - {}", e.getLocalizedMessage());
+      throw new ZoomException("Failed to create DTO from payload - %s", payload);
     }
-    if (handoverCollectionEventPayload == null)
-      throw new ZoomException("Failed to create DTO from payload " + payload);
 
     // fill transactionRequestDTO
     ZoomBookTransactionRequestDTO transactionRequestDTO =
@@ -146,32 +128,29 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
       handoverExcludePayload =
           objectMapper.readValue(payload, HandoverCollectionExcludeEventPayload.class);
     } catch (IOException e) {
-      handoverExcludePayload = null;
-      e.printStackTrace();
-    }
-
-    if (handoverExcludePayload == null) {
-      throw new ZoomException("Failed to create DTO from payload " + payload);
+      log.error(
+          "Failed to parse HandoverCollectionExcludeEventPayload - {}", e.getLocalizedMessage());
+      throw new ZoomException("Failed to create DTO from payload - %s", payload);
     }
 
     DepositSlip depositSlip =
         depositSlipService.findByDepositSlipNumber(handoverExcludePayload.getDepositSlipNumber());
     if (depositSlip == null) {
       throw new ZoomException(
-          "DepositSlip not found: {}", handoverExcludePayload.getDepositSlipNumber());
+          "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipNumber());
     }
 
     // get all CNs from depositSlip
     final Map<Long, PaymentDetailV2> cnIdToPaymentDetailV2Map = new HashMap<>();
 
-    List<Long> consignmentIDs =
+    List<Long> consignmentIds =
         consignmentDepositSlipRepository.findConsignmentIdByDepositSlipId(depositSlip.getId());
 
     String chequeNumber = handoverExcludePayload.getChequeNumber();
     String bankName = handoverExcludePayload.getBankName();
 
     Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap =
-        filterAllAffectedCNs(consignmentIDs, cnIdToPaymentDetailV2Map, chequeNumber, bankName);
+        filterAllAffectedCNs(consignmentIds, cnIdToPaymentDetailV2Map, chequeNumber, bankName);
 
     // 2 entries, one credit, and one debit for cheque bounce
     transactionRequestDTO = getNewTransactionRequestDTOForChequeBounce(handoverExcludePayload);
@@ -230,7 +209,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         cnId -> {
           PaymentDetailV2 byConsignmentId = paymentDetailV2Service.getByConsignmentId(cnId);
           // Filter by bankName and ChequeNumber
-          if (byConsignmentId.getChequeNumber().equals(chequeNumber)
+          if (byConsignmentId.getTransactionReferenceNo().equals(chequeNumber)
               && byConsignmentId.getBankName().equals(bankName))
             cnIdToPaymentDetailV2Map.put(cnId, byConsignmentId);
         });

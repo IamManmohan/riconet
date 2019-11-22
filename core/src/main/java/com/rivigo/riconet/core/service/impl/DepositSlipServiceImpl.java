@@ -3,7 +3,9 @@ package com.rivigo.riconet.core.service.impl;
 import com.rivigo.riconet.core.service.DepositSlipService;
 import com.rivigo.zoom.common.model.depositslip.DepositSlip;
 import com.rivigo.zoom.common.repository.mysql.depositslip.DepositSlipRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DepositSlipServiceImpl implements DepositSlipService {
 
   private final DepositSlipRepository depositSlipRepository;
