@@ -42,10 +42,11 @@ public class FinanceEventServiceImpl implements FinanceEventService {
       case HANDOVER_COLLECTION_POST:
       case HANDOVER_COLLECTION_UNPOST:
         handoverCollectionService.handleHandoverCollectionPostUnpostEvent(
-            eventPayload.getPayload());
+            eventPayload.getPayload(), eventType);
         break;
       case HANDOVER_COLLECTION_EXCLUDE:
-        handoverCollectionService.handleHandoverCollectionExcludeEvent(eventPayload.getPayload());
+        handoverCollectionService.handleHandoverCollectionExcludeEvent(
+            eventPayload.getPayload(), eventType);
         break;
       default:
         log.info("Event does not trigger anything {}", eventType);

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.collections.api.dto.HandoverCollectionExcludeEventPayload;
+import com.rivigo.collections.api.enums.PaymentType.ZoomPaymentType;
 import com.rivigo.finance.utils.TimeUUID;
+import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.DepositSlipService;
@@ -63,9 +65,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   private String retailCollectionDisputeTopic;
 
   @Override
-  public void handleHandoverCollectionPostUnpostEvent(String payload) {
-    // TODO : potential Error Handling
-
+  public void handleHandoverCollectionPostUnpostEvent(String payload, ZoomEventType eventType) {
     // Parse this payload to HandoverCollectionEventPayload,
     // Get location dto for the location code,
     // create ZoomBookTransactionRequestDTO and hit the zoombook for creating transaction
@@ -81,7 +81,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     // fill transactionRequestDTO
     ZoomBookTransactionRequestDTO transactionRequestDTO =
         ZoomBookTransactionRequestDTO.builder()
-            .transactionType(getTransactionType(handoverCollectionEventPayload))
+            .transactionType(getTransactionType(handoverCollectionEventPayload, eventType))
             .clientRequestId(getTimeUUID())
             .tenantType(ZoomBookTenantType.RETAIL)
             .functionType(ZoomBookFunctionType.OU_OUTSTANDING)
@@ -92,8 +92,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
             .transactionSubHeader(ZoomBookTransactionSubHeader.KNOCKOFF)
             .remarks(payload)
             // .notification() //not needed
-            // TODO clarify this - which date needs to go here (entry date or posting date)
-            .effectedAt(handoverCollectionEventPayload.getCollectionPostingDate())
+            .effectedAt(handoverCollectionEventPayload.getCollectionEntryDate())
             .reference(String.valueOf(handoverCollectionEventPayload.getCollectionId()))
             .build();
 
@@ -102,19 +101,19 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   private ZoomBookTransactionType getTransactionType(
-      HandoverCollectionEventPayload handoverCollectionEventPayload) {
-    switch (handoverCollectionEventPayload.getHandoverCollectionEventType()) {
-      case COLLECTION_UNPOST:
+      HandoverCollectionEventPayload handoverCollectionEventPayload, ZoomEventType eventType) {
+    switch (eventType) {
+      case HANDOVER_COLLECTION_UNPOST:
         return ZoomBookTransactionType.DEBIT;
-      case COLLECTION_EXCLUDE:
-      case COLLECTION_POST:
+      case HANDOVER_COLLECTION_EXCLUDE:
+      case HANDOVER_COLLECTION_POST:
       default:
         return ZoomBookTransactionType.CREDIT;
     }
   }
 
   @Override
-  public void handleHandoverCollectionExcludeEvent(String payload) {
+  public void handleHandoverCollectionExcludeEvent(String payload, ZoomEventType eventType) {
     // This is cheque bounce, and need to be handled as such
 
     // Parse this payload to HandoverCollectionEventPayload,
@@ -134,10 +133,10 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     }
 
     DepositSlip depositSlip =
-        depositSlipService.findByDepositSlipNumber(handoverExcludePayload.getDepositSlipNumber());
+        depositSlipService.findByDepositSlipId(handoverExcludePayload.getDepositSlipId());
     if (depositSlip == null) {
       throw new ZoomException(
-          "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipNumber());
+          "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipId());
     }
 
     // get all CNs from depositSlip
@@ -190,7 +189,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         .remarks(payload.getRemarks().replaceAll("[^a-zA-Z0-9,./-]", " "))
         .effectedAt(payload.getCollectionPostingDate())
         .reference(
-            payload.getDepositSlipNumber()
+            payload.getDepositSlipId()
                 + "|"
                 + payload.getBankName()
                 + "|"
@@ -222,10 +221,15 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   private ZoomBookTransactionHeader getTransactionHeader(
-      HandoverCollectionEventPayload paymentDetail) {
-    ZoomBookTransactionHeader a = null;
-    // TODO This needs to come in some form in the payload
-    return a;
+      HandoverCollectionEventPayload handoverCollectionEventPayload) {
+    ZoomBookTransactionHeader transactionHeader = null;
+    if (ZoomPaymentType.CHEQUE.equals(handoverCollectionEventPayload.getPaymentType())) {
+      transactionHeader = ZoomBookTransactionHeader.CHEQUE;
+    } else {
+      // Currently it can either be cash or cheque, so lets just keep them at that.
+      transactionHeader = ZoomBookTransactionHeader.CASH;
+    }
+    return transactionHeader;
   }
 
   private String getTimeUUID() {
