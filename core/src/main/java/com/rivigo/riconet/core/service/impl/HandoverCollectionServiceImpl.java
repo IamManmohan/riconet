@@ -133,11 +133,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     }
 
     DepositSlip depositSlip =
-        depositSlipService.findByDepositSlipId(handoverExcludePayload.getDepositSlipId());
-    if (depositSlip == null) {
-      throw new ZoomException(
-          "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipId());
-    }
+        depositSlipService
+            .findByDepositSlipId(handoverExcludePayload.getDepositSlipId())
+            .orElseThrow(
+                () ->
+                    new ZoomException(
+                        "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipId()));
 
     // get all CNs from depositSlip
     final Map<Long, PaymentDetailV2> cnIdToPaymentDetailV2Map = new HashMap<>();

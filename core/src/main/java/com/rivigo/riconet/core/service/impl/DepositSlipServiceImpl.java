@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.rivigo.riconet.core.service.DepositSlipService;
 import com.rivigo.zoom.common.model.depositslip.DepositSlip;
 import com.rivigo.zoom.common.repository.mysql.depositslip.DepositSlipRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ public class DepositSlipServiceImpl implements DepositSlipService {
   private final DepositSlipRepository depositSlipRepository;
 
   @Override
-  public DepositSlip findByDepositSlipId(String depositSlipId) {
-    return depositSlipRepository.findById(Long.valueOf(depositSlipId)).orElse(null);
+  public Optional<DepositSlip> findByDepositSlipId(Long depositSlipId) {
+    return depositSlipRepository.findById(depositSlipId);
   }
 }
