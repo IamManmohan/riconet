@@ -35,6 +35,8 @@ public class ZoomTicketingConstant {
 
   public static final String PICKUP_BANK_TRANSFER_ACTION_NAME = "pickup_bank_transfer";
 
+  public static final String UTR_BANK_TRANSFER_ACTION_NAME = "utr_bank_transfer";
+
   public static final String BANK_TRANSFER_ACTION_NAME = "cnote_bank_transfer";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";

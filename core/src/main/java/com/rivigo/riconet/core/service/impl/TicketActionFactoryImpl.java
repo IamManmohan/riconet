@@ -15,6 +15,8 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
   private void consumeHandoverTicketAction(
       TicketDTO ticketDTO, String cnote, String requestAction) {
     if (!ZoomTicketingConstant.WRITEOFF_TYPE_ID.equals(ticketDTO.getTypeId())) {
-      log.info("Ticket is not write-off ticket: TicketType: %s", ticketDTO.getTypeId());
+      log.info("Ticket is not write-off ticket: TicketType: {}", ticketDTO.getTypeId());
       return;
     }
     WriteOffRequestAction writeOffRequestAction =
@@ -63,12 +65,17 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         "Performing action on all child tickets for pickup: {}, request status : {}",
         pickupId,
         actionValue);
-    List<ConsignmentReadOnly> consignments =
-        consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId));
+    List<String> cnotes =
+        consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId)).stream()
+            .map(ConsignmentReadOnly::getCnote)
+            .collect(Collectors.toList());
+    bulkCloseBankTransferTickets(ticketDTO, actionValue, cnotes);
+  }
+
+  private void bulkCloseBankTransferTickets(
+      TicketDTO ticketDTO, String actionValue, Collection<String> cnotes) {
     ticketingService
-        .getByEntityInAndType(
-            consignments.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()),
-            ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
+        .getByEntityInAndType(cnotes, ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
         .stream()
         .map(
             t ->
@@ -109,9 +116,49 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         consumeBankTransferAction(
             ticketingService.getRequiredById(ticketId), entityId, actionValue);
         break;
+      case ZoomTicketingConstant.UTR_BANK_TRANSFER_ACTION_NAME:
+        consumeUtrBankTransferAction(
+            ticketingService.getRequiredById(ticketId), entityId, actionValue);
+        break;
       default:
         log.info("Action ignored since it is not related to Write Off - {}", actionName);
     }
+  }
+
+  private void consumeUtrBankTransferAction(
+      TicketDTO ticketDTO, String entityId, String actionValue) {
+    // Validate ticket type
+    if (!ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID.equals(ticketDTO.getTypeId())) {
+      log.info("Ticket {} is not UTR bank-transfer ticket", ticketDTO.getId());
+      return;
+    }
+
+    log.info(
+        "Performing action on all child tickets for UTR: {}, request status : {}",
+        entityId,
+        actionValue);
+    List<PaymentDetailV2> paymentsForTRN =
+        paymentDetailV2Service.getByTransactionReferenceNo(entityId).stream()
+            .filter(v -> PaymentType.BANK_TRANSFER.equals(v.getPaymentType()))
+            .collect(Collectors.toList());
+
+    if (paymentsForTRN.stream().map(PaymentDetailV2::getBankAccountReference).distinct().count()
+        > 1) {
+      ticketingService.makeComment(
+          ticketDTO.getId(),
+          "Multiple banks found for same UTR number. Please approve/reject all tickets individually");
+      return;
+    }
+
+    Collection<String> cnotes =
+        consignmentReadOnlyService
+            .getCnIdToCnoteMap(
+                paymentsForTRN.stream()
+                    .map(PaymentDetailV2::getConsignmentId)
+                    .collect(Collectors.toList()))
+            .values();
+
+    bulkCloseBankTransferTickets(ticketDTO, actionValue, cnotes);
   }
 
   private void consumeBankTransferAction(TicketDTO ticketDTO, String cnote, String actionValue) {
