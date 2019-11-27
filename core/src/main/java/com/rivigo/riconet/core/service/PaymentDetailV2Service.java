@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.zoom.common.model.PaymentDetailV2;
-
 import java.util.List;
 
 /** Created by ashfakh on 28/05/19. */

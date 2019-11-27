@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,9 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
 
   @Override
   public Map<Long, String> getCnIdToCnoteMap(List<Long> cnIds) {
-    return consignmentRepo.findByIdInAndIsActive(cnIds, 1).stream()
+    return consignmentRepo
+        .findByIdInAndIsActive(cnIds, 1)
+        .stream()
         .collect(Collectors.toMap(ConsignmentReadOnly::getId, ConsignmentReadOnly::getCnote));
   }
 }

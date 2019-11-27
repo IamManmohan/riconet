@@ -5,7 +5,6 @@ import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketCommentDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.zoomticketing.LocationType;
-
 import java.util.Collection;
 import java.util.List;
 
