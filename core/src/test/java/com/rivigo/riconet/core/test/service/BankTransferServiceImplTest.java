@@ -4,6 +4,7 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UploadedFileRecordService;
+import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.BankTransferServiceImpl;
 import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.FileTypes;
@@ -24,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 public class BankTransferServiceImplTest {
 
   @Mock private TicketingService ticketingService;
+
+  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Mock private ConsignmentReadOnlyService consignmentReadOnlyService;
 
@@ -48,7 +51,8 @@ public class BankTransferServiceImplTest {
         .thenReturn(Collections.singletonList(new UploadedFileRecord()));
     bankTransferService.createTicket(getMockMetadataInput());
 
-    Mockito.verify(ticketingService, Mockito.atLeastOnce()).createTicket(Mockito.any());
+    Mockito.verify(zoomTicketingAPIClientService, Mockito.atLeastOnce())
+        .createTicket(Mockito.any());
   }
 
   @Test
@@ -63,7 +67,8 @@ public class BankTransferServiceImplTest {
         .thenReturn(Collections.singletonList(new UploadedFileRecord()));
     bankTransferService.createTicket(getMockMetadataInput());
 
-    Mockito.verify(ticketingService, Mockito.atLeastOnce()).createTicket(Mockito.any());
+    Mockito.verify(zoomTicketingAPIClientService, Mockito.atLeastOnce())
+        .createTicket(Mockito.any());
   }
 
   @Test(expected = ZoomException.class)

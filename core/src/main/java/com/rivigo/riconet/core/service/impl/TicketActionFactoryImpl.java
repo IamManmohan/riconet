@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 public class TicketActionFactoryImpl implements TicketActionFactory {
 
   private final TicketingService ticketingService;
+
+  private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
@@ -75,7 +78,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
 
   private void bulkCloseBankTransferTickets(
       TicketDTO ticketDTO, String actionValue, Collection<String> cnotes) {
-    ticketingService
+    zoomTicketingAPIClientService
         .getByEntityInAndType(cnotes, ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
         .stream()
         .map(
@@ -85,7 +88,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
                     .actionValue(actionValue)
                     .ticketId(t.getId())
                     .build())
-        .forEach(ticketingService::performAction);
+        .forEach(zoomTicketingAPIClientService::performAction);
     ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
   }
 
@@ -147,7 +150,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
 
     if (paymentsForTRN.stream().map(PaymentDetailV2::getBankAccountReference).distinct().count()
         > 1) {
-      ticketingService.makeComment(
+      zoomTicketingAPIClientService.makeComment(
           ticketDTO.getId(),
           "Multiple banks found for same UTR number. Please approve/reject all tickets individually");
       return;

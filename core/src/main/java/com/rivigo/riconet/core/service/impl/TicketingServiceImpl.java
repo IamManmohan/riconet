@@ -31,8 +31,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Service
-public class TicketingServiceImpl extends ZoomTicketingAPIClientServiceImpl
-    implements TicketingService {
+public class TicketingServiceImpl implements TicketingService {
 
   private final EmailSenderService emailSenderService;
 

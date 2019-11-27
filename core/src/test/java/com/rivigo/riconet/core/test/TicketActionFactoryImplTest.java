@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.TicketActionFactoryImpl;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
@@ -25,6 +26,8 @@ import org.mockito.MockitoAnnotations;
 public class TicketActionFactoryImplTest {
 
   @Mock private TicketingService ticketingService;
+
+  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
@@ -53,7 +56,7 @@ public class TicketActionFactoryImplTest {
         .thenReturn(Collections.singletonList(new ConsignmentReadOnly()));
 
     Mockito.when(
-            ticketingService.getByEntityInAndType(
+            zoomTicketingAPIClientService.getByEntityInAndType(
                 Mockito.anyListOf(String.class), Mockito.anyString()))
         .thenReturn(Arrays.asList(new TicketDTO(), new TicketDTO()));
     ticketActionFactory.consume(
@@ -62,7 +65,8 @@ public class TicketActionFactoryImplTest {
         ZoomTicketingConstant.PICKUP_BANK_TRANSFER_ACTION_NAME,
         ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE);
 
-    Mockito.verify(ticketingService, Mockito.atLeastOnce()).performAction(Mockito.any());
+    Mockito.verify(zoomTicketingAPIClientService, Mockito.atLeastOnce())
+        .performAction(Mockito.any());
 
     Mockito.verify(ticketingService).closeTicketIfRequired(Mockito.any(), Mockito.anyString());
   }

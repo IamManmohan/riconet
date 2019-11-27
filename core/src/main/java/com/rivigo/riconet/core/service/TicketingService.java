@@ -7,7 +7,7 @@ import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
  * @author ramesh
  * @date 15-Aug-2018
  */
-public interface TicketingService extends ZoomTicketingAPIClientService {
+public interface TicketingService {
 
   void sendTicketingEventsEmail(NotificationDTO notificationDTO);
 

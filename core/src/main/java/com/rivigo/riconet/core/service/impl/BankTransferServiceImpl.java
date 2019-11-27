@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UploadedFileRecordService;
+import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
@@ -37,6 +38,8 @@ public class BankTransferServiceImpl implements BankTransferService {
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
+  private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+
   private final UploadedFileRecordService uploadedFileRecordService;
 
   @Override
@@ -48,7 +51,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     String s3Url = getS3Url(consignment);
 
     // Create ticket for cnote
-    ticketingService.createTicket(
+    zoomTicketingAPIClientService.createTicket(
         getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url));
 
     // Create ticket for UTR
@@ -61,7 +64,7 @@ public class BankTransferServiceImpl implements BankTransferService {
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
 
     TicketDTO utrTicket =
-        ticketingService
+        zoomTicketingAPIClientService
             .getByEntityInAndType(
                 Collections.singletonList(utrNo),
                 String.valueOf(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID))
@@ -69,7 +72,7 @@ public class BankTransferServiceImpl implements BankTransferService {
             .findFirst()
             .orElseGet(
                 () ->
-                    ticketingService.createTicket(
+                    zoomTicketingAPIClientService.createTicket(
                         getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo)));
 
     ticketingService.reopenTicketIfClosed(
@@ -105,7 +108,7 @@ public class BankTransferServiceImpl implements BankTransferService {
   }
 
   private GroupDTO getGroupForTicketing() {
-    return ticketingService.getGroupId(
+    return zoomTicketingAPIClientService.getGroupId(
         ZoomTicketingConstant.HQTR_LOCATION_ID,
         ZoomTicketingConstant.BANK_TRANSFER_GROUP_NAME,
         LocationType.HQTR);
