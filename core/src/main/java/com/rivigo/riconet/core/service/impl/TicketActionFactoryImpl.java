@@ -68,7 +68,9 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         pickupId,
         actionValue);
     List<String> cnotes =
-        consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId)).stream()
+        consignmentReadOnlyService
+            .findByPickupId(Long.parseLong(pickupId))
+            .stream()
             .map(ConsignmentReadOnly::getCnote)
             .collect(Collectors.toList());
     bulkCloseBankTransferTickets(ticketDTO, actionValue, cnotes);
@@ -145,7 +147,9 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         entityId,
         actionValue);
     List<PaymentDetailV2> paymentsForTRN =
-        paymentDetailV2Service.getByTransactionReferenceNo(entityId).stream()
+        paymentDetailV2Service
+            .getByTransactionReferenceNo(entityId)
+            .stream()
             .filter(v -> PaymentType.BANK_TRANSFER.equals(v.getPaymentType()))
             .collect(Collectors.toList());
 
@@ -160,7 +164,8 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     Collection<String> cnotes =
         consignmentReadOnlyService
             .getCnIdToCnoteMap(
-                paymentsForTRN.stream()
+                paymentsForTRN
+                    .stream()
                     .map(PaymentDetailV2::getConsignmentId)
                     .collect(Collectors.toList()))
             .values();
