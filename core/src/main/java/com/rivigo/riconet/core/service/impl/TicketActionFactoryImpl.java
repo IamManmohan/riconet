@@ -68,9 +68,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         pickupId,
         actionValue);
     List<String> cnotes =
-        consignmentReadOnlyService
-            .findByPickupId(Long.parseLong(pickupId))
-            .stream()
+        consignmentReadOnlyService.findByPickupId(Long.parseLong(pickupId)).stream()
             .map(ConsignmentReadOnly::getCnote)
             .collect(Collectors.toList());
     bulkCloseBankTransferTickets(ticketDTO, actionValue, cnotes);
@@ -78,18 +76,23 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
 
   private void bulkCloseBankTransferTickets(
       TicketDTO ticketDTO, String actionValue, Collection<String> cnotes) {
-    zoomTicketingAPIClientService
-        .getByEntityInAndType(cnotes, ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
-        .stream()
-        .map(
-            t ->
-                TicketActionDTO.builder()
-                    .actionName(ZoomTicketingConstant.BANK_TRANSFER_ACTION_NAME)
-                    .actionValue(actionValue)
-                    .ticketId(t.getId())
-                    .build())
-        .forEach(zoomTicketingAPIClientService::performAction);
-    ticketingService.closeTicketIfRequired(ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
+    try {
+      zoomTicketingAPIClientService
+          .getByEntityInAndType(cnotes, ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
+          .stream()
+          .map(
+              t ->
+                  TicketActionDTO.builder()
+                      .actionName(ZoomTicketingConstant.BANK_TRANSFER_ACTION_NAME)
+                      .actionValue(actionValue)
+                      .ticketId(t.getId())
+                      .build())
+          .forEach(zoomTicketingAPIClientService::performAction);
+      ticketingService.closeTicketIfRequired(
+          ticketDTO, ZoomTicketingConstant.ACTION_CLOSURE_MESSAGE);
+    } catch (Exception e) {
+      ticketingService.reopenTicketIfClosed(ticketDTO, e.getMessage().replace("=", ":"));
+    }
   }
 
   private WriteOffRequestAction getWriteOffRequestActionFromTicketAction(String actionValue) {
@@ -142,9 +145,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
         entityId,
         actionValue);
     List<PaymentDetailV2> paymentsForTRN =
-        paymentDetailV2Service
-            .getByTransactionReferenceNo(entityId)
-            .stream()
+        paymentDetailV2Service.getByTransactionReferenceNo(entityId).stream()
             .filter(v -> PaymentType.BANK_TRANSFER.equals(v.getPaymentType()))
             .collect(Collectors.toList());
 
@@ -159,8 +160,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     Collection<String> cnotes =
         consignmentReadOnlyService
             .getCnIdToCnoteMap(
-                paymentsForTRN
-                    .stream()
+                paymentsForTRN.stream()
                     .map(PaymentDetailV2::getConsignmentId)
                     .collect(Collectors.toList()))
             .values();
