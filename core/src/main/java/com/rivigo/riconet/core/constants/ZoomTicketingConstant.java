@@ -95,7 +95,7 @@ public class ZoomTicketingConstant {
   public static final String BANK_TRANSFER_GROUP_NAME = "Finance Bank Transfer";
 
   public static final String BANK_TRANSFER_TICKET_TITLE = "Bank Transfer payment made for %s: %s";
-  public static final String CNOTE_ADDED_TO_UTR = "Cnote: %s added";
+  public static final String CNOTE_ADDED_TO_UTR = "Cnote: %s<br>Amount: %s";
 
   public static final Long RTO_TICKET_TYPE_ID = 731L;
 }

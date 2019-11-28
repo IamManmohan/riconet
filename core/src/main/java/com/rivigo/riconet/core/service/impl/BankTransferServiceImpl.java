@@ -76,7 +76,12 @@ public class BankTransferServiceImpl implements BankTransferService {
                         getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo)));
 
     ticketingService.reopenTicketIfClosed(
-        utrTicket, String.format(ZoomTicketingConstant.CNOTE_ADDED_TO_UTR, cnote));
+        utrTicket,
+        String.format(
+            ZoomTicketingConstant.CNOTE_ADDED_TO_UTR,
+            cnote,
+            metadata.getOrDefault(
+                ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")));
   }
 
   private TicketDTO getTicketDtoForUtrBankTransfer(
@@ -95,8 +100,7 @@ public class BankTransferServiceImpl implements BankTransferService {
                     ZoomCommunicationFieldNames.PaymentDetails.BANK_NAME.name(), ""),
                 utrNo,
                 s3Url,
-                metadata.getOrDefault(
-                    ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")))
+                "see comments"))
         .title(
             String.format(
                 ZoomTicketingConstant.BANK_TRANSFER_TICKET_TITLE,
