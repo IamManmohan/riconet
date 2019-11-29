@@ -4,5 +4,6 @@ package com.rivigo.riconet.core.enums.zoomticketing;
 public enum TicketEntityType {
   CN,
   PRQ,
+  UTR,
   NONE
 }
