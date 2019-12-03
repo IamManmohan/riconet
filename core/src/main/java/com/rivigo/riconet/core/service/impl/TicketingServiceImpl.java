@@ -89,7 +89,7 @@ public class TicketingServiceImpl implements TicketingService {
   public void reopenTicketIfClosed(TicketDTO ticketDTO, String reason) {
     zoomTicketingAPIClientService.makeComment(ticketDTO.getId(), reason);
     if (ticketDTO.getStatus() != TicketStatus.CLOSED) {
-      log.info("Not closing ticket {} as status is not closed", ticketDTO);
+      log.info("Not reopening ticket {} as status is not closed", ticketDTO);
       return;
     }
     ticketDTO.setStatus(TicketStatus.REOPENED);
