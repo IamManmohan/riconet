@@ -62,7 +62,7 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   @Override
   public List<TicketDTO> getByEntityInAndType(Collection<String> entityIdList, String typeId) {
     if (CollectionUtils.isEmpty(entityIdList)) {
-      throw new ZoomException("Please provide a valid ticket entities");
+      throw new ZoomException("Please provide valid ticket entities");
     }
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
