@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -78,6 +79,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
 
   private void bulkCloseBankTransferTickets(
       TicketDTO ticketDTO, String actionValue, Collection<String> cnotes) {
+    if (CollectionUtils.isEmpty(cnotes)) return;
     try {
       zoomTicketingAPIClientService
           .getByEntityInAndType(cnotes, ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID.toString())
