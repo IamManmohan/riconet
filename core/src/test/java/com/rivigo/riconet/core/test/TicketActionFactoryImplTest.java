@@ -27,13 +27,13 @@ public class TicketActionFactoryImplTest {
 
   @Mock private TicketingService ticketingService;
 
+  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
+
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Mock private ConsignmentReadOnlyService consignmentReadOnlyService;
 
   @Mock private ConsignmentService consignmentService;
-
-  @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Mock private PaymentDetailV2Service paymentDetailV2Service;
 

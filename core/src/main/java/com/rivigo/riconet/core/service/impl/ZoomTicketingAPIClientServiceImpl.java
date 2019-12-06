@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +60,9 @@ public class ZoomTicketingAPIClientServiceImpl implements ZoomTicketingAPIClient
   }
 
   @Override
-  public List<TicketDTO> getByEntityInAndType(List<String> entityIdList, String typeId) {
+  public List<TicketDTO> getByEntityInAndType(Collection<String> entityIdList, String typeId) {
     if (CollectionUtils.isEmpty(entityIdList)) {
-      throw new ZoomException("Please provide a valid ticket entities");
+      throw new ZoomException("Please provide valid ticket entities");
     }
     JsonNode responseJson;
     MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
