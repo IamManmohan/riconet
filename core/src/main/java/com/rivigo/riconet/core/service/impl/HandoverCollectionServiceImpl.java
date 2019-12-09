@@ -119,6 +119,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     // Parse this payload to HandoverCollectionEventPayload,
     // Get location dto for the location code,
     // create ZoomBookTransactionRequestDTO and hit the zoombook for creating transaction
+    log.info("Handling Cheque Bounce Event from collections service");
     List<ZoomBookTransactionRequestDTO> transactionRequestDTOList = new ArrayList<>();
     ZoomBookTransactionRequestDTO transactionRequestDTO;
 
@@ -160,9 +161,13 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     transactionRequestDTO.setTransactionType(ZoomBookTransactionType.CREDIT);
     transactionRequestDTOList.add(transactionRequestDTO);
 
+    log.info(
+        "Making zoomBook API call for creating transactions, transactionsList: {}",
+        transactionRequestDTOList);
     // ZOOM BOOK API Call
     zoomBookAPIClientService.processZoomBookTransaction(transactionRequestDTOList);
 
+    log.info("Making zoom backend markRecoveryPending API calls for each CN");
     // Mark Recovery Pending API
     cnIdToConsignmentMap.forEach(
         (cnId, consignmentReadOnly) ->
@@ -247,6 +252,10 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
             .amount(amount)
             .build();
     JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPending(chequeBounceDTO);
+    log.info(
+        "API call for chequeBounceEvent done, for payload: {}, response: {}",
+        chequeBounceDTO,
+        jsonNode);
     // Does this make a difference what happens to the request?
   }
 }
