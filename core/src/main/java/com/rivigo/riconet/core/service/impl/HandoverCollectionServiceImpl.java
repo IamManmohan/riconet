@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -192,7 +193,10 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         .amount(payload.getCollectionAmount())
         .transactionHeader(ZoomBookTransactionHeader.CHEQUE)
         .transactionSubHeader(ZoomBookTransactionSubHeader.BOUNCED)
-        .remarks(payload.getRemarks().replaceAll("[^a-zA-Z0-9,./-]", " "))
+        .remarks(
+            Optional.ofNullable(payload.getRemarks())
+                .orElse("")
+                .replaceAll("[^a-zA-Z0-9,./-]", " "))
         .effectedAt(payload.getCollectionPostingDate())
         .reference(
             payload.getDepositSlipId()
