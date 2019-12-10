@@ -16,6 +16,7 @@ import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
+import com.rivigo.zoom.common.enums.zoombook.HandoverStatus;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionHeader;
@@ -176,7 +177,8 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
                 consignmentReadOnly.getCnote(),
                 chequeNumber,
                 bankName,
-                cnIdToPaymentDetailV2Map.get(cnId).getTotalAmount()));
+                cnIdToPaymentDetailV2Map.get(cnId).getTotalAmount(),
+                cnIdToPaymentDetailV2Map.get(cnId).getBankAccountReference()));
   }
 
   private Location getLocation(String code) {
@@ -217,9 +219,10 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     consignmentIDs.forEach(
         cnId -> {
           PaymentDetailV2 paymentDetail = paymentDetailV2Service.getByConsignmentId(cnId);
-          // Filter by bankName and ChequeNumber
+          // Filter by bankName and ChequeNumber and Handover Status(non complete are not needed)
           if (paymentDetail.getTransactionReferenceNo().equals(chequeNumber)
-              && paymentDetail.getBankName().equals(bankName))
+              && paymentDetail.getBankName().equals(bankName)
+              && !HandoverStatus.COMPLETE.equals(paymentDetail.getHandoverStatus()))
             cnIdToPaymentDetailV2Map.put(cnId, paymentDetail);
         });
 
@@ -247,11 +250,16 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   private void markRecoveryPending(
-      String cnote, String chequeNumber, String bankName, BigDecimal amount) {
+      String cnote,
+      String chequeNumber,
+      String bankName,
+      BigDecimal amount,
+      String bankAccountReference) {
     ChequeBounceDTO chequeBounceDTO =
         ChequeBounceDTO.builder()
             .cnote(cnote)
             .chequeNumber(chequeNumber)
+            .bankAccountReference(bankAccountReference)
             .bankName(bankName)
             .amount(amount)
             .build();
