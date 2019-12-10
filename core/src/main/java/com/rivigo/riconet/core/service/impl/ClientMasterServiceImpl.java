@@ -172,7 +172,8 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     } else {
       clientDTO.setOrganizationId(RIVIGO_ORGANIZATION_ID);
     }
-    if (dto.getServiceType().equals(ZoomServiceType.ZOOM_CORPORATE.name())) {
+    if (ZoomServiceType.ZOOM_CORPORATE.name().equals(dto.getServiceType()) ||
+            ZoomServiceType.RIVIGO_AIR.name().equals(dto.getServiceType())) {
       clientDTO.setCnoteType(CnoteType.NORMAL);
     } else if (dto.getServiceType().equals(ZoomServiceType.ZOOM_RETAIL.name())) {
       clientDTO.setCnoteType(CnoteType.RETAIL);
