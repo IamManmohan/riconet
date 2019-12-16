@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -159,7 +160,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     transactionRequestDTO = getNewTransactionRequestDTOForChequeBounce(handoverExcludePayload);
     transactionRequestDTO.setTransactionType(ZoomBookTransactionType.DEBIT);
     transactionRequestDTOList.add(transactionRequestDTO);
-    transactionRequestDTO = getNewTransactionRequestDTOForChequeBounce(handoverExcludePayload);
+    transactionRequestDTO = SerializationUtils.clone(transactionRequestDTO);
     transactionRequestDTO.setTransactionType(ZoomBookTransactionType.CREDIT);
     transactionRequestDTOList.add(transactionRequestDTO);
 
