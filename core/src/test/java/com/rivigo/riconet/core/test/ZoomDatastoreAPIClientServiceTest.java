@@ -106,6 +106,6 @@ public class ZoomDatastoreAPIClientServiceTest {
     Mockito.when(
             apiClientService.getEntity(
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenThrow(new IOException());
+        .thenThrow(new IOException("Test Exception"));
   }
 }

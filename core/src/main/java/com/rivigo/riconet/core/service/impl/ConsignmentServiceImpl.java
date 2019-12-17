@@ -25,9 +25,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -84,6 +86,14 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Override
   public Consignment getConsignmentById(Long consignmentId) {
     return consignmentRepo.findOne(consignmentId);
+  }
+
+  @Nullable
+  @Override
+  public Long getIdByCnote(String cnote) {
+    return Optional.ofNullable(consignmentRepo.findIdByCnote(cnote))
+        .map(BigInteger::longValue)
+        .orElse(null);
   }
 
   @Override

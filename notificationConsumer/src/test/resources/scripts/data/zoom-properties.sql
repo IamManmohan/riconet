@@ -4,7 +4,6 @@ INSERT INTO `zoom_properties` (`id`, `variable_name`, `spring_profile`, `variabl
 (3,	'startOffsetInHours',	NULL,	'0',	1,	1470216265000,	1470216265000,	NULL,	NULL),
 (4,	'startTimeForDuplicateCheck',	NULL,	'12',	1,	1470216265000,	1470216265000,	NULL,	NULL),
 (5,	'EMAIL_ENABLED',	NULL,	'true',	1,	1470216265000,	1470216265000,	NULL,	NULL),
-(6,	'PRIME_URL',	NULL,	'http://opcbackend-prod.ap-southeast-1.elasticbeanstalk.com',	1,	1470216265000,	1470216265000,	NULL,	NULL),
 (7,	'getTripsBeforeInHour',	NULL,	'720',	1,	1470035717000,	1470035717000,	NULL,	NULL),
 (8,	'getTripsAfterInHour',	NULL,	'29',	1,	1470035717000,	1470035717000,	NULL,	NULL),
 (9,	'AUTOPLAN_PARAM_MAX_SOLUTIONS_IN_DAG',	NULL,	'20',	1,	1472465078000,	1472465078000,	NULL,	NULL),

@@ -54,6 +54,11 @@ allprojects {
         from ".git-hooks/src/hooks/pre-push/gradle/pre-push",".git-hooks/src/hooks/pre-commit/commit-msg"
         into ".git/hooks"
     }
+
+    wrapper {
+        gradleVersion = '5.6.3'
+        distributionUrl = distributionUrl.replace("bin", "all")
+    }
     
     gitExecutableHooks.dependsOn(installGitHooks)
     processResources.dependsOn('spotlessApply')

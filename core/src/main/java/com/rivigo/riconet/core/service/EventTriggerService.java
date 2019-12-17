@@ -5,8 +5,8 @@ import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
-import com.rivigo.riconet.core.enums.TicketEntityType;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +30,11 @@ public class EventTriggerService {
 
   @Autowired private AppNotificationService appNotificationService;
 
-  @Autowired private HandoverService handoverService;
+  @Autowired private TicketActionFactory ticketActionFactory;
 
   @Autowired private RTOService rtoService;
+
+  @Autowired private BankTransferService bankTransferService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
@@ -120,13 +122,16 @@ public class EventTriggerService {
                 .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
                 .orElse(null));
-        handoverService.consumeHandoverTicketAction(
+        ticketActionFactory.consume(
             notificationDTO.getEntityId(),
             getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
                 .orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name()).orElse(null),
             getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_VALUE.name())
                 .orElse(null));
+        break;
+      case BANK_TRANSFER_INITIATED:
+        bankTransferService.createTicket(notificationDTO.getMetadata());
         break;
       case TICKET_CREATION:
         qcService.consumeQcBlockerTicketCreationEvent(

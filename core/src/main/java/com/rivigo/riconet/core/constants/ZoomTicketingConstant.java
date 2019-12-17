@@ -17,6 +17,14 @@ public class ZoomTicketingConstant {
 
   public static final Long WRITEOFF_TYPE_ID = 539L;
 
+  public static final Long BANK_TRANSFER_TYPE_ID = 829L;
+
+  public static final Long PICKUP_BANK_TRANSFER_TICKET_TYPE_ID = 830L;
+
+  public static final Long UTR_BANK_TRANSFER_TICKET_TYPE_ID = 832L;
+
+  public static final Long HQTR_LOCATION_ID = 9L;
+
   public static final String QC_GROUP_NAME = "QC";
 
   public static final String RTO_GROUP_TYPE_NAME = "RTO_Field";
@@ -24,6 +32,12 @@ public class ZoomTicketingConstant {
   public static final String QC_ACTION_NAME = "qc";
 
   public static final String WRITE_OFF_ACTION_NAME = "write_off";
+
+  public static final String PICKUP_BANK_TRANSFER_ACTION_NAME = "pickup_bank_transfer";
+
+  public static final String UTR_BANK_TRANSFER_ACTION_NAME = "utr_bank_transfer";
+
+  public static final String BANK_TRANSFER_ACTION_NAME = "cnote_bank_transfer";
 
   public static final String RETAIL_GROUP_NAME = "RETAIL";
 
@@ -70,6 +84,18 @@ public class ZoomTicketingConstant {
 
   public static final String TICKET_QC_BLOCKER_FAILURE_COMMENT =
       "Ticket action failed because of %s . Reopened now. Please take appropriate action and try again";
+
+  public static final String BANK_TRANSFER_MESSAGE =
+      "Please validate bank transfer request for %s: %s"
+          + "<br>Bank Name: %s"
+          + "<br>UTR No: %s"
+          + "<br>Receipt URL: <a href=\"%s\">Click here</a>"
+          + "<br>Amount to be paid: %s";
+
+  public static final String BANK_TRANSFER_GROUP_NAME = "Finance Bank Transfer";
+
+  public static final String BANK_TRANSFER_TICKET_TITLE = "Bank Transfer payment made for %s: %s";
+  public static final String CNOTE_ADDED_TO_UTR = "Cnote: %s<br>Amount: %s";
 
   public static final Long RTO_TICKET_TYPE_ID = 731L;
 }

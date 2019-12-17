@@ -65,7 +65,7 @@ public class RTOServiceImpl implements RTOService {
 
       List<TicketDTO> ticketList =
           zoomTicketingAPIClientService
-              .getTicketsByCnoteAndType(
+              .getByCnoteAndType(
                   cnote,
                   Collections.singletonList(ZoomTicketingConstant.RTO_TICKET_TYPE_ID.toString()))
               .stream()
@@ -123,7 +123,7 @@ public class RTOServiceImpl implements RTOService {
 
       List<TicketDTO> ticketList =
           zoomTicketingAPIClientService
-              .getTicketsByCnoteAndType(
+              .getByCnoteAndType(
                   parentEntityId,
                   Collections.singletonList(ZoomTicketingConstant.RTO_TICKET_TYPE_ID.toString()))
               .stream()

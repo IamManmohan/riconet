@@ -1,4 +1,4 @@
-package com.rivigo.riconet.event.dto;
+package com.rivigo.riconet.core.dto;
 
 import java.math.BigDecimal;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +23,8 @@ public class ChequeBounceDTO {
   @NotBlank private String cnote;
 
   @NotBlank private String bankName;
+
+  private String bankAccountReference;
 
   @NotBlank private String chequeNumber;
 

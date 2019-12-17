@@ -65,14 +65,14 @@ public class ZoomTicketingApiClientServiceTest {
   public void getTicketsByCnoteNullCheck() {
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Please provide a valid cnote");
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(null, null);
+    zoomTicketingAPIClientService.getByCnoteAndType(null, null);
   }
 
   @Test
   public void getTicketsByCnoteAndTypeTest() throws IOException {
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote, typeId);
+    zoomTicketingAPIClientService.getByCnoteAndType(cnote, typeId);
     validateReturnedData(HttpMethod.GET);
     Assert.assertEquals(cnote, multiValueMapArgumentCaptor.getValue().get("entityId").get(0));
     Assert.assertEquals(typeId, multiValueMapArgumentCaptor.getValue().get("typeId"));
@@ -84,7 +84,7 @@ public class ZoomTicketingApiClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while getting qc tickets with cnote 1234567890");
-    zoomTicketingAPIClientService.getTicketsByCnoteAndType(cnote, typeId);
+    zoomTicketingAPIClientService.getByCnoteAndType(cnote, typeId);
   }
 
   @Test
@@ -204,7 +204,7 @@ public class ZoomTicketingApiClientServiceTest {
     Long ticketId = 1200L;
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+    zoomTicketingAPIClientService.getById(ticketId);
     validateReturnedData(HttpMethod.GET);
     Assert.assertEquals(
         ticketId.toString(), multiValueMapArgumentCaptor.getValue().get("ticketId").get(0));
@@ -217,7 +217,7 @@ public class ZoomTicketingApiClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while getting ticket with ID: 1200");
-    zoomTicketingAPIClientService.getTicketByTicketId(ticketId);
+    zoomTicketingAPIClientService.getById(ticketId);
   }
 
   @Test
@@ -272,7 +272,7 @@ public class ZoomTicketingApiClientServiceTest {
     Mockito.when(
             apiClientService.getEntity(
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-        .thenThrow(new IOException());
+        .thenThrow(new IOException("Test Exception"));
   }
 
   private TicketDTO getTicketDTO() {

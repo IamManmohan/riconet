@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
 import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
+import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -41,6 +42,10 @@ public class ApiClientServiceImpl implements ApiClientService {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private SsoService ssoService;
+
+  @Autowired
+  @Qualifier("defaultRestClientUtilityServiceImpl")
+  private RestClientUtilityService restClientUtilityService;
 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
@@ -135,6 +140,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     }
   }
 
+  // TODO: Clean me up
   @Override
   public JsonNode getEntity(
       Object dto,
@@ -147,7 +153,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     if (queryParams != null) {
       builder = builder.queryParams(queryParams);
     }
-    URI uri = builder.build().encode().toUri();
+    URI uri = builder.build().toUri();
     log.debug("Calling  {} ", uri);
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
@@ -158,13 +164,16 @@ public class ApiClientServiceImpl implements ApiClientService {
     HttpEntity entity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
 
     try {
+      String urlWithParams =
+          restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams);
       log.info(
-          "uri: {}, httpMethod: {}, entity: {}",
+          "uri: {}, httpMethod: {}, entity: {}, url: {}",
           uri,
           httpMethod,
-          objectMapper.writeValueAsString(entity));
+          objectMapper.writeValueAsString(entity),
+          urlWithParams);
       ResponseEntity<JsonNode> response =
-          riconetRestTemplate.exchange(uri.toString(), httpMethod, entity, JsonNode.class);
+          riconetRestTemplate.exchange(urlWithParams, httpMethod, entity, JsonNode.class);
       log.info("response: {}", response);
       return response.getBody();
     } catch (HttpStatusCodeException e) {
@@ -175,7 +184,11 @@ public class ApiClientServiceImpl implements ApiClientService {
         HttpEntity retryEntity = getHttpEntity(getHeaders(token, uri.toString()), dto, uri);
         try {
           ResponseEntity<JsonNode> response =
-              riconetRestTemplate.exchange(uri.toString(), httpMethod, retryEntity, JsonNode.class);
+              riconetRestTemplate.exchange(
+                  restClientUtilityService.buildUrlWithParams(baseUrl + url, queryParams),
+                  httpMethod,
+                  retryEntity,
+                  JsonNode.class);
           return response.getBody();
         } catch (HttpStatusCodeException e2) {
           log.error("Invalid response from API  while calling {}", DateTime.now(), e2);

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
+import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
+import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
@@ -15,7 +17,6 @@ import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -38,8 +39,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   private String backendBaseUrl;
 
   @Autowired private ApiClientService apiClientService;
-
-  @Autowired private ZoomPropertyService zoomPropertyService;
 
   @Override
   public void setPriorityMapping(String cnote, PriorityReasonType reason) {
@@ -99,7 +98,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handleApproveRejectRequest(
+  public void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction) {
     JsonNode responseJson;
     String url =
@@ -356,5 +355,46 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while creating vendor with dto {}", feederVendorDTO);
       throw new ZoomException("Error while creating vendor with dto %s", feederVendorDTO);
     }
+  }
+
+  @Override
+  public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
+    log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
+    JsonNode responseJson = null;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              chequeBounceDTO,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING,
+              null,
+              backendBaseUrl);
+      log.debug("response {}", responseJson);
+    } catch (IOException e) {
+      log.error(
+          "Exception occurred while marking recovery pending for cn in zoom tech: {} ",
+          chequeBounceDTO,
+          e);
+      throw new ZoomException(
+          "Exception occurred while marking recovery pending for cn in zoom tech : %s",
+          chequeBounceDTO);
+    }
+    TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
+    return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
+  }
+
+  @Override
+  public void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
+    JsonNode responseJson;
+    String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              bankTransferRequestDTO, HttpMethod.PUT, url, null, backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
+      throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
+    }
+    apiClientService.parseJsonNode(responseJson, null);
   }
 }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NotificationDTO {
 
   private String eventName;
@@ -42,6 +44,8 @@ public class NotificationDTO {
    */
   private List<String> conditions;
 
+  private Boolean isTemplateV2;
+
   public static NotificationDTO copy(NotificationDTO input) {
     return NotificationDTO.builder()
         .eventUID(input.getEventUID())
@@ -50,6 +54,7 @@ public class NotificationDTO {
         .metadata(input.getMetadata())
         .tsMs(input.getTsMs())
         .conditions(input.getConditions())
+        .isTemplateV2(input.getIsTemplateV2())
         .entityId(input.getEntityId())
         .entityName(input.getEntityName())
         .build();
