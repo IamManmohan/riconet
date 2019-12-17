@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.dto.notification;
 
 import com.rivigo.zoom.common.model.User;
-import com.rivigo.zoom.common.pojo.AbstractMailNotificationEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class DocumentIssueNotification extends AbstractMailNotificationEntity {
-
   private String id;
   private String cnote;
   private Long consignmentId;
