@@ -18,7 +18,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class RetailNotification {
-
   private String cnote;
   private Long edd;
   private String eddString;

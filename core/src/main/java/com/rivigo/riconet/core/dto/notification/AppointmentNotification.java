@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.dto.notification;
 
 import com.rivigo.zoom.common.dto.LocationBasicDTO;
 import com.rivigo.zoom.common.dto.UserBasicDTO;
-import com.rivigo.zoom.common.pojo.AbstractMailNotificationEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class AppointmentNotification extends AbstractMailNotificationEntity {
-
   private String id;
   private String cnote;
   private Long consignmentId;
