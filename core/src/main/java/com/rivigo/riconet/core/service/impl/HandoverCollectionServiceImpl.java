@@ -29,7 +29,6 @@ import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -172,14 +171,21 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
     log.info("Making zoom backend markRecoveryPending API calls for each CN");
     // Mark Recovery Pending API
+    List<ChequeBounceDTO> chequeBounceDTOListForRecoveryPendingAPI = new ArrayList<>();
     cnIdToConsignmentMap.forEach(
-        (cnId, consignmentReadOnly) ->
-            markRecoveryPending(
-                consignmentReadOnly.getCnote(),
-                chequeNumber,
-                bankName,
-                cnIdToPaymentDetailV2Map.get(cnId).getTotalAmount(),
-                cnIdToPaymentDetailV2Map.get(cnId).getBankAccountReference()));
+        (key, consignmentReadOnly) -> {
+          PaymentDetailV2 paymentDetailV2 = cnIdToPaymentDetailV2Map.get(key);
+          ChequeBounceDTO oneDto =
+              ChequeBounceDTO.builder()
+                  .cnote(consignmentReadOnly.getCnote())
+                  .chequeNumber(chequeNumber)
+                  .bankName(bankName)
+                  .amount(paymentDetailV2.getTotalAmount())
+                  .bankAccountReference(paymentDetailV2.getBankAccountReference())
+                  .build();
+          chequeBounceDTOListForRecoveryPendingAPI.add(oneDto);
+        });
+    markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
   }
 
   private Location getLocation(String code) {
@@ -250,24 +256,11 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     return String.valueOf(TimeUUID.createUUID(System.currentTimeMillis()));
   }
 
-  private void markRecoveryPending(
-      String cnote,
-      String chequeNumber,
-      String bankName,
-      BigDecimal amount,
-      String bankAccountReference) {
-    ChequeBounceDTO chequeBounceDTO =
-        ChequeBounceDTO.builder()
-            .cnote(cnote)
-            .chequeNumber(chequeNumber)
-            .bankAccountReference(bankAccountReference)
-            .bankName(bankName)
-            .amount(amount)
-            .build();
-    JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPending(chequeBounceDTO);
+  private void markRecoveryPending(List<ChequeBounceDTO> chequeBounceDTOList) {
+    JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPendingV2(chequeBounceDTOList);
     log.info(
         "API call for chequeBounceEvent done, for payload: {}, response: {}",
-        chequeBounceDTO,
+        chequeBounceDTOList,
         jsonNode);
     // Does this make a difference what happens to the request?
   }

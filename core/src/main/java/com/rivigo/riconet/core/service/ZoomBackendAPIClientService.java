@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
+import java.util.List;
 
 public interface ZoomBackendAPIClientService {
 
@@ -53,6 +54,8 @@ public interface ZoomBackendAPIClientService {
   JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO);
 
   JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
+
+  JsonNode markRecoveryPendingV2(List<ChequeBounceDTO> chequeBounceDTO);
 
   void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 }
