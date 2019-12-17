@@ -15,6 +15,7 @@ import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   private JsonNode createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    dto.setType(vendorContractZoomEventDTO.getExpenseType().getName());
+    dto.setType(Collections.singleton(vendorContractZoomEventDTO.getExpenseType().getName()));
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     dto.setStatus("ACTIVE");
     Optional<BusinessPartner> businessPartner =
