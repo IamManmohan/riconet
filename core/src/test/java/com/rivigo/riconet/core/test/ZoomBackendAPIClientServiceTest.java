@@ -212,7 +212,8 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.anyObject(),
                 Mockito.anyObject()))
         .thenReturn(jsonNode);
-    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+    JsonNode actual_jsonNode =
+        zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
     Assert.assertEquals(jsonNode, actual_jsonNode);
   }
 
@@ -227,7 +228,7 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while creating BP with dto");
-    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
   }
 
   @Test

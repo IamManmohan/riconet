@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpMethod;
 
 public class FeederVendorServiceImplTest {
 
@@ -95,6 +96,6 @@ public class FeederVendorServiceImplTest {
     dto.setType("BP");
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
-    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
+    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
   }
 }
