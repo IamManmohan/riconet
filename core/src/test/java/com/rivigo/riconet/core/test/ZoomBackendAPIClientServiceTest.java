@@ -16,6 +16,7 @@ import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
+import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -201,7 +202,7 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntity(jsonNode);
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType("BP");
+    dto.setType(Collections.singleton("BP"));
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
     Mockito.when(
@@ -222,7 +223,7 @@ public class ZoomBackendAPIClientServiceTest {
 
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType("BP");
+    dto.setType(Collections.singleton("BP"));
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
     mockApiClientServiceGetEntityException();

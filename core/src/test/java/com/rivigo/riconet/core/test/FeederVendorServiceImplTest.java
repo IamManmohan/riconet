@@ -15,6 +15,7 @@ import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import java.io.IOException;
+import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +94,7 @@ public class FeederVendorServiceImplTest {
   public void addBusinessPartner() {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType("BP");
+    dto.setType(Collections.singleton("BP"));
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
     zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
