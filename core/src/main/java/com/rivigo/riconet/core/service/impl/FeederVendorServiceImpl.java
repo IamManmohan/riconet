@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -97,8 +98,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
           "BP/RP details are already present with vendor code : {} ,id : {} ",
           businessPartner.get().getCode(),
           businessPartner.get().getId());
-      return null;
-    } else return zoomBackendAPIClientService.addBusinessPartner(dto);
+      return zoomBackendAPIClientService.addBusinessPartner(dto, HttpMethod.PUT);
+    } else return zoomBackendAPIClientService.addBusinessPartner(dto, HttpMethod.POST);
   }
 
   @Nullable
