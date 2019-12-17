@@ -72,7 +72,7 @@ public class FeederVendorServiceImplTest {
     Mockito.when(objectMapper.readValue(Mockito.anyString(), (Class<Object>) Mockito.any()))
         .thenReturn(vendorContractZoomEventDTO);
     Mockito.when(businessPartnerRepository.findByCode((Mockito.any()))).thenReturn(null);
-    Mockito.when(zoomBackendAPIClientServiceImpl.addBusinessPartner(Mockito.any()))
+    Mockito.when(zoomBackendAPIClientServiceImpl.addBusinessPartner(Mockito.any(), Mockito.any()))
         .thenReturn(null);
     JsonNode jsnode = feederVendorServiceImpl.createFeederVendor(s);
     Assert.assertNull(jsnode);
