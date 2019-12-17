@@ -16,7 +16,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class PickupNotification {
-
   private String id;
   private Long pickupId;
   private PickupStatus status;
