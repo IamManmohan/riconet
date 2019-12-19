@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.collections.api.dto.HandoverCollectionExcludeEventPayload;
-import com.rivigo.collections.api.enums.PaymentType.ZoomPaymentType;
 import com.rivigo.finance.utils.TimeUUID;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
@@ -39,11 +38,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Slf4j
 public class HandoverCollectionServiceImpl implements HandoverCollectionService {
 
@@ -62,9 +61,6 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
-
-  @Value("${retail.collection.dispute.topic}")
-  private String retailCollectionDisputeTopic;
 
   @Override
   public void handleHandoverCollectionPostUnpostEvent(String payload, ZoomEventType eventType) {
@@ -243,11 +239,20 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   private ZoomBookTransactionHeader getTransactionHeader(
       HandoverCollectionEventPayload handoverCollectionEventPayload) {
     ZoomBookTransactionHeader transactionHeader = null;
-    if (ZoomPaymentType.CHEQUE.equals(handoverCollectionEventPayload.getPaymentType())) {
-      transactionHeader = ZoomBookTransactionHeader.CHEQUE;
-    } else {
-      // Currently it can either be cash or cheque, so lets just keep them at that.
-      transactionHeader = ZoomBookTransactionHeader.CASH;
+    if (handoverCollectionEventPayload.getPaymentType() == null) {
+      throw new ZoomException("Invalid PaymentType received, %s", handoverCollectionEventPayload);
+    }
+    switch (handoverCollectionEventPayload.getPaymentType()) {
+      case CHEQUE:
+        transactionHeader = ZoomBookTransactionHeader.CHEQUE;
+        break;
+      case CASH:
+        transactionHeader = ZoomBookTransactionHeader.CASH;
+        break;
+      default:
+        // Currently it can either be cash or cheque, so lets just keep them at that.
+        // Online knockoffs are not supposed to come from this event(compass collection service).
+        throw new ZoomException("Invalid PaymentType received, %s", handoverCollectionEventPayload);
     }
     return transactionHeader;
   }
