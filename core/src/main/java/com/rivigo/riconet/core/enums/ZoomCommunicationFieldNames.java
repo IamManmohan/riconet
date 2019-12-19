@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.enums;
 
 public enum ZoomCommunicationFieldNames {
   CNOTE,
+  CURRENT_LOCATION_ID,
   OLD_CNOTE,
   CLIENT_ID,
   LOCATION_ID,
