@@ -6,6 +6,7 @@ import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.collections.api.dto.HandoverCollectionExcludeEventPayload;
 import com.rivigo.finance.utils.TimeUUID;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.constants.HandoverConstant;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.DepositSlipService;
@@ -15,7 +16,6 @@ import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
-import com.rivigo.zoom.common.enums.zoombook.HandoverStatus;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookTransactionHeader;
@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,14 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap =
         filterAllAffectedCNs(consignmentIds, cnIdToPaymentDetailV2Map, chequeNumber, bankName);
 
+    if (MapUtils.isEmpty(cnIdToConsignmentMap)) {
+      log.info(
+          "Did not find any affected CNs, skipping all further actions for event {}, and payload: {}",
+          eventType.name(),
+          payload);
+      return;
+    }
+
     // 2 entries, one credit, and one debit for cheque bounce
     transactionRequestDTO = getNewTransactionRequestDTOForChequeBounce(handoverExcludePayload);
     transactionRequestDTO.setTransactionType(ZoomBookTransactionType.DEBIT);
@@ -166,7 +175,6 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     // ZOOM BOOK API Call
     zoomBookAPIClientService.processZoomBookTransaction(transactionRequestDTOList);
 
-    log.info("Making zoom backend markRecoveryPending API calls for each CN");
     // Mark Recovery Pending API
     List<ChequeBounceDTO> chequeBounceDTOListForRecoveryPendingAPI = new ArrayList<>();
     cnIdToConsignmentMap.forEach(
@@ -182,6 +190,9 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
                   .build();
           chequeBounceDTOListForRecoveryPendingAPI.add(oneDto);
         });
+    log.info(
+        "Making zoom backend markRecoveryPendingV2 API calls for payload: {}",
+        chequeBounceDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
   }
 
@@ -223,11 +234,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     consignmentIDs.forEach(
         cnId -> {
           PaymentDetailV2 paymentDetail = paymentDetailV2Service.getByConsignmentId(cnId);
-          // Filter by bankName and ChequeNumber and Handover Status(non complete are not needed)
+          // Filter by bankName and ChequeNumber and Handover Status(any pending are not needed)
           if (paymentDetail.getTransactionReferenceNo().equals(chequeNumber)
               && paymentDetail.getBankName().equals(bankName)
-              && !HandoverStatus.COMPLETE.equals(paymentDetail.getHandoverStatus()))
+              && !HandoverConstant.pendingStatuses.contains(paymentDetail.getHandoverStatus())) {
             cnIdToPaymentDetailV2Map.put(cnId, paymentDetail);
+          }
         });
 
     return cnIdToPaymentDetailV2Map
