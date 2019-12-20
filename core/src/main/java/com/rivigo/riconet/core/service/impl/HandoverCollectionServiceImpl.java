@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -235,8 +236,9 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         cnId -> {
           PaymentDetailV2 paymentDetail = paymentDetailV2Service.getByConsignmentId(cnId);
           // Filter by bankName and ChequeNumber and Handover Status(any pending are not needed)
-          if (paymentDetail.getTransactionReferenceNo().equals(chequeNumber)
-              && paymentDetail.getBankName().equals(bankName)
+          if (paymentDetail != null
+              && Objects.equals(chequeNumber, paymentDetail.getTransactionReferenceNo())
+              && Objects.equals(bankName, paymentDetail.getBankName())
               && !HandoverConstant.pendingStatuses.contains(paymentDetail.getHandoverStatus())) {
             cnIdToPaymentDetailV2Map.put(cnId, paymentDetail);
           }
