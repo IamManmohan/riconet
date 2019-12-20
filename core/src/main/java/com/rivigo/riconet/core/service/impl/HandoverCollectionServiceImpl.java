@@ -157,6 +157,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     transactionRequestDTOList.add(transactionRequestDTO);
     transactionRequestDTO = SerializationUtils.clone(transactionRequestDTO);
     transactionRequestDTO.setTransactionType(ZoomBookTransactionType.CREDIT);
+    transactionRequestDTO.setClientRequestId(getTimeUUID());
     transactionRequestDTOList.add(transactionRequestDTO);
 
     log.info(
