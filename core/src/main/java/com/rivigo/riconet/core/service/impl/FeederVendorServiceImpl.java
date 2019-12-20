@@ -87,9 +87,10 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   private JsonNode createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    dto.setType(Collections.singleton(vendorContractZoomEventDTO.getExpenseType().getName()));
+    dto.setExpenseType(
+        Collections.singleton(vendorContractZoomEventDTO.getExpenseType().getName()));
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
-    dto.setStatus("ACTIVE");
+    dto.setStatus(OperationalStatus.ACTIVE.toString());
     Optional<BusinessPartner> businessPartner =
         Optional.ofNullable(
             businessPartnerRepository.findByCode(vendorContractZoomEventDTO.getVendorCode()));
