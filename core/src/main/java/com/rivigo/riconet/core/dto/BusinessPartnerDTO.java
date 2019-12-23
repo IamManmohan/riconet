@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.dto;
 
+import com.rivigo.vms.enums.ExpenseType;
 import com.rivigo.zoom.common.enums.AvailabilityStatus;
 import com.rivigo.zoom.common.enums.TacticalCreditStatus;
 import java.util.List;
@@ -24,5 +25,5 @@ public class BusinessPartnerDTO {
   private String type;
   private List<LocalityDTO> localityDTOList;
   private List<String> pincodeList;
-  private Set<String> expenseType;
+  private Set<ExpenseType> expenseType;
 }
