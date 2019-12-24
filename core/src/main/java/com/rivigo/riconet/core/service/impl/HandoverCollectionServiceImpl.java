@@ -281,7 +281,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   private void markRecoveryPending(List<ChequeBounceDTO> chequeBounceDTOList) {
-    JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPendingV2(chequeBounceDTOList);
+    JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPendingBulk(chequeBounceDTOList);
     log.info(
         "API call for chequeBounceEvent done, for payload: {}, response: {}",
         chequeBounceDTOList,

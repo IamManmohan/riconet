@@ -365,9 +365,9 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public JsonNode markRecoveryPendingV2(List<ChequeBounceDTO> chequeBounceDTO) {
+  public JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO) {
     return markRecoveryPendingInternal(
-        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_V2);
+        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
   }
 
   private <T> JsonNode markRecoveryPendingInternal(

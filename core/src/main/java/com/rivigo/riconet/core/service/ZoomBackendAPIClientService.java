@@ -55,7 +55,7 @@ public interface ZoomBackendAPIClientService {
 
   JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
 
-  JsonNode markRecoveryPendingV2(List<ChequeBounceDTO> chequeBounceDTO);
+  JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO);
 
   void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 }

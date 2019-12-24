@@ -64,8 +64,8 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
       "/operations/retail/collections/handover/markRecoveryPending";
 
-  public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_V2 =
-      "/operations/retail/collections/handover/markRecoveryPending/v2";
+  public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK =
+      "/operations/retail/collections/handover/markRecoveryPendingBulk";
 
   public static final String ZOOM_BACKEND_CANCEL_PICKUP = "/operations/pickup/cancel/V2";
 
