@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
+import com.rivigo.riconet.core.service.HandoverCollectionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private ConsignmentInvoiceService consignmentInvoiceService;
 
+  @Autowired private HandoverCollectionService handoverCollectionService;
+
   @Override
   public void processFinanceEvents(EventPayload eventPayload) {
     ZoomEventType eventType = eventPayload.getEventType();
@@ -35,6 +38,15 @@ public class FinanceEventServiceImpl implements FinanceEventService {
       case VENDOR_ACTIVE_EVENT:
         JsonNode response = feederVendorService.createFeederVendor(eventPayload.getPayload());
         log.info("Vendor created {}", response);
+        break;
+      case HANDOVER_COLLECTION_POST:
+      case HANDOVER_COLLECTION_UNPOST:
+        handoverCollectionService.handleHandoverCollectionPostUnpostEvent(
+            eventPayload.getPayload(), eventType);
+        break;
+      case HANDOVER_COLLECTION_EXCLUDE:
+        handoverCollectionService.handleHandoverCollectionExcludeEvent(
+            eventPayload.getPayload(), eventType);
         break;
       default:
         log.info("Event does not trigger anything {}", eventType);

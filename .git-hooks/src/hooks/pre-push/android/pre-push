@@ -4,7 +4,7 @@
 
 function gradle_or_gradlew() {
         if [ -f ./gradlew ] ; then
-                echo "executing gradlew instead of gradle";
+                echo "NC" "Executing gradlew instead of gradle";
                 ./gradlew "$@";
         else
                 gradle "$@";
