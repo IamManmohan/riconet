@@ -39,6 +39,7 @@ public class ClientDTO {
   private String organizationName;
   private Object clientVasDetailDTO;
   private Boolean blockedDamagePilferageCns;
+  private Boolean blockedShortageCns;
   private DateTime lastUpdatedAt;
   private String rbm;
   private String cbm;
