@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(callSuper = true)
 public class FlipkartRequestDTO extends HiltiRequestDto {
   private Map<String, String> metaData;
 
