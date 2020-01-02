@@ -369,6 +369,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         break;
       case ClientConstants.FLIPKART_SELLER_CLIENT:
       case ClientConstants.FLIPKART_INDIA_CLIENT:
+      case ClientConstants.FLIPKART_INDIA_ZOOM_CLIENT:
+      case ClientConstants.FLIPKART_INTERNET_SELLER_CLIENT:
         List<HiltiRequestDto> hiltiRequestDtoListForFlipkart =
             getHiltiRequestDtosByType(notificationDTO, true);
         List<String> cnoteList =
@@ -431,7 +433,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     if (pushedEventCount > 0) {
       /** Calling Flipkart send events Api */
-      log.info("Trying Send event request to flipkart {}", clientIntegrationRequestDtoList);
+      log.info("Trying to send event request to flipkart {}", clientIntegrationRequestDtoList);
       ClientIntegrationResponseDTO responseDto =
           objectMapper.convertValue(
               sendRequestToFlipkart(clientIntegrationRequestDtoList)
