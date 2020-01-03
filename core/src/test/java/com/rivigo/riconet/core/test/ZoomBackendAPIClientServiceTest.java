@@ -16,7 +16,6 @@ import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
-import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -202,7 +201,7 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntity(jsonNode);
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType(Collections.singleton("BP"));
+    dto.setType("BP");
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
     Mockito.when(
@@ -213,8 +212,7 @@ public class ZoomBackendAPIClientServiceTest {
                 Mockito.anyObject(),
                 Mockito.anyObject()))
         .thenReturn(jsonNode);
-    JsonNode actual_jsonNode =
-        zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
+    JsonNode actual_jsonNode = zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
     Assert.assertEquals(jsonNode, actual_jsonNode);
   }
 
@@ -223,13 +221,13 @@ public class ZoomBackendAPIClientServiceTest {
 
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType(Collections.singleton("BP"));
+    dto.setType("BP");
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while creating BP with dto");
-    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
+    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
   }
 
   @Test

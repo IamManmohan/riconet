@@ -318,14 +318,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO, HttpMethod httpMethod) {
+  public JsonNode addBusinessPartner(BusinessPartnerDTO businessPartnerDTO) {
     JsonNode responseJson;
     log.info(" Creating a new vendor with dto {}", businessPartnerDTO);
     try {
       responseJson =
           apiClientService.getEntity(
               businessPartnerDTO,
-              httpMethod,
+              HttpMethod.POST,
               UrlConstant.ZOOM_BACKEND_CREATE_BP + "?" + "isvalidationRequired=false",
               null,
               backendBaseUrl);

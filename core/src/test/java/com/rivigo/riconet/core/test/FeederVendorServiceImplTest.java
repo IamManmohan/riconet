@@ -15,7 +15,6 @@ import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import java.io.IOException;
-import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpMethod;
 
 public class FeederVendorServiceImplTest {
 
@@ -73,7 +71,7 @@ public class FeederVendorServiceImplTest {
     Mockito.when(objectMapper.readValue(Mockito.anyString(), (Class<Object>) Mockito.any()))
         .thenReturn(vendorContractZoomEventDTO);
     Mockito.when(businessPartnerRepository.findByCode((Mockito.any()))).thenReturn(null);
-    Mockito.when(zoomBackendAPIClientServiceImpl.addBusinessPartner(Mockito.any(), Mockito.any()))
+    Mockito.when(zoomBackendAPIClientServiceImpl.addBusinessPartner(Mockito.any()))
         .thenReturn(null);
     JsonNode jsnode = feederVendorServiceImpl.createFeederVendor(s);
     Assert.assertNull(jsnode);
@@ -94,9 +92,9 @@ public class FeederVendorServiceImplTest {
   public void addBusinessPartner() {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode("V111");
-    dto.setType(Collections.singleton("BP"));
+    dto.setType("BP");
     dto.setStatus("ACTIVE");
     dto.setLegalName("LEGAL");
-    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto, HttpMethod.POST);
+    zoomBackendAPIClientServiceImpl.addBusinessPartner(dto);
   }
 }

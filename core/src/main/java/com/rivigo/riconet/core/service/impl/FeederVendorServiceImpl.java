@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.common.enums.BusinessPartnerType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.BusinessPartner;
 import com.rivigo.zoom.common.model.FeederVendor;
@@ -15,11 +16,9 @@ import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -87,7 +86,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
   private JsonNode createBP(VendorContractZoomEventDTO vendorContractZoomEventDTO) {
     BusinessPartnerDTO dto = new BusinessPartnerDTO();
     dto.setCode(vendorContractZoomEventDTO.getVendorCode());
-    dto.setExpenseType(Collections.singleton(vendorContractZoomEventDTO.getExpenseType()));
+    dto.setType(BusinessPartnerType.VOVO.displayName());
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
     dto.setStatus(OperationalStatus.ACTIVE.toString());
     Optional<BusinessPartner> businessPartner =
@@ -99,8 +98,8 @@ public class FeederVendorServiceImpl implements FeederVendorService {
           "BP/RP details are already present with vendor code : {} ,id : {} ",
           businessPartner.get().getCode(),
           businessPartner.get().getId());
-      return zoomBackendAPIClientService.addBusinessPartner(dto, HttpMethod.PUT);
-    } else return zoomBackendAPIClientService.addBusinessPartner(dto, HttpMethod.POST);
+      return null;
+    } else return zoomBackendAPIClientService.addBusinessPartner(dto);
   }
 
   @Nullable
