@@ -22,6 +22,7 @@ import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -359,16 +360,24 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
   @Override
   public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
+    return markRecoveryPendingInternal(
+        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING);
+  }
+
+  @Override
+  public JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO) {
+    return markRecoveryPendingInternal(
+        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
+  }
+
+  private <T> JsonNode markRecoveryPendingInternal(
+      T chequeBounceDTO, String recoveryPendingEndpoint) {
     log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
     JsonNode responseJson = null;
     try {
       responseJson =
           apiClientService.getEntity(
-              chequeBounceDTO,
-              HttpMethod.PUT,
-              UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING,
-              null,
-              backendBaseUrl);
+              chequeBounceDTO, HttpMethod.PUT, recoveryPendingEndpoint, null, backendBaseUrl);
       log.debug("response {}", responseJson);
     } catch (IOException e) {
       log.error(
