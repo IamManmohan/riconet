@@ -20,6 +20,7 @@ public class BusinessPartnerDTO {
   private AvailabilityStatus availabilityStatus;
   private TacticalCreditStatus tacticalCreditStatus;
   private Double tacticalCreditMinimumBalance;
+  private Integer negativeTacticalCreditAllowedOverdueDays;
   private String type;
   private List<LocalityDTO> localityDTOList;
   private List<String> pincodeList;
