@@ -147,7 +147,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   public List<String> getChildCnotesAtLocation(
       String cnote, Long locationId, ConsignmentStatus consignmentStatus) {
     return consignmentRepo.findAllConsignmentByCnoteLikeAndLocationAndStatus(
-        cnote + "%", locationId, consignmentStatus);
+        cnote, locationId, consignmentStatus);
   }
 
   @Override
