@@ -1,18 +1,16 @@
 package com.rivigo.riconet.event.consumer;
 
+import static com.rivigo.riconet.core.enums.SecondaryCnAutoMergeEventName.SECONDARY_CN_AUTO_MERGE;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.event.service.ConsignmentAutoMergeService;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static com.rivigo.riconet.core.enums.SecondaryCnAutoMergeEventName.SECONDARY_CN_AUTO_MERGE;
 
 @Slf4j
 @Component
