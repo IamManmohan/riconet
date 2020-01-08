@@ -35,7 +35,7 @@ public class SecondaryCnAutoMergeConsumer extends EventConsumer {
 
   @Override
   public void doAction(NotificationDTO notificationDTO) {
-    consignmentAutoMergeService.autoMergeSecondaryConsignment(notificationDTO);
+    consignmentAutoMergeService.autoMergeConsignments(notificationDTO);
   }
 
   @Override

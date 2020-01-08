@@ -12,6 +12,7 @@ import com.rivigo.riconet.event.service.ConsignmentAutoMergeService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.model.Consignment;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,29 +35,24 @@ public class ConsignmentAutoMergeServiceImpl implements ConsignmentAutoMergeServ
   private String zoomBackendBaseUrl;
 
   @Override
-  public void autoMergeSecondaryConsignment(NotificationDTO notificationDTO) {
+  public void autoMergeConsignments(NotificationDTO notificationDTO) {
     if (notificationDTO == null) {
       return;
     }
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
     String location =
         notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CURRENT_LOCATION_ID.name());
-    if (!cnote.contains(SECONDARY_CNOTE_SEPARATOR)) {
-      log.info("Cnote is not a secondary cn : {}", cnote);
-      return;
-    }
-    log.info("Trying to merge child cnote : {}", cnote);
+    log.info("Trying to merge cnote : {}", cnote);
     String parentCnote = ConsignmentUtils.getPrimaryCnote(cnote);
     Consignment parentConsignment = consignmentService.getConsignmentByCnote(parentCnote);
+    List<String> mergeCnotes = Arrays.asList(notificationDTO.getMetadata().get
+            (ZoomCommunicationFieldNames.SECONDARY_CNOTES.name()).split(","));
     if (parentConsignment == null || parentConsignment.getLocationId() == null) {
       log.warn("Parent cnote not found : {}", parentCnote);
       return;
     }
     if (parentConsignment.getLocationId().toString().equals(location)) {
       try {
-        List<String> mergeCnotes =
-            consignmentService.getChildCnotesAtLocation(
-                parentCnote, parentConsignment.getLocationId(), ConsignmentStatus.RECEIVED_AT_OU);
         JsonNode responseJson =
             apiClientService.getEntity(
                 mergeCnotes, HttpMethod.POST, "/deps/auto-merge", null, zoomBackendBaseUrl);

@@ -50,6 +50,6 @@ public class ConsignmentAutoMergeServiceImplTest {
             consignmentService.getChildCnotesAtLocation(
                 parentCnote, Long.valueOf(location), ConsignmentStatus.RECEIVED_AT_OU))
         .thenReturn(Arrays.asList(parentCnote, parentCnote + "-2", parentCnote + "-1"));
-    autoMergeService.autoMergeSecondaryConsignment(notificationDTO);
+    autoMergeService.autoMergeConsignments(notificationDTO);
   }
 }
