@@ -1,7 +1,5 @@
 package com.rivigo.riconet.event.service.impl;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.SECONDARY_CNOTE_SEPARATOR;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -9,7 +7,6 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.utils.ConsignmentUtils;
 import com.rivigo.riconet.event.service.ConsignmentAutoMergeService;
-import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.model.Consignment;
 import java.io.IOException;
 import java.util.Arrays;
@@ -45,8 +42,12 @@ public class ConsignmentAutoMergeServiceImpl implements ConsignmentAutoMergeServ
     log.info("Trying to merge cnote : {}", cnote);
     String parentCnote = ConsignmentUtils.getPrimaryCnote(cnote);
     Consignment parentConsignment = consignmentService.getConsignmentByCnote(parentCnote);
-    List<String> mergeCnotes = Arrays.asList(notificationDTO.getMetadata().get
-            (ZoomCommunicationFieldNames.SECONDARY_CNOTES.name()).split(","));
+    List<String> mergeCnotes =
+        Arrays.asList(
+            notificationDTO
+                .getMetadata()
+                .get(ZoomCommunicationFieldNames.SECONDARY_CNOTES.name())
+                .split(","));
     if (parentConsignment == null || parentConsignment.getLocationId() == null) {
       log.warn("Parent cnote not found : {}", parentCnote);
       return;
