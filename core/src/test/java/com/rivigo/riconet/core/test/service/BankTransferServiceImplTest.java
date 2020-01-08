@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.test.service;
 
+import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.TicketingService;
@@ -41,6 +42,8 @@ public class BankTransferServiceImplTest {
 
   @Test
   public void createTicketWhenUploadedFilePresentForCn() {
+    Mockito.when(zoomTicketingAPIClientService.createTicket(Mockito.any()))
+        .thenReturn(TicketDTO.builder().id(1L).build());
     Mockito.when(consignmentReadOnlyService.findRequiredById(Mockito.anyLong()))
         .thenReturn(new ConsignmentReadOnly());
     Mockito.when(
@@ -57,6 +60,8 @@ public class BankTransferServiceImplTest {
 
   @Test
   public void createTicketWhenUploadedFilePresentForPickup() {
+    Mockito.when(zoomTicketingAPIClientService.createTicket(Mockito.any()))
+        .thenReturn(TicketDTO.builder().id(1L).build());
     Mockito.when(consignmentReadOnlyService.findRequiredById(Mockito.anyLong()))
         .thenReturn(new ConsignmentReadOnly());
     Mockito.when(
