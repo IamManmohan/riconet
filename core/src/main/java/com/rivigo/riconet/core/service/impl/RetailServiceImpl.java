@@ -161,6 +161,14 @@ public class RetailServiceImpl implements RetailService {
     User user = userMasterService.getById(notification.getUserId());
     notification.setUserMobile(user.getMobileNo());
     notification.setUserName(user.getName());
+
+    // in case ouId is null, we will not send the sms as ouId is being used in all the message
+    // templates
+    if (null == notification.getOuId()) {
+      log.warn("Sms not sent as ouId is null in the notification: {}", notification.toString());
+      return;
+    }
+
     Location location = locationService.getLocationById(notification.getOuId());
     notification.setOuCode(location.getCode());
     if (notification.getNotificationType().equals(RetailNotificationType.HANDOVER)) {
