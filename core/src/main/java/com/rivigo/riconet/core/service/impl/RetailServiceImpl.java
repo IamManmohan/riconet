@@ -238,13 +238,13 @@ public class RetailServiceImpl implements RetailService {
       smsTemplate = zoomPropertyService.getString(ZoomPropertyName.RETAIL_HANDOVER_BP_SMS_STRING);
     }
     String smsString = designSms(notification, smsTemplate);
+    smsService.sendSms(bpAdmin.getUser().getMobileNo(), smsString);
     notification.getSmsList().add(new SmsDTO(bpAdmin.getUser().getMobileNo(), smsString));
     notification.setOuId(captain.getZones().get(0).getZone().getLocationId());
     notification.setOuCode(
         locationService
             .getLocationById(captain.getZones().get(0).getZone().getLocationId())
             .getCode());
-    smsService.sendSms(bpAdmin.getUser().getMobileNo(), smsString);
   }
 
   private RetailNotification processSingleNotification(
