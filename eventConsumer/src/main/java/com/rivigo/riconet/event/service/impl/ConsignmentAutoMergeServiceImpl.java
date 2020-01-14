@@ -5,9 +5,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ConsignmentService;
-import com.rivigo.riconet.core.utils.ConsignmentUtils;
 import com.rivigo.riconet.event.service.ConsignmentAutoMergeService;
-import com.rivigo.zoom.common.model.Consignment;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -37,32 +35,22 @@ public class ConsignmentAutoMergeServiceImpl implements ConsignmentAutoMergeServ
       return;
     }
     String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-    String location =
-        notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CURRENT_LOCATION_ID.name());
     log.info("Trying to merge cnote : {}", cnote);
-    String parentCnote = ConsignmentUtils.getPrimaryCnote(cnote);
-    Consignment parentConsignment = consignmentService.getConsignmentByCnote(parentCnote);
     List<String> mergeCnotes =
         Arrays.asList(
             notificationDTO
                 .getMetadata()
                 .get(ZoomCommunicationFieldNames.SECONDARY_CNOTES.name())
                 .split(","));
-    if (parentConsignment == null || parentConsignment.getLocationId() == null) {
-      log.warn("Parent cnote not found : {}", parentCnote);
-      return;
-    }
-    if (parentConsignment.getLocationId().toString().equals(location)) {
-      try {
-        JsonNode responseJson =
-            apiClientService.getEntity(
-                mergeCnotes, HttpMethod.POST, "/deps/auto-merge", null, zoomBackendBaseUrl);
-        log.debug("response {}", responseJson);
-      } catch (IOException e) {
-        log.error(
-            "Exception occurred while merging cn in zoom backend {}",
-            ExceptionUtils.getFullStackTrace(e));
-      }
+    try {
+      JsonNode responseJson =
+          apiClientService.getEntity(
+              mergeCnotes, HttpMethod.POST, "/deps/auto-merge", null, zoomBackendBaseUrl);
+      log.debug("response {}", responseJson);
+    } catch (IOException e) {
+      log.error(
+          "Exception occurred while merging cn in zoom backend {}",
+          ExceptionUtils.getFullStackTrace(e));
     }
   }
 }
