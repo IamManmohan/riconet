@@ -1,20 +1,15 @@
 package com.rivigo.riconet.core.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.FeederVendorService;
-import com.rivigo.riconet.core.service.FinanceEventService;
-import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.FinanceEventServiceImpl;
-import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.vms.enums.ExpenseType;
-import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
-import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
-import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,23 +18,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
+
 public class FinanceEventServiceImplTest {
 
   @InjectMocks FinanceEventServiceImpl financeEventServiceImpl;
 
-  @Mock ZoomBackendAPIClientServiceImpl zoomBackendAPIClientServiceImpl;
-
-  @Mock ZoomBackendAPIClientService zoomBackendAPIClientService;
-
   @Mock FeederVendorService feederVendorService;
 
-  @Mock ObjectMapper objectMapper;
-
-  @Mock FeederVendorRepository feederVendorRepository;
-
-  @Mock BusinessPartnerRepository businessPartnerRepository;
-
-  @Mock FinanceEventService financeEventService;
+  @Mock ZoomPropertyService zoomPropertyService;
 
   @Before
   public void setUp() {
@@ -59,6 +46,8 @@ public class FinanceEventServiceImplTest {
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     Mockito.when(feederVendorService.createFeederVendor(eventPayload.getPayload()))
         .thenReturn(jsonNode);
+    Mockito.when(zoomPropertyService.getBoolean(ZoomPropertyName.EMAIL_ENABLED, false))
+        .thenReturn(true);
     financeEventServiceImpl.processFinanceEvents(eventPayload);
     Assert.assertNotNull(jsonNode);
   }
