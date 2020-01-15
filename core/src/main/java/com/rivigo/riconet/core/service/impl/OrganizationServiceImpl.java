@@ -65,6 +65,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
     organizationDTO.setInsuranceApplicable(dto.getInsuranceRequired());
     organizationDTO.setFodApplicable(dto.getFodApplicable());
+    organizationDTO.setCodDodApplicable(dto.getFinanceActivated());
     organizationDTO.setEmail(dto.getClientEmail());
     organizationDTO.setMobileNumber(dto.getClientPhoneNumber());
     User samUser = userMasterService.getByEmail(dto.getSamUserEmail());
