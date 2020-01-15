@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -248,7 +249,8 @@ public class ClientMasterServiceImpl implements ClientMasterService {
 
   private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId) {
     ClientVasDetail clientVasDetail = clientVasDetailsService.getClientVasDetails(clientId);
-    if (!clientCreateUpdateDTO.getFinanceActivated() && clientVasDetail == null) {
+    if (!Optional.ofNullable(clientCreateUpdateDTO.getFinanceActivated()).orElse(false)
+        && clientVasDetail == null) {
       log.info("Vas details not required for client");
       return;
     }
@@ -256,7 +258,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     clientVasDetailDTO.setClientId(clientId);
     clientVasDetailDTO.setClientVasType(ClientVasType.COD_DOD);
     log.info("Saving cod dod details for {}", clientCreateUpdateDTO.toString());
-    if (clientCreateUpdateDTO.getFinanceActivated()) {
+    if (Optional.ofNullable(clientCreateUpdateDTO.getFinanceActivated()).orElse(false)) {
       clientVasDetailDTO.setDistrict(clientCreateUpdateDTO.getDistrict());
       clientVasDetailDTO.setInFavourOf(clientCreateUpdateDTO.getInFavorOf());
       clientVasDetailDTO.setLandmark(clientCreateUpdateDTO.getLandmark());

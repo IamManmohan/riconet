@@ -13,6 +13,7 @@ import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.repository.mysql.OrganizationRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     organizationDTO.setInsuranceApplicable(dto.getInsuranceRequired());
     organizationDTO.setFodApplicable(dto.getFodApplicable());
     // financeActivated is true when COD_DOD VAS is enabled in compass
-    organizationDTO.setCodDodApplicable(dto.getFinanceActivated());
+    organizationDTO.setCodDodApplicable(
+        Optional.ofNullable(dto.getFinanceActivated()).orElse(false));
     organizationDTO.setEmail(dto.getClientEmail());
     organizationDTO.setMobileNumber(dto.getClientPhoneNumber());
     User samUser = userMasterService.getByEmail(dto.getSamUserEmail());
