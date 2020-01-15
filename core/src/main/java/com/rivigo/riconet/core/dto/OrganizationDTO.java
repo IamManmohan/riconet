@@ -26,4 +26,5 @@ public class OrganizationDTO {
   private Long samUserId;
   private Long samLeadId;
   private Boolean fodApplicable;
+  private Boolean codDodApplicable;
 }
