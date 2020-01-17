@@ -51,14 +51,16 @@ public class BankTransferServiceImpl implements BankTransferService {
     String s3Url = getS3Url(consignment);
 
     // Create ticket for cnote
-    zoomTicketingAPIClientService.createTicket(
-        getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url));
+    TicketDTO ticketDTO =
+        zoomTicketingAPIClientService.createTicket(
+            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url));
 
     // Create ticket for UTR
-    createUTRTicket(consignment.getCnote(), metadata, s3Url);
+    createUTRTicket(consignment.getCnote(), metadata, s3Url, ticketDTO.getId());
   }
 
-  private void createUTRTicket(@NotNull String cnote, Map<String, String> metadata, String s3Url) {
+  private void createUTRTicket(
+      @NotNull String cnote, Map<String, String> metadata, String s3Url, Long parentId) {
     String utrNo =
         metadata.getOrDefault(
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
@@ -73,7 +75,7 @@ public class BankTransferServiceImpl implements BankTransferService {
             .orElseGet(
                 () ->
                     zoomTicketingAPIClientService.createTicket(
-                        getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo)));
+                        getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo, parentId)));
 
     ticketingService.reopenTicketIfClosed(
         utrTicket,
@@ -85,10 +87,11 @@ public class BankTransferServiceImpl implements BankTransferService {
   }
 
   private TicketDTO getTicketDtoForUtrBankTransfer(
-      Map<String, String> metadata, String s3Url, String utrNo) {
+      Map<String, String> metadata, String s3Url, String utrNo, Long parentId) {
     GroupDTO group = getGroupForTicketing();
     return TicketDTO.builder()
         .entityId(utrNo)
+        .parentId(parentId)
         .source(TicketSource.INTERNAL)
         .typeId(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID)
         .subject(

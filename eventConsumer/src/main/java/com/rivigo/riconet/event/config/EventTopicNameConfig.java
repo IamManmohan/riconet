@@ -45,6 +45,9 @@ public class EventTopicNameConfig {
   @Value("${CONSIGNMENT_BLOCK_UNBLOCK_ERROR}")
   private String consignmentBlockUnblockError;
 
+  @Value("${SECONDARY_CN_AUTO_MERGE_ERROR}")
+  private String secondaryCnAutoMergeError;
+
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
@@ -95,5 +98,9 @@ public class EventTopicNameConfig {
 
   public String consignmentBlockUnblockError() {
     return consignmentBlockUnblockError;
+  }
+
+  public String secondaryCnAutoMergeError() {
+    return secondaryCnAutoMergeError;
   }
 }
