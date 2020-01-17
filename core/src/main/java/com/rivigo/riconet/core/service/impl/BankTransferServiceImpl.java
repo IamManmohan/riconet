@@ -59,8 +59,7 @@ public class BankTransferServiceImpl implements BankTransferService {
             getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, utrTicketId));
   }
 
-  private Long createUTRTicket(
-      @NotNull String cnote, Map<String, String> metadata, String s3Url) {
+  private Long createUTRTicket(@NotNull String cnote, Map<String, String> metadata, String s3Url) {
     String utrNo =
         metadata.getOrDefault(
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
