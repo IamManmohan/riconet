@@ -18,6 +18,7 @@ import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
+import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import java.time.Duration;
@@ -51,6 +52,8 @@ public class EventMain {
   private final KairosExpressAppEventConsumer kairosExpressAppEventConsumer;
 
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
+
+  private final SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer;
 
   private final HealthCheckConsumer healthCheckConsumer;
 
@@ -101,6 +104,9 @@ public class EventMain {
   @Value("${expressAppPickupConsumer.group.id}")
   private String expressAppPickupGroup;
 
+  @Value("${secondaryCnAutoMergeConsumer.group.id}")
+  private String secondaryCnAutoMergeGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -110,7 +116,8 @@ public class EventMain {
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
-      ExpressAppPickupConsumer expressAppPickupConsumer) {
+      ExpressAppPickupConsumer expressAppPickupConsumer,
+      SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -120,6 +127,7 @@ public class EventMain {
     this.wmsEventConsumer = wmsEventConsumer;
     this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
+    this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
   }
 
   public static void main(String[] args) {
@@ -166,6 +174,12 @@ public class EventMain {
         kairosExpressAppGroup,
         kairosExpressAppEventConsumer);
     load(materializer, system, bootstrapServers, expressAppPickupGroup, expressAppPickupConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        secondaryCnAutoMergeGroup,
+        secondaryCnAutoMergeConsumer);
   }
 
   private void load(

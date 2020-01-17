@@ -39,6 +39,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
         markRecoveryPending(notificationDTO);
         break;
       case CN_COLLECTION_CHEQUE_BOUNCE_TICKET_CLOSED:
+      case CN_SHORTAGE_RESOLUTION:
         unblockCn(notificationDTO);
         break;
       default:
