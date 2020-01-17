@@ -33,9 +33,6 @@ public interface ConsignmentService {
 
   Consignment getConsignmentByCnote(String cnote);
 
-  List<String> getChildCnotesAtLocation(
-      String cnote, Long locationId, ConsignmentStatus consignmentStatus);
-
   List<Consignment> getConsignmentListByCnoteList(List<String> cnoteList);
 
   Map<Long, String> getIdToCnoteMap(List<String> cnoteList);
