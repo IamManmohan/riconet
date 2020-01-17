@@ -50,17 +50,17 @@ public class BankTransferServiceImpl implements BankTransferService {
     ConsignmentReadOnly consignment = consignmentReadOnlyService.findRequiredById(consignmentId);
     String s3Url = getS3Url(consignment);
 
+    // Create ticket for UTR
+    Long utrTicketId = createUTRTicket(consignment.getCnote(), metadata, s3Url);
+
     // Create ticket for cnote
     TicketDTO ticketDTO =
         zoomTicketingAPIClientService.createTicket(
-            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url));
-
-    // Create ticket for UTR
-    createUTRTicket(consignment.getCnote(), metadata, s3Url, ticketDTO.getId());
+            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, utrTicketId));
   }
 
-  private void createUTRTicket(
-      @NotNull String cnote, Map<String, String> metadata, String s3Url, Long parentId) {
+  private Long createUTRTicket(
+      @NotNull String cnote, Map<String, String> metadata, String s3Url) {
     String utrNo =
         metadata.getOrDefault(
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
@@ -75,7 +75,7 @@ public class BankTransferServiceImpl implements BankTransferService {
             .orElseGet(
                 () ->
                     zoomTicketingAPIClientService.createTicket(
-                        getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo, parentId)));
+                        getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo, null)));
 
     ticketingService.reopenTicketIfClosed(
         utrTicket,
@@ -84,6 +84,8 @@ public class BankTransferServiceImpl implements BankTransferService {
             cnote,
             metadata.getOrDefault(
                 ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")));
+
+    return utrTicket.getId();
   }
 
   private TicketDTO getTicketDtoForUtrBankTransfer(
@@ -150,11 +152,12 @@ public class BankTransferServiceImpl implements BankTransferService {
    * @return TicketDto
    */
   private TicketDTO getTicketDTOForBankTransfer(
-      @NotNull String cnote, Map<String, String> metadata, String s3URL) {
+      @NotNull String cnote, Map<String, String> metadata, String s3URL, Long parentId) {
     GroupDTO group = getGroupForTicketing();
     return TicketDTO.builder()
         .entityId(cnote)
         .source(TicketSource.INTERNAL)
+        .parentId(parentId)
         .typeId(ZoomTicketingConstant.BANK_TRANSFER_TYPE_ID)
         .subject(
             String.format(
