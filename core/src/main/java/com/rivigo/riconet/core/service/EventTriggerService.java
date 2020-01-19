@@ -93,6 +93,7 @@ public class EventTriggerService {
         ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
         qcService.consumeDeliveryLoadingEvent(deliveryUnloadingData);
         break;
+//      For reference: T4340
 //      case CN_COMPLETION_ALL_INSTANCES:
 //        ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
 //        qcService.consumeCompletionEvent(completionData);
