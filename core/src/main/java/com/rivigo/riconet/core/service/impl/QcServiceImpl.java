@@ -320,72 +320,78 @@ public class QcServiceImpl implements QcService {
           "No consignment exists with id :" + completionData.getConsignmentId());
     }
     sendCodDodSms(completionData, consignment);
-    log.info(
-        "cnote: {} isPrimaryConsignment: {} cnoteType: {}",
-        consignment.getCnote(),
-        consignmentService.isPrimaryConsignment(consignment.getCnote()),
-        consignment.getCnoteType());
-    if (!consignmentService.isPrimaryConsignment(consignment.getCnote())
-        || CnoteType.NORMAL_TO_PAY.equals(consignment.getCnoteType())) {
-      return;
-    }
-    fillClientMetadata(completionData, consignment);
-    boolean reCheckQcNeeded = check(completionData, consignment);
-    boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
-    boolean isRTOCN = completionData.getIsRTOCnote();
-    log.info(
-        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {} isRTOCN: {}",
-        consignment.getCnote(),
-        reCheckQcNeeded,
-        measurementQcNeeded,
-        isRTOCN);
 
-    if (isRTOCN) {
-      log.debug("QC ticket is not required for rto cnote: {}", completionData.getCnote());
-      return;
-    }
-    if (!measurementQcNeeded && !reCheckQcNeeded) {
-      return;
-    }
-    List<TicketDTO> ticketList =
-        zoomTicketingAPIClientService
-            .getByCnoteAndType(completionData.getCnote(), getQcTicketTypes())
-            .stream()
-            .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
-            .collect(Collectors.toList());
-    if (!CollectionUtils.isEmpty(ticketList)) {
-      return;
-    }
-    log.info(
-        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded {} locationId {}",
-        consignment.getCnote(),
-        reCheckQcNeeded,
-        measurementQcNeeded,
-        consignment.getLocationId());
-    Long groupId = null;
-    Boolean autoClose = false;
-    if (ConsignmentStatus.RECEIVED_AT_OU.equals(consignment.getStatus())) {
-      GroupDTO group =
-          zoomTicketingAPIClientService.getGroupId(
-              consignment.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME, LocationType.OU);
-      Location location = locationService.getLocationById(consignment.getLocationId());
-      groupId = group == null ? null : group.getId();
-      autoClose = (group == null) && location.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID);
-    }
-    log.info(
-        "cnote: {}  locationId: {}  groupId: {}",
-        consignment.getCnote(),
-        consignment.getLocationId(),
-        groupId);
-    createTicketsIfNeeded(reCheckQcNeeded, measurementQcNeeded, groupId, consignment, autoClose);
-    if (autoClose) {
-      return;
-    }
-    if (reCheckQcNeeded && RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId()) {
-      handleQcConsignmentBlocker(
-          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
-    }
-    zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
+    //   TODO: remove this below code from here
+    //  For reference: T4340
+    //    log.info(
+    //        "cnote: {} isPrimaryConsignment: {} cnoteType: {}",
+    //        consignment.getCnote(),
+    //        consignmentService.isPrimaryConsignment(consignment.getCnote()),
+    //        consignment.getCnoteType());
+    //    if (!consignmentService.isPrimaryConsignment(consignment.getCnote())
+    //        || CnoteType.NORMAL_TO_PAY.equals(consignment.getCnoteType())) {
+    //      return;
+    //    }
+    //    fillClientMetadata(completionData, consignment);
+    //    boolean reCheckQcNeeded = check(completionData, consignment);
+    //    boolean measurementQcNeeded = isMeasurementQcRequired(completionData);
+    //    boolean isRTOCN = completionData.getIsRTOCnote();
+    //    log.info(
+    //        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded: {} isRTOCN: {}",
+    //        consignment.getCnote(),
+    //        reCheckQcNeeded,
+    //        measurementQcNeeded,
+    //        isRTOCN);
+    //
+    //    if (isRTOCN) {
+    //      log.debug("QC ticket is not required for rto cnote: {}", completionData.getCnote());
+    //      return;
+    //    }
+    //    if (!measurementQcNeeded && !reCheckQcNeeded) {
+    //      return;
+    //    }
+    //    List<TicketDTO> ticketList =
+    //        zoomTicketingAPIClientService
+    //            .getByCnoteAndType(completionData.getCnote(), getQcTicketTypes())
+    //            .stream()
+    //            .filter(ticketDTO -> isOpenQcTicket().test(ticketDTO))
+    //            .collect(Collectors.toList());
+    //    if (!CollectionUtils.isEmpty(ticketList)) {
+    //      return;
+    //    }
+    //    log.info(
+    //        "cnote: {} reCheckQcNeeded: {} measurementQcNeeded {} locationId {}",
+    //        consignment.getCnote(),
+    //        reCheckQcNeeded,
+    //        measurementQcNeeded,
+    //        consignment.getLocationId());
+    //    Long groupId = null;
+    //    Boolean autoClose = false;
+    //    if (ConsignmentStatus.RECEIVED_AT_OU.equals(consignment.getStatus())) {
+    //      GroupDTO group =
+    //          zoomTicketingAPIClientService.getGroupId(
+    //              consignment.getLocationId(), ZoomTicketingConstant.QC_GROUP_NAME,
+    // LocationType.OU);
+    //      Location location = locationService.getLocationById(consignment.getLocationId());
+    //      groupId = group == null ? null : group.getId();
+    //      autoClose = (group == null) &&
+    // location.getOrganizationId().equals(RIVIGO_ORGANIZATION_ID);
+    //    }
+    //    log.info(
+    //        "cnote: {}  locationId: {}  groupId: {}",
+    //        consignment.getCnote(),
+    //        consignment.getLocationId(),
+    //        groupId);
+    //    createTicketsIfNeeded(reCheckQcNeeded, measurementQcNeeded, groupId, consignment,
+    // autoClose);
+    //    if (autoClose) {
+    //      return;
+    //    }
+    //    if (reCheckQcNeeded && RIVIGO_ORGANIZATION_ID == consignment.getOrganizationId()) {
+    //      handleQcConsignmentBlocker(
+    //          consignment.getId(), ConsignmentBlockerRequestType.BLOCK, QcType.RE_CHECK);
+    //    }
+    //    zoomBackendAPIClientService.updateQcCheck(consignment.getId(), true);
   }
 
   private void handleQcConsignmentBlocker(
