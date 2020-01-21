@@ -1,14 +1,12 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.zoom.common.enums.ZoomPropertyName.ENABLED_PRIME_EVENT_TYPES;
-
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.PrimeEventService;
 import com.rivigo.riconet.core.service.TripService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.zoom.common.enums.ZoomPropertyName;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.Trip;
-import com.rivigo.zoom.common.service.ZoomPropertyService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +49,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
     // Validation 2: check for enabled events: For rollback whenever new event types are enabled for
     // listening
     String enabledPrimeEventTypes =
-        zoomPropertyService.getPropertyValue(String.class, ENABLED_PRIME_EVENT_TYPES, null);
+        zoomPropertyService.getString(ZoomPropertyName.ENABLED_PRIME_EVENT_TYPES);
     if (!validateEventType(enabledPrimeEventTypes, primeEventDto.getPrimeEventType())) {
       log.info(
           "Disabled event type: {}, event: {}", primeEventDto.getPrimeEventType(), primeEventDto);
@@ -82,6 +80,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
       case "VEHICLE_EVENT_NODE_OUT":
       case "VEHICLE_EVENT_ETA":
         zoomBackendAPIClientService.processVehicleEvent(primeEventDto, trip.getId());
+        return;
       default:
         log.info(
             "Unhandled event type: {}, event: {}",
@@ -98,8 +97,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
 
   private String getPrimeRZMClientCodeListString() {
     String primeRZMClientCodeListString =
-        zoomPropertyService.getPropertyValue(
-            String.class, ZoomPropertyName.PRIME_RZM_CLIENT_CODE_LIST, null);
+        zoomPropertyService.getString(ZoomPropertyName.PRIME_RZM_CLIENT_CODE_LIST);
     if (primeRZMClientCodeListString != null) {
       primeRZMClientCodeListString = primeRZMClientCodeListString.replaceAll("\\s+", "");
       if (!primeRZMClientCodeListString.isEmpty()) return primeRZMClientCodeListString;

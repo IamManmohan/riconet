@@ -419,7 +419,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_PROCESS_VEHICLE_EVENT.replace("{tripId}", tripId.toString()),
               null,
               backendBaseUrl);
-      log.info("Feeder Vendor Created {}", responseJson);
       TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
       Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
       if (!Boolean.TRUE.equals(isSuccess)) {
