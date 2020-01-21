@@ -50,7 +50,7 @@ public class EventTopicNameConfig {
   @Value("${SECONDARY_CN_AUTO_MERGE_ERROR}")
   private String secondaryCnAutoMergeError;
 
-  @Value("${PRIME_EVENT_SINK:PRIME_TO_ZOOM_EVENTS}")
+  @Value("${PRIME_EVENT_SINK}")
   private String primeEventSink;
 
   @Value("${PRIME_EVENT_SINK_ERROR}")

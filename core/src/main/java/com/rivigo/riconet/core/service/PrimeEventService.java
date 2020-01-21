@@ -1,9 +1,8 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.riconet.core.dto.primesync.PrimeEventBaseDto;
-import java.io.IOException;
+import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 
 public interface PrimeEventService {
 
-  void processEvent(PrimeEventBaseDto primeEventBaseDto) throws IOException;
+  void processEvent(PrimeEventDto primeEventDto);
 }

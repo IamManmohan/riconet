@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.zoom.common.enums.ZoomPropertyName.ENABLED_PRIME_EVENT_TYPES;
 
-import com.rivigo.riconet.core.dto.primesync.PrimeEventBaseDto;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.service.PrimeEventService;
 import com.rivigo.riconet.core.service.TripService;
@@ -11,14 +10,12 @@ import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.Trip;
 import com.rivigo.zoom.common.service.ZoomPropertyService;
 import com.rivigo.zoom.exceptions.ZoomException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -28,8 +25,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PrimeEventServiceImpl implements PrimeEventService {
 
-  private final ObjectMapper objectMapper;
-
   private final ZoomPropertyService zoomPropertyService;
 
   private final TripService tripService;
@@ -37,13 +32,8 @@ public class PrimeEventServiceImpl implements PrimeEventService {
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Override
-  public void processEvent(PrimeEventBaseDto primeEventBaseDto) throws IOException {
-    log.info(
-        "Consuming message: type {}, timestamp: {}",
-        primeEventBaseDto.getEventType(),
-        primeEventBaseDto.getEventTimestamp());
-    PrimeEventDto primeEventDto =
-        objectMapper.readValue(primeEventBaseDto.getMessage(), PrimeEventDto.class);
+  public void processEvent(PrimeEventDto primeEventDto) {
+    log.info("Consuming message: type {}", primeEventDto.getPrimeEventType());
     if (CollectionUtils.isEmpty(primeEventDto.getCwhTrackingList())) {
       log.info("CWH Tracking list is null");
       return; // Skipped event - No retry

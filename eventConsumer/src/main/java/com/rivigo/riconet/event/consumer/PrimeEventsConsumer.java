@@ -3,7 +3,7 @@ package com.rivigo.riconet.event.consumer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
-import com.rivigo.riconet.core.dto.primesync.PrimeEventBaseDto;
+import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.service.PrimeEventService;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import java.io.IOException;
@@ -37,15 +37,15 @@ public class PrimeEventsConsumer extends ConsumerModel {
   }
 
   @Override
-  public void processMessage(String str) throws IOException {
+  public void processMessage(String str) {
     log.info("Processing message in Prime Events Consumer {}", str);
-    PrimeEventBaseDto primeEventBaseDto;
+    PrimeEventDto primeEventDto;
     try {
-      primeEventBaseDto = objectMapper.readValue(str, PrimeEventBaseDto.class);
+      primeEventDto = objectMapper.readValue(str, PrimeEventDto.class);
     } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", str, ex);
+      log.error("Error occurred while processing message {} ", str, ex);
       return;
     }
-    primeEventService.processEvent(primeEventBaseDto);
+    primeEventService.processEvent(primeEventDto);
   }
 }
