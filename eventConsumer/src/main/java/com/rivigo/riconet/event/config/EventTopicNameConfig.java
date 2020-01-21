@@ -1,10 +1,12 @@
 package com.rivigo.riconet.event.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /** Created by ashfakh on 03/07/19. */
 @Configuration
+@Getter
 public class EventTopicNameConfig {
   @Value("${ENRICHED_EVENT_SINK}")
   private String enrichedEventSink;
@@ -47,6 +49,12 @@ public class EventTopicNameConfig {
 
   @Value("${SECONDARY_CN_AUTO_MERGE_ERROR}")
   private String secondaryCnAutoMergeError;
+
+  @Value("${PRIME_EVENT_SINK:PRIME_TO_ZOOM_EVENTS}")
+  private String primeEventSink;
+
+  @Value("${PRIME_EVENT_SINK_ERROR}")
+  private String primeEventSinkError;
 
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;

@@ -48,7 +48,6 @@ public abstract class EventConsumer extends ConsumerModel {
       log.error("Error occured while processing message {} ", str, ex);
       return;
     }
-    log.debug("NotificationDTO {}", notificationDTO);
     if (eventNamesToBeConsumed()
         .stream()
         .map(Enum::name)

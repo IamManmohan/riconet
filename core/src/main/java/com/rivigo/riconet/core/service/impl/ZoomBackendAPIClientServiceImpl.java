@@ -14,6 +14,7 @@ import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
+import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -405,5 +406,28 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
     }
     apiClientService.parseJsonNode(responseJson, null);
+  }
+
+  @Override
+  public void processVehicleEvent(PrimeEventDto primeEventDto, Long tripId) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              primeEventDto,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_PROCESS_VEHICLE_EVENT.replace("{tripId}", tripId.toString()),
+              null,
+              backendBaseUrl);
+      log.info("Feeder Vendor Created {}", responseJson);
+      TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in processing vehicle event");
+      }
+    } catch (IOException e) {
+      log.error("Error while processing event with dto {}, trip id: {}", primeEventDto, tripId);
+      throw new ZoomException("Error while processing event for trip id: %s", tripId);
+    }
   }
 }
