@@ -59,8 +59,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
     // Validation 2: check for enabled events: For rollback whenever new event types are enabled for
     // listening
     if (!ENABLE_EVENT_TYPES.contains(primeEventDto.getPrimeEventType())) {
-      log.info(
-          "Disabled event type: {}, event: {}", primeEventDto.getPrimeEventType(), primeEventDto);
+      log.info("Disabled event type: {}", primeEventDto.getPrimeEventType());
       return; // Skipped event - No retry
     }
 
@@ -90,10 +89,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
         zoomBackendAPIClientService.processVehicleEvent(primeEventDto, trip.getId());
         return;
       default:
-        log.info(
-            "Unhandled event type: {}, event: {}",
-            primeEventDto.getPrimeEventType(),
-            primeEventDto);
+        log.info("Unhandled event type: {}", primeEventDto.getPrimeEventType());
         break;
     }
   }
