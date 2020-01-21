@@ -45,7 +45,6 @@ public class ZoomCommunicationsConsumer extends ConsumerModel {
     ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO = null;
     try {
       zoomCommunicationsSMSDTO = objectMapper.readValue(str, ZoomCommunicationsSMSDTO.class);
-      log.debug("ZoomCommunicationsSMSDTO {}", zoomCommunicationsSMSDTO);
     } catch (Exception e) {
       log.error("failed", e);
     }

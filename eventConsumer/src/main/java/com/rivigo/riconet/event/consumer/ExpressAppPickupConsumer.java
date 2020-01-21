@@ -46,7 +46,6 @@ public class ExpressAppPickupConsumer extends ConsumerModel {
       log.error("Error occured while processing message {} ", str, ex);
       return;
     }
-    log.debug("Event Payload {}", map);
     expressAppPickupService.processExpressPickupAutoCancellationEvent(map);
   }
 }
