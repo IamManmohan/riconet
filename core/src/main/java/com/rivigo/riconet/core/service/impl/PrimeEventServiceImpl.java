@@ -8,14 +8,15 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.model.Trip;
 import com.rivigo.zoom.exceptions.ZoomException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -29,6 +30,15 @@ public class PrimeEventServiceImpl implements PrimeEventService {
 
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  private List<String> PRIME_RZM_CLIENT_CODE_LIST;
+  private List<String> ENABLE_EVENT_TYPES = Collections.emptyList();
+
+  @PostConstruct
+  private void init() {
+    this.initializePrimeRZMClientCodeList();
+    this.initializeEnabledEventTypes();
+  }
+
   @Override
   public void processEvent(PrimeEventDto primeEventDto) {
     log.info("Consuming message: type {}", primeEventDto.getPrimeEventType());
@@ -38,7 +48,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
     }
 
     // Validation 1: Consider only zoom client codes
-    if (!this.getPrimeRZMClientCodeList().contains(primeEventDto.getClientCode())) {
+    if (!PRIME_RZM_CLIENT_CODE_LIST.contains(primeEventDto.getClientCode())) {
       log.info(
           "Unrecognized client code {} for prime trip with id: journey id:{}",
           primeEventDto.getClientCode(),
@@ -48,9 +58,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
 
     // Validation 2: check for enabled events: For rollback whenever new event types are enabled for
     // listening
-    String enabledPrimeEventTypes =
-        zoomPropertyService.getString(ZoomPropertyName.ENABLED_PRIME_EVENT_TYPES);
-    if (!validateEventType(enabledPrimeEventTypes, primeEventDto.getPrimeEventType())) {
+    if (!ENABLE_EVENT_TYPES.contains(primeEventDto.getPrimeEventType())) {
       log.info(
           "Disabled event type: {}, event: {}", primeEventDto.getPrimeEventType(), primeEventDto);
       return; // Skipped event - No retry
@@ -67,7 +75,7 @@ public class PrimeEventServiceImpl implements PrimeEventService {
       // event will be retried after some time
       throw new ZoomException("Zoom trip not found for prime trip");
     }
-    if (!trip.getVehicleNumber().equals(primeEventDto.getVehicleNumber())) {
+    if (!trip.getVehicleNumber().equalsIgnoreCase(primeEventDto.getVehicleNumber())) {
       log.info(
           "Vehicle no mismatch: zoom:{}, prime:{}",
           trip.getVehicleNumber(),
@@ -90,32 +98,28 @@ public class PrimeEventServiceImpl implements PrimeEventService {
     }
   }
 
-  private List<String> getPrimeRZMClientCodeList() {
-    String primeRZMClientCodeListString = this.getPrimeRZMClientCodeListString();
-    return Arrays.asList(primeRZMClientCodeListString.split(","));
-  }
-
-  private String getPrimeRZMClientCodeListString() {
+  private void initializePrimeRZMClientCodeList() {
     String primeRZMClientCodeListString =
         zoomPropertyService.getString(ZoomPropertyName.PRIME_RZM_CLIENT_CODE_LIST);
     if (primeRZMClientCodeListString != null) {
       primeRZMClientCodeListString = primeRZMClientCodeListString.replaceAll("\\s+", "");
-      if (!primeRZMClientCodeListString.isEmpty()) return primeRZMClientCodeListString;
+      if (!primeRZMClientCodeListString.isEmpty()) {
+        PRIME_RZM_CLIENT_CODE_LIST = Arrays.asList(primeRZMClientCodeListString.split(","));
+      }
     }
-    return "RZM,RZMA,RZMO,RZMF";
+    PRIME_RZM_CLIENT_CODE_LIST = Arrays.asList("RZM", "RZMA", "RZMO", "RZMF");
   }
 
-  private boolean validateEventType(
-      @Nullable String enabledPrimeEventTypes, String primeEventType) {
+  private void initializeEnabledEventTypes() {
+    // Not doing direct string contains as one event name might contain another event name (events
+    // A,AB,BA)
+    String enabledPrimeEventTypes =
+        zoomPropertyService.getString(ZoomPropertyName.ENABLED_PRIME_EVENT_TYPES);
     if (enabledPrimeEventTypes != null) {
-      List<String> enableEventTypes = new ArrayList<>();
-      for (String s : enabledPrimeEventTypes.split(",")) {
-        enableEventTypes.add(s.trim()); // Trim to avoid issues due to spaces
-      }
-      // Not doing direct string contains as one event name might contain another event name (events
-      // A,AB,BA)
-      return enableEventTypes.contains(primeEventType);
+      ENABLE_EVENT_TYPES =
+          Arrays.stream(enabledPrimeEventTypes.split(","))
+              .map(String::trim)
+              .collect(Collectors.toList());
     }
-    return false;
   }
 }
