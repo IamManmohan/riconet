@@ -3,11 +3,13 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
 import com.rivigo.riconet.core.service.HandoverCollectionService;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private HandoverCollectionService handoverCollectionService;
 
+  @Autowired private ZoomPropertyService zoomPropertyService;
+
   @Override
   public void processFinanceEvents(EventPayload eventPayload) {
     ZoomEventType eventType = eventPayload.getEventType();
@@ -36,8 +40,11 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         consignmentInvoiceService.saveInvoiceDetails(eventPayload.getPayload());
         break;
       case VENDOR_ACTIVE_EVENT:
-        JsonNode response = feederVendorService.createFeederVendor(eventPayload.getPayload());
-        log.info("Vendor created {}", response);
+        // flag to enable or disable vendor onboarding
+        if (zoomPropertyService.getBoolean(ZoomPropertyName.IS_VENDOR_ONBOARDING_ENABLED, false)) {
+          JsonNode response = feederVendorService.createFeederVendor(eventPayload.getPayload());
+          log.info("Vendor created {}", response);
+        }
         break;
       case HANDOVER_COLLECTION_POST:
       case HANDOVER_COLLECTION_UNPOST:
