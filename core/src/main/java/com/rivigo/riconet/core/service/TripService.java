@@ -12,4 +12,6 @@ public interface TripService {
   Map<Long, Trip> getTripsMapByIdIn(Collection<Long> tripIdList);
 
   List<Trip> getTripsByIdIn(Collection<Long> linehaulTripIds);
+
+  Trip getTripByPrimeTripCodeAndNotDeleted(String tripCode);
 }

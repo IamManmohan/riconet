@@ -72,4 +72,7 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_CREATE_BP = "/master/partner";
 
   public static final String ZOOM_BACKEND_CREATE_VENDOR = "/master/feeder_vendor";
+
+  public static final String ZOOM_BACKEND_PROCESS_VEHICLE_EVENT =
+      "/primeSync/processVehicleEvent/{tripId}";
 }
