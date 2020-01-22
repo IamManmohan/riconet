@@ -6,6 +6,7 @@ import com.rivigo.zoom.common.model.Trip;
 import com.rivigo.zoom.common.repository.mysql.TripRepository;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,5 +36,11 @@ public class TripServiceImpl implements TripService {
   @Override
   public List<Trip> getTripsByIdIn(Collection<Long> linehaulTripIds) {
     return new ArrayList<>((List) (tripRepository.findAll(linehaulTripIds)));
+  }
+
+  @Override
+  public Trip getTripByPrimeTripCodeAndNotDeleted(String tripCode) {
+    return tripRepository.findByPartnerTripCodeAndStatusNotIn(
+        tripCode, Collections.singletonList(TripStatus.DELETED));
   }
 }
