@@ -3,6 +3,9 @@ package com.rivigo.riconet.core.config;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.zoom.common.config.RedisMessageSubscriber;
+import com.rivigo.zoom.common.utils.EnvUtils;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -26,11 +30,14 @@ import redis.clients.jedis.JedisPoolConfig;
 @Import(com.rivigo.zoom.common.config.ZoomBackendCacheConfig.class)
 public class RiconetRedisConfig {
 
-  @Value("${redis.hostname}")
-  private String redisHostname;
+  @Value("${redis.node.address}")
+  private String redisNodeAddress;
 
-  @Value("${redis.port}")
-  private Integer redisPort;
+  @Value("${redis.sentinel.mastername}")
+  private String redisSentinelMaster;
+
+  @Value("${redis.database}")
+  private Integer redisDatabase;
 
   @Value("${redis.minpoolsize}")
   private Integer redisMinPoolSize;
@@ -42,23 +49,35 @@ public class RiconetRedisConfig {
   @Value("${redis.pub.sub.topic:zoom-cache}")
   private String redisPubSubTopic;
 
-  @Autowired private ObjectMapper objectMapper;
   @Autowired private AutowireCapableBeanFactory beanFactory;
+  @Autowired private ObjectMapper objectMapper;
 
   @Bean
   RedisConnectionFactory redisConnectionFactory() {
-    JedisPoolConfig poolConfig = new JedisPoolConfig();
-    poolConfig.setMaxTotal(redisMaxPoolSize);
-    poolConfig.setMaxIdle(redisMinPoolSize);
+    JedisConnectionFactory connectionFactory;
 
-    JedisConnectionFactory connectionFactory = new JedisConnectionFactory(poolConfig);
-    connectionFactory.setUsePool(true);
-    connectionFactory.setHostName(redisHostname);
-    connectionFactory.setPort(redisPort);
+    if (EnvUtils.isNonProdEnvironment()) {
+      JedisPoolConfig poolConfig = new JedisPoolConfig();
+      poolConfig.setMaxTotal(redisMaxPoolSize);
+      poolConfig.setMaxIdle(redisMinPoolSize);
 
+      connectionFactory = new JedisConnectionFactory(poolConfig);
+      connectionFactory.setHostName(redisNodeAddress.split(":")[0]);
+      connectionFactory.setPort(Integer.parseInt(redisNodeAddress.split(":")[1].split(",")[0]));
+      connectionFactory.setUsePool(true);
+    } else {
+      RedisSentinelConfiguration redisSentinelConfiguration =
+          new RedisSentinelConfiguration(
+              redisSentinelMaster,
+              Arrays.stream(redisNodeAddress.split(",")).collect(Collectors.toSet()));
+
+      connectionFactory = new JedisConnectionFactory(redisSentinelConfiguration);
+      connectionFactory.setDatabase(redisDatabase);
+      connectionFactory.setUsePool(true);
+    }
     try {
       log.info(
-          " redisHostname : {}  redisPort: {} , redisMaxIdleSize: {}, redisMaxTotalSize: {}, redisPoolConfig : {} ",
+          "RedisHostname : {}  RedisPort: {} , RedisMaxIdleSize: {}, RedisMaxTotalSize: {}, RedisPoolConfig : {} ",
           connectionFactory.getHostName(),
           connectionFactory.getPort(),
           connectionFactory.getPoolConfig().getMaxIdle(),
