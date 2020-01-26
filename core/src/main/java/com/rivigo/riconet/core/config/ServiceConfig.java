@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -17,6 +19,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
@@ -84,11 +90,43 @@ public class ServiceConfig {
     return restTemplate;
   }
 
-  @Bean(name = {"myProperties"})
-  public static PropertiesFactoryBean mapper(
-      @Value("${login.profiles.active:staging}") String classPath) {
+  /** Copied from com.rivigo.oauth2.resource.config.OAuth2ResourceConfig ** START ** */
+  @Bean(name = "myProperties")
+  public PropertiesFactoryBean mapper(
+      final @Value("${login.profiles.active:staging}") String classPath) {
     PropertiesFactoryBean bean = new PropertiesFactoryBean();
     bean.setLocation(new ClassPathResource(classPath + "/authresource.properties"));
     return bean;
   }
+
+  @Bean(name = "ssoServiceObjectMapper")
+  public ObjectMapper ssoServiceObjectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return objectMapper;
+  }
+
+  @Bean(name = "ssoServiceRestTemplate")
+  public RestTemplate ssoServiceRestTemplate() {
+    RestTemplate restTemplate = new RestTemplate();
+    restTemplate.setInterceptors(Collections.singletonList(new RequestInterceptor()));
+    return restTemplate;
+  }
+
+  private class RequestInterceptor implements ClientHttpRequestInterceptor {
+
+    @Override
+    public ClientHttpResponse intercept(
+        HttpRequest httpRequest,
+        byte[] bytes,
+        ClientHttpRequestExecution clientHttpRequestExecution)
+        throws IOException {
+      log.info("SsoService: Making {} call to {}", httpRequest.getMethod(), httpRequest.getURI());
+      ClientHttpResponse response = clientHttpRequestExecution.execute(httpRequest, bytes);
+      log.info("SsoService: Received response from sso for request to {}", httpRequest.getURI());
+      return response;
+    }
+  }
+
+  /** Copied from com.rivigo.oauth2.resource.config.OAuth2ResourceConfig ** END ** */
 }
