@@ -106,7 +106,7 @@ public class RetailServiceImpl implements RetailService {
         .append(retailNotificationDTOList.get(0).getDrsId())
         .append(" with ")
         .append(retailNotificationDTOList.get(0).getTotalCnCount())
-        .append(" CNs is assigned to you. You need to collect Rs. ")
+        .append(" CNs is assigned to you. You need to collect INR ")
         .append(
             retailNotificationDTOList
                 .stream()
@@ -124,13 +124,14 @@ public class RetailServiceImpl implements RetailService {
           retailNotificationDTO.setDrsUserName(user.getName());
           retailNotificationDTO.setDrsUserMobile(user.getMobileNo());
           retailNotifications.add(processSingleNotification(retailNotificationDTO));
-          sb.append(retailNotificationDTO.getCnote())
-              .append(" - Rs. ")
-              .append(
-                  retailNotificationDTO.getTotalAmount().setScale(1, BigDecimal.ROUND_HALF_EVEN))
-              .append(" ");
+          //          sb.append(retailNotificationDTO.getCnote())
+          //              .append(" - Rs. ")
+          //              .append(
+          //                  retailNotificationDTO.getTotalAmount().setScale(1,
+          // BigDecimal.ROUND_HALF_EVEN))
+          //              .append(" ");
         });
-    sb.append("Please do not deliver the shipment without To-Pay amount collection.");
+    sb.append("Do not deliver the shipment without collecting amount.");
     smsService.sendSms(retailNotificationDTOList.get(0).getDrsUserMobile(), sb.toString());
     retailNotifications
         .get(0)
