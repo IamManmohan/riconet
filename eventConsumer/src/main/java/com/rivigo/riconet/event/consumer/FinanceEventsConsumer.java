@@ -47,7 +47,6 @@ public class FinanceEventsConsumer extends ConsumerModel {
       log.error("Error occured while processing message {} ", str, ex);
       return;
     }
-    log.debug("Event Payload {}", eventPayload);
     financeEventService.processFinanceEvents(eventPayload);
   }
 }

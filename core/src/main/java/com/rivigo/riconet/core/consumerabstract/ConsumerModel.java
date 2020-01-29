@@ -10,6 +10,7 @@ import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Sink;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.ConsumerMessage;
+import com.rivigo.riconet.core.utils.MDCUtils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -70,8 +71,10 @@ public abstract class ConsumerModel {
   @Async
   public CompletionStage<Done> save(ConsumerRecord<String, String> record) {
     if (record.topic().equals(getTopic())) {
+      MDCUtils.setEventDetails(record);
       executorService.submit(
           () -> {
+            MDCUtils.setEventDetails(record);
             try {
               processMessage(record.value());
             } catch (Exception e) {
@@ -80,8 +83,10 @@ public abstract class ConsumerModel {
             }
           });
     } else if (record.topic().equals(getErrorTopic())) {
+      MDCUtils.setEventDetails(record);
       executorService.submit(
           () -> {
+            MDCUtils.setEventDetails(record);
             ConsumerMessage consumerMessage = null;
             try {
               consumerMessage = objectMapper.readValue(record.value(), ConsumerMessage.class);

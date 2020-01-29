@@ -18,6 +18,7 @@ import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
 import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
+import com.rivigo.riconet.event.consumer.PrimeEventsConsumer;
 import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
@@ -54,6 +55,8 @@ public class EventMain {
   private final ExpressAppPickupConsumer expressAppPickupConsumer;
 
   private final SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer;
+
+  private final PrimeEventsConsumer primeEventsConsumer;
 
   private final HealthCheckConsumer healthCheckConsumer;
 
@@ -107,6 +110,9 @@ public class EventMain {
   @Value("${secondaryCnAutoMergeConsumer.group.id}")
   private String secondaryCnAutoMergeGroup;
 
+  @Value("${primeEventsConsumer.group.id}")
+  private String primeEventsGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -117,7 +123,8 @@ public class EventMain {
       WmsEventConsumer wmsEventConsumer,
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer,
-      SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer) {
+      SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
+      PrimeEventsConsumer primeEventsConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -128,6 +135,7 @@ public class EventMain {
     this.kairosExpressAppEventConsumer = kairosExpressAppEventConsumer;
     this.expressAppPickupConsumer = expressAppPickupConsumer;
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
+    this.primeEventsConsumer = primeEventsConsumer;
   }
 
   public static void main(String[] args) {
@@ -180,6 +188,7 @@ public class EventMain {
         bootstrapServers,
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
+    load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
   }
 
   private void load(

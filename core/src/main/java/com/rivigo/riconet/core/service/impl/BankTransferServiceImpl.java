@@ -56,7 +56,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     // Create ticket for cnote
     TicketDTO ticketDTO =
         zoomTicketingAPIClientService.createTicket(
-            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, utrTicketId));
+            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, null));
   }
 
   private Long createUTRTicket(@NotNull String cnote, Map<String, String> metadata, String s3Url) {
