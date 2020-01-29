@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
+import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataDTO;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class EventTriggerService {
   @Autowired private RTOService rtoService;
 
   @Autowired private BankTransferService bankTransferService;
+
+  @Autowired private ConsignmentQcErrorCorrectionService consignmentQcService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
@@ -156,6 +159,16 @@ public class EventTriggerService {
         break;
       case CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP:
         //        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
+        break;
+      case CONSIGNMENT_QC_DATA_UPSERT:
+        Optional<Long> consignmenQcDataId =
+            getLong(notificationDTO, ConsignmentQcDataDTO.consignmenQcDataIdKey);
+        Optional<String> qcDevianceCategory =
+            getString(notificationDTO, ConsignmentQcDataDTO.qcDevianceCategoryKey);
+        if (consignmenQcDataId.isPresent() && qcDevianceCategory.isPresent()) {
+          consignmentQcService.processConsignmentQcDataEvent(
+              consignmenQcDataId.get(), qcDevianceCategory.get());
+        }
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
