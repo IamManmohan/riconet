@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
@@ -7,8 +8,9 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
-import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataDTO;
+import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ public class EventTriggerService {
 
   @Autowired private BankTransferService bankTransferService;
 
-  @Autowired private ConsignmentQcErrorCorrectionService consignmentQcService;
+  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
@@ -159,13 +161,16 @@ public class EventTriggerService {
         //        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
         break;
       case CONSIGNMENT_QC_DATA_UPSERT:
-        Optional<Long> consignmenQcDataId =
-            getLong(notificationDTO, ConsignmentQcDataDTO.consignmenQcDataIdKey);
-        Optional<String> qcDevianceCategory =
-            getString(notificationDTO, ConsignmentQcDataDTO.qcDevianceCategoryKey);
-        if (consignmenQcDataId.isPresent() && qcDevianceCategory.isPresent()) {
-          consignmentQcService.processConsignmentQcDataEvent(
-              consignmenQcDataId.get(), qcDevianceCategory.get());
+        try {
+          zoomBackendAPIClientService.qcConsignmentV2(
+              new ObjectMapper()
+                  .readValue(
+                      notificationDTO
+                          .getMetadata()
+                          .get(ConsignmentQcDataSubmitDTO.consignmentQcDataSubmitDTOKey),
+                      ConsignmentQcDataSubmitDTO.class));
+        } catch (IOException e) {
+          log.error("Json Processing Exception : ", e);
         }
         break;
       default:

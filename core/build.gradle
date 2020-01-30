@@ -9,10 +9,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    zoomErrorCorrectionV = "1.5-SNAPSHOT"
-}
-
 apply plugin: "com.diffplug.gradle.spotless"
 
 dependencies {
@@ -20,7 +16,6 @@ dependencies {
         exclude group: 'org.hibernate', module: 'hibernate-c3p0'
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
-    implementation "com.rivigo.zoom.zoom-error-correction:client:${zoomErrorCorrectionV}"
 }
 spotless {
     java {
