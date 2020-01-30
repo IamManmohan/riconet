@@ -464,11 +464,11 @@ public class QcServiceImpl implements QcService {
     String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime());
 
     StringBuilder sb = new StringBuilder();
-    sb.append("Dispatched: Your consignment #")
+    sb.append("Your CN ")
         .append(eventDTO.getCnote())
         .append(" from ")
         .append(consignment.getConsignorName())
-        .append(" will be delivered on or before ")
+        .append(" will be delivered before ")
         .append(dateStr)
         .append(". Please keep ")
         .append(codDod.getPaymentType().displayName())
@@ -476,7 +476,7 @@ public class QcServiceImpl implements QcService {
         .append(codDod.getAmount())
         .append(" in favour of ")
         .append(codDod.getInFavourOf())
-        .append(" ready for pick up. ");
+        .append(" ready.");
     String smsString = sb.toString();
     smsService.sendSms(consignment.getConsigneePhone(), smsString);
   }
