@@ -60,9 +60,9 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
         invoiceDocumentPreparedDTO.getCnote());
     if (!StringUtils.isBlank(shortUrl)) {
       String message =
-          "New consignment Id: "
+          "New CN "
               + invoiceDocumentPreparedDTO.getCnote()
-              + " has been successfully created, click here to access the GST invoice for this consignment: "
+              + " successfully created, click here to access GST invoice: "
               + shortUrl;
 
       PaymentDetailV2 paymentDetailV2 =
