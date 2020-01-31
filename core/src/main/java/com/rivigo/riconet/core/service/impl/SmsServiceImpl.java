@@ -35,7 +35,7 @@ public class SmsServiceImpl implements SmsService {
 
   public static final String X_USER_AGENT_HEADER = "X-User-Agent";
 
-  public static final String ASCII = "[^\\p{ASCII}]";
+  private static final String NON_ASCII = "[^\\p{ASCII}]";
 
   private static final String SMS_DISABLED = "sending sms is disabled";
   private static final String SMS_SERVER_URL_ABSENT = "sms server url is absent";
@@ -199,6 +199,6 @@ public class SmsServiceImpl implements SmsService {
   }
 
   private String sanitizeString(String message) {
-    return message.replaceAll(ASCII, "");
+    return message.replaceAll(NON_ASCII, "");
   }
 }
