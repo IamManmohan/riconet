@@ -200,6 +200,5 @@ public class SmsServiceImpl implements SmsService {
 
   private String sanitizeString(String message) {
     return message.replaceAll(ASCII, "");
-    ;
   }
 }
