@@ -1,8 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.predicates.EnvironmentPredicate.isActiveSpringProfileProduction;
-import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
@@ -13,9 +10,6 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.exceptions.ZoomException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +21,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.rivigo.riconet.core.predicates.EnvironmentPredicate.isActiveSpringProfileProduction;
+import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
 
 @Slf4j
 @Service
@@ -193,6 +194,7 @@ public class SmsServiceImpl implements SmsService {
         .test(System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
       return String.format("%s - %s", mobileNo, message);
     }
+    message = message.replaceAll("[^\\p{ASCII}]", "");
     return message;
   }
 }
