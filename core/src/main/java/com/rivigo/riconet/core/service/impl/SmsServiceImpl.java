@@ -35,6 +35,8 @@ public class SmsServiceImpl implements SmsService {
 
   public static final String X_USER_AGENT_HEADER = "X-User-Agent";
 
+  public static final String ASCII = "[^\\p{ASCII}]";
+
   private static final String SMS_DISABLED = "sending sms is disabled";
   private static final String SMS_SERVER_URL_ABSENT = "sms server url is absent";
   private static final String SMS_STRING_ABSENT = "sms string is absent";
@@ -118,7 +120,6 @@ public class SmsServiceImpl implements SmsService {
       log.error("sms cannot be sent as the templateV2 is null");
       return false;
     }
-
     List<String> phoneNumbers = getPhoneNumbersBasedOnProfile(mobileNo);
     SendSmsV2RequestDTO requestDto =
         SendSmsV2RequestDTO.builder()
@@ -188,12 +189,17 @@ public class SmsServiceImpl implements SmsService {
   }
 
   private String getSmsStringBasedOnProfile(String message, String mobileNo) {
+    message = sanitizeString(message);
     if (isActiveSpringProfileProduction()
         .negate()
         .test(System.getProperty(ACTIVE_PROFILES_PROPERTY_NAME))) {
       return String.format("%s - %s", mobileNo, message);
     }
-    message = message.replaceAll("[^\\p{ASCII}]", "");
     return message;
+  }
+
+  private String sanitizeString(String message) {
+    return message.replaceAll(ASCII, "");
+    ;
   }
 }
