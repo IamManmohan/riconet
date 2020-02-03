@@ -1,14 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
-import static com.rivigo.riconet.core.constants.EmailConstant.CE_TEAM_EMAIL_ID;
-import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
-import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
-import static com.rivigo.riconet.core.constants.RetailConstant.BIKE_RETAIL_TYPE;
-import static com.rivigo.riconet.core.constants.RetailConstant.BOXWISE_RETAIL_TYPE;
-import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKET_QC_BLOCKER_FAILURE_COMMENT;
-import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ReasonConstant;
@@ -65,6 +56,16 @@ import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,14 +77,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
+import static com.rivigo.riconet.core.constants.EmailConstant.CE_TEAM_EMAIL_ID;
+import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_REASON;
+import static com.rivigo.riconet.core.constants.ReasonConstant.QC_BLOCKER_SUB_REASON;
+import static com.rivigo.riconet.core.constants.RetailConstant.BIKE_RETAIL_TYPE;
+import static com.rivigo.riconet.core.constants.RetailConstant.BOXWISE_RETAIL_TYPE;
+import static com.rivigo.riconet.core.constants.ZoomTicketingConstant.TICKET_QC_BLOCKER_FAILURE_COMMENT;
+import static com.rivigo.riconet.core.predicates.TicketPredicate.isOpenQcTicket;
 
 @Slf4j
 @Service
@@ -460,20 +462,20 @@ public class QcServiceImpl implements QcService {
       return;
     }
     DateTimeFormatter formatter =
-        DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
-    String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime());
+        DateTimeFormat.forPattern("dd-MMM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+    String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime()).substring(0, 6);
 
     StringBuilder sb = new StringBuilder();
     sb.append("Your CN ")
         .append(eventDTO.getCnote())
         .append(" from ")
         .append(consignment.getConsignorName())
-        .append(" will be delivered before ")
+        .append("will be delivered before ")
         .append(dateStr)
         .append(". Please keep ")
         .append(codDod.getPaymentType().displayName())
         .append(" for Rs ")
-        .append(codDod.getAmount())
+        .append(new BigDecimal(codDod.getAmount()).stripTrailingZeros().toPlainString())
         .append(" in favour of ")
         .append(codDod.getInFavourOf())
         .append(" ready.");
