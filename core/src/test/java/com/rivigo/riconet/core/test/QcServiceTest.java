@@ -392,8 +392,11 @@ public class QcServiceTest {
     data.setConsignmentId(1l);
     data.setCnote("1234567890");
     Consignment consignment = new Consignment();
+    consignment.setConsignorName("nikhil");
     ConsignmentCodDod consignmentCodDod = new ConsignmentCodDod();
     consignmentCodDod.setPaymentType(PaymentType.CHEQUE);
+    consignmentCodDod.setAmount(20.0);
+    consignmentCodDod.setInFavourOf("Nikhil");
     when(consignmentService.getConsignmentById(1l)).thenReturn(consignment);
     when(consignmentCodDodService.getActiveCodDod(consignment.getId()))
         .thenReturn(consignmentCodDod);

@@ -385,7 +385,9 @@ public class PickupServiceImpl implements PickupService {
     valuesMap.put("locationName", pickupNotification.getLocationName());
     valuesMap.put("pincode", pickupNotification.getPincode());
     valuesMap.put("vehicleNumber", pickupNotification.getVehicleNumber());
-    valuesMap.put("weight", pickupNotification.getWeight());
+    valuesMap.put(
+        "weight",
+        new BigDecimal(pickupNotification.getWeight()).stripTrailingZeros().toPlainString());
     valuesMap.put("consignorMobile", pickupNotification.getConsignorMobile());
     valuesMap.put("contactPerson", pickupNotification.getContactPerson());
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
