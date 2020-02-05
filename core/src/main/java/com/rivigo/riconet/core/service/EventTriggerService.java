@@ -41,6 +41,8 @@ public class EventTriggerService {
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  @Autowired private ObjectMapper objectMapper;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
@@ -163,12 +165,11 @@ public class EventTriggerService {
       case CONSIGNMENT_QC_DATA_UPSERT:
         try {
           zoomBackendAPIClientService.qcConsignmentV2(
-              new ObjectMapper()
-                  .readValue(
-                      notificationDTO
-                          .getMetadata()
-                          .get(ConsignmentQcDataSubmitDTO.consignmentQcDataSubmitDTOKey),
-                      ConsignmentQcDataSubmitDTO.class));
+              objectMapper.readValue(
+                  notificationDTO
+                      .getMetadata()
+                      .get(ConsignmentQcDataSubmitDTO.consignmentQcDataSubmitDTOKey),
+                  ConsignmentQcDataSubmitDTO.class));
         } catch (IOException e) {
           log.error("Json Processing Exception : ", e);
         }
