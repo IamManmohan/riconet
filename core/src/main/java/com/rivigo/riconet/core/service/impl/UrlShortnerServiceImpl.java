@@ -58,6 +58,7 @@ public class UrlShortnerServiceImpl implements UrlShortnerService {
 
       ObjectNode jsonObject = objectMapper.createObjectNode();
       jsonObject.put("longDynamicLink", shortenerPrefix + URLEncoder.encode(longUrl, "UTF-8"));
+      jsonObject.putObject("suffix").put("option", "SHORT");
       HttpEntity entity = new HttpEntity<>(jsonObject.toString(), headers);
 
       List<NameValuePair> params = new ArrayList<>();

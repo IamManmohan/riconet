@@ -65,6 +65,7 @@ import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -460,23 +461,23 @@ public class QcServiceImpl implements QcService {
       return;
     }
     DateTimeFormatter formatter =
-        DateTimeFormat.forPattern("dd-MM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
-    String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime());
+        DateTimeFormat.forPattern("dd-MMM-yyyy").withZone(DateTimeZone.forID("Asia/Kolkata"));
+    String dateStr = formatter.print(consignment.getPromisedDeliveryDateTime()).substring(0, 6);
 
     StringBuilder sb = new StringBuilder();
-    sb.append("Dispatched: Your consignment #")
+    sb.append("Your CN ")
         .append(eventDTO.getCnote())
         .append(" from ")
         .append(consignment.getConsignorName())
-        .append(" will be delivered on or before ")
+        .append("will be delivered before ")
         .append(dateStr)
         .append(". Please keep ")
         .append(codDod.getPaymentType().displayName())
         .append(" for Rs ")
-        .append(codDod.getAmount())
+        .append(new BigDecimal(codDod.getAmount()).stripTrailingZeros().toPlainString())
         .append(" in favour of ")
         .append(codDod.getInFavourOf())
-        .append(" ready for pick up. ");
+        .append(" ready.");
     String smsString = sb.toString();
     smsService.sendSms(consignment.getConsigneePhone(), smsString);
   }
