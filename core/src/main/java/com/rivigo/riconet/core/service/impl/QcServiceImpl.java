@@ -476,7 +476,7 @@ public class QcServiceImpl implements QcService {
         .append(". Please keep ")
         .append(codDod.getPaymentType().displayName())
         .append(" for Rs ")
-        .append(new BigDecimal(codDod.getAmount()).round(m))
+        .append(new BigDecimal(codDod.getAmount()).round(m).stripTrailingZeros().toPlainString())
         .append(" in favour of ")
         .append(codDod.getInFavourOf())
         .append(" ready.");
