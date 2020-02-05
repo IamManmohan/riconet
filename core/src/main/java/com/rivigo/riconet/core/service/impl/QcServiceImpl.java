@@ -66,6 +66,7 @@ import com.rivigo.zoom.common.model.redis.QcBlockerActionParams;
 import com.rivigo.zoom.common.repository.redis.QcBlockerActionParamsRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -455,6 +456,7 @@ public class QcServiceImpl implements QcService {
   }
 
   private void sendCodDodSms(ConsignmentCompletionEventDTO eventDTO, Consignment consignment) {
+    DecimalFormat decimalFormatter = new DecimalFormat("#.##");
     ConsignmentCodDod codDod = consignmentCodDodService.getActiveCodDod(consignment.getId());
     if (codDod == null) {
       log.debug("CodDod is not activated for consignment with cnote: {}", consignment.getCnote());
@@ -474,7 +476,10 @@ public class QcServiceImpl implements QcService {
         .append(". Please keep ")
         .append(codDod.getPaymentType().displayName())
         .append(" for Rs ")
-        .append(new BigDecimal(codDod.getAmount().toString()).stripTrailingZeros().toPlainString())
+        .append(
+            new BigDecimal(decimalFormatter.format(codDod.getAmount()))
+                .stripTrailingZeros()
+                .toPlainString())
         .append(" in favour of ")
         .append(codDod.getInFavourOf())
         .append(" ready.");
