@@ -431,6 +431,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Zoom Backend API to submit QC data.
+   *
+   * @param dto
+   */
   @Override
   public void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto) {
     JsonNode responseJson;
