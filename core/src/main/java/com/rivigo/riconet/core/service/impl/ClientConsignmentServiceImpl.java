@@ -4,6 +4,7 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
 
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
@@ -71,8 +72,16 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   }
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
-    return boxRepository
-        .findByConsignmentId(cnId)
+    List<Box> boxList = boxRepository.findAllByConsignmentId(cnId);
+    boxList.forEach(box -> {
+      // in case the box barcode is deleted, we remove the timestamp which was made part of the barcode
+      // this happens in the case of flipkart CNs which are made via client integration
+      if(null != box.getStatus() && BoxStatus.DELETED.equals(box.getStatus())){
+        int lastIndex = box.getBarCode().lastIndexOf("_");
+        box.setBarCode(box.getBarCode().substring(0,lastIndex));
+      }
+    });
+    return boxList
         .stream()
         .map(Box::getBarCode)
         .collect(Collectors.toList());
