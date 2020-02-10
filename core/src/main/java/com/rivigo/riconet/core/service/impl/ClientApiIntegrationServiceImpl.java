@@ -298,9 +298,14 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
     fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
     fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    log.info("should barcode be added {}", addBarcodes);
     if (addBarcodes) {
       List<String> barCodes =
           clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
+      log.info(
+          "For consignment_id {} following are the barcodes: {}",
+          notificationDTO.getEntityId(),
+          barCodes);
       fieldData.setBarcodes(barCodes);
     }
     return fieldData;
