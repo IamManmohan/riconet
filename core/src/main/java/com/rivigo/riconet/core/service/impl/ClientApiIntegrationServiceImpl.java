@@ -308,6 +308,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
           barCodes);
       fieldData.setBarcodes(barCodes);
     }
+    log.info("fieldData {}", fieldData);
     return fieldData;
   }
 
@@ -355,12 +356,14 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                   () -> new ZoomException("Unable to get consignment from " + notificationDTO));
     }
 
+    BaseHiltiFieldData baseHiltiFieldData = getFieldDataForCnEvents(notificationDTO, addBarcodes);
+
     return Collections.singletonList(
         HiltiRequestDto.builder()
             .jobType(jobType.toString())
             .newStatusCode(statusCode.toString())
             .referenceNumber(cnote)
-            .fieldData(getFieldDataForCnEvents(notificationDTO, addBarcodes))
+            .fieldData(baseHiltiFieldData)
             .build());
   }
 
