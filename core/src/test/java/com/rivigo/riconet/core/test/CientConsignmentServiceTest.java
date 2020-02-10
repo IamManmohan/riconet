@@ -5,13 +5,16 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.impl.ClientConsignmentServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
+import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
+import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +60,7 @@ public class CientConsignmentServiceTest {
     Mockito.when(boxRepository.findByConsignmentIdIn(Ids))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(boxRepository.findByConsignmentId(Ids.get(0)))
+    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
   }
 
@@ -96,7 +99,7 @@ public class CientConsignmentServiceTest {
   }
 
   @Test
-  public void getBarcodeListFromConsignmentIdTest() {
+  public void getBarcodeListFromConsignmentIdTest1() {
     List<String> barcodesOriginal = CNOTES;
     List<String> barcodesActual =
         clientConsignmentService.getBarcodeListFromConsignmentId(Ids.get(0));
@@ -104,5 +107,21 @@ public class CientConsignmentServiceTest {
     Assert.assertEquals(barcodesOriginal.size(), barcodesActual.size());
     Assert.assertEquals(barcodesOriginal.get(0), barcodesActual.get(0));
     Assert.assertEquals(barcodesOriginal.get(1), barcodesActual.get(1));
+  }
+
+  // flipkart barcode test
+  @Test
+  public void getBarcodeListFromConsignmentIdTest2() {
+    String sampleBarcode = "fk_mp_436043_450";
+    Box box = new Box();
+    box.setBarCode(sampleBarcode + "_1581312901444");
+    box.setStatus(BoxStatus.DELETED);
+    List<Box> barcodesOriginal = Collections.singletonList(box);
+    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(1L))
+        .thenReturn(barcodesOriginal);
+
+    List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
+
+    Assert.assertEquals(barcodesActual.get(0), sampleBarcode);
   }
 }

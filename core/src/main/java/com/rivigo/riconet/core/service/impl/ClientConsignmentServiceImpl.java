@@ -72,7 +72,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   }
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
-    List<Box> boxList = boxRepository.findAllByConsignmentId(cnId);
+    List<Box> boxList = boxRepository.findBarcodeAndStatusByConsignmentId(cnId);
     boxList.forEach(
         box -> {
           // in case the box barcode is deleted, we remove the timestamp which was made part of the
