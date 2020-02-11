@@ -8,8 +8,10 @@ import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
+import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
+import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
@@ -22,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +36,8 @@ public class CientConsignmentServiceTest {
   public static final List<String> CNOTES = Arrays.asList("2000120001", "2000220002");
 
   @Mock private BoxRepository boxRepository;
+
+  @Mock private BoxHistoryRepository boxHistoryRepository;
 
   @Mock private ConsignmentService consignmentService;
 
@@ -62,6 +67,10 @@ public class CientConsignmentServiceTest {
 
     Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
+
+    Mockito.when(boxHistoryRepository.getBarcodeByBoxIdInAndStatus(Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED.name()))).thenReturn(
+            ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES)
+    );
   }
 
   @Test

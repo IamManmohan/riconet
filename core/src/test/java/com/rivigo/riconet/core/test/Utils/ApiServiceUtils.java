@@ -12,6 +12,7 @@ import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.model.Box;
+import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
@@ -25,6 +26,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -231,6 +234,16 @@ public class ApiServiceUtils {
       boxList.add(box);
     }
     return boxList;
+  }
+
+  public static List<BoxHistory> getDummyBoxHistoryList(List<Long> Ids, List<String> cnotes){
+    List<BoxHistory> boxHistoryList = new ArrayList<>();
+    for(Long id: Ids){
+      BoxHistory boxHistory = new BoxHistory();
+      boxHistory.setBoxId(id);
+      boxHistory.setBarCode(cnotes.get(Ids.indexOf(id)));
+    }
+    return boxHistoryList;
   }
 
   public static Map<String, List<String>> getDummyCnoteToBarcodeMap(
