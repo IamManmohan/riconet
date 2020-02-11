@@ -7,7 +7,9 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
+import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
+import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
@@ -26,6 +28,8 @@ import org.springframework.stereotype.Service;
 public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   @Autowired private BoxRepository boxRepository;
+
+  @Autowired private BoxHistoryRepository boxHistoryRepository;
 
   @Autowired private ConsignmentService consignmentService;
 
@@ -73,6 +77,16 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
     List<Box> boxList = boxRepository.findBarcodeAndStatusByConsignmentId(cnId);
+    List<Long> boxIdList = boxList.stream().map(Box::getId).collect(Collectors.toList());
+
+    // now take out the barcode that was present when the barcode was in drafted state.
+    // This has been done to handle the case for barcode issue which is marked via scan app
+    Map<Long, BoxHistory> boxIdToHistoryMapping =
+        boxHistoryRepository
+            .getBarcodeByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED.name())
+            .stream()
+            .collect(Collectors.toMap(BoxHistory::getBoxId, Function.identity()));
+
     boxList.forEach(
         box -> {
           // in case the box barcode is deleted, we remove the timestamp which was made part of the
@@ -81,8 +95,11 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
           if (null != box.getStatus() && BoxStatus.DELETED.equals(box.getStatus())) {
             int lastIndex = box.getBarCode().lastIndexOf("_");
             box.setBarCode(box.getBarCode().substring(0, lastIndex));
+          } else if (boxIdToHistoryMapping.containsKey(box.getId())) {
+            box.setBarCode(boxIdToHistoryMapping.get(box.getId()).getBarCode());
           }
         });
+
     return boxList.stream().map(Box::getBarCode).collect(Collectors.toList());
   }
 }
