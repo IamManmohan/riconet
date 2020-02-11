@@ -298,14 +298,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
     fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
     fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
-    log.info("should barcode be added {}", addBarcodes);
     if (addBarcodes) {
       List<String> barCodes =
           clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
-      log.info(
-          "For consignment_id {} following are the barcodes: {}",
-          notificationDTO.getEntityId(),
-          barCodes);
       fieldData.setBarcodes(barCodes);
     }
     log.info("fieldData barcodes {}", fieldData.getBarcodes());
@@ -356,14 +351,12 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                   () -> new ZoomException("Unable to get consignment from " + notificationDTO));
     }
 
-    BaseHiltiFieldData baseHiltiFieldData = getFieldDataForCnEvents(notificationDTO, addBarcodes);
-
     return Collections.singletonList(
         HiltiRequestDto.builder()
             .jobType(jobType.toString())
             .newStatusCode(statusCode.toString())
             .referenceNumber(cnote)
-            .fieldData(baseHiltiFieldData)
+            .fieldData(getFieldDataForCnEvents(notificationDTO, addBarcodes))
             .build());
   }
 
