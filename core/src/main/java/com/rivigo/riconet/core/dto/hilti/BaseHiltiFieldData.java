@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class BaseHiltiFieldData {
+public abstract class BaseHiltiFieldData {
   private String date;
   private String time;
   private List<String> barcodes;

@@ -308,7 +308,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
           barCodes);
       fieldData.setBarcodes(barCodes);
     }
-    log.info("fieldData {}", fieldData);
+    log.info("fieldData barcodes {}", fieldData.getBarcodes());
     return fieldData;
   }
 
