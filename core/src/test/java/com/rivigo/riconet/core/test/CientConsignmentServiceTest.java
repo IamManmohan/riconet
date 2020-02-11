@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
-import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
@@ -68,9 +67,10 @@ public class CientConsignmentServiceTest {
     Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(boxHistoryRepository.getBarcodeByBoxIdInAndStatus(Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED.name()))).thenReturn(
-            ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES)
-    );
+    Mockito.when(
+            boxHistoryRepository.getBarcodeByBoxIdInAndStatus(
+                Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED.name())))
+        .thenReturn(ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES));
   }
 
   @Test
