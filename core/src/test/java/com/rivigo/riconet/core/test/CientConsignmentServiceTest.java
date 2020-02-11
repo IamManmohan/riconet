@@ -8,6 +8,7 @@ import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
+import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
@@ -132,5 +133,29 @@ public class CientConsignmentServiceTest {
     List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
 
     Assert.assertEquals(barcodesActual.get(0), sampleBarcode);
+  }
+
+  @Test
+  public void getBarcodeListFromConsignmentIdTest3() {
+    Box box = new Box();
+    box.setId(1L);
+    box.setBarCode("fk_mp_436043_450");
+    box.setStatus(BoxStatus.CREATED);
+    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(1L))
+        .thenReturn(Collections.singletonList(box));
+
+    BoxHistory boxHistory = new BoxHistory();
+    boxHistory.setBarCode("myBarcode");
+    boxHistory.setBoxId(1L);
+    boxHistory.setStatus(BoxStatus.DRAFTED);
+
+    Mockito.when(
+            boxHistoryRepository.getBarcodeByBoxIdInAndStatus(
+                Matchers.eq(Collections.singletonList(1L)), Matchers.eq(BoxStatus.DRAFTED.name())))
+        .thenReturn(Collections.singletonList(boxHistory));
+
+    List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
+
+    Assert.assertEquals(barcodesActual.get(0), boxHistory.getBarCode());
   }
 }
