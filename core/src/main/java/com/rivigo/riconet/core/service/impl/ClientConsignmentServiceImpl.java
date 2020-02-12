@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
 
+import com.rivigo.riconet.core.service.BoxService;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.zoom.common.enums.BoxStatus;
@@ -9,8 +10,6 @@ import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
-import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
-import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
 import java.util.ArrayList;
@@ -27,11 +26,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
-  @Autowired private BoxRepository boxRepository;
-
-  @Autowired private BoxHistoryRepository boxHistoryRepository;
-
   @Autowired private ConsignmentService consignmentService;
+
+  @Autowired private BoxService boxService;
 
   @Autowired
   private ConsignmentCustomFieldMetadataRepository consignmentCustomFieldMetadataRepository;
@@ -67,8 +64,8 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    return boxRepository
-        .findByConsignmentIdIn(new ArrayList<>((idToCnoteMap.keySet())))
+    return boxService
+        .getByConsignmentIdIn(new ArrayList<>((idToCnoteMap.keySet())))
         .stream()
         .collect(
             Collectors.groupingBy(
@@ -76,16 +73,16 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   }
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
-    List<Box> boxList = boxRepository.findByConsignmentIdIncludingInactive(cnId);
+    List<Box> boxList = boxService.getByConsignmentIdIncludingInactive(cnId);
     List<Long> boxIdList = boxList.stream().map(Box::getId).collect(Collectors.toList());
 
     // now take out the barcode that was present when the barcode was in drafted state.
     // This has been done to handle the case for barcode issue which is marked via scan app
     Map<Long, BoxHistory> boxIdToHistoryMapping =
-        boxHistoryRepository
-            .findByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED.name())
+        boxService
+            .getByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED)
             .stream()
-            .collect(Collectors.toMap(BoxHistory::getBoxId, Function.identity()));
+            .collect(Collectors.toMap(BoxHistory::getBoxId, Function.identity(), (u, v) -> v));
 
     boxList.forEach(
         box -> {

@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.test;
 
 import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
 
+import com.rivigo.riconet.core.service.BoxService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.impl.ClientConsignmentServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
@@ -11,8 +12,6 @@ import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldMetadata;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
-import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
-import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
 import java.util.Arrays;
@@ -35,9 +34,7 @@ public class CientConsignmentServiceTest {
 
   public static final List<String> CNOTES = Arrays.asList("2000120001", "2000220002");
 
-  @Mock private BoxRepository boxRepository;
-
-  @Mock private BoxHistoryRepository boxHistoryRepository;
+  @Mock private BoxService boxService;
 
   @Mock private ConsignmentService consignmentService;
 
@@ -62,15 +59,13 @@ public class CientConsignmentServiceTest {
                     CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, METADATA))
         .thenReturn(consignmentCustomFieldMetadata);
 
-    Mockito.when(boxRepository.findByConsignmentIdIn(Ids))
+    Mockito.when(boxService.getByConsignmentIdIn(Ids))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(Ids.get(0)))
+    Mockito.when(boxService.getByConsignmentIdIncludingInactive(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(
-            boxHistoryRepository.findByBoxIdInAndStatus(
-                Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED.name())))
+    Mockito.when(boxService.getByBoxIdInAndStatus(Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED)))
         .thenReturn(ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES));
   }
 
@@ -127,8 +122,7 @@ public class CientConsignmentServiceTest {
     box.setBarCode(sampleBarcode + "_1581312901444");
     box.setStatus(BoxStatus.DELETED);
     List<Box> barcodesOriginal = Collections.singletonList(box);
-    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(1L))
-        .thenReturn(barcodesOriginal);
+    Mockito.when(boxService.getByConsignmentIdIncludingInactive(1L)).thenReturn(barcodesOriginal);
 
     List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
 
@@ -141,21 +135,26 @@ public class CientConsignmentServiceTest {
     box.setId(1L);
     box.setBarCode("fk_mp_436043_450");
     box.setStatus(BoxStatus.CREATED);
-    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(1L))
+    Mockito.when(boxService.getByConsignmentIdIncludingInactive(1L))
         .thenReturn(Collections.singletonList(box));
 
-    BoxHistory boxHistory = new BoxHistory();
-    boxHistory.setBarCode("myBarcode");
-    boxHistory.setBoxId(1L);
-    boxHistory.setStatus(BoxStatus.DRAFTED);
+    BoxHistory boxHistory1 = new BoxHistory();
+    boxHistory1.setBarCode("myBarcode");
+    boxHistory1.setBoxId(1L);
+    boxHistory1.setStatus(BoxStatus.DRAFTED);
+
+    BoxHistory boxHistory2 = new BoxHistory();
+    boxHistory2.setBarCode("myBarcode2");
+    boxHistory2.setBoxId(2L);
+    boxHistory2.setStatus(BoxStatus.DRAFTED);
 
     Mockito.when(
-            boxHistoryRepository.findByBoxIdInAndStatus(
-                Matchers.eq(Collections.singletonList(1L)), Matchers.eq(BoxStatus.DRAFTED.name())))
-        .thenReturn(Collections.singletonList(boxHistory));
+            boxService.getByBoxIdInAndStatus(
+                Matchers.eq(Collections.singletonList(1L)), Matchers.eq(BoxStatus.DRAFTED)))
+        .thenReturn(Arrays.asList(boxHistory1, boxHistory2));
 
     List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
 
-    Assert.assertEquals(barcodesActual.get(0), boxHistory.getBarCode());
+    Assert.assertEquals(barcodesActual.get(0), boxHistory1.getBarCode());
   }
 }
