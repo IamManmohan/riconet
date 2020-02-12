@@ -65,11 +65,11 @@ public class CientConsignmentServiceTest {
     Mockito.when(boxRepository.findByConsignmentIdIn(Ids))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(Ids.get(0)))
+    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
     Mockito.when(
-            boxHistoryRepository.getBarcodeByBoxIdInAndStatus(
+            boxHistoryRepository.findByBoxIdInAndStatus(
                 Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED.name())))
         .thenReturn(ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES));
   }
@@ -127,7 +127,7 @@ public class CientConsignmentServiceTest {
     box.setBarCode(sampleBarcode + "_1581312901444");
     box.setStatus(BoxStatus.DELETED);
     List<Box> barcodesOriginal = Collections.singletonList(box);
-    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(1L))
+    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(1L))
         .thenReturn(barcodesOriginal);
 
     List<String> barcodesActual = clientConsignmentService.getBarcodeListFromConsignmentId(1L);
@@ -141,7 +141,7 @@ public class CientConsignmentServiceTest {
     box.setId(1L);
     box.setBarCode("fk_mp_436043_450");
     box.setStatus(BoxStatus.CREATED);
-    Mockito.when(boxRepository.findBarcodeAndStatusByConsignmentId(1L))
+    Mockito.when(boxRepository.findByConsignmentIdIncludingInactive(1L))
         .thenReturn(Collections.singletonList(box));
 
     BoxHistory boxHistory = new BoxHistory();
@@ -150,7 +150,7 @@ public class CientConsignmentServiceTest {
     boxHistory.setStatus(BoxStatus.DRAFTED);
 
     Mockito.when(
-            boxHistoryRepository.getBarcodeByBoxIdInAndStatus(
+            boxHistoryRepository.findByBoxIdInAndStatus(
                 Matchers.eq(Collections.singletonList(1L)), Matchers.eq(BoxStatus.DRAFTED.name())))
         .thenReturn(Collections.singletonList(boxHistory));
 

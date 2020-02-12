@@ -76,14 +76,14 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   }
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
-    List<Box> boxList = boxRepository.findBarcodeAndStatusByConsignmentId(cnId);
+    List<Box> boxList = boxRepository.findByConsignmentIdIncludingInactive(cnId);
     List<Long> boxIdList = boxList.stream().map(Box::getId).collect(Collectors.toList());
 
     // now take out the barcode that was present when the barcode was in drafted state.
     // This has been done to handle the case for barcode issue which is marked via scan app
     Map<Long, BoxHistory> boxIdToHistoryMapping =
         boxHistoryRepository
-            .getBarcodeByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED.name())
+            .findByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED.name())
             .stream()
             .collect(Collectors.toMap(BoxHistory::getBoxId, Function.identity()));
 
