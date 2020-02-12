@@ -65,7 +65,9 @@ public class CientConsignmentServiceTest {
     Mockito.when(boxService.getByConsignmentIdIncludingInactive(Ids.get(0)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
-    Mockito.when(boxService.getHistoryByBoxIdInAndStatus(Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED)))
+    Mockito.when(
+            boxService.getHistoryByBoxIdInAndStatus(
+                Matchers.eq(Ids), Matchers.eq(BoxStatus.DRAFTED)))
         .thenReturn(ApiServiceUtils.getDummyBoxHistoryList(Ids, CNOTES));
   }
 
