@@ -32,10 +32,9 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   private final BoxService boxService;
 
-  @Autowired
-  private ConsignmentCustomFieldMetadataRepository consignmentCustomFieldMetadataRepository;
+  private final ConsignmentCustomFieldMetadataRepository consignmentCustomFieldMetadataRepository;
 
-  @Autowired private ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
+  private final ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
 
   public Map<String, Map<String, String>> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
