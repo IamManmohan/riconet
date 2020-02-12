@@ -8,7 +8,6 @@ import com.rivigo.zoom.common.repository.mysql.BoxHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.BoxRepository;
 import java.util.Collection;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
