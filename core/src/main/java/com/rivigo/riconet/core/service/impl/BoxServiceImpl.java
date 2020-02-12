@@ -27,7 +27,7 @@ public class BoxServiceImpl implements BoxService {
   }
 
   @Override
-  public List<BoxHistory> getByBoxIdInAndStatus(Collection<Long> boxIds, BoxStatus boxStatus) {
+  public List<BoxHistory> getHistoryByBoxIdInAndStatus(Collection<Long> boxIds, BoxStatus boxStatus) {
     return boxHistoryRepository.findByBoxIdInAndStatus(boxIds, boxStatus);
   }
 }

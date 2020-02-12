@@ -18,17 +18,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
-  @Autowired private ConsignmentService consignmentService;
+  private final ConsignmentService consignmentService;
 
-  @Autowired private BoxService boxService;
+  private final BoxService boxService;
 
   @Autowired
   private ConsignmentCustomFieldMetadataRepository consignmentCustomFieldMetadataRepository;
@@ -80,7 +83,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
     // This has been done to handle the case for barcode issue which is marked via scan app
     Map<Long, BoxHistory> boxIdToHistoryMapping =
         boxService
-            .getByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED)
+            .getHistoryByBoxIdInAndStatus(boxIdList, BoxStatus.DRAFTED)
             .stream()
             .collect(Collectors.toMap(BoxHistory::getBoxId, Function.identity(), (u, v) -> v));
 

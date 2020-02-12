@@ -12,5 +12,5 @@ public interface BoxService {
 
   List<Box> getByConsignmentIdIn(Collection<Long> cnIds);
 
-  List<BoxHistory> getByBoxIdInAndStatus(Collection<Long> boxIds, BoxStatus boxStatus);
+  List<BoxHistory> getHistoryByBoxIdInAndStatus(Collection<Long> boxIds, BoxStatus boxStatus);
 }
