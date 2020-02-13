@@ -54,12 +54,14 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
                 Collectors.toMap(
                     ConsignmentCustomFieldValue::getConsignmentId, Function.identity()));
     Map<String, Map<String, String>> cnoteToCnMetadataMap = new HashMap<>();
-    idToCnoteMap
-        .keySet()
-        .forEach(
-            k ->
-                cnoteToCnMetadataMap.put(
-                    idToCnoteMap.get(k), cnCustomFieldValue.get(k).getJsonValue()));
+    if (!cnCustomFieldValue.isEmpty()) {
+      idToCnoteMap
+          .keySet()
+          .forEach(
+              k ->
+                  cnoteToCnMetadataMap.put(
+                      idToCnoteMap.get(k), cnCustomFieldValue.get(k).getJsonValue()));
+    }
     return cnoteToCnMetadataMap;
   }
 
