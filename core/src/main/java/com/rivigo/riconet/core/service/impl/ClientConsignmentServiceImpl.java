@@ -58,9 +58,12 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
       idToCnoteMap
           .keySet()
           .forEach(
-              k ->
+              k -> {
+                if (null != k) {
                   cnoteToCnMetadataMap.put(
-                      idToCnoteMap.get(k), cnCustomFieldValue.get(k).getJsonValue()));
+                      idToCnoteMap.get(k), cnCustomFieldValue.get(k).getJsonValue());
+                }
+              });
     }
     return cnoteToCnMetadataMap;
   }
