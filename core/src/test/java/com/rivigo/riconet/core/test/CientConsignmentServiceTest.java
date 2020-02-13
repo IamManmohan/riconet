@@ -59,7 +59,7 @@ public class CientConsignmentServiceTest {
                     CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, METADATA))
         .thenReturn(consignmentCustomFieldMetadata);
 
-    Mockito.when(boxService.getByConsignmentIdIn(Ids))
+    Mockito.when(boxService.getByConsignmentIdInIncludingInactive(Ids))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
     Mockito.when(boxService.getByConsignmentIdIncludingInactive(Ids.get(0)))
