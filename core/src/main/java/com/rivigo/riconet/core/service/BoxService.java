@@ -10,7 +10,7 @@ public interface BoxService {
 
   List<Box> getByConsignmentIdIncludingInactive(Long cnId);
 
-  List<Box> getByConsignmentIdIn(Collection<Long> cnIds);
+  List<Box> getByConsignmentIdInIncludingInactive(Collection<Long> cnIds);
 
   List<BoxHistory> getHistoryByBoxIdInAndStatus(Collection<Long> boxIds, BoxStatus boxStatus);
 }

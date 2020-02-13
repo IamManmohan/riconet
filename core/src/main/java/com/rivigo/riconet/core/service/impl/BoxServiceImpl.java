@@ -26,8 +26,8 @@ public class BoxServiceImpl implements BoxService {
   }
 
   @Override
-  public List<Box> getByConsignmentIdIn(Collection<Long> cnIds) {
-    return boxRepository.findByConsignmentIdIn(cnIds);
+  public List<Box> getByConsignmentIdInIncludingInactive(Collection<Long> cnIds) {
+    return boxRepository.findByConsignmentIdInIncludingInactive(cnIds);
   }
 
   @Override

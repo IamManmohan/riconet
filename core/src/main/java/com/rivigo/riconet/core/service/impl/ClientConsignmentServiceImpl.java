@@ -70,8 +70,10 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    return boxService
-        .getByConsignmentIdIn(new ArrayList<>((idToCnoteMap.keySet())))
+    List<Box> boxList =
+        boxService.getByConsignmentIdInIncludingInactive(new ArrayList<>((idToCnoteMap.keySet())));
+
+    return getFormattedBarcodes(boxList)
         .stream()
         .collect(
             Collectors.groupingBy(
@@ -80,6 +82,10 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
     List<Box> boxList = boxService.getByConsignmentIdIncludingInactive(cnId);
+    return getFormattedBarcodes(boxList).stream().map(Box::getBarCode).collect(Collectors.toList());
+  }
+
+  private List<Box> getFormattedBarcodes(List<Box> boxList) {
     List<Long> boxIdList = boxList.stream().map(Box::getId).collect(Collectors.toList());
 
     // now take out the barcode that was present when the barcode was in drafted state.
@@ -103,6 +109,6 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
           }
         });
 
-    return boxList.stream().map(Box::getBarCode).collect(Collectors.toList());
+    return boxList;
   }
 }
