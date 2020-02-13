@@ -450,8 +450,10 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       log.error("Error while handling qcConsignmentV2 ", e);
       throw new ZoomException(
-          String.format("Error while handling qcConsignmentV2 for cnote : %s", dto.getCnote()));
+          "Error while handling qcConsignmentV2 for cnote : %s", dto.getCnote());
     }
+    log.info(
+        "Calling parse json node to verify that response status is SUCCESS or throw exception otherwise.");
     apiClientService.parseJsonNode(responseJson, null);
   }
 }

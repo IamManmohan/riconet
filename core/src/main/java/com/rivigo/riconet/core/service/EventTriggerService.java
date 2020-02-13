@@ -10,7 +10,6 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
-import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,8 +169,10 @@ public class EventTriggerService {
                       .getMetadata()
                       .get(ConsignmentQcDataSubmitDTO.consignmentQcDataSubmitDTOKey),
                   ConsignmentQcDataSubmitDTO.class));
-        } catch (IOException e) {
-          log.error("Json Processing Exception : ", e);
+        } catch (Exception e) {
+          log.error(
+              " Exception while reading value of ConsignmentQcDataSubmitDTO from notification DTO metadata : ",
+              e);
         }
         break;
       default:
