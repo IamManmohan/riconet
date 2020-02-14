@@ -40,4 +40,7 @@ public enum EventName {
 
   /** Datastore address cleanup * */
   CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP,
+
+  /** Error Correction Events */
+  CONSIGNMENT_QC_DATA_UPSERT
 }

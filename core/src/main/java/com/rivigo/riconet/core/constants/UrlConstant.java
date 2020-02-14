@@ -75,4 +75,6 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_PROCESS_VEHICLE_EVENT =
       "/primeSync/processVehicleEvent/{tripId}";
+
+  public static final String ZOOM_BACKEND_QC_CONSIGNMENT_V2 = "/operations/consignments/qc/v2";
 }

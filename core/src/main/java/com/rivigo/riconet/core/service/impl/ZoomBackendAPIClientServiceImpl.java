@@ -18,6 +18,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
@@ -428,5 +429,31 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while processing event with dto {}, trip id: {}", primeEventDto, tripId);
       throw new ZoomException("Error while processing event for trip id: %s", tripId);
     }
+  }
+
+  /**
+   * Zoom Backend API to submit QC data.
+   *
+   * @param dto
+   */
+  @Override
+  public void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              dto,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_QC_CONSIGNMENT_V2,
+              null,
+              backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while handling qcConsignmentV2 ", e);
+      throw new ZoomException(
+          "Error while handling qcConsignmentV2 for cnote : %s", dto.getCnote());
+    }
+    // Calling parse json node to verify that response status is SUCCESS or throw exception
+    // otherwise.
+    apiClientService.parseJsonNode(responseJson, null);
   }
 }

@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
@@ -7,7 +8,9 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
+import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,10 @@ public class EventTriggerService {
   @Autowired private RTOService rtoService;
 
   @Autowired private BankTransferService bankTransferService;
+
+  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
+
+  @Autowired private ObjectMapper objectMapper;
 
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
@@ -154,6 +161,20 @@ public class EventTriggerService {
         break;
       case CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP:
         //        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);
+        break;
+      case CONSIGNMENT_QC_DATA_UPSERT:
+        try {
+          zoomBackendAPIClientService.qcConsignmentV2(
+              objectMapper.readValue(
+                  notificationDTO
+                      .getMetadata()
+                      .get(ConsignmentQcDataSubmitDTO.consignmentQcDataSubmitDTOKey),
+                  ConsignmentQcDataSubmitDTO.class));
+        } catch (IOException e) {
+          log.error(
+              "IOException while reading value of ConsignmentQcDataSubmitDTO from notification DTO metadata : ",
+              e);
+        }
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
