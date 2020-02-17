@@ -12,7 +12,6 @@ import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +64,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    List<Box> boxList =
-        boxService.getByConsignmentIdInIncludingInactive(new ArrayList<>((idToCnoteMap.keySet())));
+    List<Box> boxList = boxService.getByConsignmentIdInIncludingInactive((idToCnoteMap.keySet()));
 
     return getFormattedBarcodes(boxList)
         .stream()
