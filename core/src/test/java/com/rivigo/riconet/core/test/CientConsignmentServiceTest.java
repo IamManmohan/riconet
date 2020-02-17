@@ -17,6 +17,7 @@ import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueReposi
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
@@ -59,7 +60,7 @@ public class CientConsignmentServiceTest {
                     CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, METADATA))
         .thenReturn(consignmentCustomFieldMetadata);
 
-    Mockito.when(boxService.getByConsignmentIdInIncludingInactive(Ids))
+    Mockito.when(boxService.getByConsignmentIdInIncludingInactive(new HashSet<>(Ids)))
         .thenReturn(ApiServiceUtils.getDummyBoxList(Ids, CNOTES));
 
     Mockito.when(boxService.getByConsignmentIdIncludingInactive(Ids.get(0)))

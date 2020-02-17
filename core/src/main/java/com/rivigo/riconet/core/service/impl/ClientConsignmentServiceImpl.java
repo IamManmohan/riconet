@@ -64,7 +64,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   public Map<String, List<String>> getCnoteToBarcodeMapFromCnoteList(List<String> cnoteList) {
     Map<Long, String> idToCnoteMap = consignmentService.getIdToCnoteMap(cnoteList);
-    List<Box> boxList = boxService.getByConsignmentIdInIncludingInactive((idToCnoteMap.keySet()));
+    List<Box> boxList = boxService.getByConsignmentIdInIncludingInactive(idToCnoteMap.keySet());
 
     return getFormattedBarcodes(boxList)
         .stream()
