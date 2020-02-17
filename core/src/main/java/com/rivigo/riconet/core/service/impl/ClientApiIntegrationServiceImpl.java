@@ -303,6 +303,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
           clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
       fieldData.setBarcodes(barCodes);
     }
+    log.info("fieldData barcodes {}", fieldData.getBarcodes());
     return fieldData;
   }
 
@@ -391,6 +392,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                   .orElse(Collections.emptyMap()));
           clientIntegrationRequestDTOList.add(clientIntegrationRequestDto);
         }
+        log.info("List of flipkart dtos: {}", clientIntegrationRequestDTOList.toString());
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);
         break;
       default:
