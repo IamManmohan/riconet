@@ -240,6 +240,11 @@ public class EventTriggerService {
     ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
     // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
     try {
+      consignmentService.markDeliverZoomDocsCN(unloadingData);
+    } catch (Exception e) {
+      log.error("QC service failed", e);
+    }
+    try {
       qcService.consumeUnloadingEvent(unloadingData);
     } catch (Exception e) {
       log.error("QC service failed", e);
