@@ -177,12 +177,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
   @Override
   public void markDeliverZoomDocsCN(String cnote, Long cnId) {
-    log.info("Consignment for which event came {}", cnote);
-    Consignment consignment = consignmentRepo.findById(cnId);
-    log.info("Consignment DTO {}", consignment);
-    if (consignment.getLocationId().equals(consignment.getToId())
-        && consignment.getClient().getBillingName().equalsIgnoreCase("Zoom Docs")) {
-      zoomBackendAPIClientService.markDelivered(Long.valueOf(cnote));
-    }
+    log.info("Consignment for which event came {}\n\n\n", cnote);
+    //    Consignment consignment = consignmentRepo.findById(cnId);
+    //    log.info("Consignment DTO {}", consignment);
+    //    if (consignment.getLocationId().equals(consignment.getToId())
+    //        && consignment.getClient().getBillingName().equalsIgnoreCase("Zoom Docs")) {
+    zoomBackendAPIClientService.markDelivered(Long.valueOf(cnote));
+    //    }
   }
 }
