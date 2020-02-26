@@ -46,5 +46,5 @@ public interface ConsignmentService {
 
   Long getOrganizationIdFromCnId(Long cnId);
 
-  void markDeliverZoomDocsCN(ConsignmentBasicDTO unloadingEventDTO);
+  void markDeliverZoomDocsCN(String cnote, Long cnId);
 }
