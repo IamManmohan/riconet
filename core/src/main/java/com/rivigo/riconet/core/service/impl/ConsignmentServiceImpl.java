@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ClientConstants.ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE;
+
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -177,12 +179,21 @@ public class ConsignmentServiceImpl implements ConsignmentService {
 
   @Override
   public void markDeliverZoomDocsCN(String cnote, Long cnId) {
-    log.info("Consignment for which event came {}\n\n\n", cnote);
-    //    Consignment consignment = consignmentRepo.findById(cnId);
-    //    log.info("Consignment DTO {}", consignment);
-    //    if (consignment.getLocationId().equals(consignment.getToId())
-    //        && consignment.getClient().getBillingName().equalsIgnoreCase("Zoom Docs")) {
-    zoomBackendAPIClientService.markDelivered(Long.valueOf(cnote));
-    //    }
+    log.info("Consignment for which event came {}", cnote);
+    Consignment consignment = consignmentRepo.findById(cnId);
+    log.info(
+        "Consignment location {}, from {}, to {} and client code {}",
+        consignment.getLocationId(),
+        consignment.getFromId(),
+        consignment.getToId(),
+        consignment.getClient().getClientCode());
+    if ((consignment.getLocationId().equals(consignment.getToId())
+            || consignment.getFromId().equals(consignment.getToId()))
+        && consignment
+            .getClient()
+            .getClientCode()
+            .equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)) {
+      zoomBackendAPIClientService.markDelivered(Long.valueOf(cnote));
+    }
   }
 }
