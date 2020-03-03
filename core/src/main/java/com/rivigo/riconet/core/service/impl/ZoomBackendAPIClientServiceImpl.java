@@ -466,7 +466,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               null,
               HttpMethod.PUT,
-              UrlConstant.ZOOM_BACKEND_MARK_DELIVERED.replace("{cnote}", cnote.toString()),
+              UrlConstant.ZOOM_BACKEND_MARK_DELIVERED.replace("{cnote}", cnote),
               null,
               backendBaseUrl);
     } catch (IOException e) {
