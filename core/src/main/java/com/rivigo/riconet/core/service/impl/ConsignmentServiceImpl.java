@@ -1,13 +1,12 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ClientConstants.ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE;
-
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -20,8 +19,14 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
+import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,10 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Service;
+
+import static com.rivigo.riconet.core.constants.ClientConstants.ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE;
 
 @Slf4j
 @Service
@@ -50,6 +53,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Autowired private PincodeService pincodeService;
+
+  @Autowired private LocationService locationService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
@@ -180,11 +185,12 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     return null;
   }
 
-  private Long getConsignmentToLocation(Consignment consignment) {
-    return pincodeService
-        .findByCode(consignment.getConsigneeClientAddressId().getAddress().getPincode())
-        .getDeliveryZone()
-        .getLocationId();
+  private List<Long> getConsignmentToLocation(Consignment consignment) {
+    return locationService
+        .getByAddressId(consignment.getConsigneeClientAddressId().getAddress().getId())
+        .stream()
+        .map(Location::getId)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -197,12 +203,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         consignment.getFromId(),
         consignment.getToId(),
         consignment.getClient().getClientCode());
-    if (consignment.getLocationId().equals(getConsignmentToLocation(consignment))
-        && consignment
-            .getClient()
-            .getClientCode()
-            .equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)) {
-      zoomBackendAPIClientService.markDelivered(Long.valueOf(cnote));
+    if (consignment.getClient().getClientCode().equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)
+        && getConsignmentToLocation(consignment).contains(consignment.getLocationId())) {
+      zoomBackendAPIClientService.markDelivered(cnote);
     }
   }
 }

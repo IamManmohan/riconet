@@ -458,7 +458,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void markDelivered(Long cnote) {
+  public void markDelivered(String cnote) {
     log.info("Marking cnote {} as delivered", cnote);
     JsonNode responseJson;
     try {

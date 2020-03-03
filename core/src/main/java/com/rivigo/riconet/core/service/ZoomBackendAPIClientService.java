@@ -65,5 +65,5 @@ public interface ZoomBackendAPIClientService {
 
   void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto);
 
-  void markDelivered(Long cnote);
+  void markDelivered(String cnote);
 }

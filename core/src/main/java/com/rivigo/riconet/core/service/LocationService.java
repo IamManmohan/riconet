@@ -17,4 +17,6 @@ public interface LocationService {
   Location getPcOrReportingPc(Location l);
 
   Map<Long, Location> getLocationMap();
+
+  List<Location> getByAddressId(Long id);
 }
