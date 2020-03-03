@@ -184,9 +184,9 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     return null;
   }
 
-  private List<Long> getConsignmentToLocation(Consignment consignment) {
+  private List<Long> getConsignmentToLocation(Long addressId) {
     return locationService
-        .getByAddressId(consignment.getConsigneeClientAddressId().getAddress().getId())
+        .getByAddressId(addressId)
         .stream()
         .map(Location::getId)
         .collect(Collectors.toList());
@@ -202,8 +202,11 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         consignment.getFromId(),
         consignment.getToId(),
         consignment.getClient().getClientCode());
+    List<Long> locations =
+        getConsignmentToLocation(consignment.getConsigneeClientAddressId().getAddress().getId());
+    log.info("Locations fetched are {}", locations);
     if (consignment.getClient().getClientCode().equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)
-        && getConsignmentToLocation(consignment).contains(consignment.getLocationId())) {
+        && locations.contains(consignment.getLocationId())) {
       zoomBackendAPIClientService.markDelivered(cnote);
     }
   }
