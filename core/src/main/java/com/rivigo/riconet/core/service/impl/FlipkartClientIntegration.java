@@ -36,9 +36,6 @@ public class FlipkartClientIntegration {
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
-  @Value("${flipkart.login.username}")
-  private String flipkartLoginUsername;
-
   @Value("${flipkart.login.password}")
   private String flipkartLoginPassword;
 
