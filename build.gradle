@@ -39,7 +39,7 @@ allprojects {
         description = "Generate Jacoco coverage reports after running tests."
         additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
         reports {
-            xml.enabled false
+            xml.enabled true
             csv.enabled false
         }
     }
@@ -69,6 +69,7 @@ allprojects {
         from configurations.runtime
     }
 
+    test.finalizedBy(jacocoTestReport)
     build.finalizedBy(copyToLib)
 
 }
