@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.FlipkartUtilConstants;
-import com.rivigo.riconet.core.constants.RestUtilConstants;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -83,7 +82,8 @@ public class FlipkartClientIntegration {
     parameters.put(
         FlipkartUtilConstants.FLIPKART_GRANT_TYPE_PARAM,
         Collections.singletonList(FlipkartUtilConstants.FLIPKART_GRANT_TYPE_PARAM_VALUE));
-    parameters.put(RestUtilConstants.CLIENT_ID, Collections.singletonList(flipkartClientId));
+    parameters.put(
+        FlipkartUtilConstants.FLIPKART_CLIENT_ID, Collections.singletonList(flipkartClientId));
     parameters.put(
         FlipkartUtilConstants.FLIPKART_CLIENT_SECRET,
         Collections.singletonList(flipkartLoginPassword));

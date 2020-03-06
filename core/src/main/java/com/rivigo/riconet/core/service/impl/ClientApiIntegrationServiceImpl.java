@@ -122,7 +122,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     String accessToken = flipkartClientIntegration.getFlipkartAccessToken();
     HttpHeaders headers = restClientUtilityService.getHeaders();
     headers.set(HttpHeaders.AUTHORIZATION, accessToken);
-    headers.set(RestUtilConstants.CLIENT_ID, flipkartClientId);
+    headers.set(RestUtilConstants.X_CLIENT_ID, flipkartClientId);
     headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
     return restClientUtilityService.executeRest(
