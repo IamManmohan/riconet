@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.dto.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,12 +15,19 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlipkartLoginResponseDTO {
-  private Boolean success;
-  private Map<String, String> data;
 
-  @JsonProperty("http_status")
-  private String httpStatus;
+  @JsonProperty("access_token")
+  private String accessToken;
 
-  @JsonProperty("error_response")
-  private FlipkartErrorResponseDTO errorResponseDTO;
+  @JsonProperty("token_type")
+  private String tokenType;
+
+  @JsonProperty("expires_in")
+  private Long expiresIn;
+
+  @JsonProperty("error")
+  private String error;
+
+  @JsonProperty("error_description")
+  private String errorDescription;
 }
