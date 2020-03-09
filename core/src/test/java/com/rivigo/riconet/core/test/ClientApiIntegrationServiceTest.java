@@ -10,6 +10,7 @@ import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.impl.ClientApiIntegrationServiceImpl;
+import com.rivigo.riconet.core.service.impl.FlipkartClientIntegration;
 import com.rivigo.riconet.core.service.impl.RestClientUtilityServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
@@ -48,6 +49,7 @@ public class ClientApiIntegrationServiceTest {
   @Mock private ConsignmentUploadedFilesRepository consignmentUploadedFilesRepository;
   @Mock private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
   @Mock private ClientConsignmentService clientConsignmentService;
+  @Mock private FlipkartClientIntegration flipkartClientIntegration;
   @InjectMocks private ClientApiIntegrationServiceImpl clientApiIntegrationService;
 
   @Before
@@ -63,14 +65,10 @@ public class ClientApiIntegrationServiceTest {
         "https://dummyFlipkartUpdateTransactionUrl");
     ReflectionTestUtils.setField(
         clientApiIntegrationService, "flipkartLoginUrl", "https://dummyFlipkartLoginUrl");
-    ReflectionTestUtils.setField(
-        clientApiIntegrationService, "flipkartLoginUsername", "dummyFlipkartLoginUsername");
-    ReflectionTestUtils.setField(
-        clientApiIntegrationService, "flipkartLoginPassword", "dummyFlipkartLoginPassword");
+
     ReflectionTestUtils.setField(
         clientApiIntegrationService, "flipkartClientId", "dummyFlipkartClientId");
-    ReflectionTestUtils.setField(
-        clientApiIntegrationService, "flipkartTenantId", "dummyFlipkartTenantId");
+
     ReflectionTestUtils.setField(clientApiIntegrationService, "objectMapper", objectMapper);
     Mockito.when(pickupRepository.findOne(ApiServiceUtils.PICKUP_ID))
         .thenReturn(ApiServiceUtils.getDummyPickup());
@@ -128,6 +126,8 @@ public class ClientApiIntegrationServiceTest {
                 Mockito.any(),
                 Mockito.any()))
         .thenReturn(Optional.of(ApiServiceUtils.getClientResponseDTO()));
+    Mockito.when(flipkartClientIntegration.getFlipkartAccessToken())
+        .thenReturn(ApiServiceUtils.getFlipkartLoginResponseDTO().getAccessToken());
   }
 
   private void addPickupDoneEvent() {
