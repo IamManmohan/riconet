@@ -7,7 +7,6 @@ import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.RestUtilConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
-import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
 import com.rivigo.riconet.core.dto.client.FlipkartRequestDTO;
 import com.rivigo.riconet.core.dto.hilti.BaseHiltiFieldData;
 import com.rivigo.riconet.core.dto.hilti.DeliveryDeliveredDto;
@@ -54,7 +53,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -79,23 +77,16 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Value("${flipkart.update.transaction.url}")
   public String flipkartUpdateTransactionUrl;
 
-  @Value("${flipkart.login.username}")
-  private String flipkartLoginUsername;
-
-  @Value("${flipkart.login.password}")
-  private String flipkartLoginPassword;
-
   @Value("${flipkart.client.id}")
   private String flipkartClientId;
-
-  @Value("${flipkart.tenant.id}")
-  private String flipkartTenantId;
 
   @Autowired
   @Qualifier("defaultRestClientUtilityServiceImpl")
   private RestClientUtilityService restClientUtilityService;
 
   @Autowired private PickupRepository pickupRepository;
+
+  @Autowired private FlipkartClientIntegration flipkartClientIntegration;
 
   @Autowired private LocationRepositoryV2 locationRepositoryV2;
 
@@ -127,33 +118,11 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         Object.class);
   }
 
-  private Optional<?> loginToFlipkart() {
-    String authString = flipkartLoginUsername + ":" + flipkartLoginPassword;
-    byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
-    String authStringEnc = "Basic " + new String(authEncBytes);
-
-    HttpHeaders headers = restClientUtilityService.getHeaders();
-    headers.set(HttpHeaders.AUTHORIZATION, authStringEnc);
-    headers.set(RestUtilConstants.CLIENT_ID, flipkartClientId);
-    headers.set(RestUtilConstants.TENANT_ID, flipkartTenantId);
-
-    return restClientUtilityService.executeRest(
-        flipkartLoginUrl, HttpMethod.POST, new HttpEntity<>(headers), Object.class);
-  }
-
   private Optional<?> sendRequestToFlipkart(List<FlipkartRequestDTO> requestDtos) {
-
-    /** Calling Flipkart Login Api */
-    log.info("Sending login request to flipkart");
-    FlipkartLoginResponseDTO loginResponseDto =
-        objectMapper.convertValue(
-            loginToFlipkart().orElseThrow(() -> new ZoomException("Unable to login to Flipkart")),
-            FlipkartLoginResponseDTO.class);
-    log.info("Login Response from Flipkart: {}", loginResponseDto);
-
+    String accessToken = flipkartClientIntegration.getFlipkartAccessToken();
     HttpHeaders headers = restClientUtilityService.getHeaders();
-    headers.set(HttpHeaders.AUTHORIZATION, loginResponseDto.getData().get("access_token"));
-    headers.set(RestUtilConstants.CLIENT_ID, flipkartClientId);
+    headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+    headers.set(RestUtilConstants.X_CLIENT_ID, flipkartClientId);
     headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
     return restClientUtilityService.executeRest(

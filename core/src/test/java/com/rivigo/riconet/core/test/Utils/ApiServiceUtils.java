@@ -269,14 +269,7 @@ public class ApiServiceUtils {
 
   public static FlipkartLoginResponseDTO getFlipkartLoginResponseDTO() {
     FlipkartLoginResponseDTO responseDto = new FlipkartLoginResponseDTO();
-    responseDto.setHttpStatus("OK");
-    responseDto.setSuccess(Boolean.TRUE);
-    responseDto.setData(
-        new HashMap<String, String>() {
-          {
-            put("access_token", "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
-          }
-        });
+    responseDto.setAccessToken("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
     return responseDto;
   }
 
