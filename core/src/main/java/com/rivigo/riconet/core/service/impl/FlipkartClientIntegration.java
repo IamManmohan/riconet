@@ -35,11 +35,11 @@ public class FlipkartClientIntegration {
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
+  @Value("${flipkart.login.client.id}")
+  private String flipkartLoginClientId;
+
   @Value("${flipkart.login.password}")
   private String flipkartLoginPassword;
-
-  @Value("${flipkart.client.id}")
-  private String flipkartClientId;
 
   @Value("${flipkart.tenant.id}")
   private String flipkartTenantId;
@@ -83,7 +83,7 @@ public class FlipkartClientIntegration {
         FlipkartUtilConstants.FLIPKART_GRANT_TYPE_PARAM,
         Collections.singletonList(FlipkartUtilConstants.FLIPKART_GRANT_TYPE_PARAM_VALUE));
     parameters.put(
-        FlipkartUtilConstants.FLIPKART_CLIENT_ID, Collections.singletonList(flipkartClientId));
+        FlipkartUtilConstants.FLIPKART_CLIENT_ID, Collections.singletonList(flipkartLoginClientId));
     parameters.put(
         FlipkartUtilConstants.FLIPKART_CLIENT_SECRET,
         Collections.singletonList(flipkartLoginPassword));
