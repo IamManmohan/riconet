@@ -1,9 +1,10 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.zoom.common.model.neo4j.Location;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
-import org.springframework.stereotype.Service;
 
 @Service
 public interface LocationService {
@@ -17,6 +18,4 @@ public interface LocationService {
   Location getPcOrReportingPc(Location l);
 
   Map<Long, Location> getLocationMap();
-
-  List<Location> getByAddressId(Long id);
 }

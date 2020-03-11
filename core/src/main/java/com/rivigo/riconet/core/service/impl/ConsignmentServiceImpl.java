@@ -21,7 +21,6 @@ import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentHistory;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.Organization;
-import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentRepository;
 import java.math.BigInteger;
@@ -184,14 +183,6 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     return null;
   }
 
-  private List<Long> getConsignmentToLocation(Long addressId) {
-    return locationService
-        .getByAddressId(addressId)
-        .stream()
-        .map(Location::getId)
-        .collect(Collectors.toList());
-  }
-
   @Override
   public void markDeliverZoomDocsCN(String cnote, Long cnId) {
     log.info("Consignment for which event came {}", cnote);
@@ -202,11 +193,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
         consignment.getFromId(),
         consignment.getToId(),
         consignment.getClient().getClientCode());
-    List<Long> locations =
-        getConsignmentToLocation(consignment.getConsigneeClientAddressId().getAddress().getId());
-    log.info("Locations fetched are {}", locations);
-    if (consignment.getClient().getClientCode().equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)
-        && locations.contains(consignment.getLocationId())) {
+    if (consignment
+        .getClient()
+        .getClientCode()
+        .equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)) {
       zoomBackendAPIClientService.markDelivered(cnote);
     }
   }

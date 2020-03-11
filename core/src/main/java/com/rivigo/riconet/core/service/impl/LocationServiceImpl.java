@@ -59,8 +59,4 @@ public class LocationServiceImpl implements LocationService {
         .stream()
         .collect(Collectors.toMap(Location::getId, Function.identity()));
   }
-
-  public List<Location> getByAddressId(Long id) {
-    return locationRepository.findByAddressId(id);
-  }
 }
