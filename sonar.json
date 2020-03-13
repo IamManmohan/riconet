@@ -1,0 +1,4 @@
+{
+  "sonarHost": "http://b46af8dc08672fd4c9db3a19d8da72e8b09450e4:@sonar-external.rivigo.com",
+  "sonarProjectKey": "riconet-develop"
+}
