@@ -18,12 +18,6 @@ public class UrlConstant {
 
   public static final String ZOOM_TICKETING_TICKET_ACTION = "/ticket-action";
 
-  public static final String ZOOM_BACKEND_UPDATE_QC_CHECK =
-      "/operations/consignments/qc/updateQcCheck";
-
-  public static final String ZOOM_BACKEND_HANDLE_QC_BLOCKER =
-      "/operations/consignments/qc/handleQcBlocker";
-
   public static final String ZOOM_BACKEND_BF_CPD_CALCULATION =
       "/operations/consignments/bfCpdCalculation";
 
@@ -54,8 +48,6 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_KNOCK_OFF_REQUEST =
       "/operations/retail/collections/{cnote}/knockOff";
-
-  public static final String QC_MODEL_GET_FLAG = "/get_qc_decision";
 
   public static final String ZOOM_DATASTORE_EWAYBILL_METADATA_CLEANUP = "/address/cleanup/ewaybill";
 

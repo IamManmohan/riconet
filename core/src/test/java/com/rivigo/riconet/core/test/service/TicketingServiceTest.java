@@ -160,7 +160,7 @@ public class TicketingServiceTest {
   public void closeTicketTest() {
     TicketDTO ticket3 =
         TicketDTO.builder()
-            .typeId(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID)
+            .typeId(ZoomTicketingConstant.RETAIL_CHEQUE_BOUNCE_TYPE_ID)
             .status(TicketStatus.NEW)
             .id(2l)
             .build();

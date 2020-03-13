@@ -18,8 +18,6 @@ import java.util.List;
 
 public interface ZoomBackendAPIClientService {
 
-  void updateQcCheck(Long consignmentId, Boolean qcCheck);
-
   void recalculateCpdOfBf(Long consignmentId);
 
   void unloadAssetCN(Long cnId);
@@ -35,8 +33,6 @@ public interface ZoomBackendAPIClientService {
   OrganizationDTO updateOrganization(OrganizationDTO orgDTO);
 
   ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
-
-  void handleQcBlockerClosure(Long ticketId);
 
   void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction);

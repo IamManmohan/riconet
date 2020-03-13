@@ -63,44 +63,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void updateQcCheck(Long consignmentId, Boolean qcCheck) {
-    JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("consignmentId", Collections.singletonList(consignmentId.toString()));
-    valuesMap.put("qcCheck", Collections.singletonList(qcCheck.toString()));
-    String url = UrlConstant.ZOOM_BACKEND_UPDATE_QC_CHECK;
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-    } catch (IOException e) {
-      log.error(
-          "Error while marking consignment qcCheck needed with consignmentId: {}",
-          consignmentId,
-          e);
-      throw new ZoomException(
-          "Error while marking consignment qcCheck needed  with consignmentId: " + consignmentId);
-    }
-    apiClientService.parseJsonNode(responseJson, null);
-  }
-
-  @Override
-  public void handleQcBlockerClosure(Long ticketId) {
-    JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("ticketId", Collections.singletonList(ticketId.toString()));
-    String url = UrlConstant.ZOOM_BACKEND_HANDLE_QC_BLOCKER;
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-    } catch (IOException e) {
-      log.error("Error while handling QcBlocker ticket closure with ticketId: {}", ticketId, e);
-      throw new ZoomException(
-          "Error while handling QcBlocker ticket closure with ticketId: %s", ticketId);
-    }
-    apiClientService.parseJsonNode(responseJson, null);
-  }
-
-  @Override
   public void handleWriteOffApproveRejectRequest(
       String cnote, WriteOffRequestAction writeOffRequestAction) {
     JsonNode responseJson;
