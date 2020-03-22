@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.test;
 
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.impl.ZoomPropertyServiceImpl;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
 import java.util.ArrayList;
