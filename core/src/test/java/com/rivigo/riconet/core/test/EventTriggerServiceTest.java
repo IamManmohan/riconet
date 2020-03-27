@@ -5,7 +5,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -24,13 +23,10 @@ import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -62,8 +58,6 @@ public class EventTriggerServiceTest {
 
   @Mock private RTOService rtoService;
 
-  @Captor private ArgumentCaptor<ConsignmentBasicDTO> consignmentBasicDTOArgumentCaptor;
-
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
@@ -85,9 +79,7 @@ public class EventTriggerServiceTest {
             .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(consignmentService, times(1)).triggerBfCpdCalcualtion(any());
-    Assert.assertEquals("1234567890", consignmentBasicDTOArgumentCaptor.getValue().getCnote());
-    Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getLocationId() == 12l);
-    Assert.assertTrue(consignmentBasicDTOArgumentCaptor.getValue().getConsignmentId() == 5l);
+    verify(rtoService, times(1)).reassignRTOTicketIfExists(any());
   }
 
   @Test
