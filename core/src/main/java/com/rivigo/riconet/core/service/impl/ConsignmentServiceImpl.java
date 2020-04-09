@@ -1,12 +1,16 @@
 package com.rivigo.riconet.core.service.impl;
 
+import static com.rivigo.riconet.core.constants.ClientConstants.ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE;
+
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.OrganizationService;
+import com.rivigo.riconet.core.service.PincodeService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
@@ -45,6 +49,10 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private ConsignmentScheduleService consignmentScheduleService;
 
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
+
+  @Autowired private PincodeService pincodeService;
+
+  @Autowired private LocationService locationService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
@@ -173,5 +181,23 @@ public class ConsignmentServiceImpl implements ConsignmentService {
       return orgId.longValue();
     }
     return null;
+  }
+
+  @Override
+  public void markDeliverZoomDocsCN(String cnote, Long cnId) {
+    log.info("Consignment for which event came {}", cnote);
+    Consignment consignment = consignmentRepo.findById(cnId);
+    log.info(
+        "Consignment location {}, from {}, to {} and client code {}",
+        consignment.getLocationId(),
+        consignment.getFromId(),
+        consignment.getToId(),
+        consignment.getClient().getClientCode());
+    if (consignment
+        .getClient()
+        .getClientCode()
+        .equalsIgnoreCase(ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE)) {
+      zoomBackendAPIClientService.markDelivered(cnote);
+    }
   }
 }
