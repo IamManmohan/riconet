@@ -456,4 +456,25 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     // otherwise.
     apiClientService.parseJsonNode(responseJson, null);
   }
+
+  @Override
+  public void markDelivered(String cnote) {
+    log.info("Marking cnote {} as delivered", cnote);
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_MARK_DELIVERED.replace("{cnote}", cnote),
+              null,
+              backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while marking Zoom Doc CN as Delivered ", e);
+      throw new ZoomException("Error while marking Zoom Doc Delivered for cnId : %s", cnote);
+    }
+    // Calling parse json node to verify that response status is SUCCESS or throw exception
+    // otherwise.
+    apiClientService.parseJsonNode(responseJson, null);
+  }
 }

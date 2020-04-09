@@ -64,4 +64,6 @@ public interface ZoomBackendAPIClientService {
   void processVehicleEvent(PrimeEventDto primeEventDto, Long tripId);
 
   void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto);
+
+  void markDelivered(String cnote);
 }
