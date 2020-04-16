@@ -69,4 +69,7 @@ public class UrlConstant {
       "/primeSync/processVehicleEvent/{tripId}";
 
   public static final String ZOOM_BACKEND_QC_CONSIGNMENT_V2 = "/operations/consignments/qc/v2";
+
+  public static final String ZOOM_BACKEND_MARK_DELIVERED =
+      "/operations/consignments/cndeliver/{cnote}";
 }
