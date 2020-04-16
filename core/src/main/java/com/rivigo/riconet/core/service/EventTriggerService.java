@@ -239,6 +239,16 @@ public class EventTriggerService {
   private void processCNReceivedAtOuAndHandleException(NotificationDTO notificationDTO) {
     ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
     // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
+    log.info(
+        "Processing CN Received At OU Event for {} {}",
+        unloadingData.getCnote(),
+        unloadingData.getConsignmentId());
+    try {
+      consignmentService.markDeliverZoomDocsCN(
+          unloadingData.getCnote(), unloadingData.getConsignmentId());
+    } catch (Exception e) {
+      log.error("Marking Zoom Doc CN as delivered failed", e);
+    }
     try {
       qcService.consumeUnloadingEvent(unloadingData);
     } catch (Exception e) {
