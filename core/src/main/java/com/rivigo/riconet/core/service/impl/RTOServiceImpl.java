@@ -4,7 +4,6 @@ import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketin
 import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketing.ASSIGNEE_LOCATION_CODE;
 import static com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames.Ticketing.TICKET_ENTITY_ID;
 
-import com.rivigo.riconet.core.constants.WMSConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
@@ -16,6 +15,8 @@ import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.RTOService;
 import com.rivigo.riconet.core.service.WMSService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
+import com.rivigo.zoom.wms.client.enums.TaskEntityType;
+import com.rivigo.zoom.wms.client.enums.TaskType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -111,8 +112,8 @@ public class RTOServiceImpl implements RTOService {
         return;
       }
 
-      if (!WMSConstant.RTO_REVERSE_TASK_TYPE.equals(taskType)
-          || !WMSConstant.CNOTE_ENTITY_TYPE.equals(parentEntityType)) {
+      if (!TaskType.RTO_REVERSE.name().equals(taskType)
+          || !TaskEntityType.CNOTE.name().equals(parentEntityType)) {
         log.debug(
             "Invalid taskType {} or entityType {} for rtoTicketClosure. entityId {}",
             taskType,

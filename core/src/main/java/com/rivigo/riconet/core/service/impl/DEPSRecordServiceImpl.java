@@ -324,7 +324,7 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
       case UNLOADING:
         handleUnloading(depsRecord, previousSchedule, dto, tripIdToTripMap, prsIdToPRSMap);
         break;
-      case STOCK_CHECK:
+      case BOX_AUDIT:
         dto.setScenario(DEPSScenario.WITHINPC);
         latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
         if (latestHistory != null) {
