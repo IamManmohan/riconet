@@ -11,7 +11,7 @@ import com.rivigo.zoom.wms.client.enums.TaskType;
 import com.rivigo.zoom.wms.client.enums.TaskUserType;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
@@ -34,7 +34,7 @@ public class WMSServiceImpl implements WMSService {
   public void createOrReassignRTOForwardTask(
       @NonNull String cnote, @NonNull String userEmailId, @NonNull String userLocationCode) {
 
-    Map<TaskEntityType, List<String>> hmap = new HashMap<>();
+    Map<TaskEntityType, List<String>> hmap = new EnumMap<>(TaskEntityType.class);
     hmap.put(TaskEntityType.CNOTE, Collections.singletonList(cnote));
 
     TaskCreateAssignDto taskCreateAssignDto =
