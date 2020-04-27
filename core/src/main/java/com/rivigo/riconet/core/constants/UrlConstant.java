@@ -2,6 +2,9 @@ package com.rivigo.riconet.core.constants;
 
 public class UrlConstant {
 
+  /** Zoom Backend API to generate final invoice for rivigo to pay CN's. */
+  public static final String ZOOM_BACKEND_GENERATE_INVOICE = "/operations/retail/invoice";
+
   private UrlConstant() {
     throw new IllegalStateException("Utility class");
   }
