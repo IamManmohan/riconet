@@ -34,7 +34,8 @@ public interface ZoomBackendAPIClientService {
 
   OrganizationDTO updateOrganization(OrganizationDTO orgDTO);
 
-  ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote);
+  ConsignmentUploadedFilesDTO addInvoice(
+      String invoiceUrl, String shortUrl, String cnote, Boolean isProForma);
 
   void handleQcBlockerClosure(Long ticketId);
 
@@ -66,4 +67,11 @@ public interface ZoomBackendAPIClientService {
   void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto);
 
   void markDelivered(String cnote);
+
+  /**
+   * Hits zoom backend API to generate final invoice for rivigo to pay CN's.
+   *
+   * @param cnote for generating invoice.
+   */
+  void generateInvoice(String cnote);
 }
