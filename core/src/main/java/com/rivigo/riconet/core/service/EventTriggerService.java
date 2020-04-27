@@ -176,6 +176,17 @@ public class EventTriggerService {
               e);
         }
         break;
+      case CN_DELIVERY_CLUSTER_SCAN_IN:
+        if (Boolean.parseBoolean(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.QC_DONE.name()))) {
+          zoomBackendAPIClientService.generateInvoice(
+              notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        }
+        break;
+      case CN_DRS_PLANNED:
+        zoomBackendAPIClientService.generateInvoice(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
       default:
         log.info("Event does not trigger anything {}", eventName);
     }

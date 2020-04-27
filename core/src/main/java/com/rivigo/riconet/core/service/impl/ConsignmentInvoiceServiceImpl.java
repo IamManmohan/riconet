@@ -57,7 +57,8 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     zoomBackendAPIClientService.addInvoice(
         invoiceDocumentPreparedDTO.getEncodedUrl(),
         shortUrl,
-        invoiceDocumentPreparedDTO.getCnote());
+        invoiceDocumentPreparedDTO.getCnote(),
+        invoiceDocumentPreparedDTO.getIsProForma());
     if (!StringUtils.isBlank(shortUrl)) {
       String message =
           "New CN "

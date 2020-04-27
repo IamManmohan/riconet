@@ -192,12 +192,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public ConsignmentUploadedFilesDTO addInvoice(String invoiceUrl, String shortUrl, String cnote) {
+  public ConsignmentUploadedFilesDTO addInvoice(
+      String invoiceUrl, String shortUrl, String cnote, Boolean isProForma) {
     JsonNode responseJson;
     Map<String, String> data = new HashMap<>();
     data.put(ConsignmentConstant.SHORT_URL, shortUrl);
     data.put(ConsignmentConstant.CNOTE, cnote);
     data.put(ConsignmentConstant.URL, invoiceUrl);
+    data.put(ConsignmentConstant.IS_PRO_FORMA, isProForma.toString());
     String url = UrlConstant.ZOOM_BACKEND_CONSIGNMENT_INVOICE;
     log.info("Updating invoice {} for cnote {}", shortUrl, cnote);
     try {
@@ -472,6 +474,33 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       log.error("Error while marking Zoom Doc CN as Delivered ", e);
       throw new ZoomException("Error while marking Zoom Doc Delivered for cnId : %s", cnote);
+    }
+    // Calling parse json node to verify that response status is SUCCESS or throw exception
+    // otherwise.
+    apiClientService.parseJsonNode(responseJson, null);
+  }
+
+  /**
+   * Hits zoom backend API to generate final invoice for rivigo to pay CN's.
+   *
+   * @param cnote for generating invoice.
+   */
+  @Override
+  public void generateInvoice(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("cnote", cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_GENERATE_INVOICE,
+              queryParams,
+              backendBaseUrl);
+    } catch (IOException e) {
+      log.error("Error while generating invoice for cnote {}", cnote, e);
+      throw new ZoomException("Error while generating invoice for cnote : %s", cnote);
     }
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
