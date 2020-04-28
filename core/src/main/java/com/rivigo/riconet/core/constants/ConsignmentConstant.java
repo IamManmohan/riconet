@@ -2,6 +2,9 @@ package com.rivigo.riconet.core.constants;
 
 public class ConsignmentConstant {
 
+  /** flag to save whether an invoice is ProForma or Final. */
+  public static final String IS_PRO_FORMA = "isProForma";
+
   private ConsignmentConstant() {
     throw new IllegalStateException("Utility class");
   }

@@ -47,7 +47,10 @@ public enum ZoomCommunicationFieldNames {
   MOBILE_NO, // tpm partner mobile number
 
   ONLINE_PAYMENT_LINK,
-  FORWARD_CONSIGNMENT_ID;
+  FORWARD_CONSIGNMENT_ID,
+
+  // flag to check if qc has been performed
+  QC_DONE;
 
   public enum Consignment {
     DELIVERY_DATE_TIME

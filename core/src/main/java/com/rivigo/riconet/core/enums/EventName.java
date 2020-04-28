@@ -34,5 +34,9 @@ public enum EventName {
   CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP,
 
   /** Error Correction Events */
-  CONSIGNMENT_QC_DATA_UPSERT
+  CONSIGNMENT_QC_DATA_UPSERT,
+
+  /** Events yo trigger invoice generation. */
+  CN_DELIVERY_CLUSTER_SCAN_IN,
+  CN_DRS_PLANNED
 }
