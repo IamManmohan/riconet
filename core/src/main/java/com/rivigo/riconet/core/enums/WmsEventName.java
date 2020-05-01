@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.enums;
 
 public enum WmsEventName {
+  // Notify scan app user
   CN_INBOUND_CLEAR,
   MANIFEST_CLOSED,
   PALLET_CLOSED,
@@ -13,11 +14,6 @@ public enum WmsEventName {
   CN_TOTAL_BOXES_CHANGE,
   CN_REMOVED_FROM_UNLOADING,
 
-  @Deprecated
-  TASK_CLOSED_OR_REASSIGNED,
-  @Deprecated
-  IB_CLEAR,
-  @Deprecated
-  CN_UNLOADING_PLAN_UNPLAN,
+  // catch task closure for RTO CN processing
   TASK_CLOSED
 }
