@@ -89,6 +89,7 @@ public class EventTriggerService {
         break;
       case CN_DRS_DISPATCH:
         appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
+        break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
