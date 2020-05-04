@@ -2,9 +2,9 @@ package com.rivigo.riconet.core.dto.notification;
 
 import com.rivigo.zoom.common.enums.DEPSLocationType;
 import com.rivigo.zoom.common.enums.DEPSScenario;
-import com.rivigo.zoom.common.enums.TaskType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.wms.client.enums.TaskType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

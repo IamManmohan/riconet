@@ -324,7 +324,7 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
       case UNLOADING:
         handleUnloading(depsRecord, previousSchedule, dto, tripIdToTripMap, prsIdToPRSMap);
         break;
-      case STOCK_CHECK:
+      case BOX_AUDIT:
         dto.setScenario(DEPSScenario.WITHINPC);
         latestHistory = consignmentIdToLatestHistoryMap.get(consignmentId);
         if (latestHistory != null) {
@@ -652,7 +652,7 @@ public class DEPSRecordServiceImpl implements DEPSRecordService {
         valuesMap.put(RESPONSIBLE_OU, depsNotification.getReporterLocation().getCode());
         valuesMap.put(
             RESPONSIBLE_PERSON,
-            "OU = 1% each OA + 3% each TL + 10% BM / PCM + 20% Security + 30% Fauji contractor");
+            "OU = 1% each OA + 3% each PA + 10% BM / PCM + 20% Security + 30% OA contractor");
         valuesMap.put(
             "dear",
             depsNotification.getReportee().getName()
