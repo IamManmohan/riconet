@@ -64,6 +64,8 @@ public class UrlConstant {
 
   public static final String WMS_SERVICE_TASK_CREATION = "/tasks";
 
+  public static final String TRANSACTION_MANAGER_URL = "/transaction-manager";
+
   public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
       "/operations/retail/collections/handover/markRecoveryPending";
 
