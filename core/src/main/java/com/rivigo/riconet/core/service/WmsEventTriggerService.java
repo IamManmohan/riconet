@@ -19,21 +19,8 @@ public class WmsEventTriggerService {
     WmsEventName eventName = WmsEventName.valueOf(notificationDTO.getEventName());
     switch (eventName) {
       case CN_INBOUND_CLEAR:
-        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
-        appNotificationService.sendTaskNotifications(notificationDTO, WmsEventName.IB_CLEAR);
-        break;
       case TASK_CLOSED_OR_CANCELLED:
-      case TASK_CLOSED_OR_REASSIGNED:
-        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
-        appNotificationService.sendTaskNotifications(
-            notificationDTO, WmsEventName.TASK_CLOSED_OR_REASSIGNED);
-        break;
       case CN_REMOVED_FROM_UNLOADING:
-      case CN_UNLOADING_PLAN_UNPLAN:
-        appNotificationService.sendTaskNotifications(notificationDTO, eventName);
-        appNotificationService.sendTaskNotifications(
-            notificationDTO, WmsEventName.CN_UNLOADING_PLAN_UNPLAN);
-        break;
       case MANIFEST_CLOSED:
       case PALLET_CLOSED:
       case TASK_SUBMITTED_ANOTHER_USER:
