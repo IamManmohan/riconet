@@ -19,7 +19,7 @@ import static com.rivigo.riconet.core.constants.PushNotificationConstant.PICKUP_
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.SHOP_FLOOR_ENABLED;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TASK_ID;
 import static com.rivigo.riconet.core.constants.PushNotificationConstant.TIME_STAMP;
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
+import static com.rivigo.zoom.common.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
 
 import com.rivigo.riconet.core.constants.ExpressAppConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;

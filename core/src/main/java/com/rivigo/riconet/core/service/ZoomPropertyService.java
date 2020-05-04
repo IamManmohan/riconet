@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.service;
 
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import java.util.List;
 

@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.dto.notification.AppointmentNotification;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentAppointmentService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
@@ -17,6 +16,7 @@ import com.rivigo.zoom.common.dto.UserBasicDTO;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.EmailDlName;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.enums.ZoomUserType;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentAppointmentRecord;

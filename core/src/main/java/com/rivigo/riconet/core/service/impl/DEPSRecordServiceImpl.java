@@ -9,7 +9,6 @@ import static com.rivigo.zoom.common.enums.ZoomTripType.BF;
 
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.dto.notification.DEPSNotification;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.DEPSRecordService;
@@ -33,6 +32,7 @@ import com.rivigo.zoom.common.enums.DEPSType;
 import com.rivigo.zoom.common.enums.EmailDlName;
 import com.rivigo.zoom.common.enums.PartnerType;
 import com.rivigo.zoom.common.enums.StockAccumulatorRole;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.enums.ZoomTripType;
 import com.rivigo.zoom.common.enums.ZoomUserType;
 import com.rivigo.zoom.common.model.BusinessPartner;
