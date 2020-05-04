@@ -9,7 +9,7 @@ buildscript {
         maven { url 'https://packages.confluent.io/maven' }
     }
     dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.28.1"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.12.0"
     }
 }
 
