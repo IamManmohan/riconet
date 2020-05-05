@@ -1,28 +1,30 @@
 package com.rivigo.riconet.core.service;
 
+import com.rivigo.riconet.core.dto.CollectionRequestDto;
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.TransactionManagerEventNames;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TransactionManagerEventService {
 
+  private final TransactionManagerService transactionManagerService;
+
+  private final ObjectMapper objectMapper;
+
   public void processNotification(NotificationDTO notificationDTO) {
-    TransactionManagerEventNames eventName =
-        TransactionManagerEventNames.valueOf(notificationDTO.getEventName());
-    switch (eventName) {
-      case CN_EDIT_COLLECTIONS:
-      case CN_PAYMENT_COLLECTIONS:
-      case CN_CREATION_COLLECTIONS:
-      case CHEQUE_BOUNCE_BANK_TRANSFER:
-      case NORMAL_TO_NORMAL_TO_PAY_CHANGE:
-      case PAYMENT_CHANGE_TO_BANK_TRANSFER:
-      case CN_HANDOVER_COMPLETED_COLLECTIONS:
-      default:
-        log.info("Event does not trigger anything {}", eventName);
-        break;
+    if (notificationDTO.getMetadata().containsKey("collectionPayload")) {
+      CollectionRequestDto collectionRequestDto =
+          objectMapper.convertValue(
+              notificationDTO.getMetadata().get("collectionsPayload"), CollectionRequestDto.class);
+      transactionManagerService.hitTransactionManagerAndLogResponse(collectionRequestDto);
+    } else {
+      log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
     }
   }
 }

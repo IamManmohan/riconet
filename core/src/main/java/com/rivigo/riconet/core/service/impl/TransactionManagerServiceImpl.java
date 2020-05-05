@@ -29,8 +29,9 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   public void hitTransactionManagerAndLogResponse(
       @NonNull CollectionRequestDto collectionRequestDto) {
 
+    JsonNode responseJson = null;
     try {
-      JsonNode responseJson =
+      responseJson =
           apiClientService.getEntity(
               collectionRequestDto,
               HttpMethod.POST,
@@ -49,5 +50,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
       throw new ZoomException(
           "Error while processing collectionRequestDto {}" + collectionRequestDto);
     }
+    apiClientService.parseJsonNode(responseJson, null);
   }
 }
