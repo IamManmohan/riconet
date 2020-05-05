@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
 import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

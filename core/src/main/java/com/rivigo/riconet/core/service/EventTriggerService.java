@@ -3,7 +3,6 @@ package com.rivigo.riconet.core.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
-import com.rivigo.riconet.core.dto.ConsignmentCompletionEventDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -22,8 +21,6 @@ import org.springframework.stereotype.Service;
 public class EventTriggerService {
 
   @Autowired private TicketingClientService ticketingClientService;
-
-  @Autowired private QcService qcService;
 
   @Autowired private ConsignmentService consignmentService;
 
@@ -86,49 +83,17 @@ public class EventTriggerService {
             TicketEntityType.PRQ.name(),
             eventName.name());
         break;
-      case CN_STATUS_CHANGE_FROM_RECEIVED_AT_OU:
-        ConsignmentBasicDTO loadingData = getBasicConsignmentDTO(notificationDTO);
-        qcService.consumeLoadingEvent(loadingData);
-        break;
       case CN_RECEIVED_AT_OU:
         processCNReceivedAtOuAndHandleException(notificationDTO);
         rtoService.reassignRTOTicketIfExists(notificationDTO);
         break;
       case CN_DRS_DISPATCH:
         appNotificationService.sendCnDrsDispatchEvent(notificationDTO);
-      case CN_DELIVERY_LOADED:
-        ConsignmentBasicDTO deliveryUnloadingData = getBasicConsignmentDTO(notificationDTO);
-        qcService.consumeDeliveryLoadingEvent(deliveryUnloadingData);
-        break;
-      case CN_COMPLETION_ALL_INSTANCES:
-        ConsignmentCompletionEventDTO completionData = getConsignmentCompletionDTO(notificationDTO);
-        qcService.consumeCompletionEvent(completionData);
-        break;
-      case CN_CNOTE_TYPE_CHANGED_FROM_NORMAL:
-        ConsignmentBasicDTO consignment = getBasicConsignmentDTO(notificationDTO);
-        qcService.consumeCnoteTypeChangeEvent(consignment);
         break;
       case COLLECTION_CHEQUE_BOUNCE:
         chequeBounceService.consumeChequeBounceEvent(notificationDTO);
         break;
-      case CN_CNOTE_CHANGE:
-        qcService.consumeCnoteChangeEvent(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name()),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
-        break;
-      case CN_DEPS_CREATION:
-      case CN_DEPS_CREATION_FROM_CONSIGNMENT_HISTORY:
-        qcService.consumeDepsCreationEvent(
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()),
-            notificationDTO.getEntityId());
-        break;
       case TICKET_ACTION:
-        qcService.consumeQcBlockerTicketClosedEvent(
-            notificationDTO.getEntityId(),
-            getLong(notificationDTO, ZoomCommunicationFieldNames.LAST_UPDATED_BY_ID.name())
-                .orElse(null),
-            getString(notificationDTO, ZoomCommunicationFieldNames.ACTION_NAME.name())
-                .orElse(null));
         ticketActionFactory.consume(
             notificationDTO.getEntityId(),
             getString(notificationDTO, ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name())
@@ -141,10 +106,6 @@ public class EventTriggerService {
         bankTransferService.createTicket(notificationDTO.getMetadata());
         break;
       case TICKET_CREATION:
-        qcService.consumeQcBlockerTicketCreationEvent(
-            notificationDTO.getEntityId(),
-            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.TICKET_ENTITY_ID.name()),
-            getLong(notificationDTO, ZoomCommunicationFieldNames.TYPE_ID.name()).orElse(null));
         ticketingService.setPriorityMapping(notificationDTO);
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
@@ -231,22 +192,6 @@ public class EventTriggerService {
     }
   }
 
-  private ConsignmentCompletionEventDTO getConsignmentCompletionDTO(
-      NotificationDTO notificationDTO) {
-    return ConsignmentCompletionEventDTO.builder()
-        .cnote(notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()))
-        .isRTOCnote(
-            notificationDTO
-                .getMetadata()
-                .containsKey(ZoomCommunicationFieldNames.FORWARD_CONSIGNMENT_ID.name()))
-        .consignmentId(
-            Long.parseLong(
-                notificationDTO
-                    .getMetadata()
-                    .get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name())))
-        .build();
-  }
-
   private void processCNReceivedAtOuAndHandleException(NotificationDTO notificationDTO) {
     ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
     // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
@@ -259,11 +204,6 @@ public class EventTriggerService {
           unloadingData.getCnote(), unloadingData.getConsignmentId());
     } catch (Exception e) {
       log.error("Marking Zoom Doc CN as delivered failed", e);
-    }
-    try {
-      qcService.consumeUnloadingEvent(unloadingData);
-    } catch (Exception e) {
-      log.error("QC service failed", e);
     }
     try {
       consignmentService.triggerBfCpdCalcualtion(unloadingData);
