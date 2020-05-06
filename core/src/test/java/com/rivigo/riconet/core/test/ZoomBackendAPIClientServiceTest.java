@@ -53,30 +53,12 @@ public class ZoomBackendAPIClientServiceTest {
   private Long consignmentId = 1234L;
 
   @Test
-  public void updateQcCheckTest() throws IOException {
-    Boolean qcCheck = true;
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
-    mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.updateQcCheck(consignmentId, qcCheck);
-    validateReturnedData(jsonNode, HttpMethod.PUT, true);
-  }
-
-  @Test
   public void setPriorityMappingTest() throws IOException {
     String cnote = "1234567890";
     PriorityReasonType reasonType = PriorityReasonType.TICKET;
     JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
     zoomBackendAPIClientServiceImpl.setPriorityMapping(cnote, reasonType);
-  }
-
-  @Test
-  public void updateQcCheckExceptionTest() throws IOException {
-    mockApiClientServiceGetEntityException();
-    expectedException.expect(ZoomException.class);
-    expectedException.expectMessage(
-        "Error while marking consignment qcCheck needed  with consignmentId: 1234");
-    zoomBackendAPIClientServiceImpl.updateQcCheck(consignmentId, true);
   }
 
   @Test
@@ -94,23 +76,6 @@ public class ZoomBackendAPIClientServiceTest {
     expectedException.expectMessage(
         "Error while recalculating cpd of BF consignment with id: 1234");
     zoomBackendAPIClientServiceImpl.recalculateCpdOfBf(consignmentId);
-  }
-
-  @Test
-  public void handleQcBlockerClosureTest() throws IOException {
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
-    mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
-    validateReturnedData(jsonNode, HttpMethod.PUT, false);
-  }
-
-  @Test
-  public void handleQcBlockerClosureExceptionTest() throws IOException {
-    mockApiClientServiceGetEntityException();
-    expectedException.expect(ZoomException.class);
-    expectedException.expectMessage(
-        "Error while handling QcBlocker ticket closure with ticketId: 5");
-    zoomBackendAPIClientServiceImpl.handleQcBlockerClosure(5l);
   }
 
   @Test

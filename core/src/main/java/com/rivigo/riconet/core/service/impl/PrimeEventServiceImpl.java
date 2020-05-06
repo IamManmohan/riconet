@@ -1,11 +1,11 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.PrimeEventService;
 import com.rivigo.riconet.core.service.TripService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.Trip;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.Arrays;

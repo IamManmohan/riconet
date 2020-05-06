@@ -3,7 +3,6 @@ package com.rivigo.riconet.core.test;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.EmailConstant;
 import com.rivigo.riconet.core.constants.ErrorConstant;
-import com.rivigo.riconet.core.constants.ReasonConstant;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,16 +31,6 @@ public class UtilityTest {
         (Constructor<TimeUtilsZoom>) TimeUtilsZoom.class.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     timeUtilsZoom = constructor.newInstance();
-  }
-
-  @Test(expected = Exception.class)
-  public void reasonConstant()
-      throws IllegalAccessException, InvocationTargetException, InstantiationException {
-    ReasonConstant reasonConstant;
-    Constructor<ReasonConstant> constructor =
-        (Constructor<ReasonConstant>) ReasonConstant.class.getDeclaredConstructors()[0];
-    constructor.setAccessible(true);
-    reasonConstant = constructor.newInstance();
   }
 
   @Test(expected = Exception.class)

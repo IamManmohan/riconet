@@ -58,8 +58,8 @@ public class ZoomTicketingApiClientServiceTest {
   private String cnote = "1234567890";
   private List<String> typeId =
       Arrays.asList(
-          ZoomTicketingConstant.QC_RECHECK_TYPE_ID.toString(),
-          ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID.toString());
+          ZoomTicketingConstant.RETAIL_CHEQUE_BOUNCE_TYPE_ID.toString(),
+          ZoomTicketingConstant.WRITEOFF_TYPE_ID.toString());
 
   @Test
   public void getTicketsByCnoteNullCheck() {
@@ -83,7 +83,7 @@ public class ZoomTicketingApiClientServiceTest {
   public void getTicketsByCnoteAndTypeExceptionTest() throws IOException {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    expectedException.expectMessage("Error while getting qc tickets with cnote 1234567890");
+    expectedException.expectMessage("Error while getting tickets with cnote 1234567890");
     zoomTicketingAPIClientService.getByCnoteAndType(cnote, typeId);
   }
 
@@ -277,7 +277,7 @@ public class ZoomTicketingApiClientServiceTest {
 
   private TicketDTO getTicketDTO() {
     return TicketDTO.builder()
-        .typeId(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID)
+        .typeId(ZoomTicketingConstant.RETAIL_CHEQUE_BOUNCE_TYPE_ID)
         .status(TicketStatus.CLOSED)
         .entityId(cnote)
         .id(1L)
