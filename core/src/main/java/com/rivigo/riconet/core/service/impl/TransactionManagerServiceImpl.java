@@ -55,7 +55,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
 
   @Override
   public void hitTransactionManagerAndLogResponse(
-      @NonNull CollectionRequestDto collectionRequestDto) throws JsonProcessingException {
+      @NonNull CollectionRequestDto collectionRequestDto) {
 
     User user = userMasterService.getByEmail(ssoPassword);
 
@@ -72,7 +72,12 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     headers.add("userId", user.getId().toString());
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String requestJson = objectMapper.writeValueAsString(collectionRequestDto);
+    String requestJson = null;
+    try {
+      requestJson = objectMapper.writeValueAsString(collectionRequestDto);
+    } catch (JsonProcessingException e) {
+      log.error("Could not convert to string collectionRequestDto: {}", collectionRequestDto);
+    }
 
     HttpEntity httpHeaders = new HttpEntity<>(requestJson, headers);
 
