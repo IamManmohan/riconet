@@ -2,7 +2,7 @@ package com.rivigo.riconet.core.dto.client;
 
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
-import com.rivigo.zoom.common.enums.Unit;
+import com.rivigo.zoom.util.commons.enums.Unit;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
