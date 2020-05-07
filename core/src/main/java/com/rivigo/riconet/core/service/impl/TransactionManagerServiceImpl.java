@@ -30,17 +30,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TransactionManagerServiceImpl implements TransactionManagerService {
 
-  private final ApiClientService apiClientService;
+  private final ObjectMapper objectMapper;
 
-  @Autowired private ObjectMapper objectMapper;
+  private final SsoService ssoService;
 
-  @Autowired private SsoService ssoService;
+  private final UserMasterService userMasterService;
 
-  @Autowired private UserMasterService userMasterService;
-
-  @Autowired
   @Qualifier("defaultRestClientUtilityServiceImpl")
-  private RestClientUtilityService restClientUtilityService;
+  private final RestClientUtilityService restClientUtilityService;
 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
@@ -51,7 +48,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Value("${transaction.manager.url}")
   private String transactionManagerBaseUrl;
 
-  @Autowired private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
+  private final AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
 
   @Override
   public void hitTransactionManagerAndLogResponse(
