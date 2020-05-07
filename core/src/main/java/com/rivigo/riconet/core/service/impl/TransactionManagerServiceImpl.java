@@ -6,7 +6,6 @@ import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.CollectionRequestDto;
-import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.UserMasterService;
