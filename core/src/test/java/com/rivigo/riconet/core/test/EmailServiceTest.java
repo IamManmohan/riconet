@@ -6,9 +6,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.EmailServiceImpl;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

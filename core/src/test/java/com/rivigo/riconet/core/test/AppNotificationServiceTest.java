@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.test;
 
-import static com.rivigo.riconet.core.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
+import static com.rivigo.zoom.common.enums.ZoomPropertyName.STG_NOTIF_ALLOWED_APP_USER_IDS;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;

@@ -5,7 +5,6 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.TicketingFieldName;
-import com.rivigo.riconet.core.enums.ZoomPropertyName;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.EmailSenderService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -15,6 +14,7 @@ import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomPropertyServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
 import java.util.ArrayList;
@@ -160,7 +160,7 @@ public class TicketingServiceTest {
   public void closeTicketTest() {
     TicketDTO ticket3 =
         TicketDTO.builder()
-            .typeId(ZoomTicketingConstant.QC_MEASUREMENT_TYPE_ID)
+            .typeId(ZoomTicketingConstant.RETAIL_CHEQUE_BOUNCE_TYPE_ID)
             .status(TicketStatus.NEW)
             .id(2l)
             .build();
