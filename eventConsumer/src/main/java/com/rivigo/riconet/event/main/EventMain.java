@@ -20,6 +20,7 @@ import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.PrimeEventsConsumer;
 import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
+import com.rivigo.riconet.event.consumer.TransactionManagerEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import java.time.Duration;
@@ -60,6 +61,8 @@ public class EventMain {
 
   private final HealthCheckConsumer healthCheckConsumer;
 
+  private final TransactionManagerEventConsumer transactionManagerEventConsumer;
+
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
   @Value("${bootstrap.servers}")
@@ -79,6 +82,9 @@ public class EventMain {
 
   @Value("${akka.kafka.consumer.kafka-clients.enable.auto.commit}")
   private String autoCommitEnabled;
+
+  @Value("${transactionManagerConsumer.group.id}")
+  private String transactionManagerConsumerGroup;
 
   @Value("${event.healthCheckConsumer.group.id}")
   private String healthCheckConsumerGroup;
@@ -124,7 +130,8 @@ public class EventMain {
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer,
       SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
-      PrimeEventsConsumer primeEventsConsumer) {
+      PrimeEventsConsumer primeEventsConsumer,
+      TransactionManagerEventConsumer transactionManagerEventConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -136,6 +143,7 @@ public class EventMain {
     this.expressAppPickupConsumer = expressAppPickupConsumer;
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
     this.primeEventsConsumer = primeEventsConsumer;
+    this.transactionManagerEventConsumer = transactionManagerEventConsumer;
   }
 
   public static void main(String[] args) {
@@ -189,6 +197,7 @@ public class EventMain {
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
+    load(materializer, system, bootstrapServers, transactionManagerConsumerGroup, transactionManagerEventConsumer);
   }
 
   private void load(
