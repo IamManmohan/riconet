@@ -197,7 +197,12 @@ public class EventMain {
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
-    load(materializer, system, bootstrapServers, transactionManagerConsumerGroup, transactionManagerEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        transactionManagerConsumerGroup,
+        transactionManagerEventConsumer);
   }
 
   private void load(
