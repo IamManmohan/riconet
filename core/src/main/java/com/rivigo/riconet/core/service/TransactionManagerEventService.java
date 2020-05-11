@@ -1,8 +1,10 @@
 package com.rivigo.riconet.core.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.CollectionRequestDto;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,17 @@ public class TransactionManagerEventService {
 
   public void processNotification(NotificationDTO notificationDTO) {
     if (notificationDTO.getMetadata().containsKey(COLLECTIONS_PAYLOAD)) {
-      CollectionRequestDto collectionRequestDto =
-          objectMapper.convertValue(
-              notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD), CollectionRequestDto.class);
-      transactionManagerService.hitTransactionManagerAndLogResponse(collectionRequestDto);
+      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      CollectionRequestDto collectionRequestDto = null;
+      try {
+        collectionRequestDto =
+            objectMapper.readValue(
+                notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD), CollectionRequestDto.class);
+        transactionManagerService.hitTransactionManagerAndLogResponse(collectionRequestDto);
+      } catch (IOException e) {
+        log.error("Could not deserialize collections payload");
+      }
+
     } else {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
     }
