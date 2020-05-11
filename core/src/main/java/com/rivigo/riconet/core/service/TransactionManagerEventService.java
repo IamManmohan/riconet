@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.CollectionRequestDto;
 import com.rivigo.riconet.core.dto.NotificationDTO;
