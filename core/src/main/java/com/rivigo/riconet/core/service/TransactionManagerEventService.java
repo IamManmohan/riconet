@@ -17,11 +17,13 @@ public class TransactionManagerEventService {
 
   private final ObjectMapper objectMapper;
 
+  String COLLECTIONS_PAYLOAD = "collectionPayload";
+
   public void processNotification(NotificationDTO notificationDTO) {
-    if (notificationDTO.getMetadata().containsKey("collectionsPayload")) {
+    if (notificationDTO.getMetadata().containsKey(COLLECTIONS_PAYLOAD)) {
       CollectionRequestDto collectionRequestDto =
           objectMapper.convertValue(
-              notificationDTO.getMetadata().get("collectionsPayload"), CollectionRequestDto.class);
+              notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD), CollectionRequestDto.class);
       transactionManagerService.hitTransactionManagerAndLogResponse(collectionRequestDto);
     } else {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
