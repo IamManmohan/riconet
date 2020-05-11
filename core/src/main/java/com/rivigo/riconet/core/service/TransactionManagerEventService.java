@@ -23,7 +23,6 @@ public class TransactionManagerEventService {
 
   public void processNotification(NotificationDTO notificationDTO) {
     if (notificationDTO.getMetadata().containsKey(COLLECTIONS_PAYLOAD)) {
-      objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       CollectionRequestDto collectionRequestDto = null;
       try {
         collectionRequestDto =
