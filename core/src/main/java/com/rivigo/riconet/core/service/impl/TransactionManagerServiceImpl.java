@@ -53,7 +53,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   public void hitTransactionManagerAndLogResponse(
       @NonNull CollectionRequestDto collectionRequestDto) {
 
-    User user = userMasterService.getByEmail(ssoPassword);
+    User user = userMasterService.getByEmail(ssoUsername);
 
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
