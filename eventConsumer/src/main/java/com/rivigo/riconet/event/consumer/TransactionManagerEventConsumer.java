@@ -26,13 +26,18 @@ public class TransactionManagerEventConsumer extends EventConsumer {
   }
 
   @Override
+  public String getTopic() {
+    return eventTopicNameConfig.getTransactionManagerEventSink();
+  }
+
+  @Override
   public void doAction(NotificationDTO notificationDTO) {
     transactionManagerEventService.processNotification(notificationDTO);
   }
 
   @Override
   public String getConsumerName() {
-    return eventTopicNameConfig.getTransactionManagerEventSink();
+    return getClass().getName();
   }
 
   @Override
