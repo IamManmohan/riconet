@@ -83,6 +83,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
         transactionManagerBaseUrl + UrlConstant.TRANSACTION_MANAGER_URL,
         HttpMethod.POST,
         httpHeaders,
-        Boolean.class);
+        String.class);
   }
 }
