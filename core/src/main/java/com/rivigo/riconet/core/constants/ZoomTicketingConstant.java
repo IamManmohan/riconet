@@ -1,5 +1,8 @@
 package com.rivigo.riconet.core.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ZoomTicketingConstant {
 
   private ZoomTicketingConstant() {
@@ -62,4 +65,12 @@ public class ZoomTicketingConstant {
   public static final String CNOTE_ADDED_TO_UTR = "Cnote: %s<br>Amount: %s";
 
   public static final Long RTO_TICKET_TYPE_ID = 731L;
+
+  public static final Long PRIME_CORPORATE_GROUP_TYPE_ID = 153L;
+
+  public static final Long GREEN_GROUP_TYPE_ID = 159L;
+
+  public static final List<Long> getGroupTypeIdsForAssigneeChangeEmail() {
+    return Arrays.asList(PRIME_CORPORATE_GROUP_TYPE_ID, GREEN_GROUP_TYPE_ID);
+  }
 }

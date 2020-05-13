@@ -113,6 +113,8 @@ public class EventTriggerService {
         rtoService.processRTOAsigneeChangeEvent(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
+        break;
       case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
       case TICKET_CC_NEW_PERSON_ADDITION:
