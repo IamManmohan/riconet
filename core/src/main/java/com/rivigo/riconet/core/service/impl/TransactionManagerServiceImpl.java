@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.oauth2.resource.service.SsoService;
@@ -119,18 +120,18 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   }
 
   @Override
-  public void syncExclusion(Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap) {
+  public void syncExclusion(
+      Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap,
+      Map<Long, PaymentDetailV2> cnIdToPaymentDetailV2Map) {
     if (MapUtils.isEmpty(cnIdToConsignmentMap)) {
       return;
     }
-    List<PaymentDetailV2> paymentDetailV2s =
-        paymentDetailV2Service.getByConsignmentIdIn(cnIdToConsignmentMap.keySet());
     Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap =
         consignmentScheduleService.getActivePlansMapByIds(cnIdToConsignmentMap.keySet());
     Map<Long, Location> locationMap = locationService.getLocationMap();
 
     buildRequestDtoAndSendEvents(
-        paymentDetailV2s,
+        Lists.newArrayList(cnIdToPaymentDetailV2Map.values()),
         cnIdToConsignmentMap,
         consignmentScheduleMap,
         locationMap,
