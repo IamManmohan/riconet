@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.service.DepositSlipService;
 import com.rivigo.riconet.core.service.HandoverCollectionService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
+import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
@@ -63,6 +64,8 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
+  private final TransactionManagerService transactionManagerService;
+
   /**
    * Parse this payload to HandoverCollectionEventPayload, Get location dto for the location code,
    * create ZoomBookTransactionRequestDTO and hit the zoombook for creating transaction This
@@ -98,6 +101,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
+
+    try {
+      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
+    } catch (Exception e) {
+      log.error("Could not sync post/unpost to transaction manager - ", e);
+    }
   }
 
   private ZoomBookTransactionType getTransactionType(ZoomEventType eventType) {
@@ -182,6 +191,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         "Making zoom backend markRecoveryPendingV2 API calls for payload: {}",
         chequeBounceDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
+
+    try {
+      transactionManagerService.syncExclusion(cnIdToConsignmentMap);
+    } catch (Exception e) {
+      log.error("Could not sync exclusion to transaction manager - ", e);
+    }
   }
 
   private Location getLocation(String code) {

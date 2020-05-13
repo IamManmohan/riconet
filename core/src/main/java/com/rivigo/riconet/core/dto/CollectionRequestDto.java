@@ -2,9 +2,15 @@ package com.rivigo.riconet.core.dto;
 
 import com.rivigo.riconet.core.enums.CollectionEventType;
 import com.rivigo.zoom.common.enums.PaymentMode;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CollectionRequestDto {
 
   private Long consignmentId;
