@@ -95,6 +95,11 @@ public class PickupServiceImpl implements PickupService {
   }
 
   @Override
+  public List<Pickup> getPickups(List<Long> pickupIds) {
+    return pickupRepository.findByIdIn(pickupIds);
+  }
+
+  @Override
   public void processPickupNotificationDTOList(
       List<PickupNotificationDTO> pickupNotificationDTOList) {
     if (CollectionUtils.isEmpty(pickupNotificationDTOList)) {

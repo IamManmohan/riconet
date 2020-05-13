@@ -14,15 +14,19 @@ import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
+import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.TransactionManagerService;
+import com.rivigo.riconet.core.service.TransportationPartnerMappingService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
+import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
+import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
@@ -31,8 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +52,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
@@ -74,6 +81,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
 
   private final LocationService locationService;
 
+  private final PickupService pickupService;
+
   private final PaymentDetailV2Service paymentDetailV2Service;
 
   private final ConsignmentScheduleService consignmentScheduleService;
@@ -81,6 +90,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
   private final ConsignmentDepositSlipRepository consignmentDepositSlipRepository;
+
+  private final TransportationPartnerMappingService transportationPartnerMappingService;
 
   @Override
   public void hitTransactionManagerAndLogResponse(
@@ -129,13 +140,56 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap =
         consignmentScheduleService.getActivePlansMapByIds(cnIdToConsignmentMap.keySet());
     Map<Long, Location> locationMap = locationService.getLocationMap();
+    Map<Long, String> pickupToUser =
+        getUserByPickupId(
+            cnIdToConsignmentMap
+                .values()
+                .stream()
+                .map(ConsignmentReadOnly::getPickupId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+    Map<Long, String> drsToUser =
+        getUserByDRSId(
+            cnIdToConsignmentMap
+                .values()
+                .stream()
+                .map(ConsignmentReadOnly::getDrsId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
 
     buildRequestDtoAndSendEvents(
         Lists.newArrayList(cnIdToPaymentDetailV2Map.values()),
         cnIdToConsignmentMap,
         consignmentScheduleMap,
         locationMap,
+        pickupToUser,
+        drsToUser,
         ZoomEventType.HANDOVER_COLLECTION_EXCLUDE);
+  }
+
+  private Map<Long, String> getUserByPickupId(List<Long> pickupIds) {
+    if (CollectionUtils.isEmpty(pickupIds)) return new HashMap<>();
+    List<Pickup> pickups = pickupService.getPickups(pickupIds);
+    List<Long> userIds =
+        pickups
+            .stream()
+            .map(Pickup::getUserId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    Map<Long, String> userEmailMap = userMasterService.getUserEmailMap(userIds);
+    return pickups
+        .stream()
+        .filter(p -> userEmailMap.containsKey(p.getUserId()))
+        .collect(Collectors.toMap(Pickup::getId, p -> userEmailMap.get(p.getUserId())));
+  }
+
+  private Map<Long, String> getUserByDRSId(List<Long> drsIds) {
+    if (CollectionUtils.isEmpty(drsIds)) return new HashMap<>();
+    Map<Long, Long> userIdByDrs = transportationPartnerMappingService.getUserIdByDrsId(drsIds);
+    Map<Long, String> userEmailMap = userMasterService.getUserEmailMap(userIdByDrs.values());
+    Map<Long, String> userByDsr = new HashMap<>();
+    userIdByDrs.forEach((dsrId, userId) -> userByDsr.put(dsrId, userEmailMap.get(userId)));
+    return userByDsr;
   }
 
   @Override
@@ -153,7 +207,13 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     Map<Long, Location> locationMap = locationService.getLocationMap();
 
     buildRequestDtoAndSendEvents(
-        paymentDetails, consignmentMap, consignmentScheduleMap, locationMap, zoomEventType);
+        paymentDetails,
+        consignmentMap,
+        consignmentScheduleMap,
+        locationMap,
+        Collections.emptyMap(),
+        Collections.emptyMap(),
+        zoomEventType);
   }
 
   private void buildRequestDtoAndSendEvents(
@@ -161,29 +221,43 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
       Map<Long, ConsignmentReadOnly> consignmentMap,
       Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap,
       Map<Long, Location> locationMap,
+      Map<Long, String> pickupToUser,
+      Map<Long, String> drsToUser,
       ZoomEventType zoomEventType) {
 
     List<CollectionRequestDto> collectionRequestDtos = new ArrayList<>();
     for (PaymentDetailV2 paymentDetailV2 : paymentDetails) {
-      ConsignmentReadOnly consignmentReadOnly =
-          consignmentMap.get(paymentDetailV2.getConsignmentId());
+      ConsignmentReadOnly consignment = consignmentMap.get(paymentDetailV2.getConsignmentId());
       CollectionRequestDto collectionRequestDto =
           CollectionRequestDto.builder()
-              .consignmentId(consignmentReadOnly.getId())
-              .cnote(consignmentReadOnly.getCnote())
-              .eventType(gettCollectionEventType(zoomEventType, paymentDetailV2.getPaymentType()))
+              .consignmentId(consignment.getId())
+              .cnote(consignment.getCnote())
+              .eventType(getCollectionEventType(zoomEventType, paymentDetailV2.getPaymentType()))
               .amount(paymentDetailV2.getTotalRoundOffAmount().longValue())
               .bankTransferPendingApproval(paymentDetailV2.getBankName())
               .paymentType(paymentDetailV2.getPaymentMode())
+              .captainCode(getCaptainCode(consignment, paymentDetailV2, pickupToUser, drsToUser))
               .build();
       collectionRequestDto =
           setLocationDetails(
-              collectionRequestDto,
-              consignmentScheduleMap.get(consignmentReadOnly.getId()),
-              locationMap);
+              collectionRequestDto, consignmentScheduleMap.get(consignment.getId()), locationMap);
       collectionRequestDtos.add(collectionRequestDto);
     }
     sendEventsToTransactionManager(collectionRequestDtos);
+  }
+
+  private String getCaptainCode(
+      ConsignmentReadOnly consignment,
+      PaymentDetailV2 paymentDetailV2,
+      Map<Long, String> pickupToUser,
+      Map<Long, String> drsToUser) {
+    if (paymentDetailV2.getPaymentMode() == PaymentMode.PAID) {
+      Long pickupId = consignment.getPickupId();
+      return pickupToUser.get(pickupId);
+    } else {
+      Long drsId = consignment.getDrsId();
+      return drsToUser.get(drsId);
+    }
   }
 
   private void sendEventsToTransactionManager(List<CollectionRequestDto> collectionRequestDtos) {
@@ -235,7 +309,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     return null;
   }
 
-  private CollectionEventType gettCollectionEventType(
+  private CollectionEventType getCollectionEventType(
       ZoomEventType zoomEventType, PaymentType paymentType) {
     if (zoomEventType == ZoomEventType.HANDOVER_COLLECTION_POST) {
       if (paymentType == PaymentType.CASH) {

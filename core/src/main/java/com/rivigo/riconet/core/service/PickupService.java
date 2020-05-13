@@ -12,6 +12,8 @@ public interface PickupService {
 
   Map<Long, Pickup> getPickupMapByIdIn(List<Long> pickupTripIdList);
 
+  List<Pickup> getPickups(List<Long> pickupIds);
+
   void processPickupNotificationDTOList(List<PickupNotificationDTO> pickupNotificationDTOList);
 
   void deductPickupCharges(NotificationDTO notificationDTO);
