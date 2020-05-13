@@ -16,4 +16,6 @@ public interface ConsignmentReadOnlyService {
   List<ConsignmentReadOnly> findByPickupId(Long pickupId);
 
   Map<Long, String> getCnIdToCnoteMap(List<Long> cnIds);
+
+  Map<Long, ConsignmentReadOnly> getConsignmentMap(List<Long> cnIds);
 }

@@ -7,6 +7,7 @@ import com.rivigo.zoom.exceptions.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,13 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
         .findByIdInAndIsActive(cnIds, 1)
         .stream()
         .collect(Collectors.toMap(ConsignmentReadOnly::getId, ConsignmentReadOnly::getCnote));
+  }
+
+  @Override
+  public Map<Long, ConsignmentReadOnly> getConsignmentMap(List<Long> cnIds) {
+    return consignmentRepo
+        .findByIdIn(cnIds)
+        .stream()
+        .collect(Collectors.toMap(ConsignmentReadOnly::getId, Function.identity()));
   }
 }

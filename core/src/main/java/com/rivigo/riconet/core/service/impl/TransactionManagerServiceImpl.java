@@ -2,11 +2,14 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
+import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.CollectionRequestDto;
 import com.rivigo.riconet.core.enums.CollectionEventType;
+import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
@@ -21,6 +24,7 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
+import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +77,10 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
 
   private final ConsignmentScheduleService consignmentScheduleService;
 
+  private final ConsignmentReadOnlyService consignmentReadOnlyService;
+
+  private final ConsignmentDepositSlipRepository consignmentDepositSlipRepository;
+
   @Override
   public void hitTransactionManagerAndLogResponse(
       @NonNull CollectionRequestDto collectionRequestDto) {
@@ -121,15 +129,48 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
         consignmentScheduleService.getActivePlansMapByIds(cnIdToConsignmentMap.keySet());
     Map<Long, Location> locationMap = locationService.getLocationMap();
 
+    buildRequestDtoAndSendEvents(
+        paymentDetailV2s,
+        cnIdToConsignmentMap,
+        consignmentScheduleMap,
+        locationMap,
+        ZoomEventType.HANDOVER_COLLECTION_EXCLUDE);
+  }
+
+  @Override
+  public void syncPostUnpost(
+      HandoverCollectionEventPayload handoverCollectionEventPayload, ZoomEventType zoomEventType) {
+    List<Long> consignmentIds =
+        consignmentDepositSlipRepository.findConsignmentIdByDepositSlipId(
+            handoverCollectionEventPayload.getDepositSlipId());
+    Map<Long, ConsignmentReadOnly> consignmentMap =
+        consignmentReadOnlyService.getConsignmentMap(consignmentIds);
+    List<PaymentDetailV2> paymentDetails =
+        paymentDetailV2Service.getByConsignmentIdIn(consignmentIds);
+    Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap =
+        consignmentScheduleService.getActivePlansMapByIds(consignmentIds);
+    Map<Long, Location> locationMap = locationService.getLocationMap();
+
+    buildRequestDtoAndSendEvents(
+        paymentDetails, consignmentMap, consignmentScheduleMap, locationMap, zoomEventType);
+  }
+
+  private void buildRequestDtoAndSendEvents(
+      List<PaymentDetailV2> paymentDetails,
+      Map<Long, ConsignmentReadOnly> consignmentMap,
+      Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap,
+      Map<Long, Location> locationMap,
+      ZoomEventType zoomEventType) {
+
     List<CollectionRequestDto> collectionRequestDtos = new ArrayList<>();
-    for (PaymentDetailV2 paymentDetailV2 : paymentDetailV2s) {
+    for (PaymentDetailV2 paymentDetailV2 : paymentDetails) {
       ConsignmentReadOnly consignmentReadOnly =
-          cnIdToConsignmentMap.get(paymentDetailV2.getConsignmentId());
+          consignmentMap.get(paymentDetailV2.getConsignmentId());
       CollectionRequestDto collectionRequestDto =
           CollectionRequestDto.builder()
               .consignmentId(consignmentReadOnly.getId())
               .cnote(consignmentReadOnly.getCnote())
-              .eventType(getExclusionEventType(paymentDetailV2.getPaymentType()))
+              .eventType(gettCollectionEventType(zoomEventType, paymentDetailV2.getPaymentType()))
               .amount(paymentDetailV2.getTotalRoundOffAmount().longValue())
               .bankTransferPendingApproval(paymentDetailV2.getBankName())
               .paymentType(paymentDetailV2.getPaymentMode())
@@ -193,10 +234,29 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     return null;
   }
 
-  private CollectionEventType getExclusionEventType(PaymentType paymentType) {
-    if (paymentType == PaymentType.CHEQUE) {
-      return CollectionEventType.CHEQUE_BOUNCE;
+  private CollectionEventType gettCollectionEventType(
+      ZoomEventType zoomEventType, PaymentType paymentType) {
+    if (zoomEventType == ZoomEventType.HANDOVER_COLLECTION_POST) {
+      if (paymentType == PaymentType.CASH) {
+        return CollectionEventType.KNOCK_OFF_CASH;
+      } else if (paymentType == PaymentType.CHEQUE) {
+        return CollectionEventType.KNOCK_OFF_CHEQUE;
+      } else {
+        return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
+      }
+    } else if (zoomEventType == ZoomEventType.HANDOVER_COLLECTION_UNPOST) {
+      if (paymentType == PaymentType.CASH) {
+        return CollectionEventType.KNOCK_OFF_CASH;
+      } else if (paymentType == PaymentType.CHEQUE) {
+        return CollectionEventType.KNOCK_OFF_CHEQUE;
+      } else {
+        return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
+      }
+    } else {
+      if (paymentType == PaymentType.CHEQUE) {
+        return CollectionEventType.CHEQUE_BOUNCE;
+      }
+      return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
     }
-    return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
   }
 }
