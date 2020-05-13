@@ -242,15 +242,15 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
       } else if (paymentType == PaymentType.CHEQUE) {
         return CollectionEventType.KNOCK_OFF_CHEQUE;
       } else {
-        return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
+        return CollectionEventType.KNOCK_OFF_BANK_TRANSFER;
       }
     } else if (zoomEventType == ZoomEventType.HANDOVER_COLLECTION_UNPOST) {
       if (paymentType == PaymentType.CASH) {
-        return CollectionEventType.KNOCK_OFF_CASH;
+        return CollectionEventType.KNOCK_OFF_REVERT_CASH;
       } else if (paymentType == PaymentType.CHEQUE) {
-        return CollectionEventType.KNOCK_OFF_CHEQUE;
+        return CollectionEventType.KNOCK_OFF_REVERT_CHEQUE;
       } else {
-        return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
+        return CollectionEventType.KNOCK_OFF_REVERT_BANK_TRANSFER;
       }
     } else {
       if (paymentType == PaymentType.CHEQUE) {
