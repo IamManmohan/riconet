@@ -6,15 +6,33 @@ import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.CollectionRequestDto;
+import com.rivigo.riconet.core.enums.CollectionEventType;
+import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.riconet.core.service.LocationService;
+import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.UserMasterService;
+import com.rivigo.zoom.common.enums.LocationTag;
+import com.rivigo.zoom.common.enums.LocationTypeV2;
+import com.rivigo.zoom.common.enums.PaymentType;
+import com.rivigo.zoom.common.model.ConsignmentReadOnly;
+import com.rivigo.zoom.common.model.ConsignmentSchedule;
+import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.model.User;
+import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,6 +66,12 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   private String transactionManagerBaseUrl;
 
   private final AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
+
+  private final LocationService locationService;
+
+  private final PaymentDetailV2Service paymentDetailV2Service;
+
+  private final ConsignmentScheduleService consignmentScheduleService;
 
   @Override
   public void hitTransactionManagerAndLogResponse(
@@ -84,5 +108,95 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
         HttpMethod.POST,
         httpHeaders,
         String.class);
+  }
+
+  @Override
+  public void syncExclusion(Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap) {
+    if (MapUtils.isEmpty(cnIdToConsignmentMap)) {
+      return;
+    }
+    List<PaymentDetailV2> paymentDetailV2s =
+        paymentDetailV2Service.getByConsignmentIdIn(cnIdToConsignmentMap.keySet());
+    Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap =
+        consignmentScheduleService.getActivePlansMapByIds(cnIdToConsignmentMap.keySet());
+    Map<Long, Location> locationMap = locationService.getLocationMap();
+
+    List<CollectionRequestDto> collectionRequestDtos = new ArrayList<>();
+    for (PaymentDetailV2 paymentDetailV2 : paymentDetailV2s) {
+      ConsignmentReadOnly consignmentReadOnly =
+          cnIdToConsignmentMap.get(paymentDetailV2.getConsignmentId());
+      CollectionRequestDto collectionRequestDto =
+          CollectionRequestDto.builder()
+              .consignmentId(consignmentReadOnly.getId())
+              .cnote(consignmentReadOnly.getCnote())
+              .eventType(getExclusionEventType(paymentDetailV2.getPaymentType()))
+              .amount(paymentDetailV2.getTotalRoundOffAmount().longValue())
+              .bankTransferPendingApproval(paymentDetailV2.getBankName())
+              .paymentType(paymentDetailV2.getPaymentMode())
+              .build();
+      collectionRequestDto =
+          setLocationDetails(
+              collectionRequestDto,
+              consignmentScheduleMap.get(consignmentReadOnly.getId()),
+              locationMap);
+      collectionRequestDtos.add(collectionRequestDto);
+    }
+    sendEventsToTransactionManager(collectionRequestDtos);
+  }
+
+  private void sendEventsToTransactionManager(List<CollectionRequestDto> collectionRequestDtos) {
+    for (CollectionRequestDto collectionRequestDto : collectionRequestDtos) {
+      try {
+        hitTransactionManagerAndLogResponse(collectionRequestDto);
+      } catch (Exception e) {
+        log.error(
+            "Error communicating with transaction manager for {}. Error - ",
+            collectionRequestDto,
+            e);
+      }
+    }
+  }
+
+  private CollectionRequestDto setLocationDetails(
+      CollectionRequestDto collectionRequestDto,
+      List<ConsignmentSchedule> consignmentSchedules,
+      Map<Long, Location> locationMap) {
+    consignmentSchedules =
+        consignmentSchedules
+            .stream()
+            .filter(p -> LocationTypeV2.LOCATION.equals(p.getLocationType()))
+            .filter(
+                p -> !Arrays.asList(LocationTag.BF, LocationTag.DF).contains(p.getLocationTag()))
+            .collect(Collectors.toList());
+
+    consignmentSchedules
+        .stream()
+        .min(Comparator.comparing(ConsignmentSchedule::getSequence))
+        .ifPresent(
+            start ->
+                collectionRequestDto.setPickupOuCode(
+                    getLocationCode(locationMap, start.getLocationId())));
+    consignmentSchedules
+        .stream()
+        .max(Comparator.comparing(ConsignmentSchedule::getSequence))
+        .ifPresent(
+            end ->
+                collectionRequestDto.setDeliveryOuCode(
+                    getLocationCode(locationMap, end.getLocationId())));
+    return collectionRequestDto;
+  }
+
+  private String getLocationCode(Map<Long, Location> locationMap, Long locationId) {
+    if (locationMap.containsKey(locationId)) {
+      return locationMap.get(locationId).getCode();
+    }
+    return null;
+  }
+
+  private CollectionEventType getExclusionEventType(PaymentType paymentType) {
+    if (paymentType == PaymentType.CHEQUE) {
+      return CollectionEventType.CHEQUE_BOUNCE;
+    }
+    return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
   }
 }

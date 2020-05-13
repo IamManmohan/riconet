@@ -18,7 +18,7 @@ public class TransactionManagerEventService {
 
   private final ObjectMapper objectMapper;
 
-  String COLLECTIONS_PAYLOAD = "collectionPayload";
+  private static String COLLECTIONS_PAYLOAD = "collectionPayload";
 
   public void processNotification(NotificationDTO notificationDTO) {
     if (notificationDTO.getMetadata().containsKey(COLLECTIONS_PAYLOAD)) {
