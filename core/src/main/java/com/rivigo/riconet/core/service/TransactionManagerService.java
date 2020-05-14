@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service;
 
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
-import com.rivigo.riconet.core.dto.CollectionRequestDto;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
 import java.util.Map;
@@ -10,7 +9,7 @@ import lombok.NonNull;
 
 public interface TransactionManagerService {
 
-  void hitTransactionManagerAndLogResponse(@NonNull CollectionRequestDto collectionRequestDto);
+  void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString);
 
   void syncExclusion(
       Map<Long, ConsignmentReadOnly> cnIdToConsignmentMap,

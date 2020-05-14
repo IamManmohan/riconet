@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
@@ -94,8 +93,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   private final TransportationPartnerMappingService transportationPartnerMappingService;
 
   @Override
-  public void hitTransactionManagerAndLogResponse(
-      @NonNull CollectionRequestDto collectionRequestDto) {
+  public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
 
     User user = userMasterService.getByEmail(ssoUsername);
 
@@ -112,16 +110,11 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     headers.add("userId", user.getId().toString());
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String requestJson = null;
-    try {
-      requestJson = objectMapper.writeValueAsString(collectionRequestDto);
-    } catch (JsonProcessingException e) {
-      log.error("Could not convert to string collectionRequestDto: {}", collectionRequestDto);
-    }
+    HttpEntity httpHeaders = new HttpEntity<>(collectionRequestDtoJsonString, headers);
 
-    HttpEntity httpHeaders = new HttpEntity<>(requestJson, headers);
-
-    log.debug("Hitting transaction manager with collectionRequestDto: {}", collectionRequestDto);
+    log.debug(
+        "Hitting transaction manager with collectionRequestDto: {}",
+        collectionRequestDtoJsonString);
 
     restClientUtilityService.executeRest(
         transactionManagerBaseUrl + UrlConstant.TRANSACTION_MANAGER_URL,
@@ -263,7 +256,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   private void sendEventsToTransactionManager(List<CollectionRequestDto> collectionRequestDtos) {
     for (CollectionRequestDto collectionRequestDto : collectionRequestDtos) {
       try {
-        hitTransactionManagerAndLogResponse(collectionRequestDto);
+        String requestJsonString = objectMapper.writeValueAsString(collectionRequestDto);
+        hitTransactionManagerAndLogResponse(requestJsonString);
       } catch (Exception e) {
         log.error(
             "Error communicating with transaction manager for {}. Error - ",
