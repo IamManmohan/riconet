@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
+import com.rivigo.finance.utils.StringUtils;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
@@ -30,6 +31,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,6 +97,42 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Override
   public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
 
+    HttpEntity httpEntity = new HttpEntity<>(collectionRequestDtoJsonString, buildHttpHeaders());
+
+    log.debug(
+        "Hitting transaction manager with collectionRequestDto: {}",
+        collectionRequestDtoJsonString);
+
+    restClientUtilityService.executeRest(
+        transactionManagerBaseUrl + UrlConstant.TRANSACTION_MANAGER_URL,
+        HttpMethod.POST,
+        httpEntity,
+        String.class);
+  }
+
+  @Override
+  public void rollbackTransactionsAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
+
+    HttpEntity httpEntity = new HttpEntity<>(buildHttpHeaders());
+    String reference = extractReference(collectionRequestDtoJsonString);
+
+    if (StringUtils.isEmpty(reference)) {
+      return;
+    }
+    log.debug(
+        "Hitting transaction manager with collectionRequestDto: {}",
+        collectionRequestDtoJsonString);
+
+    restClientUtilityService.executeRest(
+        transactionManagerBaseUrl
+            + UrlConstant.TRANSACTION_MANAGER_REFERENCE_ROLLBACK_ENDPOINT
+            + reference,
+        HttpMethod.DELETE,
+        httpEntity,
+        String.class);
+  }
+
+  private HttpHeaders buildHttpHeaders() {
     User user = userMasterService.getByEmail(ssoUsername);
 
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
@@ -109,18 +147,21 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     headers.add("token", token);
     headers.add("userId", user.getId().toString());
     headers.setContentType(MediaType.APPLICATION_JSON);
+    return headers;
+  }
 
-    HttpEntity httpHeaders = new HttpEntity<>(collectionRequestDtoJsonString, headers);
-
-    log.debug(
-        "Hitting transaction manager with collectionRequestDto: {}",
-        collectionRequestDtoJsonString);
-
-    restClientUtilityService.executeRest(
-        transactionManagerBaseUrl + UrlConstant.TRANSACTION_MANAGER_URL,
-        HttpMethod.POST,
-        httpHeaders,
-        String.class);
+  private String extractReference(String collectionRequestDtoString) {
+    CollectionRequestDto requestDto = null;
+    try {
+      requestDto = objectMapper.readValue(collectionRequestDtoString, CollectionRequestDto.class);
+      return requestDto.getCnote();
+    } catch (IOException e) {
+      log.error(
+          "Could not parse collection request dto from {}. Error - ",
+          collectionRequestDtoString,
+          e);
+    }
+    return StringUtils.EMPTY_STRING;
   }
 
   @Override
