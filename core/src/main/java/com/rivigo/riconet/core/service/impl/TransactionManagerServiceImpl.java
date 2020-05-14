@@ -362,11 +362,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
       } else {
         return CollectionEventType.KNOCK_OFF_REVERT_BANK_TRANSFER;
       }
-    } else {
-      if (paymentType == PaymentType.CHEQUE) {
-        return CollectionEventType.CHEQUE_BOUNCE;
-      }
-      return CollectionEventType.CHEQUE_BOUNCE_BANK_TRANSFER;
     }
+    return CollectionEventType.CHEQUE_BOUNCE;
   }
 }
