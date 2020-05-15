@@ -108,7 +108,7 @@ public abstract class ConsumerModel {
 
   public abstract void processMessage(String str) throws IOException;
 
-  private void processError(ConsumerMessage consumerMessage, String errorMsg) {
+  protected void processError(ConsumerMessage consumerMessage, String errorMsg) {
     log.error("Processing error for payload {}", consumerMessage.toString());
     if (consumerMessage.getRetryCount() < getNumRetries()) {
       consumerMessage.setLastUpdatedAt(DateTime.now().getMillis());
@@ -123,7 +123,7 @@ public abstract class ConsumerModel {
     }
   }
 
-  private void processFirstTimeError(String message, String errorMsg) {
+  protected void processFirstTimeError(String message, String errorMsg) {
     log.error("Processing first time error: {}", errorMsg);
     ConsumerMessage consumerMessage = new ConsumerMessage();
     String uuid = UUID.randomUUID().toString().replace("-", "");
