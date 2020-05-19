@@ -66,6 +66,13 @@ public class TicketingServiceImpl implements TicketingService {
       return;
     }
     log.info("Event Metadata : {} ", metadata);
+    if (!this.emailUpdateRequired(eventName, metadata)) {
+      log.info(
+          "Email update not required for Event: {} EventUID: {} ",
+          eventName,
+          notificationDTO.getEventUID());
+      return;
+    }
     Optional<List<String>> toRecipients = this.getRecipients(eventName, metadata);
     String subject = this.getSubject(eventName, metadata);
     String body = this.getBody(eventName, metadata);
@@ -108,6 +115,29 @@ public class TicketingServiceImpl implements TicketingService {
       log.info("Auto closing ticket");
       closeTicket(ticketDTO, actionClosureMessage);
     }
+  }
+
+  private boolean emailUpdateRequired(EventName eventName, Map<String, String> metadata) {
+    switch (eventName) {
+      case TICKET_CREATION:
+      case TICKET_STATUS_CHANGE:
+      case TICKET_ESCALATION_CHANGE:
+      case TICKET_SEVERITY_CHANGE:
+      case TICKET_COMMENT_CREATION:
+      case TICKET_CC_NEW_PERSON_ADDITION:
+        return false;
+      case TICKET_ASSIGNEE_CHANGE:
+        return TicketingEmailTemplateHelper.getValueFromMap(
+                metadata, TicketingFieldName.GROUP_TYPE_ID)
+            .filter(
+                s ->
+                    ZoomTicketingConstant.groupTypeIdsForAssigneeChangeEmail.contains(
+                        Long.valueOf(s)))
+            .isPresent();
+      default:
+        log.info(" Email update not required for event : {}", eventName);
+    }
+    return false;
   }
 
   private Optional<List<String>> getRecipients(EventName eventName, Map<String, String> metadata) {
