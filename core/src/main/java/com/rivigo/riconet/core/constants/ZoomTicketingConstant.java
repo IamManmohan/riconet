@@ -1,6 +1,6 @@
 package com.rivigo.riconet.core.constants;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 public class ZoomTicketingConstant {
@@ -70,7 +70,6 @@ public class ZoomTicketingConstant {
 
   public static final Long GREEN_GROUP_TYPE_ID = 159L;
 
-  public static final List<Long> getGroupTypeIdsForAssigneeChangeEmail() {
-    return Arrays.asList(PRIME_CORPORATE_GROUP_TYPE_ID, GREEN_GROUP_TYPE_ID);
-  }
+  public static final List<Long> groupTypeIdsForAssigneeChangeEmail =
+      ImmutableList.of(PRIME_CORPORATE_GROUP_TYPE_ID, GREEN_GROUP_TYPE_ID);
 }

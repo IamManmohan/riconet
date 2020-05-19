@@ -113,14 +113,12 @@ public class EventTriggerService {
         rtoService.processRTOAsigneeChangeEvent(notificationDTO);
         break;
       case TICKET_ASSIGNEE_CHANGE:
-        ticketingService.sendTicketingEventsEmail(notificationDTO);
-        break;
       case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
       case TICKET_CC_NEW_PERSON_ADDITION:
       case TICKET_SEVERITY_CHANGE:
       case TICKET_COMMENT_CREATION:
-        //        ticketingService.sendTicketingEventsEmail(notificationDTO);
+        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case CONSIGNMENT_EWAYBILL_METADATA_CREATION_ADDRESS_CLEANUP:
         //        datastoreService.cleanupAddressesUsingEwaybillMetadata(notificationDTO);

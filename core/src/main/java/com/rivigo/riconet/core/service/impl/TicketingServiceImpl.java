@@ -131,8 +131,8 @@ public class TicketingServiceImpl implements TicketingService {
                 metadata, TicketingFieldName.GROUP_TYPE_ID)
             .filter(
                 s ->
-                    ZoomTicketingConstant.getGroupTypeIdsForAssigneeChangeEmail()
-                        .contains(Long.valueOf(s)))
+                    ZoomTicketingConstant.groupTypeIdsForAssigneeChangeEmail.contains(
+                        Long.valueOf(s)))
             .isPresent();
       default:
         log.info(" Email update not required for event : {}", eventName);
