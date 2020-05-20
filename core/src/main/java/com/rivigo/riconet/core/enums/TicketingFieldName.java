@@ -33,6 +33,7 @@ public enum TicketingFieldName {
   OWNER_GROUP_NAME_OR_OWNER_EMAIL, // if owner_type = 'GROUP' then groupName else owner_email
   S3URL,
   TICKET_TYPE,
+  GROUP_TYPE_ID,
   COMMENT_TEXT,
   COMMENTOR_EMAIL,
   SLA,
