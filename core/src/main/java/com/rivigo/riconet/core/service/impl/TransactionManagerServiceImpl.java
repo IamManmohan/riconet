@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -254,7 +255,9 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @return map of pickup id to user mapping.
    */
   private Map<Long, String> getUserByPickupId(List<Long> pickupIds) {
-    if (CollectionUtils.isEmpty(pickupIds)) return new HashMap<>();
+    if (CollectionUtils.isEmpty(pickupIds)) {
+      return new HashMap<>();
+    }
     final List<Pickup> pickups = pickupService.getPickups(pickupIds);
     final List<Long> userIds =
         pickups
@@ -276,11 +279,13 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @return map of drs id to user mapping.
    */
   private Map<Long, String> getUserByDRSId(List<Long> drsIds) {
-    if (CollectionUtils.isEmpty(drsIds)) return new HashMap<>();
+    if (CollectionUtils.isEmpty(drsIds)) {
+      return new HashMap<>();
+    }
     final Map<Long, Long> userIdByDrs =
         transportationPartnerMappingService.getUserIdByDrsId(drsIds);
     final Map<Long, String> userEmailMap = userMasterService.getUserEmailMap(userIdByDrs.values());
-    final Map<Long, String> userByDsr = new HashMap<>();
+    final Map<Long, String> userByDsr = new ConcurrentHashMap<>();
     userIdByDrs.forEach((dsrId, userId) -> userByDsr.put(dsrId, userEmailMap.get(userId)));
     return userByDsr;
   }
@@ -339,7 +344,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     final List<CollectionRequestDto> collectionRequestDtos = new ArrayList<>();
     for (final PaymentDetailV2 paymentDetailV2 : paymentDetails) {
       ConsignmentReadOnly consignment = consignmentMap.get(paymentDetailV2.getConsignmentId());
-      CollectionRequestDto collectionRequestDto =
+      final CollectionRequestDto collectionRequestDto =
           CollectionRequestDto.builder()
               .consignmentId(consignment.getId())
               .cnote(consignment.getCnote())
@@ -406,11 +411,11 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @param locationMap location id to location mapping.
    * @return enriched collection request dto.
    */
-  private CollectionRequestDto setLocationDetails(
+  private static CollectionRequestDto setLocationDetails(
       CollectionRequestDto collectionRequestDto,
       List<ConsignmentSchedule> consignmentSchedules,
       Map<Long, Location> locationMap) {
-    List<ConsignmentSchedule> filteredConsignmentSchedules =
+    final List<ConsignmentSchedule> filteredConsignmentSchedules =
         consignmentSchedules
             .stream()
             .filter(p -> LocationTypeV2.LOCATION == p.getLocationType())
