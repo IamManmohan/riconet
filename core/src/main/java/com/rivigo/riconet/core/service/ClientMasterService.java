@@ -9,4 +9,6 @@ public interface ClientMasterService {
   Client getClientByCode(String code);
 
   void createUpdateClient(String dto);
+
+  void updateEpodDetails(String payload);
 }

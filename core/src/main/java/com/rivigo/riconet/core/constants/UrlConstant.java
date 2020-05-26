@@ -75,4 +75,8 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_MARK_DELIVERED =
       "/operations/consignments/cndeliver/{cnote}";
+
+  public static final String ZOOM_BACKEND_UPLOAD_EPOD = "/epod/uploadPod";
+
+  public static final String ZOOM_BACKEND_EPOD_FLAG = "/epod/updateEpodFlag";
 }

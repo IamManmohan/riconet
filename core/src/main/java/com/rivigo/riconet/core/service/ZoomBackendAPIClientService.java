@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.EpodApplicableDTO;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
@@ -70,4 +71,8 @@ public interface ZoomBackendAPIClientService {
    * @param cnote for generating invoice.
    */
   void generateInvoice(String cnote);
+
+  JsonNode uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO);
+
+  void updateEpodDetails(EpodApplicableDTO epodApplicableDTO);
 }
