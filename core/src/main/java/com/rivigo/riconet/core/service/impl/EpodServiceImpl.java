@@ -8,11 +8,10 @@ import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Slf4j
 @Service
