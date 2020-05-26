@@ -17,4 +17,6 @@ public interface TransactionManagerService {
 
   void syncPostUnpost(
       HandoverCollectionEventPayload handoverCollectionEventPayload, ZoomEventType eventType);
+
+  void rollbackTransactionsAndLogResponse(@NonNull String collectionRequestDtoJsonString);
 }

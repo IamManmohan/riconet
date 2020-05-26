@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.TransactionManagerEventNames;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,15 @@ public class TransactionManagerEventService {
 
   public void processNotification(NotificationDTO notificationDTO) {
     if (notificationDTO.getMetadata().containsKey(COLLECTIONS_PAYLOAD)) {
-      transactionManagerService.hitTransactionManagerAndLogResponse(
-          notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD));
+      if (TransactionManagerEventNames.CN_INVALIDATION_COLLECTIONS
+          .name()
+          .equals(notificationDTO.getEventName())) {
+        transactionManagerService.rollbackTransactionsAndLogResponse(
+            notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD));
+      } else {
+        transactionManagerService.hitTransactionManagerAndLogResponse(
+            notificationDTO.getMetadata().get(COLLECTIONS_PAYLOAD));
+      }
     } else {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
     }

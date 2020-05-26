@@ -58,6 +58,9 @@ public class UrlConstant {
 
   public static final String TRANSACTION_MANAGER_URL = "/transaction";
 
+  public static final String TRANSACTION_MANAGER_REFERENCE_ROLLBACK_ENDPOINT =
+      "/transaction/reference/";
+
   public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
       "/operations/retail/collections/handover/markRecoveryPending";
 
