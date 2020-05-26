@@ -1,9 +1,6 @@
 package com.rivigo.riconet.event.consumer;
 
 import akka.Done;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.ConsumerMessage;
 import com.rivigo.riconet.core.dto.NotificationDTO;
@@ -11,7 +8,6 @@ import com.rivigo.riconet.core.enums.TransactionManagerEventNames;
 import com.rivigo.riconet.core.service.TransactionManagerEventService;
 import com.rivigo.riconet.core.utils.MDCUtils;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
