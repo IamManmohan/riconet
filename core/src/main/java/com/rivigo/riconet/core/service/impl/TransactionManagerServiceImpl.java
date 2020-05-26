@@ -106,8 +106,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
 
     HttpHeaders headers = new HttpHeaders();
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    headers.add("token", token);
-    headers.add("userId", user.getId().toString());
+    headers.add("Token", token);
+    headers.add("User-Id", user.getId().toString());
     headers.setContentType(MediaType.APPLICATION_JSON);
 
     HttpEntity httpHeaders = new HttpEntity<>(collectionRequestDtoJsonString, headers);
