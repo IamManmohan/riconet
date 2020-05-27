@@ -3,11 +3,11 @@ package com.rivigo.riconet.core.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Created by Nikhil Rawat on 26/05/20. */
+/** @author Nikhil Rawat on 26/05/20. DTO for toggling epodApplicable flag on clinet */
 @Getter
 @Setter
-public class EpodApplicableDTO {
+public class EpodApplicableDto {
   private String clientCode;
-  private String ServiceType;
+  private String serviceType;
   private String epodRequirement;
 }

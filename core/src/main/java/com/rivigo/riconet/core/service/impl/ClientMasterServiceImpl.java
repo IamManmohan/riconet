@@ -7,7 +7,7 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
-import com.rivigo.riconet.core.dto.EpodApplicableDTO;
+import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
@@ -283,14 +283,14 @@ public class ClientMasterServiceImpl implements ClientMasterService {
 
   @Override
   public void updateEpodDetails(String payload) {
-    EpodApplicableDTO epodApplicableDTO = getEpodApplicableDto(payload);
+    EpodApplicableDto epodApplicableDTO = getEpodApplicableDto(payload);
     zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
   }
 
-  private EpodApplicableDTO getEpodApplicableDto(String dtoString) {
-    EpodApplicableDTO epodApplicableDTO;
+  private EpodApplicableDto getEpodApplicableDto(String dtoString) {
+    EpodApplicableDto epodApplicableDTO;
     try {
-      epodApplicableDTO = objectMapper.readValue(dtoString, EpodApplicableDTO.class);
+      epodApplicableDTO = objectMapper.readValue(dtoString, EpodApplicableDto.class);
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", dtoString, ex);
       return null;

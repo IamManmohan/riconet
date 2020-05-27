@@ -2,8 +2,9 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.constants.EpodConstants;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
-import com.rivigo.riconet.core.dto.EpodPreparedDTO;
+import com.rivigo.riconet.core.dto.EpodPreparedDto;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -25,24 +26,25 @@ public class EpodServiceImpl implements EpodService {
 
   @Override
   public JsonNode uploadEpod(String json) {
-    EpodPreparedDTO epodPreparedDTO = getEpodPreapredDTO(json);
-    if (epodPreparedDTO != null) {
-      ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO = new ConsignmentUploadedFilesDTO();
+    final EpodPreparedDto epodPreparedDTO = getEpodPreapredDTO(json);
+    if (epodPreparedDTO == null) {
+      throw new ZoomException("EpodPreparedDTO cannot be null or empty.");
+    } else {
+      final ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO =
+          new ConsignmentUploadedFilesDTO();
       consignmentUploadedFilesDTO.setS3URL(epodPreparedDTO.getUrl());
       consignmentUploadedFilesDTO.setConsignmentId(
           consignmentService.getIdByCnote(epodPreparedDTO.getIdentifier()));
       consignmentUploadedFilesDTO.setFileName(epodPreparedDTO.getIdentifier());
-      consignmentUploadedFilesDTO.setFileTypes("EPOD");
+      consignmentUploadedFilesDTO.setFileTypes(EpodConstants.EPOD);
       return zoomBackendAPIClientService.uploadEpod(consignmentUploadedFilesDTO);
-    } else {
-      throw new ZoomException("EpodPreparedDTO cannot be null or empty.");
     }
   }
 
-  private EpodPreparedDTO getEpodPreapredDTO(String json) {
-    EpodPreparedDTO epodPreparedDTO;
+  private EpodPreparedDto getEpodPreapredDTO(String json) {
+    EpodPreparedDto epodPreparedDTO;
     try {
-      epodPreparedDTO = objectMapper.readValue(json, EpodPreparedDTO.class);
+      epodPreparedDTO = objectMapper.readValue(json, EpodPreparedDto.class);
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", json, ex);
       return null;

@@ -30,6 +30,12 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
+  /**
+   * This service is used for uploading epod link.
+   *
+   * @param json string which is converted to consignmentUploadedFilesDTO for further api calls.
+   * @return upload the s3 url for the epod in consignment_uploaded_files.
+   */
   @Autowired private EpodService epodService;
 
   @Override
