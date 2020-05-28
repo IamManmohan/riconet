@@ -9,5 +9,5 @@ import lombok.Setter;
 public class EpodApplicableDto {
   private String clientCode;
   private String serviceType;
-  private String epodRequirement;
+  private String electronicPODApplicability;
 }
