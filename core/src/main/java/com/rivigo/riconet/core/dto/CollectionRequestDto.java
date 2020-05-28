@@ -19,6 +19,7 @@ public class CollectionRequestDto {
   private Long amount;
   private String pickupOuCode;
   private String bankTransferPendingApproval;
+  private String oldBankTransferPendingApproval;
 
   private PaymentMode paymentType;
   private String clientCode;
