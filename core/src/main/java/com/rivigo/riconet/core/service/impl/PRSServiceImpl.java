@@ -23,4 +23,9 @@ public class PRSServiceImpl implements PRSService {
         .stream()
         .collect(Collectors.toMap(PickupRunSheet::getId, Function.identity()));
   }
+
+  @Override
+  public List<PickupRunSheet> getPickupRunSheets(List<Long> prsIds) {
+    return prsRepository.findByIdIn(prsIds);
+  }
 }

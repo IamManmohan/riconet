@@ -8,8 +8,8 @@ import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
+import com.rivigo.riconet.core.service.PRSService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
-import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.TransportationPartnerMappingService;
 import com.rivigo.riconet.core.service.UserMasterService;
@@ -23,7 +23,7 @@ import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
-import com.rivigo.zoom.common.model.Pickup;
+import com.rivigo.zoom.common.model.PickupRunSheet;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
@@ -69,11 +69,11 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Value("${transaction.manager.client.key}")
   private String transactionManagerClientKey;
 
+  /** bean of prs service to fetch prs details. */
+  private final PRSService prsService;
+
   /** bean of location service. */
   private final LocationService locationService;
-
-  /** bean of pickup service to fetch pickup details. */
-  private final PickupService pickupService;
 
   /** bean of PdV2 to get the payment details of consignment. */
   private final PaymentDetailV2Service paymentDetailV2Service;
@@ -197,12 +197,12 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     final Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap =
         consignmentScheduleService.getActivePlansMapByIds(cnIdToConsignmentMap.keySet());
     final Map<Long, Location> locationMap = locationService.getLocationMap();
-    final Map<Long, String> pickupToUser =
-        getUserByPickupId(
+    final Map<Long, String> prsToUser =
+        getUserByPrsId(
             cnIdToConsignmentMap
                 .values()
                 .stream()
-                .map(ConsignmentReadOnly::getPickupId)
+                .map(ConsignmentReadOnly::getPrsId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
     final Map<Long, String> drsToUser =
@@ -219,33 +219,25 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
         cnIdToConsignmentMap,
         consignmentScheduleMap,
         locationMap,
-        pickupToUser,
+        prsToUser,
         drsToUser,
         ZoomEventType.HANDOVER_COLLECTION_EXCLUDE);
   }
 
   /**
-   * This function fetches list of pickup id to user mapping.
+   * This function fetches list of prs id to user mapping.
    *
-   * @param pickupIds list of pickup ids.
-   * @return map of pickup id to user mapping.
+   * @param prsIds list of prs ids.
+   * @return map of prs id to user mapping.
    */
-  private Map<Long, String> getUserByPickupId(List<Long> pickupIds) {
-    if (CollectionUtils.isEmpty(pickupIds)) {
+  private Map<Long, String> getUserByPrsId(List<Long> prsIds) {
+    if (CollectionUtils.isEmpty(prsIds)) {
       return new HashMap<>();
     }
-    final List<Pickup> pickups = pickupService.getPickups(pickupIds);
-    final List<Long> userIds =
-        pickups
-            .stream()
-            .map(Pickup::getUserId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-    final Map<Long, String> userEmailMap = userMasterService.getUserEmailMap(userIds);
-    return pickups
+    final List<PickupRunSheet> pickupRunSheets = prsService.getPickupRunSheets(prsIds);
+    return pickupRunSheets
         .stream()
-        .filter(p -> userEmailMap.containsKey(p.getUserId()))
-        .collect(Collectors.toMap(Pickup::getId, p -> userEmailMap.get(p.getUserId())));
+        .collect(Collectors.toMap(PickupRunSheet::getId, prs -> prs.getUser().getEmail()));
   }
 
   /**
@@ -304,7 +296,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @param consignmentMap consignment id to consignment read mapping.
    * @param consignmentScheduleMap consignment id to schedule mapping.
    * @param locationMap location id to location mapping.
-   * @param pickupToUser pickup id to user mapping.
+   * @param prsToUser prs id to user mapping.
    * @param drsToUser drs id to user mapping.
    * @param zoomEventType zoom event type.
    */
@@ -313,7 +305,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
       Map<Long, ConsignmentReadOnly> consignmentMap,
       Map<Long, List<ConsignmentSchedule>> consignmentScheduleMap,
       Map<Long, Location> locationMap,
-      Map<Long, String> pickupToUser,
+      Map<Long, String> prsToUser,
       Map<Long, String> drsToUser,
       ZoomEventType zoomEventType) {
 
@@ -330,7 +322,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
               .paymentMode(
                   com.rivigo.transaction.manager.client.enums.PaymentMode.valueOf(
                       paymentDetailV2.getPaymentMode().name()))
-              .captainCode(getCaptainCode(consignment, paymentDetailV2, pickupToUser, drsToUser))
+              .captainCode(getCaptainCode(consignment, paymentDetailV2, prsToUser, drsToUser))
               .build();
       setLocationDetails(
           collectionRequestDto, consignmentScheduleMap.get(consignment.getId()), locationMap);
@@ -344,18 +336,18 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    *
    * @param consignment consignment read only.
    * @param paymentDetailV2 payment detail v2.
-   * @param pickupToUser pickup id to user mapping.
+   * @param prsToUser prs id to user mapping.
    * @param drsToUser drs id to user mapping.
    * @return captain code.
    */
   private static String getCaptainCode(
       com.rivigo.zoom.common.interfase.IConsignmentReadOnly consignment,
       PaymentDetailV2 paymentDetailV2,
-      Map<Long, String> pickupToUser,
+      Map<Long, String> prsToUser,
       Map<Long, String> drsToUser) {
     if (paymentDetailV2.getPaymentMode() == PaymentMode.PAID) {
-      final Long pickupId = consignment.getPickupId();
-      return pickupToUser.get(pickupId);
+      final Long prsId = consignment.getPrsId();
+      return prsToUser.get(prsId);
     } else {
       final Long drsId = consignment.getDrsId();
       return drsToUser.get(drsId);
