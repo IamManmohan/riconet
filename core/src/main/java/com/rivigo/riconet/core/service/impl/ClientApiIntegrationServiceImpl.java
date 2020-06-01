@@ -29,6 +29,7 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
+import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
@@ -140,6 +141,13 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     Map<String, List<String>> cnoteToBarcodesMap =
         clientConsignmentService.getCnoteToBarcodeMapFromCnoteList(
             cnList.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()));
+    List<Long> consignmentIds =
+        cnList.stream().map(ConsignmentReadOnly::getId).collect(Collectors.toList());
+
+    // fetching the consignment schedules for all consignments.
+    final Map<Long, List<ConsignmentSchedule>> consignmentScheduleListForAllCNs =
+        consignmentScheduleService.getActivePlansMapByIds(consignmentIds);
+
     return cnList
         .stream()
         .map(
@@ -153,6 +161,13 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                 pickupDoneDto.setBarcodes(cnoteToBarcodesMap.get(v.getCnote()));
               }
               pickupDoneDto.setDate(TimeUtilsZoom.getDate(pickup.getPickupDate()));
+
+              if (consignmentScheduleListForAllCNs.containsKey(v.getId())) {
+                final List<ConsignmentSchedule> consignmentSchedules =
+                    consignmentScheduleListForAllCNs.get(v.getId());
+                pickupDoneDto.setRevisedEdd(getRevisedEddFromCnSchedule(consignmentSchedules));
+              }
+
               return HiltiRequestDto.builder()
                   .jobType(HiltiJobType.PICKUP.toString())
                   .newStatusCode(HiltiStatusCode.PICKUP_DONE.toString())
@@ -187,12 +202,12 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                 .orElse(Collections.singletonList(consignment.getLocationId())));
     Map<Long, String> idToLocationNameMap =
         locations.stream().collect(Collectors.toMap(Location::getId, Location::getName));
-
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_RECEIVED_AT_OU:
         return IntransitArrivedDto.builder()
             .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
             .atDestination("no")
+            .revisedEdd(getRevisedEddFromCnSchedule(schedules))
             .build();
       case CN_DELIVERY_LOADED:
         return IntransitArrivedDto.builder()
@@ -212,10 +227,41 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     }
   }
 
+  /**
+   * This function finds the revised edd(scheduled arrival time) from cn schedule list where
+   * schedule locationType = PINCODE and locationTag = TO_PINCODE.
+   *
+   * @param schedules consignment schedule collection.
+   * @return revised edd in string format.
+   */
+  private String getRevisedEddFromCnSchedule(Collection<ConsignmentSchedule> schedules) {
+    Optional<ConsignmentSchedule> toPincodeCnScheduleOptional =
+        schedules
+            .stream()
+            .filter(
+                s ->
+                    LocationTypeV2.PINCODE.equals(s.getLocationType())
+                        && LocationTag.TO_PINCODE.equals(s.getLocationTag()))
+            .findAny();
+
+    String revisedEdd = "";
+    if (toPincodeCnScheduleOptional.isPresent()) {
+      revisedEdd =
+          TimeUtilsZoom.getDate(
+              new DateTime(toPincodeCnScheduleOptional.get().getArrivalScheduledTime()));
+    }
+    return revisedEdd;
+  }
+
   private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
+    List<ConsignmentSchedule> consignmentSchedules;
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_OUT_FOR_DELIVERY:
-        return DeliveryOFDDto.builder().build();
+        consignmentSchedules =
+            consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
+        return DeliveryOFDDto.builder()
+            .revisedEdd(getRevisedEddFromCnSchedule(consignmentSchedules))
+            .build();
       case CN_DELIVERY:
         List<ConsignmentUploadedFiles> uploadedDocuments =
             consignmentUploadedFilesRepository.findByConsignmentId(notificationDTO.getEntityId());
@@ -236,10 +282,13 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             undeliveredConsignmentsRepository
                 .findTop1ByConsignmentIdAndOldDrsIdNotNullOrderByIdDesc(
                     notificationDTO.getEntityId());
+        consignmentSchedules =
+            consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
         return DeliveryNotDeliveredDto.builder()
             .undeliveryReason(
                 undeliveredConsignment.getReason() + ": " + undeliveredConsignment.getSubReason())
             .podUndelivered("")
+            .rdd(getRevisedEddFromCnSchedule(consignmentSchedules))
             .build();
       default:
         log.error("Unrecognized delivery event {}", notificationDTO);

@@ -7,14 +7,17 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @ToString
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public abstract class BaseHiltiFieldData {
   private String date;
   private String time;
   private List<String> barcodes;
+  private String revisedEdd;
 }
