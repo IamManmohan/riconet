@@ -65,10 +65,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
 
-  /** sso password. */
-  @Value("${rivigo.sso.password}")
-  private String ssoPassword;
-
   /** transaction manager client key. */
   @Value("${transaction.manager.client.key}")
   private String transactionManagerClientKey;
