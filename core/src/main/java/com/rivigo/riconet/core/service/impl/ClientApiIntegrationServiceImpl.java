@@ -141,7 +141,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     Map<String, List<String>> cnoteToBarcodesMap =
         clientConsignmentService.getCnoteToBarcodeMapFromCnoteList(
             cnList.stream().map(ConsignmentReadOnly::getCnote).collect(Collectors.toList()));
-    List<Long> consignmentIds =
+    final List<Long> consignmentIds =
         cnList.stream().map(ConsignmentReadOnly::getId).collect(Collectors.toList());
 
     // fetching the consignment schedules for all consignments.
