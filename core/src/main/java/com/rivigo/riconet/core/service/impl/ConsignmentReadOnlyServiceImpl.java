@@ -46,7 +46,7 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
   @Override
   public Map<Long, ConsignmentReadOnly> getConsignmentMap(List<Long> cnIds) {
     return consignmentRepo
-        .findByIdIn(cnIds)
+        .findByIdInAndIsActive(cnIds, 1)
         .stream()
         .collect(Collectors.toMap(ConsignmentReadOnly::getId, Function.identity()));
   }

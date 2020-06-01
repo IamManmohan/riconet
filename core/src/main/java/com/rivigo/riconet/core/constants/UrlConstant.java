@@ -56,8 +56,6 @@ public class UrlConstant {
 
   public static final String WMS_SERVICE_TASK_CREATION = "/tasks";
 
-  public static final String TRANSACTION_MANAGER_URL = "/transaction";
-
   public static final String TRANSACTION_MANAGER_REFERENCE_ROLLBACK_ENDPOINT =
       "/transaction/reference/";
 

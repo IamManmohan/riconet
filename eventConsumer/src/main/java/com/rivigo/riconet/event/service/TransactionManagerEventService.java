@@ -1,7 +1,8 @@
-package com.rivigo.riconet.core.service;
+package com.rivigo.riconet.event.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.TransactionManagerEventNames;
+import com.rivigo.riconet.core.service.TransactionManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +26,17 @@ public class TransactionManagerEventService {
    * @param notificationDTO dto for notification.
    */
   public void processNotification(NotificationDTO notificationDTO) {
-    if (notificationDTO.getMetadata().containsKey(collectionsPayload)) {
-      if (TransactionManagerEventNames.CN_INVALIDATION_COLLECTIONS
-          .name()
-          .equals(notificationDTO.getEventName())) {
-        transactionManagerService.rollbackTransactionsAndLogResponse(
-            notificationDTO.getMetadata().get(collectionsPayload));
-      } else {
-        transactionManagerService.hitTransactionManagerAndLogResponse(
-            notificationDTO.getMetadata().get(collectionsPayload));
-      }
-    } else {
+    if (!notificationDTO.getMetadata().containsKey(collectionsPayload)) {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
+    }
+    if (TransactionManagerEventNames.CN_INVALIDATION_COLLECTIONS
+        .name()
+        .equals(notificationDTO.getEventName())) {
+      transactionManagerService.rollbackTransactionsAndLogResponse(
+          notificationDTO.getMetadata().get(collectionsPayload));
+    } else {
+      transactionManagerService.hitTransactionManagerAndLogResponse(
+          notificationDTO.getMetadata().get(collectionsPayload));
     }
   }
 }

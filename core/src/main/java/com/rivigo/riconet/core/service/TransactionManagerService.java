@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service;
 
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.transaction.manager.client.dto.CollectionRequestDto;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
 import java.util.Map;
@@ -16,6 +17,13 @@ public interface TransactionManagerService {
    * @param collectionRequestDtoJsonString request json string to be sent to transaction manager.
    */
   void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString);
+
+  /**
+   * This function hits transaction manager with collectionRequestDto and logs the response.
+   *
+   * @param collectionRequestDto request dto to be sent to transaction manager.
+   */
+  void hitTransactionManagerAndLogResponse(@NonNull CollectionRequestDto collectionRequestDto);
 
   /**
    * This function fetches pickup user and drs user and sends events.

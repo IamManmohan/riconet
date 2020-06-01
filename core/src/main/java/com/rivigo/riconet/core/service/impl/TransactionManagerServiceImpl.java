@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
@@ -8,18 +7,17 @@ import com.rivigo.finance.utils.StringUtils;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
-import com.rivigo.riconet.core.constants.UrlConstant;
-import com.rivigo.riconet.core.dto.CollectionRequestDto;
-import com.rivigo.riconet.core.enums.CollectionEventType;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.PickupService;
-import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.TransportationPartnerMappingService;
 import com.rivigo.riconet.core.service.UserMasterService;
+import com.rivigo.transaction.manager.client.dto.CollectionRequestDto;
+import com.rivigo.transaction.manager.client.enums.CollectionEventType;
+import com.rivigo.transaction.manager.client.service.TransactionService;
 import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
 import com.rivigo.zoom.common.enums.PaymentMode;
@@ -32,6 +30,7 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
+import com.rivigo.zoom.util.rest.exception.ZoomRestException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.NonNull;
@@ -48,12 +48,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -72,10 +67,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   /** bean of user master service for fetching details of the user. */
   private final UserMasterService userMasterService;
 
-  /** Rest utility service to hit external APIs. */
-  @Qualifier("defaultRestClientUtilityServiceImpl")
-  private final RestClientUtilityService restClientUtilityService;
-
   /** sso user name. */
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
@@ -83,10 +74,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   /** sso password. */
   @Value("${rivigo.sso.password}")
   private String ssoPassword;
-
-  /** transaction manager base url. */
-  @Value("${transaction.manager.url}")
-  private String transactionManagerBaseUrl;
 
   /** bean to fetch redis token. */
   private final AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
@@ -112,6 +99,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   /** bean of transportation mapping service to get captain details. */
   private final TransportationPartnerMappingService transportationPartnerMappingService;
 
+  private final TransactionService transactionService;
+
   /**
    * This function hits transaction manager with collectionRequestDtoJsonString and logs the
    * response.
@@ -120,19 +109,30 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    */
   @Override
   public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
+    CollectionRequestDto collectionRequestDto =
+        objectMapper.convertValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
+    hitTransactionManagerAndLogResponse(collectionRequestDto);
+  }
 
-    final HttpEntity httpEntity =
-        new HttpEntity<>(collectionRequestDtoJsonString, buildHttpHeaders());
+  /**
+   * This function hits transaction manager with collectionRequestDto and logs the response.
+   *
+   * @param collectionRequestDto request dto to be sent to transaction manager.
+   */
+  @Override
+  public void hitTransactionManagerAndLogResponse(
+      @NonNull CollectionRequestDto collectionRequestDto) {
 
-    log.debug(
-        "Hitting transaction manager with collectionRequestDto: {}",
-        collectionRequestDtoJsonString);
+    log.debug("Hitting transaction manager with collectionRequestDto: {}", collectionRequestDto);
 
-    restClientUtilityService.executeRest(
-        transactionManagerBaseUrl + UrlConstant.TRANSACTION_MANAGER_URL,
-        HttpMethod.POST,
-        httpEntity,
-        String.class);
+    try {
+      final Optional<String> response =
+          transactionService.createTransactions(
+              getUserId(), getBearerToken(), collectionRequestDto);
+      response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
+    } catch (ZoomRestException e) {
+      log.error("Create transaction failed in transaction manager.");
+    }
   }
 
   /**
@@ -148,41 +148,39 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     if (StringUtils.isEmpty(reference)) {
       return;
     }
-    log.debug(
-        "Hitting transaction manager with collectionRequestDto: {}",
-        collectionRequestDtoJsonString);
 
-    final HttpEntity httpEntity = new HttpEntity<>(buildHttpHeaders());
-
-    restClientUtilityService.executeRest(
-        transactionManagerBaseUrl
-            + UrlConstant.TRANSACTION_MANAGER_REFERENCE_ROLLBACK_ENDPOINT
-            + reference,
-        HttpMethod.DELETE,
-        httpEntity,
-        String.class);
+    try {
+      final Optional<String> response =
+          transactionService.rollbackByReference(getUserId(), getBearerToken(), reference);
+      response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
+    } catch (ZoomRestException e) {
+      log.error("Rollback transaction failed in transaction manager.");
+    }
   }
 
   /**
-   * This function is used to build https headers for transaction manager service.
+   * This function is used to return user id to be sent to transaction manager service.
    *
-   * @return http headers.
+   * @return user id of sso.
    */
-  private HttpHeaders buildHttpHeaders() {
+  private String getUserId() {
+    final User user = userMasterService.getByEmail(ssoUsername);
+    return user.getId().toString();
+  }
+
+  /**
+   * This function is used to return bearer token to be sent to transaction manager service.
+   *
+   * @return bearer token of sso.
+   */
+  private String getBearerToken() {
     String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
     if (token == null) {
       log.info("No existing token found. New token is being generated ");
       token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
       accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
     }
-
-    final User user = userMasterService.getByEmail(ssoUsername);
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    headers.add("Token", token);
-    headers.add("User-Id", user.getId().toString());
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return headers;
+    return token;
   }
 
   /**
@@ -349,16 +347,18 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
               .consignmentId(consignment.getId())
               .cnote(consignment.getCnote())
               .eventType(getCollectionEventType(zoomEventType, paymentDetailV2.getPaymentType()))
-              .amount(paymentDetailV2.getTotalRoundOffAmount().longValue())
+              .amount(paymentDetailV2.getTotalRoundOffAmount())
               .bankTransferPendingApproval(paymentDetailV2.getBankName())
-              .paymentType(paymentDetailV2.getPaymentMode())
+              .paymentMode(
+                  com.rivigo.transaction.manager.client.enums.PaymentMode.valueOf(
+                      paymentDetailV2.getPaymentMode().name()))
               .captainCode(getCaptainCode(consignment, paymentDetailV2, pickupToUser, drsToUser))
               .build();
       setLocationDetails(
           collectionRequestDto, consignmentScheduleMap.get(consignment.getId()), locationMap);
       collectionRequestDtos.add(collectionRequestDto);
     }
-    sendEventsToTransactionManager(collectionRequestDtos);
+    collectionRequestDtos.forEach(this::hitTransactionManagerAndLogResponse);
   }
 
   /**
@@ -381,25 +381,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     } else {
       final Long drsId = consignment.getDrsId();
       return drsToUser.get(drsId);
-    }
-  }
-
-  /**
-   * This function sends a list of collection request DTOs to transaction manager service.
-   *
-   * @param collectionRequestDtos list of collection request DTOs.
-   */
-  private void sendEventsToTransactionManager(List<CollectionRequestDto> collectionRequestDtos) {
-    for (final CollectionRequestDto collectionRequestDto : collectionRequestDtos) {
-      try {
-        final String requestJsonString = objectMapper.writeValueAsString(collectionRequestDto);
-        hitTransactionManagerAndLogResponse(requestJsonString);
-      } catch (JsonProcessingException e) {
-        log.error(
-            "Error communicating with transaction manager for {}. Error - ",
-            collectionRequestDto,
-            e);
-      }
     }
   }
 
@@ -429,30 +410,19 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
         .ifPresent(
             start ->
                 collectionRequestDto.setPickupOuCode(
-                    getLocationCode(locationMap, start.getLocationId())));
+                    Optional.ofNullable(locationMap.get(start.getLocationId()))
+                        .map(Location::getCode)
+                        .orElse(null)));
     filteredConsignmentSchedules
         .stream()
         .max(Comparator.comparing(ConsignmentSchedule::getSequence))
         .ifPresent(
             end ->
                 collectionRequestDto.setDeliveryOuCode(
-                    getLocationCode(locationMap, end.getLocationId())));
+                    Optional.ofNullable(locationMap.get(end.getLocationId()))
+                        .map(Location::getCode)
+                        .orElse(null)));
     return collectionRequestDto;
-  }
-
-  /**
-   * This function returns the code of location base on location id.
-   *
-   * @param locationMap location id to location mapping.
-   * @param locationId id of the location.
-   * @return location code.
-   */
-  private static String getLocationCode(Map<Long, Location> locationMap, Long locationId) {
-    final Location location = locationMap.get(locationId);
-    if (null != location) {
-      return location.getCode();
-    }
-    return null;
   }
 
   /**

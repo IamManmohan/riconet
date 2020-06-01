@@ -72,11 +72,6 @@ public abstract class ConsumerModel {
   public CompletionStage<Done> save(ConsumerRecord<String, String> record) {
     if (record.topic().equals(getTopic())) {
       MDCUtils.setEventDetails(record);
-      log.info(
-          "Processing message {} on topic {} partition {} ",
-          record.value(),
-          record.topic(),
-          record.partition());
       executorService.submit(
           () -> {
             MDCUtils.setEventDetails(record);
