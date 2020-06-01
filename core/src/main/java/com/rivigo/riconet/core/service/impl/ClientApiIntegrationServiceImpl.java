@@ -234,23 +234,21 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
    * @param schedules consignment schedule collection.
    * @return revised edd in string format.
    */
-  private String getRevisedEddFromCnSchedule(Collection<ConsignmentSchedule> schedules) {
-    Optional<ConsignmentSchedule> toPincodeCnScheduleOptional =
+  private static String getRevisedEddFromCnSchedule(Collection<ConsignmentSchedule> schedules) {
+    final Optional<ConsignmentSchedule> toPincodeCnScheduleOptional =
         schedules
             .stream()
             .filter(
                 s ->
-                    LocationTypeV2.PINCODE.equals(s.getLocationType())
-                        && LocationTag.TO_PINCODE.equals(s.getLocationTag()))
+                    LocationTypeV2.PINCODE == s.getLocationType()
+                        && LocationTag.TO_PINCODE == s.getLocationTag())
             .findAny();
 
-    String revisedEdd = "";
     if (toPincodeCnScheduleOptional.isPresent()) {
-      revisedEdd =
-          TimeUtilsZoom.getDate(
-              new DateTime(toPincodeCnScheduleOptional.get().getArrivalScheduledTime()));
+      return TimeUtilsZoom.getDate(
+          new DateTime(toPincodeCnScheduleOptional.get().getArrivalScheduledTime()));
     }
-    return revisedEdd;
+    return "";
   }
 
   private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {

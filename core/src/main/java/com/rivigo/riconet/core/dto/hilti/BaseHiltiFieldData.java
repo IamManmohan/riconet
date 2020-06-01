@@ -19,5 +19,6 @@ public abstract class BaseHiltiFieldData {
   private String date;
   private String time;
   private List<String> barcodes;
+  /** Latest scheduled arrival time for consignee location from cn schedule. */
   private String revisedEdd;
 }
