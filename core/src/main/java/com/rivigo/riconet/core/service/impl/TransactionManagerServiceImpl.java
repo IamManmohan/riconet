@@ -5,8 +5,6 @@ import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.finance.utils.StringUtils;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
-import com.rivigo.oauth2.resource.service.SsoService;
-import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -29,7 +27,6 @@ import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
-import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.util.rest.exception.ZoomRestException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,9 +58,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   /** object mapper bean for converting DTOs. */
   private final ObjectMapper objectMapper;
 
-  /** bean of sso service to get the details of sso user. */
-  private final SsoService ssoService;
-
   /** bean of user master service for fetching details of the user. */
   private final UserMasterService userMasterService;
 
@@ -75,8 +69,9 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Value("${rivigo.sso.password}")
   private String ssoPassword;
 
-  /** bean to fetch redis token. */
-  private final AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
+  /** transaction manager client key. */
+  @Value("${transaction.manager.client.key}")
+  private String transactionManagerClientKey;
 
   /** bean of location service. */
   private final LocationService locationService;
@@ -99,6 +94,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   /** bean of transportation mapping service to get captain details. */
   private final TransportationPartnerMappingService transportationPartnerMappingService;
 
+  /** bean of transaction service for hitting transaction manager. */
   private final TransactionService transactionService;
 
   /**
@@ -128,7 +124,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     try {
       final Optional<String> response =
           transactionService.createTransactions(
-              getUserId(), getBearerToken(), collectionRequestDto);
+              getUserId(), transactionManagerClientKey, collectionRequestDto);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
       log.error("Create transaction failed in transaction manager.");
@@ -151,7 +147,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
 
     try {
       final Optional<String> response =
-          transactionService.rollbackByReference(getUserId(), getBearerToken(), reference);
+          transactionService.rollbackByReference(
+              getUserId(), transactionManagerClientKey, reference);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
       log.error("Rollback transaction failed in transaction manager.");
@@ -166,21 +163,6 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   private String getUserId() {
     final User user = userMasterService.getByEmail(ssoUsername);
     return user.getId().toString();
-  }
-
-  /**
-   * This function is used to return bearer token to be sent to transaction manager service.
-   *
-   * @return bearer token of sso.
-   */
-  private String getBearerToken() {
-    String token = accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN);
-    if (token == null) {
-      log.info("No existing token found. New token is being generated ");
-      token = ssoService.getUserAccessToken(ssoUsername, ssoPassword).getResponse();
-      accessTokenSsfRedisRepository.set(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN, token);
-    }
-    return token;
   }
 
   /**
