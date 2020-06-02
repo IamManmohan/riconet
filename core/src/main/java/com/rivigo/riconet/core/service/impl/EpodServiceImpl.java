@@ -72,13 +72,13 @@ public class EpodServiceImpl implements EpodService {
    * @author Nikhil Rawat on 26/05/20.
    */
   private EpodPreparedDto getEpodPreapredDTO(String json) {
-    EpodPreparedDto epodPreparedDTO;
     try {
+      EpodPreparedDto epodPreparedDTO;
       epodPreparedDTO = objectMapper.readValue(json, EpodPreparedDto.class);
+      return epodPreparedDTO;
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", json, ex);
       return null;
     }
-    return epodPreparedDTO;
   }
 }

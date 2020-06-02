@@ -76,7 +76,7 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_MARK_DELIVERED =
       "/operations/consignments/cndeliver/{cnote}";
 
-  /** End point for EPOD prepared, after this it would be uploaded in consignment_uploaded_files */
+  /** End point for EPOD prepared, after this it would be uploaded in consignment_uploaded_files. */
   public static final String ZOOM_BACKEND_UPLOAD_EPOD = "/epod/uploadPod";
 
   /** End point for epod flag in clients. */

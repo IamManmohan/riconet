@@ -11,10 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EpodApplicableDto {
-  /** variable for storing client code */
+  /** variable for storing client code. */
   private String clientCode;
-  /** variable for storing serviceType */
+  /** variable for storing serviceType. */
   private String serviceType;
-  /** variable for storing the e-pod applicability flag */
+  /** variable for storing the e-pod applicability flag. */
   private String electronicPODApplicability;
 }

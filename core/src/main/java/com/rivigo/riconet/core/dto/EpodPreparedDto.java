@@ -11,10 +11,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EpodPreparedDto {
-  /** variable for storing componentType */
+  /** variable for storing componentType. */
   private String componentType;
-  /** variable for storing identifier which is CNOTE number */
+  /** variable for storing identifier which is CNOTE number. */
   private String identifier;
-  /** variable for storing s3 url of the e-pod document */
+  /** variable for storing s3 url of the e-pod document. */
   private String url;
 }

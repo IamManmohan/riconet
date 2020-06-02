@@ -492,8 +492,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
       return responseJson;
     } catch (IOException e) {
-      throw new ZoomException(
-          "Error while uploading epod with dto {}", consignmentUploadedFilesDTO);
+      throw new ZoomException("Error while uploading epod ", e);
     }
   }
 
@@ -520,7 +519,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
         throw new ZoomException("Error in updating epod flag");
       }
     } catch (IOException e) {
-      throw new ZoomException("Error while updating epod flag with dto {}", epodApplicableDTO);
+      throw new ZoomException("Error while updating epod flag ", e);
     }
   }
 }

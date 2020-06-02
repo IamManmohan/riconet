@@ -297,13 +297,13 @@ public class ClientMasterServiceImpl implements ClientMasterService {
    * @author Nikhil Rawat on 26/05/20.
    */
   private EpodApplicableDto getEpodApplicableDto(String dtoString) {
-    EpodApplicableDto epodApplicableDTO;
     try {
+      EpodApplicableDto epodApplicableDTO;
       epodApplicableDTO = objectMapper.readValue(dtoString, EpodApplicableDto.class);
+      return epodApplicableDTO;
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", dtoString, ex);
       return null;
     }
-    return epodApplicableDTO;
   }
 }
