@@ -110,6 +110,8 @@ subprojects {
         
         compile group: 'junit', name: 'junit', version: '4.12'
 
+        compile group:'com.rivigo.transaction.manager', name: 'client', version: "1.1"
+
         testCompile "org.mockito:mockito-core:1.+"
     }
 }
