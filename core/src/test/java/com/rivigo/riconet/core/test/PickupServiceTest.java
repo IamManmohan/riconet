@@ -102,7 +102,7 @@ public class PickupServiceTest {
         ZoomCommunicationFieldNames.ORGANIZATION_ID.name(),
         String.valueOf(ConsignmentConstant.RIVIGO_ORGANIZATION_ID));
     metadata.put(ZoomCommunicationFieldNames.PICK_UP_ID.name(), "23");
-    when(pickupRepository.findOne(any())).thenReturn(new Pickup());
+    when(pickupRepository.findById(any())).thenReturn(new Pickup());
     pickupService.deductPickupCharges(
         NotificationDTO.builder()
             .eventName(BfPickupChargesEventName.CN_COMPLETION_ALL_INSTANCES.name())
@@ -127,7 +127,7 @@ public class PickupServiceTest {
     Pickup pickup = new Pickup();
     pickup.setPickupStatus(PickupStatus.COMPLETE);
     pickup.setId(23l);
-    when(pickupRepository.findOne(23l)).thenReturn(pickup);
+    when(pickupRepository.findById(23l)).thenReturn(pickup);
     when(consignmentReadOnlyService.findByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
     pickupService.deductPickupCharges(
@@ -154,7 +154,7 @@ public class PickupServiceTest {
     Pickup pickup = new Pickup();
     pickup.setPickupStatus(PickupStatus.COMPLETE);
     pickup.setId(23l);
-    when(pickupRepository.findOne(23l)).thenReturn(pickup);
+    when(pickupRepository.findById(23l)).thenReturn(pickup);
     when(consignmentReadOnlyService.findByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));
     when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
@@ -203,7 +203,7 @@ public class PickupServiceTest {
     Client client = new Client();
     client.setOrganizationId(100l);
     when(consignmentService.isPrimaryConsignment(any())).thenReturn(true);
-    when(pickupRepository.findOne(23l)).thenReturn(pickup);
+    when(pickupRepository.findById(23l)).thenReturn(pickup);
     when(clientMasterService.getClientById(pickup.getClientId())).thenReturn(client);
     when(consignmentReadOnlyService.findByPickupId(23l))
         .thenReturn(Arrays.asList(consignmentReadOnly1, consignmentReadOnly2));

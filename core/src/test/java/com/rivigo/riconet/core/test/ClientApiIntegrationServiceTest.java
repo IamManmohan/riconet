@@ -70,7 +70,7 @@ public class ClientApiIntegrationServiceTest {
         clientApiIntegrationService, "flipkartClientId", "dummyFlipkartClientId");
 
     ReflectionTestUtils.setField(clientApiIntegrationService, "objectMapper", objectMapper);
-    Mockito.when(pickupRepository.findOne(ApiServiceUtils.PICKUP_ID))
+    Mockito.when(pickupRepository.findById(ApiServiceUtils.PICKUP_ID))
         .thenReturn(ApiServiceUtils.getDummyPickup());
     Mockito.when(consignmentReadOnlyService.findByPickupId(ApiServiceUtils.PICKUP_ID))
         .thenReturn(
