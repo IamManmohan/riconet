@@ -417,10 +417,10 @@ public class PickupServiceImpl implements PickupService {
         Long pickupId = Long.parseLong(metadata.get(ZoomCommunicationFieldNames.PICK_UP_ID.name()));
         Long organizationId =
             Long.parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()));
-        deductPickupCharges(pickupRepository.findById(pickupId), organizationId);
+        deductPickupCharges(pickupRepository.findOne(pickupId), organizationId);
         break;
       case PICKUP_COMPLETION:
-        final Pickup pickup = pickupRepository.findById(notificationDTO.getEntityId());
+        final Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
         if (pickup == null) {
           log.debug(
               "PICKUP_COMPLETION event is ignored as for pickupId {} as pickup doesn't exist",

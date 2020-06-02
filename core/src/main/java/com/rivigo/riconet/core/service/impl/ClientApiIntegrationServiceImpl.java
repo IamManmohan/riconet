@@ -134,7 +134,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   private List<HiltiRequestDto> getPickupRequestDtos(
       NotificationDTO notificationDTO, Boolean addBarcodes) {
-    Pickup pickup = pickupRepository.findById(notificationDTO.getEntityId());
+    Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
     List<ConsignmentReadOnly> cnList =
         consignmentReadOnlyService.findByPickupId(notificationDTO.getEntityId());
     Map<String, List<String>> cnoteToBarcodesMap =
