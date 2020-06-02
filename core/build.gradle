@@ -16,6 +16,7 @@ dependencies {
         exclude group: 'org.hibernate', module: 'hibernate-c3p0'
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
+    compile group:'com.rivigo.transaction.manager', name: 'client', version: "1.1"
 }
 spotless {
     java {

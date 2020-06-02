@@ -9,7 +9,7 @@ buildscript {
         maven { url 'https://packages.confluent.io/maven' }
     }
     dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.28.1"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:4.0.0"
     }
 }
 
@@ -94,7 +94,6 @@ subprojects {
             exclude module: 'aws-java-sdk'
             exclude module: 'scala-library'
         }
-        compile group:'com.rivigo.transaction.manager', name: 'client', version: "1.1-SNAPSHOT"
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:3.1.14')
         compile('com.rivigo.collections:collections-api:1.1.3'){
