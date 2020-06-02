@@ -37,7 +37,7 @@ allprojects {
     jacocoTestReport {
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
-        files(sourceSets.main.allJava.srcDirs)
+        additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
         reports {
             xml.enabled true
             csv.enabled false
