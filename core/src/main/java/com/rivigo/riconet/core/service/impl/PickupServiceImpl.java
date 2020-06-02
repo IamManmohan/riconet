@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -63,29 +65,30 @@ import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PickupServiceImpl implements PickupService {
 
-  @Autowired private PickupRepository pickupRepository;
+  private final PickupRepository pickupRepository;
 
-  @Autowired private ClientMasterService clientMasterService;
+  private final ClientMasterService clientMasterService;
 
-  @Autowired private StockAccumulatorService stockAccumulatorService;
+  private final StockAccumulatorService stockAccumulatorService;
 
-  @Autowired private ZoomUserMasterService zoomUserMasterService;
+  private final ZoomUserMasterService zoomUserMasterService;
 
-  @Autowired private ZoomPropertyService zoomPropertyService;
+  private final ZoomPropertyService zoomPropertyService;
 
-  @Autowired private LocationService locationService;
+  private final LocationService locationService;
 
-  @Autowired private SmsService smsService;
+  private final SmsService smsService;
 
-  @Autowired private ConsignmentReadOnlyService consignmentReadOnlyService;
+  private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
-  @Autowired private ZoomBookAPIClientService zoomBookAPIClientService;
+  private final ZoomBookAPIClientService zoomBookAPIClientService;
 
-  @Autowired private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-  @Autowired private ConsignmentService consignmentService;
+  private final ConsignmentService consignmentService;
 
   @Override
   public Map<Long, Pickup> getPickupMapByIdIn(List<Long> pickupTripIdList) {

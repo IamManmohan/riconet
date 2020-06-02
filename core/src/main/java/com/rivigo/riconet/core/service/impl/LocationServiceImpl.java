@@ -12,17 +12,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LocationServiceImpl implements LocationService {
 
-  @Autowired private LocationRepositoryV2 locationRepository;
+  private final LocationRepositoryV2 locationRepository;
 
-  @Autowired private OrganizationService organizationService;
+  private final OrganizationService organizationService;
 
   public Location getLocationById(Long locationId) {
     return locationRepository.findById(locationId);
