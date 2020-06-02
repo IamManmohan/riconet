@@ -14,16 +14,41 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * This service is responsible for EPOD related tasks.
+ *
+ * @author Nikhil Rawat on 26/05/20.
+ */
 @Slf4j
 @Service
 public class EpodServiceImpl implements EpodService {
 
+  /**
+   * Object mapper for coverting the string payload to a DTO.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Autowired private ObjectMapper objectMapper;
-
+  /**
+   * consignment service for getting cn details from zoom backend.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Autowired private ConsignmentService consignmentService;
 
+  /**
+   * zoomBackendAPI client service for hitting zoom-backend api.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  /**
+   * function that coverts the dto String fetched from compass to EpodPreaparedDto, and hits zoom
+   * backend to upload pod.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Override
   public JsonNode uploadEpod(String json) {
     final EpodPreparedDto epodPreparedDTO = getEpodPreapredDTO(json);
@@ -41,6 +66,11 @@ public class EpodServiceImpl implements EpodService {
     }
   }
 
+  /**
+   * function that coverts the dto String fetched from compass to EpodPreaparedDto.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   private EpodPreparedDto getEpodPreapredDTO(String json) {
     EpodPreparedDto epodPreparedDTO;
     try {

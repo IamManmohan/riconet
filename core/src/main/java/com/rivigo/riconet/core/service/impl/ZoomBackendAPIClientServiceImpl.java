@@ -469,7 +469,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     // otherwise.
     apiClientService.parseJsonNode(responseJson, null);
   }
-
+  /**
+   * function that uploads the e-pod by hitting the zoom-backend api.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Override
   public JsonNode uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO) {
     JsonNode responseJson;
@@ -493,6 +497,12 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * function that hits the zoom-backend upload epod api so that epod is stored in consignment
+   * uploaded files.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Override
   public void updateEpodDetails(EpodApplicableDto epodApplicableDTO) {
     JsonNode responseJson;

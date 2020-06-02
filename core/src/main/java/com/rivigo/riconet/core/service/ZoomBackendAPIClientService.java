@@ -80,5 +80,10 @@ public interface ZoomBackendAPIClientService {
    */
   JsonNode uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO);
 
+  /**
+   * This function is used to update epod flag details.
+   *
+   * @param epodApplicableDTO for updating epod details.
+   */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
 }

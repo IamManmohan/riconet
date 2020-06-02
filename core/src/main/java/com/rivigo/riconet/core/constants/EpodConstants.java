@@ -1,11 +1,10 @@
 package com.rivigo.riconet.core.constants;
 
+import lombok.experimental.UtilityClass;
+
 /** This is a Utility class for storing epod constants */
-public final class EpodConstants {
+@UtilityClass
+public class EpodConstants {
 
-  private EpodConstants() {
-    throw new IllegalStateException("Utility class");
-  }
-
-  public static final String EPOD = "EPOD";
+  public final String EPOD = "EPOD";
 }

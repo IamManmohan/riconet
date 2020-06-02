@@ -280,13 +280,22 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);
     }
   }
-
+  /**
+   * function that hits the zoom-backend for updating the e-pod applicable flag.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   @Override
   public void updateEpodDetails(String payload) {
     EpodApplicableDto epodApplicableDTO = getEpodApplicableDto(payload);
     zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
   }
 
+  /**
+   * function that coverts the dto String fetched from compass to EpodApplicableDto.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
   private EpodApplicableDto getEpodApplicableDto(String dtoString) {
     EpodApplicableDto epodApplicableDTO;
     try {
