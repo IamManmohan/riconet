@@ -341,7 +341,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @return captain code.
    */
   private static String getCaptainCode(
-      com.rivigo.zoom.common.interfase.IConsignmentReadOnly consignment,
+      ConsignmentReadOnly consignment,
       PaymentDetailV2 paymentDetailV2,
       Map<Long, String> prsToUser,
       Map<Long, String> drsToUser) {
