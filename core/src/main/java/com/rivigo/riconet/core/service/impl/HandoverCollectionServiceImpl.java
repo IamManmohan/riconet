@@ -189,11 +189,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         chequeBounceDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
 
-    try {
-      transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
-    } catch (Exception e) {
-      log.error("Could not sync exclusion to transaction manager - ", e);
-    }
+    transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
   }
 
   private Location getLocation(String code) {

@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.constants;
 
 import lombok.experimental.UtilityClass;
 
+/** This file contains the various external URLs. */
 @UtilityClass
 public class UrlConstant {
   /** Zoom Backend API to generate final invoice for rivigo to pay CN's. */
