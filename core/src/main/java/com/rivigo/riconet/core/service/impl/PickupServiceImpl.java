@@ -420,7 +420,7 @@ public class PickupServiceImpl implements PickupService {
         deductPickupCharges(pickupRepository.findOne(pickupId), organizationId);
         break;
       case PICKUP_COMPLETION:
-        final Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
+        Pickup pickup = pickupRepository.findOne(notificationDTO.getEntityId());
         if (pickup == null) {
           log.debug(
               "PICKUP_COMPLETION event is ignored as for pickupId {} as pickup doesn't exist",
