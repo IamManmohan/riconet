@@ -20,16 +20,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class LocationServiceImpl implements LocationService {
 
-  @Autowired private LocationRepositoryV2 locationRepository;
+  @Autowired private LocationRepositoryV2 locationRepositoryV2;
 
   @Autowired private OrganizationService organizationService;
 
   public Location getLocationById(Long locationId) {
-    return locationRepository.findById(locationId);
+    return locationRepositoryV2.findById(locationId);
   }
 
   public Location getLocationByCode(String code) {
-    return locationRepository.findByCode(code);
+    return locationRepositoryV2.findByCode(code);
   }
 
   public List<Location> getAllClusterSiblingsOfLocation(String fromLocationCode) {
@@ -38,7 +38,7 @@ public class LocationServiceImpl implements LocationService {
         organizationService.getByOrganizationTypeAndOperationalStatus(
             OrganizationType.RIVIGO, OperationalStatus.ACTIVE);
     List<Long> orgIds = organization.stream().map(Organization::getId).collect(Collectors.toList());
-    return locationRepository.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
+    return locationRepositoryV2.getAllAdministrativeEntitySiblingsOfLocationAndOrganization(
         fromLocation.getId(), orgIds, LocationType.CLUSTER.name());
   }
 
@@ -49,12 +49,12 @@ public class LocationServiceImpl implements LocationService {
     if (l.getLocationType() == LocationType.PROCESSING_CENTER) {
       return l;
     } else {
-      return locationRepository.getReportingPc(l.getId());
+      return locationRepositoryV2.getReportingPc(l.getId());
     }
   }
 
   public Map<Long, Location> getLocationMap() {
-    return locationRepository
+    return locationRepositoryV2
         .findByStatus(OperationalStatus.ACTIVE.name())
         .stream()
         .collect(Collectors.toMap(Location::getId, Function.identity()));
