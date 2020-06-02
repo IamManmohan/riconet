@@ -95,11 +95,6 @@ public class PickupServiceImpl implements PickupService {
   }
 
   @Override
-  public List<Pickup> getPickups(List<Long> pickupIds) {
-    return pickupRepository.findByIdIn(pickupIds);
-  }
-
-  @Override
   public void processPickupNotificationDTOList(
       List<PickupNotificationDTO> pickupNotificationDTOList) {
     if (CollectionUtils.isEmpty(pickupNotificationDTOList)) {
@@ -425,7 +420,7 @@ public class PickupServiceImpl implements PickupService {
         deductPickupCharges(pickupRepository.findById(pickupId), organizationId);
         break;
       case PICKUP_COMPLETION:
-        Pickup pickup = pickupRepository.findById(notificationDTO.getEntityId());
+        final Pickup pickup = pickupRepository.findById(notificationDTO.getEntityId());
         if (pickup == null) {
           log.debug(
               "PICKUP_COMPLETION event is ignored as for pickupId {} as pickup doesn't exist",

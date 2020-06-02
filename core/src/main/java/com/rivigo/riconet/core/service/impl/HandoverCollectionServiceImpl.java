@@ -64,6 +64,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
+  /** bean of transaction manager service to send requests to transaction manager. */
   private final TransactionManagerService transactionManagerService;
 
   /**
@@ -102,11 +103,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
 
-    try {
-      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
-    } catch (Exception e) {
-      log.error("Could not sync post/unpost to transaction manager - ", e);
-    }
+    transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
   }
 
   private ZoomBookTransactionType getTransactionType(ZoomEventType eventType) {

@@ -26,6 +26,12 @@ public class PaymentDetailV2ServiceImpl implements PaymentDetailV2Service {
     return paymentDetailV2Repository.findByConsignmentIdAndIsActive(consignmentId, true);
   }
 
+  /**
+   * This function is used to fetch list of payment detail v2 based on list of consignment ids.
+   *
+   * @param consignmentIds list of consignment ids.
+   * @return list of payment detail v2.
+   */
   @Override
   public List<PaymentDetailV2> getByConsignmentIdIn(Collection<Long> consignmentIds) {
     return paymentDetailV2Repository.findByConsignmentIdInAndIsActive(consignmentIds, true);

@@ -43,6 +43,13 @@ public class ConsignmentReadOnlyServiceImpl implements ConsignmentReadOnlyServic
         .collect(Collectors.toMap(ConsignmentReadOnly::getId, ConsignmentReadOnly::getCnote));
   }
 
+  /**
+   * This function is used to fetch map of consignment id to consignment read only based on list of
+   * consignment ids.
+   *
+   * @param cnIds list of consignment ids.
+   * @return map of consignment id to consignment read only.
+   */
   @Override
   public Map<Long, ConsignmentReadOnly> getConsignmentMap(List<Long> cnIds) {
     return consignmentRepo

@@ -18,7 +18,7 @@ public class TransactionManagerEventService {
   private final TransactionManagerService transactionManagerService;
 
   /** key constant for collections payload. */
-  private static final String collectionsPayload = "collectionPayload";
+  private static final String COLLECTION_PAYLOAD = "collectionPayload";
 
   /**
    * This function processes notification for transaction manager.
@@ -26,17 +26,17 @@ public class TransactionManagerEventService {
    * @param notificationDTO dto for notification.
    */
   public void processNotification(NotificationDTO notificationDTO) {
-    if (!notificationDTO.getMetadata().containsKey(collectionsPayload)) {
+    if (!notificationDTO.getMetadata().containsKey(COLLECTION_PAYLOAD)) {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
     }
     if (TransactionManagerEventNames.CN_INVALIDATION_COLLECTIONS
         .name()
         .equals(notificationDTO.getEventName())) {
       transactionManagerService.rollbackTransactionsAndLogResponse(
-          notificationDTO.getMetadata().get(collectionsPayload));
+          notificationDTO.getMetadata().get(COLLECTION_PAYLOAD));
     } else {
       transactionManagerService.hitTransactionManagerAndLogResponse(
-          notificationDTO.getMetadata().get(collectionsPayload));
+          notificationDTO.getMetadata().get(COLLECTION_PAYLOAD));
     }
   }
 }

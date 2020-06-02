@@ -101,7 +101,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    */
   @Override
   public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
-    CollectionRequestDto collectionRequestDto =
+    final CollectionRequestDto collectionRequestDto =
         objectMapper.convertValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
     hitTransactionManagerAndLogResponse(collectionRequestDto);
   }

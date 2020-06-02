@@ -8,6 +8,9 @@ import com.rivigo.zoom.common.model.PaymentDetailV2;
 import java.util.Map;
 import lombok.NonNull;
 
+/**
+ * This interface deals with the interaction that happens between transaction manager and riconet.
+ */
 public interface TransactionManagerService {
 
   /**

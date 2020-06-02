@@ -19,5 +19,11 @@ public interface UserMasterService {
 
   List<User> getByEmailIn(List<String> emailList);
 
+  /**
+   * This function is used to get map of user id to email id based on list of user ids.
+   *
+   * @param userIds list of user ids.
+   * @return map of user id to email id.
+   */
   Map<Long, String> getUserEmailMap(Collection<Long> userIds);
 }

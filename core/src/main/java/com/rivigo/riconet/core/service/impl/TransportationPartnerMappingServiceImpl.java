@@ -22,6 +22,12 @@ public class TransportationPartnerMappingServiceImpl
         ZoomTripType.DRS, drsId);
   }
 
+  /**
+   * This function is used to get map of drs id to user id based on list of drs Ids.
+   *
+   * @param drsIds list of drs Ids.
+   * @return map of drs id to user id.
+   */
   @Override
   public Map<Long, Long> getUserIdByDrsId(List<Long> drsIds) {
     return transportationPartnerMappingRepository

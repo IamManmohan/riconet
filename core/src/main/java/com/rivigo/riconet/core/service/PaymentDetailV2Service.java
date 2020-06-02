@@ -10,6 +10,12 @@ public interface PaymentDetailV2Service {
 
   PaymentDetailV2 getByConsignmentId(Long consignmentId);
 
+  /**
+   * This function is used to fetch list of payment detail v2 based on list of consignment ids.
+   *
+   * @param consignmentIds list of consignment ids.
+   * @return list of payment detail v2.
+   */
   List<PaymentDetailV2> getByConsignmentIdIn(Collection<Long> consignmentIds);
 
   List<PaymentDetailV2> getByTransactionReferenceNo(String transactionReferenceNo);

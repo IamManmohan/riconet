@@ -1,13 +1,11 @@
 package com.rivigo.riconet.core.constants;
 
-public class UrlConstant {
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
+public class UrlConstant {
   /** Zoom Backend API to generate final invoice for rivigo to pay CN's. */
   public static final String ZOOM_BACKEND_GENERATE_INVOICE = "/operations/retail/invoice";
-
-  private UrlConstant() {
-    throw new IllegalStateException("Utility class");
-  }
 
   public static final String ZOOM_TICKETING_GET_BY_CNOTE_AND_TYPE = "/ticket/entityandtype";
 
@@ -55,9 +53,6 @@ public class UrlConstant {
   public static final String ZOOM_DATASTORE_EWAYBILL_METADATA_CLEANUP = "/address/cleanup/ewaybill";
 
   public static final String WMS_SERVICE_TASK_CREATION = "/tasks";
-
-  public static final String TRANSACTION_MANAGER_REFERENCE_ROLLBACK_ENDPOINT =
-      "/transaction/reference/";
 
   public static final String ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING =
       "/operations/retail/collections/handover/markRecoveryPending";

@@ -47,6 +47,12 @@ public class UserMasterServiceImpl implements UserMasterService {
     return userRepository.findByEmailIn(emailList);
   }
 
+  /**
+   * This function is used to get map of user id to email id based on list of user ids.
+   *
+   * @param userIds list of user ids.
+   * @return map of user id to email id.
+   */
   @Override
   public Map<Long, String> getUserEmailMap(Collection<Long> userIds) {
     return userRepository

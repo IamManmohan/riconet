@@ -24,6 +24,12 @@ public class PRSServiceImpl implements PRSService {
         .collect(Collectors.toMap(PickupRunSheet::getId, Function.identity()));
   }
 
+  /**
+   * This function is used to list of pickup run sheets bu ids.
+   *
+   * @param prsIds list of PRS ids.
+   * @return list of pickup run sheet.
+   */
   @Override
   public List<PickupRunSheet> getPickupRunSheets(List<Long> prsIds) {
     return prsRepository.findByIdIn(prsIds);

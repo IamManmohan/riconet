@@ -17,5 +17,12 @@ public interface ConsignmentReadOnlyService {
 
   Map<Long, String> getCnIdToCnoteMap(List<Long> cnIds);
 
+  /**
+   * This function is used to fetch map of consignment id to consignment read only based on list of
+   * consignment ids.
+   *
+   * @param cnIds list of consignment ids.
+   * @return map of consignment id to consignment read only.
+   */
   Map<Long, ConsignmentReadOnly> getConsignmentMap(List<Long> cnIds);
 }

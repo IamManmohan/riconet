@@ -10,9 +10,9 @@ public enum TransactionManagerEventNames {
   CN_PAYMENT_COLLECTIONS,
   /** Handover completed event for consignment. */
   CN_HANDOVER_COMPLETED_COLLECTIONS,
-  /** CN type change from normal to normal to pay event */
+  /** CN type change from normal to normal to pay event. */
   NORMAL_TO_NORMAL_TO_PAY_CHANGE_COLLECTIONS,
-  /** CN type change from normal to pay to normal event */
+  /** CN type change from normal to pay to normal event. */
   NORMAL_TO_PAY_TO_NORMAL_CHANGE_COLLECTIONS,
   /** PAID to TO_PAY type change of consignment. */
   PAID_TO_TO_PAY_CHANGE_COLLECTIONS,
