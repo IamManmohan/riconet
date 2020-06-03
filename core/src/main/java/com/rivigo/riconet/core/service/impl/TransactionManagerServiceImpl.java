@@ -100,11 +100,16 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    * @param collectionRequestDtoJsonString request json string to be sent to transaction manager.
    */
   @Override
-  public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString)
-      throws IOException {
+  public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
     log.info("Collection request payload {}", collectionRequestDtoJsonString);
-    final CollectionRequestDto collectionRequestDto =
-        objectMapper.readValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
+    final CollectionRequestDto collectionRequestDto;
+    try {
+      collectionRequestDto =
+          objectMapper.readValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
+    } catch (IOException e) {
+      log.error("Transformation failed {}", e.getMessage(), e);
+      throw new RuntimeException(e);
+    }
     log.info("Converted to collection Request {}", collectionRequestDto);
     hitTransactionManagerAndLogResponse(collectionRequestDto);
   }
