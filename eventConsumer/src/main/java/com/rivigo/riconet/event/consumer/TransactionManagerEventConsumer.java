@@ -95,6 +95,7 @@ public class TransactionManagerEventConsumer extends EventConsumer {
    */
   @Override
   public void doAction(NotificationDTO notificationDTO) {
+    log.info("Action on notification {}", notificationDTO);
     transactionManagerEventService.processNotification(notificationDTO);
   }
 

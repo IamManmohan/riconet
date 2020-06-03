@@ -32,9 +32,11 @@ public class TransactionManagerEventService {
     if (TransactionManagerEventNames.CN_INVALIDATION_COLLECTIONS
         .name()
         .equals(notificationDTO.getEventName())) {
+      log.info("Cn Invalidation Event");
       transactionManagerService.rollbackTransactionsAndLogResponse(
           notificationDTO.getMetadata().get(COLLECTION_PAYLOAD));
     } else {
+      log.info("Collections Event");
       transactionManagerService.hitTransactionManagerAndLogResponse(
           notificationDTO.getMetadata().get(COLLECTION_PAYLOAD));
     }

@@ -103,6 +103,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   public void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
     final CollectionRequestDto collectionRequestDto =
         objectMapper.convertValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
+    log.info("Converted to collection Request {}", collectionRequestDto);
     hitTransactionManagerAndLogResponse(collectionRequestDto);
   }
 
@@ -136,11 +137,13 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Override
   public void rollbackTransactionsAndLogResponse(@NonNull String collectionRequestDtoJsonString) {
 
+    log.info("RollBacking {}", collectionRequestDtoJsonString);
     final String reference = extractReference(collectionRequestDtoJsonString);
     if (StringUtils.isEmpty(reference)) {
       return;
     }
 
+    log.info("Reference {}", reference);
     try {
       final Optional<String> response =
           transactionService.rollbackByReference(
