@@ -126,7 +126,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
               getUserId(), transactionManagerClientKey, collectionRequestDto);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
-      log.error("Create transaction failed in transaction manager.");
+      log.error("Create transaction failed in transaction manager because: {}", e.getMessage());
     }
   }
 
@@ -152,7 +152,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
               getUserId(), transactionManagerClientKey, reference);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
-      log.error("Rollback transaction failed in transaction manager.");
+      log.error("Rollback transaction failed in transaction manager because {}", e.getMessage());
     }
   }
 
