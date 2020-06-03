@@ -3,12 +3,11 @@ package com.rivigo.riconet.event.service;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.TransactionManagerEventNames;
 import com.rivigo.riconet.core.service.TransactionManagerService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 /** Service for dealing with notification DTOs relating to transaction manager. */
 @Slf4j
