@@ -21,7 +21,6 @@ dependencies {
         exclude group: 'org.springframework'
         exclude group: 'io.zipkin.brave'
         exclude group: 'org.aspectj'
-        exclude group: 'com.rivigo.zoom.util'
     }
 }
 spotless {
