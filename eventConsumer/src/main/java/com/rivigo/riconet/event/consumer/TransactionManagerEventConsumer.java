@@ -96,12 +96,7 @@ public class TransactionManagerEventConsumer extends EventConsumer {
   @Override
   public void doAction(NotificationDTO notificationDTO) {
     log.info("Action on notification {}", notificationDTO);
-    try {
-      transactionManagerEventService.processNotification(notificationDTO);
-    } catch (Exception e) {
-      log.error("Here's what went wrong - {}", e.getMessage(), e);
-      throw new RuntimeException(e);
-    }
+    transactionManagerEventService.processNotification(notificationDTO);
   }
 
   /**
