@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableJpaRepositories(
-  basePackages = "com.rivigo.zoom.common.repository",
+  basePackages = "com.rivigo.zoom.common.repository.mysql",
   entityManagerFactoryRef = "entityManagerFactory",
   transactionManagerRef = "zoomTransactionManager"
 )
