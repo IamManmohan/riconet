@@ -40,7 +40,8 @@ import org.springframework.web.client.RestTemplate;
     "com.rivigo.riconet.ruleengine",
     "com.rivigo.riconet.core.config",
     "com.rivigo.riconet.core.test.consumer",
-    "com.rivigo.riconet.event.service"
+    "com.rivigo.riconet.event.service",
+    "com.rivigo.transaction.manager.client.service"
   }
 )
 @Slf4j
