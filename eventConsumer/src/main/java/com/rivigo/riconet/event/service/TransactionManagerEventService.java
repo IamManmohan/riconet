@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 /** Service for dealing with notification DTOs relating to transaction manager. */
 @Slf4j
 @Service
@@ -25,7 +27,7 @@ public class TransactionManagerEventService {
    *
    * @param notificationDTO dto for notification.
    */
-  public void processNotification(NotificationDTO notificationDTO) {
+  public void processNotification(NotificationDTO notificationDTO) throws IOException {
     if (!notificationDTO.getMetadata().containsKey(COLLECTION_PAYLOAD)) {
       log.error("Collections payload doesn't exist in notification: {}", notificationDTO);
     }

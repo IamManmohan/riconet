@@ -5,6 +5,8 @@ import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.transaction.manager.client.dto.CollectionRequestDto;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
+
+import java.io.IOException;
 import java.util.Map;
 import lombok.NonNull;
 
@@ -19,7 +21,7 @@ public interface TransactionManagerService {
    *
    * @param collectionRequestDtoJsonString request json string to be sent to transaction manager.
    */
-  void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString);
+  void hitTransactionManagerAndLogResponse(@NonNull String collectionRequestDtoJsonString) throws IOException;
 
   /**
    * This function hits transaction manager with collectionRequestDto and logs the response.

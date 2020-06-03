@@ -100,7 +100,7 @@ public class TransactionManagerEventConsumer extends EventConsumer {
       transactionManagerEventService.processNotification(notificationDTO);
     } catch (Exception e) {
       log.error("Here's what went wrong - {}", e.getMessage(), e);
-      throw e;
+      throw new RuntimeException(e);
     }
   }
 
