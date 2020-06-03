@@ -23,6 +23,7 @@ import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
 import com.rivigo.riconet.event.consumer.TransactionManagerEventConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
+import com.rivigo.zoom.util.commons.config.SerDeConfig;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -156,6 +157,8 @@ public class EventMain {
             ZoomBackendNeo4jReadConfig.class,
             RiconetRedisConfig.class,
             AsyncConfig.class,
+            com.rivigo.zoom.util.commons.config.AsyncConfig.class,
+            SerDeConfig.class,
             KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
     EventMain eventMain = context.getBean(EventMain.class);
