@@ -62,6 +62,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -165,7 +166,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
               if (consignmentScheduleListForAllCNs.containsKey(v.getId())) {
                 final List<ConsignmentSchedule> consignmentSchedules =
                     consignmentScheduleListForAllCNs.get(v.getId());
-                pickupDoneDto.setRevisedEdd(getRevisedEddFromCnSchedule(consignmentSchedules));
+                pickupDoneDto.setRevisedEdd(
+                    getRevisedEddFromCnScheduleAndConsignment(
+                        consignmentSchedules, v.getPromisedDeliveryDateTime()));
               }
 
               return HiltiRequestDto.builder()
@@ -207,7 +210,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         return IntransitArrivedDto.builder()
             .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
             .atDestination("no")
-            .revisedEdd(getRevisedEddFromCnSchedule(schedules))
+            .revisedEdd(
+                getRevisedEddFromCnScheduleAndConsignment(
+                    schedules, consignment.getPromisedDeliveryDateTime()))
             .build();
       case CN_DELIVERY_LOADED:
         return IntransitArrivedDto.builder()
@@ -232,9 +237,12 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
    * schedule locationType = PINCODE and locationTag = TO_PINCODE.
    *
    * @param schedules consignment schedule collection.
+   * @param cnPromisedDeliveryDateTime promised delivery date time from consignment table.
    * @return revised edd in string format.
    */
-  private static String getRevisedEddFromCnSchedule(Collection<ConsignmentSchedule> schedules) {
+  private static String getRevisedEddFromCnScheduleAndConsignment(
+      @NonNull Collection<ConsignmentSchedule> schedules,
+      @NonNull DateTime cnPromisedDeliveryDateTime) {
     final Optional<ConsignmentSchedule> toPincodeCnScheduleOptional =
         schedules
             .stream()
@@ -246,19 +254,27 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
     if (toPincodeCnScheduleOptional.isPresent()) {
       return TimeUtilsZoom.getDate(
-          new DateTime(toPincodeCnScheduleOptional.get().getArrivalScheduledTime()));
+          new DateTime(
+              Math.max(
+                  toPincodeCnScheduleOptional.get().getArrivalScheduledTime(),
+                  cnPromisedDeliveryDateTime.getMillis())));
     }
-    return "";
+    return TimeUtilsZoom.getDate(cnPromisedDeliveryDateTime);
   }
 
   private BaseHiltiFieldData getDeliveryFieldData(NotificationDTO notificationDTO) {
     List<ConsignmentSchedule> consignmentSchedules;
+    ConsignmentReadOnly consignmentReadOnly;
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_OUT_FOR_DELIVERY:
+        consignmentReadOnly =
+            consignmentReadOnlyService.findRequiredById(notificationDTO.getEntityId());
         consignmentSchedules =
             consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
         return DeliveryOFDDto.builder()
-            .revisedEdd(getRevisedEddFromCnSchedule(consignmentSchedules))
+            .revisedEdd(
+                getRevisedEddFromCnScheduleAndConsignment(
+                    consignmentSchedules, consignmentReadOnly.getPromisedDeliveryDateTime()))
             .build();
       case CN_DELIVERY:
         List<ConsignmentUploadedFiles> uploadedDocuments =
@@ -280,13 +296,17 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             undeliveredConsignmentsRepository
                 .findTop1ByConsignmentIdAndOldDrsIdNotNullOrderByIdDesc(
                     notificationDTO.getEntityId());
+        consignmentReadOnly =
+            consignmentReadOnlyService.findRequiredById(notificationDTO.getEntityId());
         consignmentSchedules =
             consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
         return DeliveryNotDeliveredDto.builder()
             .undeliveryReason(
                 undeliveredConsignment.getReason() + ": " + undeliveredConsignment.getSubReason())
             .podUndelivered("")
-            .rdd(getRevisedEddFromCnSchedule(consignmentSchedules))
+            .rdd(
+                getRevisedEddFromCnScheduleAndConsignment(
+                    consignmentSchedules, consignmentReadOnly.getPromisedDeliveryDateTime()))
             .build();
       default:
         log.error("Unrecognized delivery event {}", notificationDTO);
