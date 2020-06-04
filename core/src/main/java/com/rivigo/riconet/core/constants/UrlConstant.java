@@ -75,4 +75,6 @@ public class UrlConstant {
 
   public static final String ZOOM_BACKEND_MARK_DELIVERED =
       "/operations/consignments/cndeliver/{cnote}";
+
+  public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";
 }
