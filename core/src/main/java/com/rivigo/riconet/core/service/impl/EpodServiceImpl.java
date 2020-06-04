@@ -1,8 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.constants.EpodConstants;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.EpodPreparedDto;
 import com.rivigo.riconet.core.service.ConsignmentService;
@@ -10,6 +8,7 @@ import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EpodServiceImpl implements EpodService {
 
   /**
@@ -28,20 +28,20 @@ public class EpodServiceImpl implements EpodService {
    *
    * @author Nikhil Rawat on 26/05/20.
    */
-  @Autowired private ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
   /**
    * consignment service for getting cn details from zoom backend.
    *
    * @author Nikhil Rawat on 26/05/20.
    */
-  @Autowired private ConsignmentService consignmentService;
+  private final ConsignmentService consignmentService;
 
   /**
    * zoomBackendAPI client service for hitting zoom-backend api.
    *
    * @author Nikhil Rawat on 26/05/20.
    */
-  @Autowired private ZoomBackendAPIClientService zoomBackendAPIClientService;
+  private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   /**
    * function that coverts the dto String fetched from compass to EpodPreaparedDto, and hits zoom
@@ -50,7 +50,7 @@ public class EpodServiceImpl implements EpodService {
    * @author Nikhil Rawat on 26/05/20.
    */
   @Override
-  public JsonNode uploadEpod(String json) {
+  public void uploadEpod(String json) {
     final EpodPreparedDto epodPreparedDTO = getEpodPreapredDTO(json);
     if (epodPreparedDTO == null) {
       throw new ZoomException("EpodPreparedDTO cannot be null or empty.");
@@ -61,8 +61,7 @@ public class EpodServiceImpl implements EpodService {
       consignmentUploadedFilesDTO.setConsignmentId(
           consignmentService.getIdByCnote(epodPreparedDTO.getIdentifier()));
       consignmentUploadedFilesDTO.setFileName(epodPreparedDTO.getIdentifier());
-      consignmentUploadedFilesDTO.setFileTypes(EpodConstants.EPOD);
-      return zoomBackendAPIClientService.uploadEpod(consignmentUploadedFilesDTO);
+      zoomBackendAPIClientService.uploadEpod(consignmentUploadedFilesDTO);
     }
   }
 

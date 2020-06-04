@@ -78,7 +78,7 @@ public interface ZoomBackendAPIClientService {
    * @param consignmentUploadedFilesDTO for uploading epod.
    * @return upload the s3 url for the epod in consignment_uploaded_files.
    */
-  JsonNode uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO);
+  void uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO);
 
   /**
    * This function is used to update epod flag details.

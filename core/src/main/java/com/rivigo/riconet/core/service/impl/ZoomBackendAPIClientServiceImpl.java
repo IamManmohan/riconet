@@ -475,7 +475,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * @author Nikhil Rawat on 26/05/20.
    */
   @Override
-  public JsonNode uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO) {
+  public void uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO) {
     JsonNode responseJson;
     try {
       responseJson =
@@ -485,12 +485,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_UPLOAD_EPOD,
               null,
               backendBaseUrl);
-      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in uploading epod");
       }
-      return responseJson;
     } catch (IOException e) {
       throw new ZoomException("Error while uploading epod ", e);
     }
@@ -510,11 +509,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               epodApplicableDTO,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_EPOD_FLAG,
+              UrlConstant.ZOOM_BACKEND_UPDATE_EPOD_FLAG,
               null,
               backendBaseUrl);
-      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in updating epod flag");
       }
