@@ -81,6 +81,8 @@ public class ClientApiIntegrationServiceTest {
     Mockito.when(consignmentReadOnlyService.findConsignmentById(ApiServiceUtils.CONSIGNMENT_ID))
         .thenReturn(
             Optional.of(ApiServiceUtils.getDummyConsignmentWithCnote(CNOTES.get(CNOTE_INDEX))));
+    Mockito.when(consignmentReadOnlyService.findRequiredById(ApiServiceUtils.CONSIGNMENT_ID))
+        .thenReturn(ApiServiceUtils.getDummyConsignmentWithCnote(CNOTES.get(CNOTE_INDEX)));
     Mockito.when(consignmentScheduleService.getActivePlan(ApiServiceUtils.CONSIGNMENT_ID))
         .thenReturn(ApiServiceUtils.getDummyConsignmentSchedule());
     Mockito.when(locationRepositoryV2.findByIdIn(Mockito.anyList()))
