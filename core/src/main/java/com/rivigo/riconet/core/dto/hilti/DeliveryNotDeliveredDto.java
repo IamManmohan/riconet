@@ -20,4 +20,9 @@ public class DeliveryNotDeliveredDto extends BaseHiltiFieldData {
   private String latLong;
   private String undeliveryReason;
   private String podUndelivered;
+  /**
+   * Revised edd sent to client. This value is taken from consignment schedule
+   * (scheduled_arrival_time column) for TO_PINCODE location.
+   */
+  private String rdd;
 }
