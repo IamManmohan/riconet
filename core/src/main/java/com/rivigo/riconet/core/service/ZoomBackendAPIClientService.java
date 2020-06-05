@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
@@ -70,4 +71,19 @@ public interface ZoomBackendAPIClientService {
    * @param cnote for generating invoice.
    */
   void generateInvoice(String cnote);
+
+  /**
+   * This function is used to update epod link.
+   *
+   * @param consignmentUploadedFilesDTO for uploading epod.
+   * @return upload the s3 url for the epod in consignment_uploaded_files.
+   */
+  void uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO);
+
+  /**
+   * This function is used to update epod flag details.
+   *
+   * @param epodApplicableDTO for updating epod details.
+   */
+  void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
 }

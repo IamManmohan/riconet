@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
+import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
@@ -467,5 +468,57 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
     apiClientService.parseJsonNode(responseJson, null);
+  }
+  /**
+   * function that uploads the e-pod by hitting the zoom-backend api.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
+  @Override
+  public void uploadEpod(ConsignmentUploadedFilesDTO consignmentUploadedFilesDTO) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              consignmentUploadedFilesDTO,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_UPLOAD_EPOD,
+              null,
+              backendBaseUrl);
+      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in uploading epod");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while uploading epod ", e);
+    }
+  }
+
+  /**
+   * function that hits the zoom-backend upload epod api so that epod is stored in consignment
+   * uploaded files.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
+  @Override
+  public void updateEpodDetails(EpodApplicableDto epodApplicableDTO) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              epodApplicableDTO,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_UPDATE_EPOD_FLAG,
+              null,
+              backendBaseUrl);
+      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in updating epod flag");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating epod flag ", e);
+    }
   }
 }
