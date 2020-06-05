@@ -20,6 +20,7 @@ import com.rivigo.riconet.event.consumer.FinanceEventsConsumer;
 import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.PrimeEventsConsumer;
 import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
+import com.rivigo.riconet.event.consumer.WhatsappReceiveMessageConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import java.time.Duration;
@@ -59,6 +60,8 @@ public class EventMain {
   private final PrimeEventsConsumer primeEventsConsumer;
 
   private final HealthCheckConsumer healthCheckConsumer;
+
+  private final WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer;
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
@@ -113,6 +116,9 @@ public class EventMain {
   @Value("${primeEventsConsumer.group.id}")
   private String primeEventsGroup;
 
+  @Value("${whatsappReceiveMessageConsumer.group.id}")
+  private String whatsappReceiveMessageGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -124,7 +130,8 @@ public class EventMain {
       KairosExpressAppEventConsumer kairosExpressAppEventConsumer,
       ExpressAppPickupConsumer expressAppPickupConsumer,
       SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
-      PrimeEventsConsumer primeEventsConsumer) {
+      PrimeEventsConsumer primeEventsConsumer,
+      WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -136,6 +143,7 @@ public class EventMain {
     this.expressAppPickupConsumer = expressAppPickupConsumer;
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
     this.primeEventsConsumer = primeEventsConsumer;
+    this.whatsappReceiveMessageConsumer = whatsappReceiveMessageConsumer;
   }
 
   public static void main(String[] args) {
@@ -189,6 +197,12 @@ public class EventMain {
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        whatsappReceiveMessageGroup,
+        whatsappReceiveMessageConsumer);
   }
 
   private void load(
