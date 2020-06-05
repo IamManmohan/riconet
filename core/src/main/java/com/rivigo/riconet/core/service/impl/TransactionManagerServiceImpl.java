@@ -65,9 +65,13 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   @Value("${rivigo.sso.username}")
   private String ssoUsername;
 
-  /** transaction manager client key. */
-  @Value("${transaction.manager.client.key}")
-  private String transactionManagerClientKey;
+  /** transaction manager client id. */
+  @Value("${transaction.manager.client.id}")
+  private String transactionManagerClientId;
+
+  /** transaction manager secret key. */
+  @Value("${transaction.manager.secret.key}")
+  private String transactionManagerSecretKey;
 
   /** bean of prs service to fetch prs details. */
   private final PRSService prsService;
@@ -128,7 +132,10 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     try {
       final Optional<String> response =
           transactionService.createTransactions(
-              getUserId(), transactionManagerClientKey, collectionRequestDto);
+              getUserId(),
+              transactionManagerClientId,
+              transactionManagerSecretKey,
+              collectionRequestDto);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
       log.error("Create transaction failed in transaction manager because: {}", e.getMessage());
@@ -154,7 +161,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     try {
       final Optional<String> response =
           transactionService.rollbackByReference(
-              getUserId(), transactionManagerClientKey, reference);
+              getUserId(), transactionManagerClientId, transactionManagerSecretKey, reference);
       response.ifPresent(s -> log.info("Response from hitting transaction manager: {}", s));
     } catch (ZoomRestException e) {
       log.error("Rollback transaction failed in transaction manager because {}", e.getMessage());
