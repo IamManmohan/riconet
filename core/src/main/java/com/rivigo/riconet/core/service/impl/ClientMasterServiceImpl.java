@@ -7,6 +7,7 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
+import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
@@ -277,6 +278,32 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       zoomBackendAPIClientService.updateVasDetails(clientVasDetailDTO);
     } else {
       zoomBackendAPIClientService.addVasDetails(clientVasDetailDTO);
+    }
+  }
+  /**
+   * function that hits the zoom-backend for updating the e-pod applicable flag.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
+  @Override
+  public void updateEpodDetails(String payload) {
+    EpodApplicableDto epodApplicableDTO = getEpodApplicableDto(payload);
+    zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
+  }
+
+  /**
+   * function that coverts the dto String fetched from compass to EpodApplicableDto.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
+  private EpodApplicableDto getEpodApplicableDto(String dtoString) {
+    try {
+      EpodApplicableDto epodApplicableDTO;
+      epodApplicableDTO = objectMapper.readValue(dtoString, EpodApplicableDto.class);
+      return epodApplicableDTO;
+    } catch (IOException ex) {
+      log.error("Error occured while processing message {} ", dtoString, ex);
+      return null;
     }
   }
 }
