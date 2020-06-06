@@ -5,6 +5,7 @@ import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
+import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
 import com.rivigo.riconet.core.service.HandoverCollectionService;
@@ -29,12 +30,26 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
+  /**
+   * This service is used for uploading epod link.
+   *
+   * @param json string which is converted to consignmentUploadedFilesDTO for further api calls.
+   * @return upload the s3 url for the epod in consignment_uploaded_files.
+   */
+  @Autowired private EpodService epodService;
+
   @Override
   public void processFinanceEvents(EventPayload eventPayload) {
     ZoomEventType eventType = eventPayload.getEventType();
     switch (eventType) {
       case CMS_CLIENT_UPSERT:
         clientMasterService.createUpdateClient(eventPayload.getPayload());
+        break;
+      case CMS_CLIENT_SETTING_UPSERT:
+        clientMasterService.updateEpodDetails(eventPayload.getPayload());
+        break;
+      case ELECTRONIC_POD_PREPARED:
+        epodService.uploadEpod(eventPayload.getPayload());
         break;
       case INVOICE_DOCUMENT_PREPARED:
         consignmentInvoiceService.saveInvoiceDetails(eventPayload.getPayload());
