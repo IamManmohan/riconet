@@ -44,17 +44,20 @@ public class TransactionManagerEventConsumer extends EventConsumer {
   @Async
   @Override
   public CompletionStage<Done> save(ConsumerRecord<String, String> record) {
+    MDCUtils.setEventDetails(record);
     if (record.topic().equals(getTopic())) {
-      MDCUtils.setEventDetails(record);
       log.info(
           "Processing message {} on topic {} partition {} ",
           record.value(),
           record.topic(),
           record.partition());
-      MDCUtils.setEventDetails(record);
-      processMessage(record.value());
+      try {
+        processMessage(record.value());
+      } catch (Exception e) {
+        String errorMsg = getStackTrace(e);
+        processFirstTimeError(record.value(), errorMsg);
+      }
     } else if (record.topic().equals(getErrorTopic())) {
-      MDCUtils.setEventDetails(record);
       ConsumerMessage consumerMessage = null;
       try {
         consumerMessage = objectMapper.readValue(record.value(), ConsumerMessage.class);

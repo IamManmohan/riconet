@@ -103,7 +103,11 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
 
-    transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
+    try {
+      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
+    } catch (ZoomException e) {
+      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    }
   }
 
   private ZoomBookTransactionType getTransactionType(ZoomEventType eventType) {

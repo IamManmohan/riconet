@@ -27,6 +27,7 @@ import com.rivigo.zoom.common.model.PickupRunSheet;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.exception.ZoomRestException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
           objectMapper.readValue(collectionRequestDtoJsonString, CollectionRequestDto.class);
     } catch (IOException e) {
       log.error("Transformation failed {}", e.getMessage(), e);
-      throw new RuntimeException(e);
+      throw new ZoomException(e);
     }
     log.info("Converted to collection Request {}", collectionRequestDto);
     hitTransactionManagerAndLogResponse(collectionRequestDto);
