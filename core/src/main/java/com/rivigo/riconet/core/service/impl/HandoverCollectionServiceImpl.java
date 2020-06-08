@@ -105,7 +105,7 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
     try {
       transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
-    } catch (ZoomException e) {
+    } catch (Exception e) {
       log.error("Could not hit transaction manager as: {}", e.getMessage());
     }
   }
@@ -193,7 +193,11 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         chequeBounceDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
 
-    transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
+    try {
+      transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
+    } catch (Exception e) {
+      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    }
   }
 
   private Location getLocation(String code) {
@@ -201,8 +205,8 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   /**
-   * Create DTOs for credit and debit, Get location dto for the location code, (dont forget to keep
-   * the clientRequestId unique)
+   * HandoverCollectionServiceImpl Create DTOs for credit and debit, Get location dto for the
+   * location code, (dont forget to keep the clientRequestId unique)
    *
    * @param payload the payload from collection for exclude event.
    * @return List of 2 entries, one credit, and one debit for cheque bounce
