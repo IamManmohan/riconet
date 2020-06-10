@@ -18,6 +18,7 @@ import com.rivigo.riconet.notification.consumer.DocIssueNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.PickupNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.RetailNotificationConsumer;
 import com.rivigo.riconet.notification.consumer.ZoomCommunicationsConsumer;
+import com.rivigo.zoom.util.commons.config.SerDeConfig;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -99,6 +100,8 @@ public class NotificationMain {
             ZoomBackendNeo4jReadConfig.class,
             RiconetRedisConfig.class,
             AsyncConfig.class,
+            com.rivigo.zoom.util.commons.config.AsyncConfig.class,
+            SerDeConfig.class,
             KafkaConfig.class);
     final ActorMaterializer materializer = ActorMaterializer.create(system);
 

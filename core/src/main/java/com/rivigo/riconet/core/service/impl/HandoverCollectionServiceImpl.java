@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.service.DepositSlipService;
 import com.rivigo.riconet.core.service.HandoverCollectionService;
 import com.rivigo.riconet.core.service.LocationService;
 import com.rivigo.riconet.core.service.PaymentDetailV2Service;
+import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
@@ -63,6 +64,9 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
   private final ConsignmentReadOnlyService consignmentReadOnlyService;
 
+  /** bean of transaction manager service to send requests to transaction manager. */
+  private final TransactionManagerService transactionManagerService;
+
   /**
    * Parse this payload to HandoverCollectionEventPayload, Get location dto for the location code,
    * create ZoomBookTransactionRequestDTO and hit the zoombook for creating transaction This
@@ -98,6 +102,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
 
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
+
+    try {
+      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
+    } catch (Exception e) {
+      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    }
   }
 
   private ZoomBookTransactionType getTransactionType(ZoomEventType eventType) {
@@ -182,6 +192,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         "Making zoom backend markRecoveryPendingV2 API calls for payload: {}",
         chequeBounceDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
+
+    try {
+      transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
+    } catch (Exception e) {
+      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    }
   }
 
   private Location getLocation(String code) {
@@ -189,8 +205,8 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
   }
 
   /**
-   * Create DTOs for credit and debit, Get location dto for the location code, (dont forget to keep
-   * the clientRequestId unique)
+   * HandoverCollectionServiceImpl Create DTOs for credit and debit, Get location dto for the
+   * location code, (dont forget to keep the clientRequestId unique)
    *
    * @param payload the payload from collection for exclude event.
    * @return List of 2 entries, one credit, and one debit for cheque bounce

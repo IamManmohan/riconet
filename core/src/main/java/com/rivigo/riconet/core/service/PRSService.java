@@ -9,4 +9,12 @@ import org.springframework.stereotype.Service;
 public interface PRSService {
 
   Map<Long, PickupRunSheet> getPrsMapByPRSIdIn(List<Long> prsTripIdList);
+
+  /**
+   * This function is used to list of pickup run sheets bu ids.
+   *
+   * @param prsIds list of PRS ids.
+   * @return list of pickup run sheet.
+   */
+  List<PickupRunSheet> getPickupRunSheets(List<Long> prsIds);
 }
