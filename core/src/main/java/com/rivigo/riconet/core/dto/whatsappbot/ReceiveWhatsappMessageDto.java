@@ -13,10 +13,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ReceiveWhatsappMessageDto implements Serializable {
-  String from;
-  String message;
-  String userName;
-  String type;
-  Long createdAt;
-  String replyTo;
+  private String from;
+  private String message;
+  private String userName;
+  private String type;
+  private Long createdAt;
+  private String replyTo;
 }

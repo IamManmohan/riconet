@@ -1,10 +1,10 @@
-package com.rivigo.riconet.core.service.impl;
+package com.rivigo.riconet.event.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.core.service.ApiClientService;
-import com.rivigo.riconet.core.service.WhatsappBotService;
+import com.rivigo.riconet.event.service.WhatsappBotService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+/**
+ * Layer to interact with the whatsapp-bot service.
+ *
+ * @author shubham
+ * @version 1
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -23,6 +29,11 @@ public class WhatsappBotServiceImpl implements WhatsappBotService {
   @Value("${whatsappbot.url}")
   private String whatsappBotBaseUrl;
 
+  /**
+   * It processes the message received from the user and sends it to whatsapp for replying back.
+   *
+   * @param receiveWhatsappMessageDto message received from the user.
+   */
   @Override
   public void processReceivedWhatsappMessage(ReceiveWhatsappMessageDto receiveWhatsappMessageDto) {
     JsonNode responseJson;

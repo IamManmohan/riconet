@@ -1,9 +1,11 @@
-package com.rivigo.riconet.core.service;
+package com.rivigo.riconet.event.service;
 
 import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
-import org.springframework.stereotype.Service;
 
-@Service
+/**
+ * @author shubham
+ * @version 1
+ */
 public interface WhatsappBotService {
 
   void processReceivedWhatsappMessage(ReceiveWhatsappMessageDto receiveWhatsappMessageDto);

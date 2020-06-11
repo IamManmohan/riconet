@@ -1,31 +1,27 @@
 package com.rivigo.riconet.event.consumer;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.core.dto.whatsappbot.BasePubSubDto;
 import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
-import com.rivigo.riconet.core.service.WhatsappBotService;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
+import com.rivigo.riconet.event.service.WhatsappBotService;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WhatsappReceiveMessageConsumer extends ConsumerModel {
 
-  @Autowired private EventTopicNameConfig eventTopicNameConfig;
+  private final EventTopicNameConfig eventTopicNameConfig;
 
-  @Autowired private WhatsappBotService whatsappBotService;
+  private final WhatsappBotService whatsappBotService;
 
-  private ObjectMapper objectMapper;
-
-  public WhatsappReceiveMessageConsumer() {
-    objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-  }
+  private final ObjectMapper objectMapper;
 
   @Override
   public String getTopic() {
