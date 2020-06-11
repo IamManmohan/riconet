@@ -26,6 +26,14 @@ public class EventTopicNameConfig {
   @Value("${WMS_EVENT_SINK_ERROR}")
   private String wmsEventSinkError;
 
+  /** topic name for transaction manager event sink. */
+  @Value("${TRANSACTION_MANAGER_EVENT_SINK}")
+  private String transactionManagerEventSink;
+
+  /** topic name for transaction manager event sink error. */
+  @Value("${TRANSACTION_MANAGER_EVENT_SINK_ERROR}")
+  private String transactionManagerEventSinkError;
+
   @Value("${KAIROS_EXPRESS_APP_SINK}")
   private String kairosExpressAppSink;
 
