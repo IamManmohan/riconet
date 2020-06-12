@@ -9,7 +9,7 @@ buildscript {
         maven { url 'https://packages.confluent.io/maven' }
     }
     dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.12.0"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:4.0.0"
     }
 }
 
@@ -37,7 +37,7 @@ allprojects {
     jacocoTestReport {
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
-        additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+        files(sourceSets.main.allJava.srcDirs)
         reports {
             xml.enabled true
             csv.enabled false
