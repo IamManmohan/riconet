@@ -2,8 +2,8 @@ package com.rivigo.riconet.event.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
-import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.core.service.ApiClientService;
+import com.rivigo.riconet.event.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.event.service.WhatsappBotService;
 import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;

@@ -2,9 +2,9 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
-import com.rivigo.riconet.core.dto.whatsappbot.BasePubSubDto;
-import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
+import com.rivigo.riconet.event.dto.whatsappbot.BasePubSubDto;
+import com.rivigo.riconet.event.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.event.service.WhatsappBotService;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;

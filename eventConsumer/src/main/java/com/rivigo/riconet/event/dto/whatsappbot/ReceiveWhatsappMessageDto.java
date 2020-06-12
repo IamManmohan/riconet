@@ -1,4 +1,4 @@
-package com.rivigo.riconet.core.dto.whatsappbot;
+package com.rivigo.riconet.event.dto.whatsappbot;
 
 import java.io.Serializable;
 import lombok.AllArgsConstructor;

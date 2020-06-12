@@ -1,6 +1,6 @@
 package com.rivigo.riconet.event.service;
 
-import com.rivigo.riconet.core.dto.whatsappbot.ReceiveWhatsappMessageDto;
+import com.rivigo.riconet.event.dto.whatsappbot.ReceiveWhatsappMessageDto;
 
 /**
  * @author shubham
