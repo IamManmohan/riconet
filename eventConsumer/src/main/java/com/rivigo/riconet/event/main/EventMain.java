@@ -21,6 +21,7 @@ import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.PrimeEventsConsumer;
 import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
 import com.rivigo.riconet.event.consumer.TransactionManagerEventConsumer;
+import com.rivigo.riconet.event.consumer.WhatsappReceiveMessageConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.util.commons.config.SerDeConfig;
@@ -63,6 +64,8 @@ public class EventMain {
   private final HealthCheckConsumer healthCheckConsumer;
 
   private final TransactionManagerEventConsumer transactionManagerEventConsumer;
+
+  private final WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer;
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
@@ -120,6 +123,9 @@ public class EventMain {
   @Value("${primeEventsConsumer.group.id}")
   private String primeEventsGroup;
 
+  @Value("${whatsappReceiveMessageConsumer.group.id}")
+  private String whatsappReceiveMessageGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -132,7 +138,8 @@ public class EventMain {
       ExpressAppPickupConsumer expressAppPickupConsumer,
       SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
       PrimeEventsConsumer primeEventsConsumer,
-      TransactionManagerEventConsumer transactionManagerEventConsumer) {
+      TransactionManagerEventConsumer transactionManagerEventConsumer,
+      WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -145,6 +152,7 @@ public class EventMain {
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
     this.primeEventsConsumer = primeEventsConsumer;
     this.transactionManagerEventConsumer = transactionManagerEventConsumer;
+    this.whatsappReceiveMessageConsumer = whatsappReceiveMessageConsumer;
   }
 
   public static void main(String[] args) {
@@ -206,6 +214,12 @@ public class EventMain {
         bootstrapServers,
         transactionManagerConsumerGroup,
         transactionManagerEventConsumer);
+    load(
+        materializer,
+        system,
+        bootstrapServers,
+        whatsappReceiveMessageGroup,
+        whatsappReceiveMessageConsumer);
   }
 
   private void load(
