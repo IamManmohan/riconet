@@ -4,6 +4,7 @@ ARG SPRING_PROFILE=kubernetes
 ARG LOGIN_PROFILE=staging
 ARG XMX_XMS_VALUE=512m
 ARG BACKEND_READ_JDBC_URL=jdbc:mysql://host.docker.internal:3306/rivigo_zoom
+ARG BACKEND_WRITE_JDBC_URL=jdbc:mysql://host.docker.internal:3306/rivigo_zoom
 ARG OUT_TOPIC_PREFIX=local
 ARG NEO4J_URL=http://host.docker.internal:7474
 ARG PROPERTIES_PATH_EVENT=eventConsumer/src/main/resources/kubernetes/
@@ -22,7 +23,7 @@ ENV COMMON_JAVA_OPTS="$EXTRA_ARGS -Xms$XMX_XMS_VALUE \
     -Dspring.profiles.active=$SPRING_PROFILE  \
     -Dzoom.neo4j.url=$NEO4J_URL \
     -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
-    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL \
+    -Dzoom.mysql.url=$BACKEND_WRITE_JDBC_URL \
     -Dtopic.prefix.out=$OUT_TOPIC_PREFIX"
 
 
