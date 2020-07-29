@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.rivigo.collections.api.dto.HandoverCollectionEventPayload;
 import com.rivigo.finance.utils.StringUtils;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.constants.CollectionsConstraintConstants;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
 import com.rivigo.riconet.core.service.LocationService;
@@ -330,6 +331,15 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
     final List<CollectionRequestDto> collectionRequestDtos = new ArrayList<>();
     for (final PaymentDetailV2 paymentDetailV2 : paymentDetails) {
       ConsignmentReadOnly consignment = consignmentMap.get(paymentDetailV2.getConsignmentId());
+      if (consignment
+          .getBookingDateTime()
+          .isBefore(CollectionsConstraintConstants.COLLECTIONS_FOR_CN_BOOKED_AFTER_TIMESTAMP)) {
+        log.info(
+            "Skipping Cn {} to register transactions because it was booked before {} ",
+            consignment.getCnote(),
+            CollectionsConstraintConstants.COLLECTIONS_FOR_CN_BOOKED_AFTER_TIMESTAMP);
+        continue;
+      }
       final CollectionRequestDto collectionRequestDto =
           CollectionRequestDto.builder()
               .consignmentId(consignment.getId())
