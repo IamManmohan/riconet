@@ -22,11 +22,6 @@ ARG EXTRA_ARGS="-XX:+UseG1GC"
 ARG NAMESPACE=local
 
 # backend jdbc config
-ARG BACKEND_WRITE_JDBC_URL=jdbc:mysql://zoom-mysql.stg.rivigo.com:3306/staging_rivigo_zoom
-ARG BACKEND_WRITE_JDBC_USERNAME="general"
-ARG BACKEND_WRITE_JDBC_PASSWORD="general"
-
-# backend jdbc config
 ARG BACKEND_READ_JDBC_URL=jdbc:mysql://zoom-mysql.stg.rivigo.com:3306/staging_rivigo_zoom
 ARG BACKEND_READ_JDBC_USERNAME="general"
 ARG BACKEND_READ_JDBC_PASSWORD="general"
@@ -50,12 +45,9 @@ ENV COMMON_JAVA_OPTS="$EXTRA_ARGS -Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE \
     -Dzoom.neo4j.url=$NEO4J_URL \
     -Dzoom.neo4j.username=$NEO4J_USERNAME \
     -Dzoom.neo4j.password=$NEO4J_PASSWORD \
-    -Dread.zoom.mysql.jdbcUrl=$BACKEND_READ_JDBC_URL \
-    -Dread.zoom.mysql.username=$BACKEND_READ_JDBC_USERNAME \
-    -Dread.zoom.mysql.password=$BACKEND_READ_JDBC_PASSWORD \
-    -Dzoom.mysql.jdbcUrl=$BACKEND_WRITE_JDBC_URL \
-    -Dzoom.mysql.username=$BACKEND_WRITE_JDBC_USERNAME \
-    -Dzoom.mysql.password=$BACKEND_WRITE_JDBC_PASSWORD \
+    -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL \
+    -Dzoom.mysql.username=$BACKEND_READ_JDBC_USERNAME \
+    -Dzoom.mysql.password=$BACKEND_READ_JDBC_PASSWORD \
     -Dtopic.prefix.out=$OUT_TOPIC_PREFIX"
 
 
