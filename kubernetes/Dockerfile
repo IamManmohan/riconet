@@ -22,11 +22,6 @@ ARG EXTRA_ARGS="-XX:+UseG1GC"
 ARG NAMESPACE=local
 
 # backend jdbc config
-ARG BACKEND_WRITE_JDBC_URL=jdbc:mysql://zoom-mysql.stg.rivigo.com:3306/staging_rivigo_zoom
-ARG BACKEND_WRITE_JDBC_USERNAME="general"
-ARG BACKEND_WRITE_JDBC_PASSWORD="general"
-
-# backend jdbc config
 ARG BACKEND_READ_JDBC_URL=jdbc:mysql://zoom-mysql.stg.rivigo.com:3306/staging_rivigo_zoom
 ARG BACKEND_READ_JDBC_USERNAME="general"
 ARG BACKEND_READ_JDBC_PASSWORD="general"
