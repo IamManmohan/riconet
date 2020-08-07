@@ -41,9 +41,9 @@ public class WhatsappReceiveMessageConsumer extends ConsumerModel {
   }
 
   public void processMessage(String str) throws IOException {
-    boolean isEmailEnabled =
+    boolean isWhatsappEnabled =
             zoomPropertyService.getBoolean(ZoomPropertyName.RECEIVE_WHATSAPP_MESSAGE_ENABLED, false);
-    if(EnvironmentPredicate.isActiveSpringProfileProduction().test(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))||isEmailEnabled) {
+    if(EnvironmentPredicate.isActiveSpringProfileProduction().test(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))||isWhatsappEnabled) {
       BasePubSubDto basePubSubDto = objectMapper.readValue(str, BasePubSubDto.class);
       ReceiveWhatsappMessageDto receiveWhatsappMessageDto =
               objectMapper.readValue(basePubSubDto.getMessage(), ReceiveWhatsappMessageDto.class);
