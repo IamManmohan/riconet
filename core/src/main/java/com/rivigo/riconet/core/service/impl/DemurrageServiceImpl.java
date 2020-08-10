@@ -78,7 +78,7 @@ public class DemurrageServiceImpl implements DemurrageService {
     } else {
       return false;
     }
-    return DateTime.parse(startTime).isAfter(cn.getPromisedDeliveryDateTime())
+    return cn.getPromisedDeliveryDateTime().isBefore(new DateTime(Long.parseLong(startTime)))
         && NORMAL_CNOTE_TYPE.equals(cn.getCnoteType().toString())
         && RIVIGO_ORGANIZATION_ID.equals(cn.getOrganizationId().toString())
         && IS_ACTIVE_CONSIGNMENT == cn.getIsActive();
