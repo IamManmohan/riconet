@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.enums;
 
 public enum ZoomCommunicationFieldNames {
+  ID,
   CNOTE,
   CURRENT_LOCATION_ID,
   SECONDARY_CNOTES,
@@ -98,5 +99,10 @@ public enum ZoomCommunicationFieldNames {
     BANK_NAME,
     TRANSACTION_REFERENCE_NO,
     TRANSFERRED_AMOUNT
+  }
+
+  public enum Undelivery {
+    ALERT_CREATED_AT,
+    DELIVERY_REATTEMPT_CHARGEABLE
   }
 }

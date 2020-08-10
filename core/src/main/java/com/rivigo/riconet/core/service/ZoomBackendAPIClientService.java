@@ -86,4 +86,8 @@ public interface ZoomBackendAPIClientService {
    * @param epodApplicableDTO for updating epod details.
    */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
+
+  void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId);
+
+  void endDemurrage(String cnote);
 }

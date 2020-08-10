@@ -521,4 +521,50 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while updating epod flag ", e);
     }
   }
+
+  @Override
+  public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
+    JsonNode responseJson;
+    try {
+      MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add("cnote", cnote);
+      queryParams.add("startTime", startTime.toString());
+      queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId.toString());
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      TypeReference<String> mapType = new TypeReference<String>() {};
+      String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
+      log.info("Start demurrage response: {}", response);
+    } catch (IOException e) {
+      log.error("Error while starting demurrage for cnote {} at time {}", cnote, startTime);
+      throw new ZoomException("Error while starting demurrage for cnote {}", cnote);
+    }
+  }
+
+  @Override
+  public void endDemurrage(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("cnote", cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_END_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      TypeReference<String> mapType = new TypeReference<String>() {};
+      String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
+      log.info("End demurrage response: {}", response);
+    } catch (IOException e) {
+      log.error("Error while ending demurrage for cnote {}", cnote);
+      throw new ZoomException("Error while ending demurrage for cnote {}", cnote);
+    }
+  }
 }

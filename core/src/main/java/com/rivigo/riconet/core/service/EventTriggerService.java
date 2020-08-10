@@ -40,12 +40,15 @@ public class EventTriggerService {
 
   @Autowired private ObjectMapper objectMapper;
 
+  @Autowired private DemurrageService demurrageService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
         appNotificationService.sendCnDeliveredNotification(notificationDTO);
+        demurrageService.processEventToEndDemurrage(notificationDTO);
       case CN_TRIP_DISPATCHED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(
@@ -147,6 +150,9 @@ public class EventTriggerService {
       case CN_DRS_PLANNED:
         zoomBackendAPIClientService.generateInvoice(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case CN_UNDELIVERY:
+        demurrageService.processEventToStartDemurrage(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
