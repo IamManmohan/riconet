@@ -1,12 +1,10 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.Condition;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.DemurrageService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +26,19 @@ public class DemurrageServiceImpl implements DemurrageService {
   private static final String RIVIGO_ORGANIZATION_ID = "1";
   private static final String DELIVERED_STATUS = "DELIVERED";
   private static final int IS_ACTIVE_CONSIGNMENT = 1;
+  private static final String DELIVERY_REATTEMPT_CHARGEABLE_TRUE = "1";
 
   @Override
   public void processEventToStartDemurrage(NotificationDTO notificationDTO) {
     Map<String, String> metadata = notificationDTO.getMetadata();
-    List<String> conditions = notificationDTO.getConditions();
     String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
     String undeliveredCnRecordId = metadata.get(ZoomCommunicationFieldNames.ID.name());
     String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
     String startTime = metadata.get(ZoomCommunicationFieldNames.Undelivery.ALERT_CREATED_AT.name());
+    String deliveryReattemptChargeable =
+        metadata.get(ZoomCommunicationFieldNames.Undelivery.DELIVERY_REATTEMPT_CHARGEABLE.name());
     log.debug("Start demurrage request for cnote {} starting at time {}.", cnote, startTime);
-    if (!conditions.contains(Condition.DELIVERY_REATTEMPT_CHARGEABLE_TRUE.name())
+    if (!DELIVERY_REATTEMPT_CHARGEABLE_TRUE.equals(deliveryReattemptChargeable)
         || !isCnDemurrageValid(consignmentId, startTime)) {
       log.debug("Cnote {} not valid for start demurrage request.", cnote);
       return;
