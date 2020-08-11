@@ -533,8 +533,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
     JsonNode responseJson;
     try {
-      MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-      queryParams.add("cnote", cnote);
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add(ConsignmentConstant.CNOTE, cnote);
       queryParams.add("startTime", startTime);
       queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId);
       responseJson =
@@ -544,11 +544,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
               queryParams,
               backendBaseUrl);
-      TypeReference<String> mapType = new TypeReference<String>() {};
-      String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
+      final TypeReference<String> mapType = new TypeReference<String>() {};
+      final String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
       log.info("Start demurrage response: {}", response);
     } catch (IOException e) {
-      log.error("Error while starting demurrage for cnote {} at time {}", cnote, startTime);
+      log.error("Error while starting demurrage for cnote {} at time {}", cnote, startTime, e);
       throw new ZoomException("Error while starting demurrage for cnote {}", cnote);
     }
   }
@@ -563,7 +563,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     JsonNode responseJson;
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-      queryParams.set("cnote", cnote);
+      queryParams.set(ConsignmentConstant.CNOTE, cnote);
       responseJson =
           apiClientService.getEntity(
               null,
@@ -571,11 +571,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_END_DEMURRAGE,
               queryParams,
               backendBaseUrl);
-      TypeReference<String> mapType = new TypeReference<String>() {};
-      String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
+      final TypeReference<String> mapType = new TypeReference<String>() {};
+      final String response = (String) apiClientService.parseJsonNode(responseJson, mapType);
       log.info("End demurrage response: {}", response);
     } catch (IOException e) {
-      log.error("Error while ending demurrage for cnote {}", cnote);
+      log.error("Error while ending demurrage for cnote {}", cnote, e);
       throw new ZoomException("Error while ending demurrage for cnote {}", cnote);
     }
   }

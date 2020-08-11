@@ -1,5 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.DemurrageService;
@@ -39,14 +40,9 @@ public class DemurrageServiceImpl implements DemurrageService {
   private final DemurrageRepository demurrageRepository;
 
   /**
-   * Some constants fields to store appropriate details to be required when making certains
+   * Constants field to store Delivery reattempt chargeable flag required when making certain
    * validations.
    */
-  private static final String NORMAL_CNOTE_TYPE = "NORMAL";
-
-  private static final String RIVIGO_ORGANIZATION_ID = "1";
-  private static final String DELIVERED_STATUS = "DELIVERED";
-  private static final int IS_ACTIVE_CONSIGNMENT = 1;
   private static final String DELIVERY_REATTEMPT_CHARGEABLE_TRUE = "1";
 
   /**
@@ -59,23 +55,24 @@ public class DemurrageServiceImpl implements DemurrageService {
    */
   @Override
   public void processEventToStartDemurrage(NotificationDTO notificationDTO) {
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
-    String startTime = metadata.get(ZoomCommunicationFieldNames.Undelivery.ALERT_CREATED_AT.name());
+    final Map<String, String> metadata = notificationDTO.getMetadata();
+    final String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
+    final String startTime =
+        metadata.get(ZoomCommunicationFieldNames.Undelivery.ALERT_CREATED_AT.name());
     log.debug(
         "Start demurrage request for cnote {} starting at time {} received.", cnote, startTime);
-    String undeliveredCnRecordId = metadata.get(ZoomCommunicationFieldNames.ID.name());
-    String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
-    String deliveryReattemptChargeable =
+    final String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
+    final String deliveryReattemptChargeable =
         metadata.get(ZoomCommunicationFieldNames.Undelivery.DELIVERY_REATTEMPT_CHARGEABLE.name());
-    Demurrage existingDemurrage =
+    final Demurrage existingDemurrage =
         demurrageRepository.findDemurrageByConsignmentIdAndIsActiveTrue(
-            Long.parseLong(consignmentId));
+            Long.valueOf(consignmentId));
 
     /*
-     * For new entry, Delivery reattempt flag must be true for backend call to be made to start demurrage.
-     * If entry already exists in demurrage table, then backend call must be always made to appropriately
-     * update existing entry. Some other validations also done using separate functions.
+     * For new entry, Delivery reattempt flag must be true for backend call to be made
+     * to start demurrage. If entry already exists in demurrage table, then backend call
+     * must be always made to appropriately update existing entry. Some other validations
+     * also done using separate functions.
      */
     if (!(DELIVERY_REATTEMPT_CHARGEABLE_TRUE.equals(deliveryReattemptChargeable)
             || existingDemurrage != null)
@@ -83,6 +80,7 @@ public class DemurrageServiceImpl implements DemurrageService {
       log.debug("Cnote {} not valid for start demurrage request.", cnote);
       return;
     }
+    final String undeliveredCnRecordId = metadata.get(ZoomCommunicationFieldNames.ID.name());
     zoomBackendAPIClientService.startDemurrage(cnote, startTime, undeliveredCnRecordId);
   }
 
@@ -96,11 +94,11 @@ public class DemurrageServiceImpl implements DemurrageService {
    */
   @Override
   public void processEventToEndDemurrage(NotificationDTO notificationDTO) {
-    Map<String, String> metadata = notificationDTO.getMetadata();
-    String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
-    String deliveryDateTime =
+    final Map<String, String> metadata = notificationDTO.getMetadata();
+    final String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
+    final String deliveryDateTime =
         metadata.get(ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name());
-    String status = metadata.get(ZoomCommunicationFieldNames.STATUS.name());
+    final String status = metadata.get(ZoomCommunicationFieldNames.STATUS.name());
     log.debug(
         "End demurrage request for cnote {} delivered at time {} received.",
         cnote,
@@ -109,9 +107,9 @@ public class DemurrageServiceImpl implements DemurrageService {
      * Some validations to made before backend call to mark demurrage as completed is done.
      * Consignment must have status DELIVERED and deliveryDateTime not null.
      */
-    if (!isCnCorporateTBB(metadata)
-        || deliveryDateTime == null
-        || !DELIVERED_STATUS.equals(status)) {
+    if (deliveryDateTime == null
+        || !ConsignmentConstant.DELIVERED_STATUS.equals(status)
+        || !isCnCorporateTBB(metadata)) {
       log.debug("Cnote {} not valid for end demurrage request.", cnote);
       return;
     }
@@ -122,10 +120,12 @@ public class DemurrageServiceImpl implements DemurrageService {
    * Demurrage is valid for only CORPORATE TBB consignments. Hence this functions makes these
    * validations at time of marking demurrage completed.
    */
-  private boolean isCnCorporateTBB(Map<String, String> metadata) {
-    String cnoteType = metadata.get(ZoomCommunicationFieldNames.CNOTE_TYPE.name());
-    String organizationId = metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name());
-    return NORMAL_CNOTE_TYPE.equals(cnoteType) && RIVIGO_ORGANIZATION_ID.equals(organizationId);
+  private static boolean isCnCorporateTBB(Map<String, String> metadata) {
+    final String cnoteType = metadata.get(ZoomCommunicationFieldNames.CNOTE_TYPE.name());
+    final long organizationId =
+        Long.parseLong(metadata.get(ZoomCommunicationFieldNames.ORGANIZATION_ID.name()));
+    return ConsignmentConstant.NORMAL_CNOTE_TYPE.equals(cnoteType)
+        && ConsignmentConstant.RIVIGO_ORGANIZATION_ID == organizationId;
   }
 
   /**
@@ -135,8 +135,8 @@ public class DemurrageServiceImpl implements DemurrageService {
    * Consignment must be active consignment.
    */
   private boolean isCnDemurrageValid(String consignmentId, String startTime) {
-    Optional<ConsignmentReadOnly> consignmentReadOnlyOptional =
-        consignmentReadOnlyService.findConsignmentById(Long.parseLong(consignmentId));
+    final Optional<ConsignmentReadOnly> consignmentReadOnlyOptional =
+        consignmentReadOnlyService.findConsignmentById(Long.valueOf(consignmentId));
     ConsignmentReadOnly cn = null;
     if (consignmentReadOnlyOptional.isPresent()) {
       cn = consignmentReadOnlyOptional.get();
@@ -144,8 +144,8 @@ public class DemurrageServiceImpl implements DemurrageService {
       return false;
     }
     return cn.getPromisedDeliveryDateTime().isBefore(new DateTime(Long.parseLong(startTime)))
-        && NORMAL_CNOTE_TYPE.equals(cn.getCnoteType().toString())
-        && RIVIGO_ORGANIZATION_ID.equals(cn.getOrganizationId().toString())
-        && IS_ACTIVE_CONSIGNMENT == cn.getIsActive();
+        && ConsignmentConstant.NORMAL_CNOTE_TYPE.equals(cn.getCnoteType().toString())
+        && ConsignmentConstant.RIVIGO_ORGANIZATION_ID == cn.getOrganizationId()
+        && ConsignmentConstant.IS_ACTIVE_CONSIGNMENT == cn.getIsActive();
   }
 }
