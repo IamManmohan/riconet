@@ -522,14 +522,21 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Function used to make backend API call to start demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   * @param startTime contains startTime of demurrage as string.
+   * @param undeliveredCnRecordId contains undeliveredConsignment record id.
+   */
   @Override
   public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
     JsonNode responseJson;
     try {
       MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
       queryParams.add("cnote", cnote);
-      queryParams.add("startTime", startTime.toString());
-      queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId.toString());
+      queryParams.add("startTime", startTime);
+      queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId);
       responseJson =
           apiClientService.getEntity(
               null,
@@ -546,6 +553,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Function used to make backend API call to end demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
   @Override
   public void endDemurrage(String cnote) {
     JsonNode responseJson;

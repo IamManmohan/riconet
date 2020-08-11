@@ -6,5 +6,5 @@ public enum Condition {
   SUFFIX,
   INVALID_ENRICHED_EVENT,
   ASSET_CN,
-  DEPS_CN
+  DEPS_CN;
 }

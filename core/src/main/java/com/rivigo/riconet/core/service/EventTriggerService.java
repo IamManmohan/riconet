@@ -40,6 +40,10 @@ public class EventTriggerService {
 
   @Autowired private ObjectMapper objectMapper;
 
+  /**
+   * DemurrageService is used to trigger demurrage Start and End events at time of CN undelivery and
+   * delivery respectively.
+   */
   @Autowired private DemurrageService demurrageService;
 
   public void processNotification(NotificationDTO notificationDTO) {
