@@ -5,7 +5,7 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 /**
  * DemurrageService is responsible for demurrage related tasks.
  *
- * @author Nikhil Aggarwalki
+ * @author Nikhil Aggarwal
  * @date 10-Aug-2020
  */
 public interface DemurrageService {
