@@ -29,4 +29,15 @@ public interface DemurrageService {
    * @param notificationDTO event payload populated with all the required details.
    */
   void processEventToEndDemurrage(NotificationDTO notificationDTO);
+
+  /**
+   * Function used to cancel ongoing demurrage for given consignment. <br>
+   * This function is called when event CN_DELETED is triggered. <br>
+   * This function is used to fetch approriate fields from input NotificationDTO and after
+   * validation, makes an API call to backend service to cancel ongoing demurrage for given
+   * consignment.
+   *
+   * @param notificationDTO event payload populated with all the required details.
+   */
+  void processEventToCancelDemurrage(NotificationDTO notificationDTO);
 }

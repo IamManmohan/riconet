@@ -39,5 +39,8 @@ public enum EventName {
 
   /** Events yo trigger invoice generation. */
   CN_DELIVERY_CLUSTER_SCAN_IN,
-  CN_DRS_PLANNED
+  CN_DRS_PLANNED,
+
+  /** DEPS record creation event. */
+  DEPS_RECORD_CREATION
 }

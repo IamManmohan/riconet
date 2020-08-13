@@ -103,7 +103,7 @@ public enum ZoomCommunicationFieldNames {
 
   // Field names for CN_UNDELIVERY event.
   public enum Undelivery {
-    ALERT_CREATED_AT,
+    UNDELIVERED_AT,
     DELIVERY_REATTEMPT_CHARGEABLE
   }
 }

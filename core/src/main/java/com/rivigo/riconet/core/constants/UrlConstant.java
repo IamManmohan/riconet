@@ -88,4 +88,7 @@ public class UrlConstant {
 
   /** Backend API to mark demurrage as completed for given consignment. */
   public final String ZOOM_BACKEND_END_DEMURRAGE = "/vas/demurrage/end";
+
+  /** Backend API to cancel ongoing demurrage for given consignment. */
+  public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
 }

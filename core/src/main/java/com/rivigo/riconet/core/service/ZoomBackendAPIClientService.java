@@ -102,4 +102,11 @@ public interface ZoomBackendAPIClientService {
    * @param cnote contains cnote number of consignment.
    */
   void endDemurrage(String cnote);
+
+  /**
+   * Function used to make backend API call to cancel ongoing demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  void cancelDemurrage(String cnote);
 }

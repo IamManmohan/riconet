@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 /**
  * DemurrageService is responsible for demurrage related tasks.
  *
- * @author Nikhil Aggarwalki
+ * @author Nikhil Aggarwal
  * @date 10-Aug-2020
  */
 @Slf4j
@@ -58,7 +58,7 @@ public class DemurrageServiceImpl implements DemurrageService {
     final Map<String, String> metadata = notificationDTO.getMetadata();
     final String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
     final String startTime =
-        metadata.get(ZoomCommunicationFieldNames.Undelivery.ALERT_CREATED_AT.name());
+        metadata.get(ZoomCommunicationFieldNames.Undelivery.UNDELIVERED_AT.name());
     log.debug(
         "Start demurrage request for cnote {} starting at time {} received.", cnote, startTime);
     final String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
@@ -147,5 +147,34 @@ public class DemurrageServiceImpl implements DemurrageService {
         && ConsignmentConstant.NORMAL_CNOTE_TYPE.equals(cn.getCnoteType().toString())
         && ConsignmentConstant.RIVIGO_ORGANIZATION_ID == cn.getOrganizationId()
         && ConsignmentConstant.IS_ACTIVE_CONSIGNMENT == cn.getIsActive();
+  }
+
+  /**
+   * Function used to cancel ongoing demurrage for given consignment. <br>
+   * This function is called when event CN_DELETED is triggered. <br>
+   * This function is used to fetch approriate fields from input NotificationDTO and after
+   * validation, makes an API call to backend service to cancel ongoing demurrage for given
+   * consignment.
+   *
+   * @param notificationDTO event payload populated with all the required details.
+   */
+  @Override
+  public void processEventToCancelDemurrage(NotificationDTO notificationDTO) {
+    final Map<String, String> metadata = notificationDTO.getMetadata();
+    final String cnote = metadata.get(ZoomCommunicationFieldNames.CNOTE.name());
+    log.debug("Cancel ongoing demurrage request for cnote {} received.", cnote);
+    final String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
+    final Demurrage existingDemurrage =
+        demurrageRepository.findDemurrageByConsignmentIdAndIsActiveTrue(
+            Long.valueOf(consignmentId));
+    /*
+     * Some validations to be made before backend call to cancel demurrage is done.
+     * Consignment must have ongoing demurrage, hence an active entry in demurrage table.
+     */
+    if (existingDemurrage == null) {
+      log.debug("Cnote {} does not have any ongoing demurrage.", cnote);
+      return;
+    }
+    zoomBackendAPIClientService.cancelDemurrage(cnote);
   }
 }

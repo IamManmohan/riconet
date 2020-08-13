@@ -70,6 +70,7 @@ public class EventTriggerService {
             entityId, TicketEntityType.CN.name(), eventName.name());
         break;
       case CN_STALE:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         String staleCategory =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STALE_CATEGORY.name());
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
@@ -79,6 +80,7 @@ public class EventTriggerService {
             entityId, TicketEntityType.CN.name(), staleCategoryEventName);
         break;
       case CN_DELETED:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
@@ -157,6 +159,9 @@ public class EventTriggerService {
         break;
       case CN_UNDELIVERY:
         demurrageService.processEventToStartDemurrage(notificationDTO);
+        break;
+      case DEPS_RECORD_CREATION:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
