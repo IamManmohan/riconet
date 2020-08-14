@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * DemurrageService is responsible for demurrage related tasks.
+ * DemurrageService is responsible for demurrage related tasks. <br>
+ * To summarise: Demurrage End time will be set as FINAL DELIVERY TIME, and Start time will be set
+ * as FIRST DELIVERY FAILURE DUE TO CLIENT FACING REASONS.
  *
  * @author Nikhil Aggarwal
  * @date 10-Aug-2020
@@ -69,14 +71,17 @@ public class DemurrageServiceImpl implements DemurrageService {
             Long.valueOf(consignmentId));
 
     /*
-     * For new entry, Delivery reattempt flag must be true for backend call to be made
-     * to start demurrage. If entry already exists in demurrage table, then backend call
-     * must be always made to appropriately update existing entry. Some other validations
-     * also done using separate functions.
+     * Condition A: Delivery Reattempt Chargeable flag is true.
+     * Condition B: Demurrage entry already exists for cnote.
+     * Condition C: isCnDemurrageValid()
+     * We want to hit backend api when ((A or B) and C) is true.
+     * (A or B) is necessary to cover the cases where consignment is undelivered again
+     * after being delivered (i.e. its demurrage is marked as completed). It is possible
+     * that consignment may not be undelivered second time for client facing reasons.
      */
-    if (!(DELIVERY_REATTEMPT_CHARGEABLE_TRUE.equals(deliveryReattemptChargeable)
+    if (!((DELIVERY_REATTEMPT_CHARGEABLE_TRUE.equals(deliveryReattemptChargeable)
             || existingDemurrage != null)
-        || !isCnDemurrageValid(consignmentId, startTime)) {
+        && isCnDemurrageValid(consignmentId, startTime))) {
       log.debug("Cnote {} not valid for start demurrage request.", cnote);
       return;
     }
