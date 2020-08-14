@@ -228,4 +228,39 @@ public class ZoomBackendAPIClientServiceTest {
     expectedException.expectMessage("Error while creating vendor with dto");
     zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
   }
+
+  @Test
+  public void startDemurrageTest() throws IOException {
+    String cnote = "123456";
+    String startTime = "1234567890";
+    String id = "654321";
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+  }
+
+  @Test
+  public void endDemurrageTest() throws IOException {
+    String cnote = "123456";
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.endDemurrage(cnote);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.endDemurrage(cnote);
+  }
+
+  @Test
+  public void cancelDemurrageTest() throws IOException {
+    String cnote = "123456";
+    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
+  }
 }

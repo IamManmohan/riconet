@@ -104,17 +104,23 @@ public class DemurrageServiceImpl implements DemurrageService {
     final String deliveryDateTime =
         metadata.get(ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name());
     final String status = metadata.get(ZoomCommunicationFieldNames.STATUS.name());
+    final String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
     log.debug(
         "End demurrage request for cnote {} delivered at time {} received.",
         cnote,
         deliveryDateTime);
+    final Demurrage existingDemurrage =
+        demurrageRepository.findDemurrageByConsignmentIdAndIsActiveTrue(
+            Long.valueOf(consignmentId));
     /*
      * Some validations to made before backend call to mark demurrage as completed is done.
-     * Consignment must have status DELIVERED and deliveryDateTime not null.
+     * Consignment must have status DELIVERED and deliveryDateTime not null. Consignment must
+     * have existing demurrage entry in table to make end api call.
      */
     if (deliveryDateTime == null
         || !ConsignmentConstant.DELIVERED_STATUS.equals(status)
-        || !isCnCorporateTBB(metadata)) {
+        || !isCnCorporateTBB(metadata)
+        || existingDemurrage == null) {
       log.debug("Cnote {} not valid for end demurrage request.", cnote);
       return;
     }
