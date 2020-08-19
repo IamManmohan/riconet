@@ -234,7 +234,7 @@ public class ZoomBackendAPIClientServiceTest {
     String cnote = "123456";
     String startTime = "1234567890";
     String id = "654321";
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
     zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
     mockApiClientServiceGetEntityException();
@@ -245,7 +245,7 @@ public class ZoomBackendAPIClientServiceTest {
   @Test
   public void endDemurrageTest() throws IOException {
     String cnote = "123456";
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
     zoomBackendAPIClientServiceImpl.endDemurrage(cnote);
     mockApiClientServiceGetEntityException();
@@ -256,7 +256,7 @@ public class ZoomBackendAPIClientServiceTest {
   @Test
   public void cancelDemurrageTest() throws IOException {
     String cnote = "123456";
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
     zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
     mockApiClientServiceGetEntityException();

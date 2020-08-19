@@ -547,8 +547,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
       final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
       if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException(
-            "Cnote {} not valid for start demurrage request at time {}.", cnote, startTime);
+        log.error("Cnote {} not valid for start demurrage request at time {}.", cnote, startTime);
       }
     } catch (IOException e) {
       throw new ZoomException(
@@ -577,7 +576,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
       final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
       if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException("Cnote {} not valid for end demurrage request.", cnote);
+        log.error("Cnote {} not valid for end demurrage request.", cnote);
       }
     } catch (IOException e) {
       throw new ZoomException("Error while ending demurrage for cnote {}", cnote, e);
@@ -605,7 +604,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
       final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
       if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException("Cnote {} not valid for cancel demurrage request.", cnote);
+        log.error("Cnote {} not valid for cancel demurrage request.", cnote);
       }
     } catch (IOException e) {
       throw new ZoomException("Error while cancelling demurrage for cnote {}", cnote, e);
