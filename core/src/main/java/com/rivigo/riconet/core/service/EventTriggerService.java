@@ -40,12 +40,19 @@ public class EventTriggerService {
 
   @Autowired private ObjectMapper objectMapper;
 
+  /**
+   * DemurrageService is used to trigger demurrage Start and End events at time of CN undelivery and
+   * delivery respectively.
+   */
+  @Autowired private DemurrageService demurrageService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
         appNotificationService.sendCnDeliveredNotification(notificationDTO);
+        demurrageService.processEventToEndDemurrage(notificationDTO);
       case CN_TRIP_DISPATCHED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(
@@ -63,6 +70,7 @@ public class EventTriggerService {
             entityId, TicketEntityType.CN.name(), eventName.name());
         break;
       case CN_STALE:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         String staleCategory =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.STALE_CATEGORY.name());
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
@@ -72,6 +80,7 @@ public class EventTriggerService {
             entityId, TicketEntityType.CN.name(), staleCategoryEventName);
         break;
       case CN_DELETED:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
@@ -147,6 +156,12 @@ public class EventTriggerService {
       case CN_DRS_PLANNED:
         zoomBackendAPIClientService.generateInvoice(
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
+      case CN_UNDELIVERY:
+        demurrageService.processEventToStartDemurrage(notificationDTO);
+        break;
+      case DEPS_RECORD_CREATION:
+        demurrageService.processEventToCancelDemurrage(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

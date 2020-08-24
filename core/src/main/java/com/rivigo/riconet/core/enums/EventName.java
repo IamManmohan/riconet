@@ -15,6 +15,7 @@ public enum EventName {
   CN_TRIP_DISPATCHED,
   CN_PAYMENT_HANDOVER_COMPLETED,
   CN_STALE,
+  CN_UNDELIVERY,
 
   COLLECTION_CHEQUE_BOUNCE,
   BANK_TRANSFER_INITIATED,
@@ -38,5 +39,8 @@ public enum EventName {
 
   /** Events yo trigger invoice generation. */
   CN_DELIVERY_CLUSTER_SCAN_IN,
-  CN_DRS_PLANNED
+  CN_DRS_PLANNED,
+
+  /** DEPS record creation event. */
+  DEPS_RECORD_CREATION
 }
