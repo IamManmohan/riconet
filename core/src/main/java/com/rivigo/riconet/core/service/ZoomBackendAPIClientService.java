@@ -86,4 +86,6 @@ public interface ZoomBackendAPIClientService {
    * @param epodApplicableDTO for updating epod details.
    */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
+
+  void updateClientBlockerDetails(EpodApplicableDto epodApplicableDTO);
 }

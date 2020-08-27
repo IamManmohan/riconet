@@ -306,4 +306,9 @@ public class ClientMasterServiceImpl implements ClientMasterService {
       return null;
     }
   }
+
+  public void updateClientBlocker(String payload) {
+    EpodApplicableDto epodApplicableDTO = getEpodApplicableDto(payload);
+    zoomBackendAPIClientService.updateClientBlockerDetails(epodApplicableDTO);
+  }
 }

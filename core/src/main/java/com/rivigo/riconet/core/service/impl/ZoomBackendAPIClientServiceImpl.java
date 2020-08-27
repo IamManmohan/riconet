@@ -521,4 +521,28 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while updating epod flag ", e);
     }
   }
+
+  @Override
+  public void updateClientBlockerDetails(EpodApplicableDto epodApplicableDTO) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("clientId", cnote);
+      queryParams.set("reasonId", "98");
+      queryParams.set("dispatchBlockUnblock", cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_GENERATE_INVOICE,
+              queryParams,
+              backendBaseUrl);
+      log.info(
+          "client blocker on client {}, successful {}",
+          epodApplicableDTO.getClientCode(),
+          responseJson);
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating client blocker ", e);
+    }
+  }
 }

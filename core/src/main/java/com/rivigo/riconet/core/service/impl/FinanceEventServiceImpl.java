@@ -70,6 +70,13 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
         break;
+
+      case CMS_CLIENT_UPSERT_2:
+        clientMasterService.createUpdateClient(eventPayload.getPayload());
+        break;
+      case CMS_CLIENT_UPSERT_3:
+        clientMasterService.createUpdateClient(eventPayload.getPayload());
+        break;
       default:
         log.info("Event does not trigger anything {}", eventType);
     }

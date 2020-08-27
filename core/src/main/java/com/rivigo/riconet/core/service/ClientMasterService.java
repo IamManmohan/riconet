@@ -17,4 +17,6 @@ public interface ClientMasterService {
    * @return update the flag value in the clinet table.
    */
   void updateEpodDetails(String payload);
+
+  void updateClientBlocker(String payload);
 }
