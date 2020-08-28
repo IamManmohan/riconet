@@ -523,13 +523,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void updateClientBlockerDetails(EpodApplicableDto epodApplicableDTO) {
+  public void updateClientBlockerDetails(Long clientId, Boolean isOverdueLimitBreached) {
     JsonNode responseJson;
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-      queryParams.set("clientId", cnote);
+      queryParams.set("clientId", String.valueOf(clientId));
       queryParams.set("reasonId", "98");
-      queryParams.set("dispatchBlockUnblock", cnote);
+      queryParams.set("dispatchBlockUnblock", String.valueOf(isOverdueLimitBreached));
       responseJson =
           apiClientService.getEntity(
               null,
@@ -538,8 +538,9 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               queryParams,
               backendBaseUrl);
       log.info(
-          "client blocker on client {}, successful {}",
-          epodApplicableDTO.getClientCode(),
+          "client blocker on client {} with isOverdueLimitBreached {}, successful {}",
+          clientId,
+          isOverdueLimitBreached,
           responseJson);
     } catch (IOException e) {
       throw new ZoomException("Error while updating client blocker ", e);

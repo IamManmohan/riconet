@@ -87,5 +87,5 @@ public interface ZoomBackendAPIClientService {
    */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
 
-  void updateClientBlockerDetails(EpodApplicableDto epodApplicableDTO);
+  void updateClientBlockerDetails(Long clientId, Boolean isOverdueLimitBreached);
 }
