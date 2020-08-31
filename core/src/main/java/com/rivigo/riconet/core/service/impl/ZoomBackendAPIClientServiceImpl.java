@@ -522,6 +522,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * This function calls the blocking API in the zoom backend with the client code and
+   * enable/disable flag.
+   *
+   * @param clientId client id on which blocker to be toggled.
+   * @param isOverdueLimitBreached toggle flag.
+   */
   @Override
   public void updateClientBlockerDetails(Long clientId, Boolean isOverdueLimitBreached) {
     JsonNode responseJson;

@@ -1,10 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
@@ -19,6 +14,7 @@ import com.rivigo.riconet.core.service.ClientVasDetailsService;
 import com.rivigo.riconet.core.service.OrganizationService;
 import com.rivigo.riconet.core.service.UserMasterService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.enums.ClientVasType;
 import com.rivigo.zoom.common.enums.CnoteType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
@@ -31,6 +27,11 @@ import com.rivigo.zoom.common.repository.mysql.BillingEntityRepository;
 import com.rivigo.zoom.common.repository.mysql.ClientRepository;
 import com.rivigo.zoom.common.repository.mysql.IndustryTypeRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,10 +40,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.CLIENT_DEFAULT_SAM_ID;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.GLOBAL_ORGANIZATION;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RETAIL_CLIENT_CODE;
+import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGANIZATION_ID;
 
 @Slf4j
 @Service
@@ -289,29 +291,20 @@ public class ClientMasterServiceImpl implements ClientMasterService {
    */
   @Override
   public void updateEpodDetails(String payload) {
-    EpodApplicableDto epodApplicableDTO = getDtoFromjsonString(payload, EpodApplicableDto.class);
+    EpodApplicableDto epodApplicableDTO =
+        FinanceUtils.getDtoFromjsonString(payload, EpodApplicableDto.class);
     zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
   }
 
   /**
-   * function that coverts the dto String fetched from compass to EpodApplicableDto.
+   * This function adds / remove blocker for a client who has breached its credit limit, first the
+   * string is converted to the desired DTO and then zoom-backend API is hit with the , client-code.
    *
-   * @author Nikhil Rawat on 26/05/20.
+   * @param payload contains the payload in the string format.
    */
-  private EpodApplicableDto getEpodApplicableDto(String dtoString) {
-    try {
-      EpodApplicableDto epodApplicableDTO;
-      epodApplicableDTO = objectMapper.readValue(dtoString, EpodApplicableDto.class);
-      return epodApplicableDTO;
-    } catch (IOException ex) {
-      log.error("Error occured while processing message {} ", dtoString, ex);
-      return null;
-    }
-  }
-
   public void updateClientBlocker(String payload) {
     ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto =
-        getDtoFromjsonString(payload, ZoomClientCreditLimitBreachDTO.class);
+        FinanceUtils.getDtoFromjsonString(payload, ZoomClientCreditLimitBreachDTO.class);
     Client client =
         Optional.ofNullable(zoomClientCreditLimitBreachDto)
             .map(ZoomClientCreditLimitBreachDTO::getClientCode)
@@ -322,15 +315,6 @@ public class ClientMasterServiceImpl implements ClientMasterService {
           client.getId(), zoomClientCreditLimitBreachDto.getOverdueLimitBreached());
     } else {
       throw new ZoomException("client for updating client blocker does not exist");
-    }
-  }
-
-  private <T> T getDtoFromjsonString(String dtoString, Class<?> target) {
-    try {
-      return (T) objectMapper.readValue(dtoString, Class.forName(target.getName()));
-    } catch (IOException | ClassNotFoundException ex) {
-      log.error("Error occured while processing message {} ", dtoString, ex);
-      return null;
     }
   }
 }

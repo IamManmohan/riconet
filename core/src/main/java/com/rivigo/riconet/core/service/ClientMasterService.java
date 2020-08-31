@@ -18,5 +18,10 @@ public interface ClientMasterService {
    */
   void updateEpodDetails(String payload);
 
+  /**
+   * This function adds / remove blocker for a client who has breached its credit limit.
+   *
+   * @param payload contains the payload in the string format.
+   */
   void updateClientBlocker(String payload);
 }
