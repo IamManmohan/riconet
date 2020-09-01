@@ -82,4 +82,6 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
 
   public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";
+
+  public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/blockUnblockClient";
 }

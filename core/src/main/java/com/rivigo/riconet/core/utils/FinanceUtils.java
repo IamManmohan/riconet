@@ -68,8 +68,8 @@ public class FinanceUtils {
    */
   public static <T> T getDtoFromjsonString(String dtoString, Class<?> target) {
     try {
-      return (T) objectMapper.readValue(dtoString, Class.forName(target.getName()));
-    } catch (IOException | ClassNotFoundException ex) {
+      return (T) objectMapper.readValue(dtoString, target);
+    } catch (IOException ex) {
       log.error("Error occured while processing message {} ", dtoString, ex);
       return null;
     }

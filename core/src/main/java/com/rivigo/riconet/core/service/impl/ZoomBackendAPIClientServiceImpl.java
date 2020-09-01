@@ -540,11 +540,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       queryParams.set("dispatchBlockUnblock", String.valueOf(isOverdueLimitBreached));
       responseJson =
           apiClientService.getEntity(
-              null,
-              HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_GENERATE_INVOICE,
-              queryParams,
-              backendBaseUrl);
+              null, HttpMethod.POST, UrlConstant.BLOCK_UNBLOCK_CLIENT, queryParams, backendBaseUrl);
       log.info(
           "client blocker on client {} with isOverdueLimitBreached {}, successful {}",
           clientId,
