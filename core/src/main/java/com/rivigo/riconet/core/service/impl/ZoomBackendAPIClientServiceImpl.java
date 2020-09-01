@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
@@ -535,7 +536,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
       queryParams.set("clientId", String.valueOf(clientId));
-      queryParams.set("reasonId", "98");
+      queryParams.set("reasonId", ClientConstants.CREDIT_LIMIT_BREACH_REASON_ID);
       queryParams.set("dispatchBlockUnblock", String.valueOf(isOverdueLimitBreached));
       responseJson =
           apiClientService.getEntity(

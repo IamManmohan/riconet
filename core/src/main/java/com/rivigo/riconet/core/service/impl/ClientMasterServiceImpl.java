@@ -308,12 +308,10 @@ public class ClientMasterServiceImpl implements ClientMasterService {
         Optional.ofNullable(zoomClientCreditLimitBreachDto)
             .map(ZoomClientCreditLimitBreachDTO::getClientCode)
             .map(v -> clientRepository.findByClientCode(v))
-            .orElse(null);
-    if (client != null) {
-      zoomBackendAPIClientService.updateClientBlockerDetails(
-          client.getId(), zoomClientCreditLimitBreachDto.getOverdueLimitBreached());
-    } else {
-      throw new ZoomException("client for updating client blocker does not exist");
-    }
+            .orElseThrow(
+                () -> new ZoomException("client for updating client blocker does not exist"));
+
+    zoomBackendAPIClientService.updateClientBlockerDetails(
+        client.getId(), zoomClientCreditLimitBreachDto.getOverdueLimitBreached());
   }
 }
