@@ -2,14 +2,18 @@ package com.rivigo.riconet.event.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
+import com.rivigo.riconet.core.predicates.EnvironmentPredicate;
+import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.event.config.EventTopicNameConfig;
 import com.rivigo.riconet.event.dto.whatsappbot.BasePubSubDto;
 import com.rivigo.riconet.event.dto.whatsappbot.ReceiveWhatsappMessageDto;
 import com.rivigo.riconet.event.service.WhatsappBotService;
+import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -23,6 +27,8 @@ public class WhatsappReceiveMessageConsumer extends ConsumerModel {
 
   private final ObjectMapper objectMapper;
 
+  private final ZoomPropertyService zoomPropertyService;
+
   @Override
   public String getTopic() {
     return eventTopicNameConfig.getWhatsappMessageReceive();
@@ -34,9 +40,16 @@ public class WhatsappReceiveMessageConsumer extends ConsumerModel {
   }
 
   public void processMessage(String str) throws IOException {
-    BasePubSubDto basePubSubDto = objectMapper.readValue(str, BasePubSubDto.class);
-    ReceiveWhatsappMessageDto receiveWhatsappMessageDto =
-        objectMapper.readValue(basePubSubDto.getMessage(), ReceiveWhatsappMessageDto.class);
-    whatsappBotService.processReceivedWhatsappMessage(receiveWhatsappMessageDto);
+    boolean isWhatsappEnabled =
+        zoomPropertyService.getBoolean(ZoomPropertyName.RECEIVE_WHATSAPP_MESSAGE_ENABLED, false);
+    if (EnvironmentPredicate.isActiveSpringProfileProduction()
+            .test(System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME))
+        || isWhatsappEnabled) {
+      BasePubSubDto basePubSubDto = objectMapper.readValue(str, BasePubSubDto.class);
+      ReceiveWhatsappMessageDto receiveWhatsappMessageDto =
+          objectMapper.readValue(basePubSubDto.getMessage(), ReceiveWhatsappMessageDto.class);
+
+      whatsappBotService.processReceivedWhatsappMessage(receiveWhatsappMessageDto);
+    }
   }
 }

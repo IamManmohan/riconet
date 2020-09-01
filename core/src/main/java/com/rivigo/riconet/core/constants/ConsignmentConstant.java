@@ -21,4 +21,13 @@ public class ConsignmentConstant {
   public static final String SHORT_URL = "shortUrl";
   public static final String URL = "url";
   public static final String METADATA = "metadata";
+
+  /** Constant String to hold Normal CnoteType constant. */
+  public static final String NORMAL_CNOTE_TYPE = "NORMAL";
+
+  /** Constant String to hold Consignment status DELIVERED. */
+  public static final String DELIVERED_STATUS = "DELIVERED";
+
+  /** Constant interger to hold is_active of active consignment. */
+  public static final int IS_ACTIVE_CONSIGNMENT = 1;
 }
