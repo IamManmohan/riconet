@@ -38,7 +38,7 @@ public class FinanceEventsConsumer extends ConsumerModel {
   }
 
   @Override
-  public void processMessage(String str) throws ClassNotFoundException {
+  public void processMessage(String str) {
     log.info("Processing message in Finance Events Consumer {}", str);
     EventPayload eventPayload = null;
     try {
