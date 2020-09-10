@@ -1,6 +1,9 @@
 package com.rivigo.riconet.core.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -9,14 +12,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 public class FinanceUtils {
-
-  @Autowired private static ObjectMapper objectMapper;
 
   private FinanceUtils() {
     throw new IllegalStateException("Utility class");
@@ -66,10 +64,10 @@ public class FinanceUtils {
    *
    * @author Nikhil Rawat on 26/05/20.
    */
-  public static <T> T getDtoFromjsonString(String dtoString, Class<?> target)
-      throws ClassNotFoundException {
+  public static <T> T getDtoFromjsonString(String dtoString, Class<?> target) {
     try {
-      return (T) objectMapper.readValue(dtoString, Class.forName(target.getName()));
+      ObjectMapper objectMapper = new ObjectMapper();
+      return (T) objectMapper.readValue(dtoString, target);
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", dtoString, ex);
       return null;

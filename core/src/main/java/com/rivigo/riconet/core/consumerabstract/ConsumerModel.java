@@ -101,7 +101,7 @@ public abstract class ConsumerModel {
     return CompletableFuture.completedFuture(Done.getInstance());
   }
 
-  public abstract void processMessage(String str) throws IOException, ClassNotFoundException;
+  public abstract void processMessage(String str) throws IOException;
 
   protected void processError(ConsumerMessage consumerMessage, String errorMsg) {
     log.error("Processing error for payload {}", consumerMessage.toString());

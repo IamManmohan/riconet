@@ -39,7 +39,7 @@ public class FinanceEventServiceImpl implements FinanceEventService {
   @Autowired private EpodService epodService;
 
   @Override
-  public void processFinanceEvents(EventPayload eventPayload) throws ClassNotFoundException {
+  public void processFinanceEvents(EventPayload eventPayload) {
     ZoomEventType eventType = eventPayload.getEventType();
     switch (eventType) {
       case CMS_CLIENT_UPSERT:

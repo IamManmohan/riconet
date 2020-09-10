@@ -33,7 +33,7 @@ public class FinanceEventServiceImplTest {
   }
 
   @Test
-  public void processFinanceEventsEventTest() throws IOException, ClassNotFoundException {
+  public void processFinanceEventsEventTest() throws IOException {
     VendorContractZoomEventDTO vendorContractZoomEventDTO = new VendorContractZoomEventDTO();
     vendorContractZoomEventDTO.setExpenseType(ExpenseType.RLH_FEEDER);
     vendorContractZoomEventDTO.setVendorCode("V-1001");
@@ -52,7 +52,7 @@ public class FinanceEventServiceImplTest {
   }
 
   @Test
-  public void processFinanceEventsEventNothingTest() throws IOException, ClassNotFoundException {
+  public void processFinanceEventsEventNothingTest() throws IOException {
     VendorContractZoomEventDTO vendorContractZoomEventDTO = new VendorContractZoomEventDTO();
     vendorContractZoomEventDTO.setExpenseType(ExpenseType.RLH_FEEDER);
     vendorContractZoomEventDTO.setVendorCode("V-1001");
