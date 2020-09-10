@@ -88,6 +88,28 @@ public interface ZoomBackendAPIClientService {
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
 
   /**
+   * Function used to make backend API call to start demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   * @param startTime contains startTime of demurrage as string.
+   * @param undeliveredCnRecordId contains undeliveredConsignment record id.
+   */
+  void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId);
+
+  /**
+   * Function used to make backend API call to end demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  void endDemurrage(String cnote);
+
+  /**
+   * Function used to make backend API call to cancel ongoing demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  void cancelDemurrage(String cnote);
+  /**
    * This function calls the blocking API in the zoom backend with the client code and
    * enable/disable flag.
    *

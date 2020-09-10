@@ -83,5 +83,14 @@ public class UrlConstant {
 
   public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";
 
+  /** Backend API to mark demurrage as started for given consignment. */
+  public final String ZOOM_BACKEND_START_DEMURRAGE = "/vas/demurrage/start";
+
+  /** Backend API to mark demurrage as completed for given consignment. */
+  public final String ZOOM_BACKEND_END_DEMURRAGE = "/vas/demurrage/end";
+
+  /** Backend API to cancel ongoing demurrage for given consignment. */
+  public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
+
   public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/blockUnblockClient";
 }

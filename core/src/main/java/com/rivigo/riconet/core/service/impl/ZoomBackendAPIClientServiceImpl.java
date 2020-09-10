@@ -524,6 +524,94 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   /**
+   * Function used to make backend API call to start demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   * @param startTime contains startTime of demurrage as string.
+   * @param undeliveredCnRecordId contains undeliveredConsignment record id.
+   */
+  @Override
+  public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add(ConsignmentConstant.CNOTE, cnote);
+      queryParams.add("startTime", startTime);
+      queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for start demurrage request at time {}.", cnote, startTime);
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while starting demurrage for cnote {} at time {}", cnote, startTime, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to end demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  @Override
+  public void endDemurrage(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set(ConsignmentConstant.CNOTE, cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_END_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for end demurrage request.", cnote);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while ending demurrage for cnote {}", cnote, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to cancel ongoing demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  @Override
+  public void cancelDemurrage(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set(ConsignmentConstant.CNOTE, cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_CANCEL_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for cancel demurrage request.", cnote);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while cancelling demurrage for cnote {}", cnote, e);
+    }
+  }
+  /**
    * This function calls the blocking API in the zoom backend with the client code and
    * enable/disable flag.
    *
