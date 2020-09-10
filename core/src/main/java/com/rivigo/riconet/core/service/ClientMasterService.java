@@ -16,12 +16,12 @@ public interface ClientMasterService {
    * @param payload that we receive from compass.
    * @return update the flag value in the clinet table.
    */
-  void updateEpodDetails(String payload);
+  void updateEpodDetails(String payload) throws ClassNotFoundException;
 
   /**
    * This function adds / remove blocker for a client who has breached its credit limit.
    *
    * @param payload contains the payload in the string format.
    */
-  void updateClientBlocker(String payload);
+  void updateClientBlocker(String payload) throws ClassNotFoundException;
 }

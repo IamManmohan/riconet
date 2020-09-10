@@ -289,7 +289,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
    * @author Nikhil Rawat on 26/05/20.
    */
   @Override
-  public void updateEpodDetails(String payload) {
+  public void updateEpodDetails(String payload) throws ClassNotFoundException {
     EpodApplicableDto epodApplicableDTO =
         FinanceUtils.getDtoFromjsonString(payload, EpodApplicableDto.class);
     zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
@@ -301,7 +301,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
    *
    * @param payload contains the payload in the string format.
    */
-  public void updateClientBlocker(String payload) {
+  public void updateClientBlocker(String payload) throws ClassNotFoundException {
     ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto =
         FinanceUtils.getDtoFromjsonString(payload, ZoomClientCreditLimitBreachDTO.class);
     Client client =
