@@ -64,18 +64,18 @@ public class BankTransferServiceImpl implements BankTransferService {
         metadata.getOrDefault(
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
 
-    TicketDTO utrTicket =
+    List<TicketDTO> utrTicketList =
         zoomTicketingAPIClientService
             .getByEntityInAndType(
                 Collections.singletonList(utrNo),
-                String.valueOf(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID))
-            .stream()
-            .findFirst()
-            .orElseGet(
-                () ->
-                    zoomTicketingAPIClientService.createTicket(
-                        getTicketDtoForUtrBankTransfer(metadata, s3Url, utrNo, null)));
+                String.valueOf(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID));
 
+    if(CollectionUtils.isEmpty(utrTicketList)){
+      log.info("Since UTR ticket doesn't already exist, this UTR validation will follow new bank transfer flow.");
+      throw new ZoomException("UTR ticket doesn't exist for UTR number: {}",utrNo);
+    }
+
+    TicketDTO utrTicket = utrTicketList.get(0);
     ticketingService.reopenTicketIfClosed(
         utrTicket,
         String.format(
