@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
@@ -113,8 +114,8 @@ public interface ZoomBackendAPIClientService {
    * This function calls the blocking API in the zoom backend with the client code and
    * enable/disable flag.
    *
-   * @param clientId client id on which blocker to be toggled.
-   * @param isOverdueLimitBreached toggle flag.
+   * @param zoomClientCreditLimitBreachDto dto which contains client list and reason list of the
+   *     blockers to be added.
    */
-  void updateClientBlockerDetails(Long clientId, Boolean isOverdueLimitBreached);
+  void updateClientBlockerDetails(ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto);
 }

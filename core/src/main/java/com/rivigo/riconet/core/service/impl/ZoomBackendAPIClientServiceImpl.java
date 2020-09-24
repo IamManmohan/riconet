@@ -2,7 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.riconet.core.constants.ClientConstants;
+import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
@@ -615,28 +615,23 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * This function calls the blocking API in the zoom backend with the client code and
    * enable/disable flag.
    *
-   * @param clientId client id on which blocker to be toggled.
-   * @param isOverdueLimitBreached toggle flag.
+   * @param zoomClientCreditLimitBreachDto dto which contains client list and reason list of the
+   *     blockers to be added.
    */
   @Override
-  public void updateClientBlockerDetails(Long clientId, Boolean isOverdueLimitBreached) {
-    JsonNode responseJson;
+  public void updateClientBlockerDetails(
+      ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto) {
     try {
-      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-      queryParams.set("clientId", String.valueOf(clientId));
-      queryParams.set("reasonId", ClientConstants.CREDIT_LIMIT_BREACH_REASON_ID);
-      queryParams.set("dispatchBlockUnblock", String.valueOf(isOverdueLimitBreached));
-      log.info(
-          "calling client block api with clientId: {}, isOverdueLimitBreached: {}",
-          clientId,
-          isOverdueLimitBreached);
-      responseJson =
+      JsonNode responseJson =
           apiClientService.getEntity(
-              null, HttpMethod.POST, UrlConstant.BLOCK_UNBLOCK_CLIENT, queryParams, backendBaseUrl);
+              zoomClientCreditLimitBreachDto,
+              HttpMethod.POST,
+              UrlConstant.BLOCK_UNBLOCK_CLIENT,
+              null,
+              backendBaseUrl);
       log.info(
-          "client blocker on client {} with isOverdueLimitBreached {}, successful {}",
-          clientId,
-          isOverdueLimitBreached,
+          "client blocker request received from compass with dto {} and response from backend {}",
+          zoomClientCreditLimitBreachDto,
           responseJson);
     } catch (IOException e) {
       throw new ZoomException("Error while updating client blocker ", e);

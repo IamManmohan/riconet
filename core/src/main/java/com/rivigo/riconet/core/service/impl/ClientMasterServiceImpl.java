@@ -31,7 +31,6 @@ import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.repository.mysql.BillingEntityRepository;
 import com.rivigo.zoom.common.repository.mysql.ClientRepository;
 import com.rivigo.zoom.common.repository.mysql.IndustryTypeRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -304,14 +303,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
   public void updateClientBlocker(String payload) {
     ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto =
         FinanceUtils.getDtoFromjsonString(payload, ZoomClientCreditLimitBreachDTO.class);
-    Client client =
-        Optional.ofNullable(zoomClientCreditLimitBreachDto)
-            .map(ZoomClientCreditLimitBreachDTO::getClientCode)
-            .map(v -> clientRepository.findByClientCode(v))
-            .orElseThrow(
-                () -> new ZoomException("client for updating client blocker does not exist"));
 
-    zoomBackendAPIClientService.updateClientBlockerDetails(
-        client.getId(), zoomClientCreditLimitBreachDto.getOverdueLimitBreached());
+    zoomBackendAPIClientService.updateClientBlockerDetails(zoomClientCreditLimitBreachDto);
   }
 }
