@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -620,9 +621,9 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    */
   @Override
   public void updateClientBlockerDetails(
-      ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto) {
+      @NonNull ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto) {
     try {
-      JsonNode responseJson =
+      final JsonNode responseJson =
           apiClientService.getEntity(
               zoomClientCreditLimitBreachDto,
               HttpMethod.POST,

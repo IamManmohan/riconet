@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -288,21 +289,21 @@ public class ClientMasterServiceImpl implements ClientMasterService {
    * @author Nikhil Rawat on 26/05/20.
    */
   @Override
-  public void updateEpodDetails(String payload) {
-    EpodApplicableDto epodApplicableDTO =
-        FinanceUtils.getDtoFromjsonString(payload, EpodApplicableDto.class);
+  public void updateEpodDetails(@NonNull String payload) {
+    final EpodApplicableDto epodApplicableDTO =
+        FinanceUtils.getDtoFromJsonString(payload, EpodApplicableDto.class);
     zoomBackendAPIClientService.updateEpodDetails(epodApplicableDTO);
   }
 
   /**
-   * This function adds / remove blocker for a client who has breached its credit limit, first the
-   * string is converted to the desired DTO and then zoom-backend API is hit with the , client-code.
+   * This function adds / removes blocker for a client who has breached its credit limit, first the
+   * string is converted to the desired DTO and then zoom-backend API is hit with the client-code.
    *
    * @param payload contains the payload in the string format.
    */
   public void updateClientBlocker(String payload) {
     ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto =
-        FinanceUtils.getDtoFromjsonString(payload, ZoomClientCreditLimitBreachDTO.class);
+        FinanceUtils.getDtoFromJsonString(payload, ZoomClientCreditLimitBreachDTO.class);
 
     zoomBackendAPIClientService.updateClientBlockerDetails(zoomClientCreditLimitBreachDto);
   }

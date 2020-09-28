@@ -63,7 +63,7 @@ public class FinanceUtils {
    *
    * @author Nikhil Rawat on 26/05/20.
    */
-  public static <T> T getDtoFromjsonString(String dtoString, Class<?> target) {
+  public static <T> T getDtoFromJsonString(String dtoString, Class<?> target) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       return (T) objectMapper.readValue(dtoString, target);
