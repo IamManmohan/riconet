@@ -56,6 +56,6 @@ public class WhatsappBotServiceImpl implements WhatsappBotService {
     }
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 }

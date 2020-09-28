@@ -9,12 +9,13 @@ import com.rivigo.cms.constants.ServiceType;
 import com.rivigo.oauth2.resource.service.SsoService;
 import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
-import com.rivigo.riconet.core.dto.datastore.DatastoreResponseDto;
-import com.rivigo.riconet.core.enums.RequestStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
+import com.rivigo.zoom.backend.client.utils.HeaderUtils;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.rest.dto.Response;
+import com.rivigo.zoom.util.rest.enums.ResponseStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -55,6 +56,9 @@ public class ApiClientServiceImpl implements ApiClientService {
 
   @Value("${billing.base.url}")
   private String billingBaseUrl;
+
+  @Value("${zoom.url}")
+  private String backendBaseUrl;
 
   @Autowired
   @Qualifier("riconetRestTemplate")
@@ -97,14 +101,13 @@ public class ApiClientServiceImpl implements ApiClientService {
   }
 
   @Override
-  public <T> T parseResponseJsonNodeFromDatastore(JsonNode responseJson, JavaType javaType) {
+  public <T> T parseNewResponseJsonNode(JsonNode responseJson, JavaType javaType) {
 
-    DatastoreResponseDto response =
-        objectMapper.convertValue(responseJson, DatastoreResponseDto.class);
+    Response response = objectMapper.convertValue(responseJson, Response.class);
 
     log.debug(responseJson.toString());
     log.debug(response.getStatus().toString());
-    if (response.getStatus().equals(RequestStatus.SUCCESS)) {
+    if (response.getStatus().equals(ResponseStatus.SUCCESS)) {
       return objectMapper.convertValue(response.getPayload(), javaType);
     }
     log.error(
@@ -124,6 +127,9 @@ public class ApiClientServiceImpl implements ApiClientService {
       // The value of Business must be any zoom business type, irrespective of cn business type
       // Identifying business is un-necessary overhead
       headers.add("Business", ServiceType.ZOOM_CORPORATE.name());
+    }
+    if (uri.contains(backendBaseUrl)) {
+      headers.add(HeaderUtils.NEW_RESPONSE_HEADER_KEY, "true");
     }
     return headers;
   }
