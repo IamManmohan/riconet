@@ -14,4 +14,6 @@ public class ClientConstants {
   public static final String FLIPKART_INDIA_ZOOM_CLIENT = "4128";
   public static final String FLIPKART_INTERNET_SELLER_CLIENT = "5522";
   public static final String ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE = "ZDOCS";
+
+  public static final String CORPORATE_CLIENT_RETURN_CN_MOVEMENT_TYPE = "RETURN";
 }
