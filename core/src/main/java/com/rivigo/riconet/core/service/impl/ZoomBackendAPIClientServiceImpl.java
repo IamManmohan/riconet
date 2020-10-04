@@ -610,4 +610,50 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while cancelling demurrage for cnote {}", cnote, e);
     }
   }
+
+  @Override
+  public void knockOffUtrBankTransfer(String utrNo) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("utrNo", utrNo);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER,
+              queryParams,
+              backendBaseUrl);
+      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Knockoff request for UTR: {} failed.", utrNo);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while knocking off bank transfer for UTR {}", utrNo, e);
+    }
+  }
+
+  @Override
+  public void revertKnockOffUtrBankTransfer(String utrNo) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("utrNo", utrNo);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER,
+              queryParams,
+              backendBaseUrl);
+      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Revert Knockoff request for UTR: {} failed.", utrNo);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while Reverting Knockoff bank transfer for UTR {}", utrNo, e);
+    }
+  }
 }

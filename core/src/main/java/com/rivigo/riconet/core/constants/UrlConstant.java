@@ -91,4 +91,10 @@ public class UrlConstant {
 
   /** Backend API to cancel ongoing demurrage for given consignment. */
   public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
+
+  public final String ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/complete";
+
+  public final String ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/revert";
 }

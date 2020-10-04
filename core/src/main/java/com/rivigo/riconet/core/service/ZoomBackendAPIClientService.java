@@ -109,4 +109,8 @@ public interface ZoomBackendAPIClientService {
    * @param cnote contains cnote number of consignment.
    */
   void cancelDemurrage(String cnote);
+
+  void knockOffUtrBankTransfer(String utrNo);
+
+  void revertKnockOffUtrBankTransfer(String utrNo);
 }
