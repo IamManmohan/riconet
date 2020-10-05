@@ -11,7 +11,7 @@ public interface ApiClientService {
 
   Object parseJsonNode(JsonNode responseJson, TypeReference mapType);
 
-  <T> T parseResponseJsonNodeFromDatastore(JsonNode responseJson, JavaType javaType);
+  <T> T parseNewResponseJsonNode(JsonNode responseJson, JavaType javaType);
 
   JsonNode getEntity(
       Object dto,
