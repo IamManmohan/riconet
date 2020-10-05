@@ -108,6 +108,9 @@ public class ApiClientServiceImpl implements ApiClientService {
     log.debug(responseJson.toString());
     log.debug(response.getStatus().toString());
     if (response.getStatus().equals(ResponseStatus.SUCCESS)) {
+      if (javaType == null) {
+        return null;
+      }
       return objectMapper.convertValue(response.getPayload(), javaType);
     }
     log.error(
