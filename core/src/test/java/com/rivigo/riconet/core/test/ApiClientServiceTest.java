@@ -35,7 +35,7 @@ public class ApiClientServiceTest {
 
     JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     Boolean response =
-        apiClientService.parseResponseJsonNodeFromDatastore(
+        apiClientService.parseNewResponseJsonNode(
             jsonNode, objectMapper.constructType(Boolean.class));
     Assert.assertTrue(response);
   }
@@ -46,7 +46,6 @@ public class ApiClientServiceTest {
     JsonNode jsonNode = ApiServiceUtils.getDatastoreFailureResponseSampleJsonNode();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while cleanup from datastore");
-    apiClientService.parseResponseJsonNodeFromDatastore(
-        jsonNode, objectMapper.constructType(Boolean.class));
+    apiClientService.parseNewResponseJsonNode(jsonNode, objectMapper.constructType(Boolean.class));
   }
 }
