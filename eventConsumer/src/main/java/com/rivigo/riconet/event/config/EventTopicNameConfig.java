@@ -64,12 +64,6 @@ public class EventTopicNameConfig {
   @Value("${PRIME_EVENT_SINK_ERROR}")
   private String primeEventSinkError;
 
-  @Value("${WHATSAPP_MESSAGE_RECEIVE}")
-  private String whatsappMessageReceive;
-
-  @Value("${WHATSAPP_MESSAGE_RECEIVE_ERROR}")
-  private String whatsappMessageReceiveError;
-
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;
   }
