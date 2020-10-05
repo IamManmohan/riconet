@@ -1,5 +1,8 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.finance.zoom.dto.UniqueTransactionReferencePostingDTO;
+import com.rivigo.finance.zoom.enums.UniqueTransactionReferencePostingStatus;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.zoomticketing.GroupDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
@@ -12,12 +15,14 @@ import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UploadedFileRecordService;
+import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.UploadedFileRecord;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -41,6 +46,10 @@ public class BankTransferServiceImpl implements BankTransferService {
   private final ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   private final UploadedFileRecordService uploadedFileRecordService;
+
+  private final ObjectMapper objectMapper;
+
+  private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
   @Override
   public void createTicket(Map<String, String> metadata) {
@@ -74,7 +83,6 @@ public class BankTransferServiceImpl implements BankTransferService {
           "Since UTR ticket doesn't already exist, this UTR validation will follow new bank transfer flow.");
       throw new ZoomException("UTR ticket doesn't exist for UTR number: {}", utrNo);
     }
-
     TicketDTO utrTicket = utrTicketList.get(0);
     ticketingService.reopenTicketIfClosed(
         utrTicket,
@@ -178,5 +186,33 @@ public class BankTransferServiceImpl implements BankTransferService {
         .assigneeId(group == null ? null : group.getId())
         .assigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP)
         .build();
+  }
+
+  @Override
+  public void handleUniqueTransactionReferencePostingEvent(String payload) {
+    UniqueTransactionReferencePostingDTO utrPostingDto =
+        getUniqueTransactionReferencePostingDto(payload);
+    if (utrPostingDto == null) {
+      throw new ZoomException("UniqueTransactionReferencePostingDto cannot be null.");
+    }
+    String utrNo = utrPostingDto.getUniqueTransactionReferenceNumber();
+    UniqueTransactionReferencePostingStatus utrPostingStatus = utrPostingDto.getStatus();
+    if (UniqueTransactionReferencePostingStatus.COMPLETE.equals(utrPostingStatus)) {
+      log.info("Knockoff complete request received for UTR: {}", utrNo);
+      zoomBackendAPIClientService.knockOffUtrBankTransfer(utrNo);
+    } else if (UniqueTransactionReferencePostingStatus.INCOMPLETE.equals(utrPostingStatus)) {
+      log.info("Knockoff incomplete request received for UTR: {}", utrNo);
+      zoomBackendAPIClientService.revertKnockOffUtrBankTransfer(utrNo);
+    }
+  }
+
+  private UniqueTransactionReferencePostingDTO getUniqueTransactionReferencePostingDto(
+      String payload) {
+    try {
+      return objectMapper.readValue(payload, UniqueTransactionReferencePostingDTO.class);
+    } catch (IOException e) {
+      log.info("Error occurred while processing message: {}", payload);
+      return null;
+    }
   }
 }

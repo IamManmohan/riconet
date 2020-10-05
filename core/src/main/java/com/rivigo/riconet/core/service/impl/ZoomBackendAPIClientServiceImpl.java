@@ -360,7 +360,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   @Override
-  public void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
+  public void handleKnockOffRequestForCnote(
+      String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
     try {

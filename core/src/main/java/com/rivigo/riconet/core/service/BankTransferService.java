@@ -5,4 +5,6 @@ import java.util.Map;
 public interface BankTransferService {
 
   void createTicket(Map<String, String> metadata);
+
+  void handleUniqueTransactionReferencePostingEvent(String payload);
 }

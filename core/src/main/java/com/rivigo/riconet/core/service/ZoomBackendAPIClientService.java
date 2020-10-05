@@ -57,7 +57,7 @@ public interface ZoomBackendAPIClientService {
 
   JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO);
 
-  void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
+  void handleKnockOffRequestForCnote(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 
   void processVehicleEvent(PrimeEventDto primeEventDto, Long tripId);
 

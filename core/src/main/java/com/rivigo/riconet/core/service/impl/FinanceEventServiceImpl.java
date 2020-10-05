@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
 import com.rivigo.riconet.core.service.EpodService;
@@ -29,6 +30,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
   @Autowired private HandoverCollectionService handoverCollectionService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private BankTransferService bankTransferService;
 
   /**
    * This service is used for uploading epod link.
@@ -69,6 +72,9 @@ public class FinanceEventServiceImpl implements FinanceEventService {
       case HANDOVER_COLLECTION_EXCLUDE:
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
+        break;
+      case UNIQUE_TRANSACTION_REFERENCE_POSTING:
+        bankTransferService.handleUniqueTransactionReferencePostingEvent(eventPayload.getPayload());
         break;
       default:
         log.info("Event does not trigger anything {}", eventType);
