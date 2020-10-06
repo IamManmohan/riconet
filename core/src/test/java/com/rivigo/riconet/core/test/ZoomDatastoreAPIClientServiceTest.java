@@ -87,12 +87,12 @@ public class ZoomDatastoreAPIClientServiceTest {
 
   private void validateParsingCallDone(JsonNode jsonNode) {
     verify(apiClientService, times(1))
-        .parseResponseJsonNodeFromDatastore(jsonNodeArgumentCaptor.capture(), Mockito.any());
+        .parseNewResponseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 
   private void mockApiClientServiceParseResponseJsonNodeFromDatastore() {
-    when(apiClientService.parseResponseJsonNodeFromDatastore(any(), any())).thenReturn(true);
+    when(apiClientService.parseNewResponseJsonNode(any(), any())).thenReturn(true);
   }
 
   private void mockApiClientServiceGetEntity(JsonNode jsonNode) throws IOException {

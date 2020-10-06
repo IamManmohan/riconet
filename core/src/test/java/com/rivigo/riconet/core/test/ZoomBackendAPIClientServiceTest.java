@@ -142,7 +142,7 @@ public class ZoomBackendAPIClientServiceTest {
           multiValueMapArgumentCaptor.getValue().get("consignmentId").get(0));
 
     verify(apiClientService, times(1))
-        .parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
+        .parseNewResponseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 

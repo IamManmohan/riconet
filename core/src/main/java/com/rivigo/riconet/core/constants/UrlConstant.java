@@ -81,8 +81,6 @@ public class UrlConstant {
   /** End point for epod flag in clients. */
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
 
-  public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";
-
   /** Backend API to mark demurrage as started for given consignment. */
   public final String ZOOM_BACKEND_START_DEMURRAGE = "/vas/demurrage/start";
 

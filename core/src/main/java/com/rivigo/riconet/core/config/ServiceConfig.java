@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.rivigo.zoom.common.interceptor.XUserAgentInterceptor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -53,6 +54,9 @@ public class ServiceConfig {
   private static final int QUEUE_SIZE = 10;
   private static final int KEEP_ALIVE_TIME = 5000;
 
+  @Value("${service.name}")
+  private String serviceName;
+
   @Bean
   ThreadPoolTaskScheduler taskScheduler() {
     ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
@@ -89,6 +93,7 @@ public class ServiceConfig {
   @Qualifier("riconetRestTemplate")
   RestTemplate riconetRestTemplate() {
     RestTemplate restTemplate = new RestTemplate();
+    restTemplate.setInterceptors(Collections.singletonList(new XUserAgentInterceptor(serviceName)));
     return restTemplate;
   }
 
