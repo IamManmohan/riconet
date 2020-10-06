@@ -624,8 +624,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER,
               queryParams,
               backendBaseUrl);
-      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         log.error("Knockoff request for UTR: {} failed.", utrNo);
       }
@@ -647,8 +647,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER,
               queryParams,
               backendBaseUrl);
-      final TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         log.error("Revert Knockoff request for UTR: {} failed.", utrNo);
       }
