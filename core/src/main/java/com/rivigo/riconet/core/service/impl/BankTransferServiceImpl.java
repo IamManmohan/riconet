@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+/** BankTransferService is used to handle all tasks related to payment type BANK_TRANSFER. */
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -51,6 +52,11 @@ public class BankTransferServiceImpl implements BankTransferService {
 
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  /**
+   * This function is used to create UTR and cnote level ticket in zoom-ticketing for payment type
+   * Bank Transfer. <br>
+   * This flow ensures Backward compatibility.
+   */
   @Override
   public void createTicket(Map<String, String> metadata) {
 
@@ -78,11 +84,14 @@ public class BankTransferServiceImpl implements BankTransferService {
             Collections.singletonList(utrNo),
             String.valueOf(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID));
 
+    // No new UTR level ticket will be created.
     if (CollectionUtils.isEmpty(utrTicketList)) {
       log.info(
           "Since UTR ticket doesn't already exist, this UTR validation will follow new bank transfer flow.");
       throw new ZoomException("UTR ticket doesn't exist for UTR number: {}", utrNo);
     }
+    // Only already existing tickets will be reopened if they are closed.
+    // Ensures backward compatibility.
     TicketDTO utrTicket = utrTicketList.get(0);
     ticketingService.reopenTicketIfClosed(
         utrTicket,
@@ -188,6 +197,11 @@ public class BankTransferServiceImpl implements BankTransferService {
         .build();
   }
 
+  /**
+   * This function handles incoming UniqueTransactionReferencePosting event from compass. <br>
+   * Bases on UniqueTransactionReferencePostingStatus, either knockoff or revert knockoff request is
+   * sent to backend.
+   */
   @Override
   public void handleUniqueTransactionReferencePostingEvent(String payload) {
     UniqueTransactionReferencePostingDTO utrPostingDto =
@@ -206,6 +220,10 @@ public class BankTransferServiceImpl implements BankTransferService {
     }
   }
 
+  /**
+   * This function is used to convert input string to UniqueTransactionReferencePostingDto for
+   * further actions.
+   */
   private UniqueTransactionReferencePostingDTO getUniqueTransactionReferencePostingDto(
       String payload) {
     try {

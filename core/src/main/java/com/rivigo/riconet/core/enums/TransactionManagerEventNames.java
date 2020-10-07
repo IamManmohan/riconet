@@ -34,7 +34,10 @@ public enum TransactionManagerEventNames {
   BANK_TRANSFER_APPROVAL_COLLECTIONS,
   /** bank transfer rejection collections event. */
   BANK_TRANSFER_REJECTION_COLLECTIONS,
+  /** bank transfer UTR knockoff collections event. */
   BANK_TRANSFER_UTR_KNOCKOFF_COLLECTIONS,
+  /** bank transfer UTR revert knockoff collections event. */
   BANK_TRANSFER_UTR_REVERT_KNOCKOFF_COLLECTIONS,
+  /** bank transfer UTR rejection collections event. */
   BANK_TRANSFER_UTR_REJECTION_COLLECTIONS
 }

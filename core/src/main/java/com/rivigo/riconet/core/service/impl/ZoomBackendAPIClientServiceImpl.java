@@ -325,6 +325,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * This function is used to maked backend API call to reject bank transfer payment for given
+   * consignment. <br>
+   * MarkRecoveryPending flow is triggered for given consignment.
+   *
+   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   */
   @Override
   public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
     return markRecoveryPendingInternal(
@@ -358,6 +365,14 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     return apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.JSON_NODE);
   }
 
+  /**
+   * This function is used to make Backend API call to knockoff bank transfer payment for given
+   * cnote. <br>
+   * This function ensures backward compatibility.
+   *
+   * @param cnote Cnote that needs to be knocked off.
+   * @param bankTransferRequestDTO Bank transfer payment details to be knocked off.
+   */
   @Override
   public void handleKnockOffRequestForCnote(
       String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
@@ -611,6 +626,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Function used to make backend API call to knockoff bank transfer payment for given UTR number.
+   *
+   * @param utrNo UTR number to be knocked off.
+   */
   @Override
   public void knockOffUtrBankTransfer(String utrNo) {
     JsonNode responseJson;
@@ -634,6 +654,12 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Function used to make backend API call to revert knockoff bank transfer payment for given UTR
+   * number.
+   *
+   * @param utrNo UTR number to be revert knocked off.
+   */
   @Override
   public void revertKnockOffUtrBankTransfer(String utrNo) {
     JsonNode responseJson;

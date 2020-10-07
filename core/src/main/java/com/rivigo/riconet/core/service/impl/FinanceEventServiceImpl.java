@@ -31,6 +31,10 @@ public class FinanceEventServiceImpl implements FinanceEventService {
 
   @Autowired private ZoomPropertyService zoomPropertyService;
 
+  /**
+   * BankTransferService is used to handle incoming UniqueTransactionReferencePosting event from
+   * compass and forward the knockoff/revert-knockoff request to backend.
+   */
   @Autowired private BankTransferService bankTransferService;
 
   /**
