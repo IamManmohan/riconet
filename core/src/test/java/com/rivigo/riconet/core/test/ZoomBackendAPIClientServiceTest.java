@@ -263,4 +263,26 @@ public class ZoomBackendAPIClientServiceTest {
     expectedException.expect(ZoomException.class);
     zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
   }
+
+  @Test
+  public void knockOffUtrBankTransferTest() throws IOException {
+    String utrNo = "1234567123456789";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.knockOffUtrBankTransfer(utrNo);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.knockOffUtrBankTransfer(utrNo);
+  }
+
+  @Test
+  public void revertKnockOffUtrBankTransferTest() throws IOException {
+    String utrNo = "1234567123456789";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.revertKnockOffUtrBankTransfer(utrNo);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.revertKnockOffUtrBankTransfer(utrNo);
+  }
 }
