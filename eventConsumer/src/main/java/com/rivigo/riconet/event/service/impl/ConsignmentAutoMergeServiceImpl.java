@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ApiClientService;
-import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.event.service.ConsignmentAutoMergeService;
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ConsignmentAutoMergeServiceImpl implements ConsignmentAutoMergeService {
-
-  private final ConsignmentService consignmentService;
 
   private final ApiClientService apiClientService;
 

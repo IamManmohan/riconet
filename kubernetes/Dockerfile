@@ -12,7 +12,7 @@ ARG PROPERTIES_PATH_NOTIFICATION=notificationConsumer/src/main/resources/kuberne
 # profile names
 ARG LOGIN_PROFILE=staging
 ARG SPRING_PROFILE=kubernetes
-ARG OUT_TOPIC_PREFIX=zoom_k8s_nx.namespace
+ARG OUT_TOPIC_PREFIX=zoom_kubernetes.namespace
 
 # xms xmx config
 ARG XMX_XMS_VALUE=512m
