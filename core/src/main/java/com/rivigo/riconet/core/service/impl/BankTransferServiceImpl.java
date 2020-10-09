@@ -67,11 +67,14 @@ public class BankTransferServiceImpl implements BankTransferService {
 
     // Create ticket for UTR
     Long utrTicketId = createUTRTicket(consignment.getCnote(), metadata, s3Url);
+    if (utrTicketId == null) {
+      log.info("UTR ticket doesn't exist for given UTR.");
+      return;
+    }
 
     // Create ticket for cnote
-    TicketDTO ticketDTO =
-        zoomTicketingAPIClientService.createTicket(
-            getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, null));
+    zoomTicketingAPIClientService.createTicket(
+        getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, null));
   }
 
   private Long createUTRTicket(@NotNull String cnote, Map<String, String> metadata, String s3Url) {
@@ -88,7 +91,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     if (CollectionUtils.isEmpty(utrTicketList)) {
       log.info(
           "Since UTR ticket doesn't already exist, this UTR validation will follow new bank transfer flow.");
-      throw new ZoomException("UTR ticket doesn't exist for UTR number: {}", utrNo);
+      return null;
     }
     // Only already existing tickets will be reopened if they are closed.
     // Ensures backward compatibility.
@@ -102,34 +105,6 @@ public class BankTransferServiceImpl implements BankTransferService {
                 ZoomCommunicationFieldNames.PaymentDetails.TOTAL_AMOUNT.name(), "")));
 
     return utrTicket.getId();
-  }
-
-  private TicketDTO getTicketDtoForUtrBankTransfer(
-      Map<String, String> metadata, String s3Url, String utrNo, Long parentId) {
-    GroupDTO group = getGroupForTicketing();
-    return TicketDTO.builder()
-        .entityId(utrNo)
-        .parentId(parentId)
-        .source(TicketSource.INTERNAL)
-        .typeId(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID)
-        .subject(
-            String.format(
-                ZoomTicketingConstant.BANK_TRANSFER_MESSAGE,
-                TicketEntityType.UTR.name(),
-                "",
-                metadata.getOrDefault(
-                    ZoomCommunicationFieldNames.PaymentDetails.BANK_NAME.name(), ""),
-                utrNo,
-                s3Url,
-                "see comments"))
-        .title(
-            String.format(
-                ZoomTicketingConstant.BANK_TRANSFER_TICKET_TITLE,
-                TicketEntityType.UTR.name(),
-                utrNo))
-        .assigneeId(group == null ? null : group.getId())
-        .assigneeType(group == null ? AssigneeType.NONE : AssigneeType.GROUP)
-        .build();
   }
 
   private GroupDTO getGroupForTicketing() {
