@@ -8,6 +8,7 @@ import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
+import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.UploadedFileRecordService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
@@ -41,6 +42,8 @@ public class BankTransferServiceImplTest {
 
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
+  @Mock private TicketingService ticketingService;
+
   @Mock private ObjectMapper objectMapper;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
@@ -66,15 +69,16 @@ public class BankTransferServiceImplTest {
         .thenReturn(Collections.singletonList(new UploadedFileRecord()));
     Mockito.when(
             zoomTicketingAPIClientService.getByEntityInAndType(
-                Mockito.anyList(), Mockito.anyString()))
+                Mockito.anyListOf(String.class), Mockito.anyString()))
         .thenReturn(Collections.emptyList());
-    expectedException.expect(ZoomException.class);
     bankTransferService.createTicket(getMockMetadataInput());
     Mockito.when(
             zoomTicketingAPIClientService.getByEntityInAndType(
-                Mockito.anyList(), Mockito.anyString()))
+                Mockito.anyListOf(String.class), Mockito.anyString()))
         .thenReturn(Collections.singletonList(ticketDTO));
-    expectedException.expect(ZoomException.class);
+    Mockito.doNothing()
+        .when(ticketingService)
+        .reopenTicketIfClosed(Mockito.any(TicketDTO.class), Mockito.anyString());
     bankTransferService.createTicket(getMockMetadataInput());
     Mockito.verify(zoomTicketingAPIClientService, Mockito.times(1)).createTicket(Mockito.any());
   }
@@ -93,15 +97,16 @@ public class BankTransferServiceImplTest {
         .thenReturn(Collections.singletonList(new UploadedFileRecord()));
     Mockito.when(
             zoomTicketingAPIClientService.getByEntityInAndType(
-                Mockito.anyList(), Mockito.anyString()))
+                Mockito.anyListOf(String.class), Mockito.anyString()))
         .thenReturn(Collections.emptyList());
-    expectedException.expect(ZoomException.class);
     bankTransferService.createTicket(getMockMetadataInput());
     Mockito.when(
             zoomTicketingAPIClientService.getByEntityInAndType(
-                Mockito.anyList(), Mockito.anyString()))
+                Mockito.anyListOf(String.class), Mockito.anyString()))
         .thenReturn(Collections.singletonList(ticketDTO));
-    expectedException.expect(ZoomException.class);
+    Mockito.doNothing()
+        .when(ticketingService)
+        .reopenTicketIfClosed(Mockito.any(TicketDTO.class), Mockito.anyString());
     bankTransferService.createTicket(getMockMetadataInput());
     Mockito.verify(zoomTicketingAPIClientService, Mockito.times(1)).createTicket(Mockito.any());
   }
