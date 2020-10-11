@@ -66,7 +66,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     String s3Url = getS3Url(consignment);
 
     // Create ticket for UTR
-    Long utrTicketId = createUTRTicket(consignment.getCnote(), metadata, s3Url);
+    Long utrTicketId = createUTRTicket(consignment.getCnote(), metadata);
     if (utrTicketId == null) {
       log.info("UTR ticket doesn't exist for given UTR.");
       return;
@@ -77,12 +77,12 @@ public class BankTransferServiceImpl implements BankTransferService {
         getTicketDTOForBankTransfer(consignment.getCnote(), metadata, s3Url, null));
   }
 
-  private Long createUTRTicket(@NotNull String cnote, Map<String, String> metadata, String s3Url) {
-    String utrNo =
+  private Long createUTRTicket(@NotNull String cnote, Map<String, String> metadata) {
+    final String utrNo =
         metadata.getOrDefault(
             ZoomCommunicationFieldNames.PaymentDetails.TRANSACTION_REFERENCE_NO.name(), "");
 
-    List<TicketDTO> utrTicketList =
+    final List<TicketDTO> utrTicketList =
         zoomTicketingAPIClientService.getByEntityInAndType(
             Collections.singletonList(utrNo),
             String.valueOf(ZoomTicketingConstant.UTR_BANK_TRANSFER_TICKET_TYPE_ID));
@@ -95,7 +95,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     }
     // Only already existing tickets will be reopened if they are closed.
     // Ensures backward compatibility.
-    TicketDTO utrTicket = utrTicketList.get(0);
+    final TicketDTO utrTicket = utrTicketList.get(0);
     ticketingService.reopenTicketIfClosed(
         utrTicket,
         String.format(
@@ -179,19 +179,21 @@ public class BankTransferServiceImpl implements BankTransferService {
    */
   @Override
   public void handleUniqueTransactionReferencePostingEvent(String payload) {
-    UniqueTransactionReferencePostingDTO utrPostingDto =
+    final UniqueTransactionReferencePostingDTO utrPostingDto =
         getUniqueTransactionReferencePostingDto(payload);
     if (utrPostingDto == null) {
       throw new ZoomException("UniqueTransactionReferencePostingDto cannot be null.");
     }
-    String utrNo = utrPostingDto.getUniqueTransactionReferenceNumber();
-    UniqueTransactionReferencePostingStatus utrPostingStatus = utrPostingDto.getStatus();
+    final String utrNo = utrPostingDto.getUniqueTransactionReferenceNumber();
+    final UniqueTransactionReferencePostingStatus utrPostingStatus = utrPostingDto.getStatus();
     if (UniqueTransactionReferencePostingStatus.COMPLETE.equals(utrPostingStatus)) {
       log.info("Knockoff complete request received for UTR: {}", utrNo);
       zoomBackendAPIClientService.knockOffUtrBankTransfer(utrNo);
     } else if (UniqueTransactionReferencePostingStatus.INCOMPLETE.equals(utrPostingStatus)) {
       log.info("Knockoff incomplete request received for UTR: {}", utrNo);
       zoomBackendAPIClientService.revertKnockOffUtrBankTransfer(utrNo);
+    } else {
+      throw new ZoomException("Invalid UniqueTransactionReferencePostingStatus.");
     }
   }
 
@@ -204,7 +206,7 @@ public class BankTransferServiceImpl implements BankTransferService {
     try {
       return objectMapper.readValue(payload, UniqueTransactionReferencePostingDTO.class);
     } catch (IOException e) {
-      log.info("Error occurred while processing message: {}", payload);
+      log.info("Error occurred while processing message: {}", payload, e);
       return null;
     }
   }

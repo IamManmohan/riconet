@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -375,7 +376,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    */
   @Override
   public void handleKnockOffRequestForCnote(
-      String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
+      String cnote, @Valid BankTransferRequestDTO bankTransferRequestDTO) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
     try {
