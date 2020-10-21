@@ -407,11 +407,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT,
               null,
               backendBaseUrl);
-      Boolean isSuccess =
-          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
-      if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException("Error in processing athena gps event");
-      }
+      apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
     } catch (IOException e) {
       log.error("Error while processing event with dto {}", athenaGpsEventDto);
       throw new ZoomException("Error while processing event for gps");
