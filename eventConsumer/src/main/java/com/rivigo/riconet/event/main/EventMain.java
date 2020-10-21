@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.config.ZoomBackendNeo4jReadConfig;
 import com.rivigo.riconet.core.config.ZoomRiconetConfig;
 import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
+import com.rivigo.riconet.event.consumer.AthenaGpsEventsConsumer;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
@@ -59,6 +60,8 @@ public class EventMain {
   private final SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer;
 
   private final PrimeEventsConsumer primeEventsConsumer;
+
+  private final AthenaGpsEventsConsumer athenaGpsEventsConsumer;
 
   private final HealthCheckConsumer healthCheckConsumer;
 
@@ -120,6 +123,9 @@ public class EventMain {
   @Value("${primeEventsConsumer.group.id}")
   private String primeEventsGroup;
 
+  @Value("${athenaGpsEventsConsumer.group.id}")
+  private String athenaGpsEventsGroup;
+
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
@@ -132,6 +138,7 @@ public class EventMain {
       ExpressAppPickupConsumer expressAppPickupConsumer,
       SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
       PrimeEventsConsumer primeEventsConsumer,
+      AthenaGpsEventsConsumer athenaGpsEventsConsumer,
       TransactionManagerEventConsumer transactionManagerEventConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
@@ -144,6 +151,7 @@ public class EventMain {
     this.expressAppPickupConsumer = expressAppPickupConsumer;
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
     this.primeEventsConsumer = primeEventsConsumer;
+    this.athenaGpsEventsConsumer = athenaGpsEventsConsumer;
     this.transactionManagerEventConsumer = transactionManagerEventConsumer;
   }
 
@@ -200,6 +208,7 @@ public class EventMain {
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
+    load(materializer, system, bootstrapServers, athenaGpsEventsGroup, athenaGpsEventsConsumer);
     load(
         materializer,
         system,

@@ -27,3 +27,5 @@ spotless {
         googleJavaFormat('1.5')
     }
 }
+
+processResources.dependsOn('spotlessApply')
