@@ -9,6 +9,7 @@ import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
+import com.rivigo.riconet.core.dto.athenagps.AthenaGpsEventDto;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
@@ -60,6 +61,8 @@ public interface ZoomBackendAPIClientService {
   void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 
   void processVehicleEvent(PrimeEventDto primeEventDto, Long tripId);
+
+  void processAthenaGpsEvent(AthenaGpsEventDto athenaGpsEventDto);
 
   void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto);
 

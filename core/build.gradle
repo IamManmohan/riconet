@@ -34,3 +34,4 @@ spotless {
     }
 }
 
+processResources.dependsOn('spotlessApply')
