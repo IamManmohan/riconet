@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
+import com.rivigo.riconet.core.dto.athenagps.AthenaGpsEventDto;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
@@ -409,6 +410,24 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       log.error("Error while processing event with dto {}, trip id: {}", primeEventDto, tripId);
       throw new ZoomException("Error while processing event for trip id: %s", tripId);
+    }
+  }
+
+  @Override
+  public void processAthenaGpsEvent(AthenaGpsEventDto athenaGpsEventDto) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              athenaGpsEventDto,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT,
+              null,
+              backendBaseUrl);
+      apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+    } catch (IOException e) {
+      log.error("Error while processing event with dto {}", athenaGpsEventDto);
+      throw new ZoomException("Error while processing event for gps");
     }
   }
 
