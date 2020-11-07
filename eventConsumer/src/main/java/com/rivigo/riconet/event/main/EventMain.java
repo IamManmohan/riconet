@@ -12,6 +12,7 @@ import com.rivigo.riconet.core.config.ZoomBackendNeo4jReadConfig;
 import com.rivigo.riconet.core.config.ZoomRiconetConfig;
 import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
+import com.rivigo.riconet.event.consumer.AthenaGpsEventsConsumer;
 import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
@@ -21,7 +22,6 @@ import com.rivigo.riconet.event.consumer.KairosExpressAppEventConsumer;
 import com.rivigo.riconet.event.consumer.PrimeEventsConsumer;
 import com.rivigo.riconet.event.consumer.SecondaryCnAutoMergeConsumer;
 import com.rivigo.riconet.event.consumer.TransactionManagerEventConsumer;
-import com.rivigo.riconet.event.consumer.WhatsappReceiveMessageConsumer;
 import com.rivigo.riconet.event.consumer.WmsEventConsumer;
 import com.rivigo.riconet.event.consumer.ZoomEventTriggerConsumer;
 import com.rivigo.zoom.util.commons.config.SerDeConfig;
@@ -61,11 +61,11 @@ public class EventMain {
 
   private final PrimeEventsConsumer primeEventsConsumer;
 
+  private final AthenaGpsEventsConsumer athenaGpsEventsConsumer;
+
   private final HealthCheckConsumer healthCheckConsumer;
 
   private final TransactionManagerEventConsumer transactionManagerEventConsumer;
-
-  private final WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer;
 
   private static final String CONSUMER_OFFSET_CONFIG = "latest";
 
@@ -123,8 +123,8 @@ public class EventMain {
   @Value("${primeEventsConsumer.group.id}")
   private String primeEventsGroup;
 
-  @Value("${whatsappReceiveMessageConsumer.group.id}")
-  private String whatsappReceiveMessageGroup;
+  @Value("${athenaGpsEventsConsumer.group.id}")
+  private String athenaGpsEventsGroup;
 
   public EventMain(
       HealthCheckConsumer healthCheckConsumer,
@@ -138,8 +138,8 @@ public class EventMain {
       ExpressAppPickupConsumer expressAppPickupConsumer,
       SecondaryCnAutoMergeConsumer secondaryCnAutoMergeConsumer,
       PrimeEventsConsumer primeEventsConsumer,
-      TransactionManagerEventConsumer transactionManagerEventConsumer,
-      WhatsappReceiveMessageConsumer whatsappReceiveMessageConsumer) {
+      AthenaGpsEventsConsumer athenaGpsEventsConsumer,
+      TransactionManagerEventConsumer transactionManagerEventConsumer) {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
@@ -151,8 +151,8 @@ public class EventMain {
     this.expressAppPickupConsumer = expressAppPickupConsumer;
     this.secondaryCnAutoMergeConsumer = secondaryCnAutoMergeConsumer;
     this.primeEventsConsumer = primeEventsConsumer;
+    this.athenaGpsEventsConsumer = athenaGpsEventsConsumer;
     this.transactionManagerEventConsumer = transactionManagerEventConsumer;
-    this.whatsappReceiveMessageConsumer = whatsappReceiveMessageConsumer;
   }
 
   public static void main(String[] args) {
@@ -208,18 +208,13 @@ public class EventMain {
         secondaryCnAutoMergeGroup,
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
+    load(materializer, system, bootstrapServers, athenaGpsEventsGroup, athenaGpsEventsConsumer);
     load(
         materializer,
         system,
         bootstrapServers,
         transactionManagerConsumerGroup,
         transactionManagerEventConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-        whatsappReceiveMessageGroup,
-        whatsappReceiveMessageConsumer);
   }
 
   private void load(

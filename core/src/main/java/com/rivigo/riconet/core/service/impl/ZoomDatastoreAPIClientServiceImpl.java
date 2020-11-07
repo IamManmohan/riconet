@@ -42,7 +42,7 @@ public class ZoomDatastoreAPIClientServiceImpl implements ZoomDatastoreAPIClient
       responseJson =
           apiClientService.getEntity(
               ewaybillMetadataDTO, HttpMethod.POST, url, null, datastoreBaseUrl);
-      return apiClientService.parseResponseJsonNodeFromDatastore(
+      return apiClientService.parseNewResponseJsonNode(
           responseJson, objectMapper.constructType(Boolean.class));
     } catch (IOException e) {
       log.error(

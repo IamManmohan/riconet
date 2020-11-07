@@ -64,11 +64,11 @@ public class EventTopicNameConfig {
   @Value("${PRIME_EVENT_SINK_ERROR}")
   private String primeEventSinkError;
 
-  @Value("${WHATSAPP_MESSAGE_RECEIVE}")
-  private String whatsappMessageReceive;
+  @Value("${ATHENA_GPS_EVENT_SINK}")
+  private String athenaGpsEventSink;
 
-  @Value("${WHATSAPP_MESSAGE_RECEIVE_ERROR}")
-  private String whatsappMessageReceiveError;
+  @Value("${ATHENA_GPS_EVENT_SINK_ERROR}")
+  private String athenaGpsEventSinkError;
 
   public String enrichedEventSinkTopic() {
     return enrichedEventSink;

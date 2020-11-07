@@ -70,6 +70,8 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_PROCESS_VEHICLE_EVENT =
       "/primeSync/processVehicleEvent/{tripId}";
 
+  public static final String ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT = "/athenaGpsEvent";
+
   public static final String ZOOM_BACKEND_QC_CONSIGNMENT_V2 = "/operations/consignments/qc/v2";
 
   public static final String ZOOM_BACKEND_MARK_DELIVERED =
@@ -80,8 +82,6 @@ public class UrlConstant {
 
   /** End point for epod flag in clients. */
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
-
-  public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";
 
   /** Backend API to mark demurrage as started for given consignment. */
   public final String ZOOM_BACKEND_START_DEMURRAGE = "/vas/demurrage/start";
