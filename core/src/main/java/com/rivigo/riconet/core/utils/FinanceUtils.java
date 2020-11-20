@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.zoom.exceptions.ZoomException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -54,5 +56,15 @@ public class FinanceUtils {
       } while (twoHalves++ < 1);
     }
     return buf.toString();
+  }
+
+  public static <T> T getDtoFromPayload(ObjectMapper objectMapper, String payload, Class<T> clazz) {
+    try {
+      return objectMapper.readValue(payload, clazz);
+    } catch (Exception e) {
+      log.error("Failed to parse {} - {}", clazz.toString(), e.getLocalizedMessage());
+      throw new ZoomException(
+          "Failed to create %s DTO from payload - %s", clazz.toString(), payload);
+    }
   }
 }

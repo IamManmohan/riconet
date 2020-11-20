@@ -5,6 +5,7 @@ import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
+import com.rivigo.riconet.core.service.ConsignmentLiabilityService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
@@ -29,6 +30,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
   @Autowired private HandoverCollectionService handoverCollectionService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private ConsignmentLiabilityService consignmentLiabilityService;
 
   /**
    * This service is used for uploading epod link.
@@ -70,6 +73,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
         break;
+      case CONSIGNMENT_LIABILITY:
+        consignmentLiabilityService.updateConsignmentLiability(eventPayload.getPayload());
       default:
         log.info("Event does not trigger anything {}", eventType);
     }

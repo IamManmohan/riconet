@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
+import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
@@ -86,4 +87,6 @@ public interface ZoomBackendAPIClientService {
    * @param epodApplicableDTO for updating epod details.
    */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
+
+  void updateConsignmentLiability(Long consignmentId, ConsignmentLiability consignmentLiability);
 }

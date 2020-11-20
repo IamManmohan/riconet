@@ -19,6 +19,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.exceptions.ZoomException;
@@ -511,6 +512,31 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               HttpMethod.POST,
               UrlConstant.ZOOM_BACKEND_UPDATE_EPOD_FLAG,
               null,
+              backendBaseUrl);
+      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
+      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in updating epod flag");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating epod flag ", e);
+    }
+  }
+
+  @Override
+  public void updateConsignmentLiability(
+      Long consignmentId, ConsignmentLiability consignmentLiability) {
+    JsonNode responseJson;
+    try {
+      MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+      paramMap.set("consignmentId", consignmentId.toString());
+      paramMap.set("consignmentLiability", consignmentLiability.name());
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY,
+              paramMap,
               backendBaseUrl);
       final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
       final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
