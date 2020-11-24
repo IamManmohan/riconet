@@ -7,6 +7,7 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
@@ -251,7 +252,14 @@ public class ClientMasterServiceImpl implements ClientMasterService {
 
   private void createUpdateVasDetails(ClientCreateUpdateDTO clientCreateUpdateDTO, Long clientId) {
     ClientVasDetail clientVasDetail = clientVasDetailsService.getClientVasDetails(clientId);
-    if (!Optional.ofNullable(clientCreateUpdateDTO.getFinanceActivated()).orElse(false)
+    /* for corporate clients, add/ update client-vas details only for FORWARD CN MOVEMENT TYPE. */
+    if (ClientConstants.CORPORATE_CLIENT_RETURN_CN_MOVEMENT_TYPE.equals(
+        clientCreateUpdateDTO.getServiceReference())) {
+      log.info(
+          "For corporate client-code {}, vas details add/update not required for RETURN CN MOVEMENT TYPE",
+          clientCreateUpdateDTO.getClientCode());
+      return;
+    } else if (!Optional.ofNullable(clientCreateUpdateDTO.getFinanceActivated()).orElse(false)
         && clientVasDetail == null) {
       log.info("Vas details not required for client");
       return;
