@@ -541,10 +541,10 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
       final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
       if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException("Error in updating epod flag");
+        throw new ZoomException("Error in updating consignment liability");
       }
     } catch (IOException e) {
-      throw new ZoomException("Error while updating epod flag ", e);
+      throw new ZoomException("Error while updating consignment liability ", e);
     }
   }
 }
