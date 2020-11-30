@@ -7,8 +7,8 @@ import static com.rivigo.riconet.core.constants.ConsignmentConstant.RIVIGO_ORGAN
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ClientCreateUpdateDTO;
-import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.client.BillingEntityDTO;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
