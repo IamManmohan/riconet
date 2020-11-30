@@ -102,7 +102,7 @@ subprojects {
             exclude module: 'spring-data-commons'
         }
 
-        compile("com.rivigo:rivigo-finance-external-api:0.0.24") {
+        compile("com.rivigo:rivigo-finance-external-api:0.0.24.6165-SNAPSHOT") {
             exclude module: 'cms-external-api'
         }
 

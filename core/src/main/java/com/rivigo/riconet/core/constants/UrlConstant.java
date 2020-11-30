@@ -91,4 +91,7 @@ public class UrlConstant {
 
   /** Backend API to cancel ongoing demurrage for given consignment. */
   public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
+
+  /** Backend API to add client level blockers based on client credit limit breach event. */
+  public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/addUpdateClientLimitBlocker";
 }

@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -626,6 +628,32 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
     } catch (IOException e) {
       throw new ZoomException("Error while cancelling demurrage for cnote {}", cnote, e);
+    }
+  }
+  /**
+   * This function calls the blocking API in the zoom backend with the client code and
+   * enable/disable flag.
+   *
+   * @param zoomClientCreditLimitBreachDto dto which contains client list and reason list of the
+   *     blockers to be added.
+   */
+  @Override
+  public void updateClientBlockerDetails(
+      @NonNull ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto) {
+    try {
+      final JsonNode responseJson =
+          apiClientService.getEntity(
+              zoomClientCreditLimitBreachDto,
+              HttpMethod.POST,
+              UrlConstant.BLOCK_UNBLOCK_CLIENT,
+              null,
+              backendBaseUrl);
+      log.info(
+          "client blocker request received from compass with dto {} and response from backend {}",
+          zoomClientCreditLimitBreachDto,
+          responseJson);
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating client blocker ", e);
     }
   }
 }
