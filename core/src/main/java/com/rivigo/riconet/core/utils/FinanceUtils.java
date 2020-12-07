@@ -58,6 +58,14 @@ public class FinanceUtils {
     return buf.toString();
   }
 
+  /**
+   * Transform payload string to class object
+   *
+   * @param objectMapper Object Mapper
+   * @param payload Payload
+   * @param clazz Clazz
+   * @return class object
+   */
   public static <T> T getDtoFromPayload(ObjectMapper objectMapper, String payload, Class<T> clazz) {
     try {
       return objectMapper.readValue(payload, clazz);

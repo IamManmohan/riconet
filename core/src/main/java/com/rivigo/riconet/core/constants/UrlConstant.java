@@ -81,6 +81,7 @@ public class UrlConstant {
   /** End point for epod flag in clients. */
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
 
+  /** End Point for Zoom Backend Update Consignment Liability */
   public static final String ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY = "/consignmentLiability";
 
   public static final String WHATSAPP_BOT_PROCESS_RECEIVE_MESSAGE = "/message/reply";

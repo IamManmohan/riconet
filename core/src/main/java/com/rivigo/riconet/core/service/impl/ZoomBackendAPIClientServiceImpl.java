@@ -523,6 +523,12 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param consignmentId cn id
+   * @param consignmentLiability Consignment Liability
+   */
   @Override
   public void updateConsignmentLiability(
       Long consignmentId, ConsignmentLiability consignmentLiability) {

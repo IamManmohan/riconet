@@ -88,5 +88,11 @@ public interface ZoomBackendAPIClientService {
    */
   void updateEpodDetails(EpodApplicableDto epodApplicableDTO);
 
+  /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param consignmentId cn id
+   * @param consignmentLiability Consignment Liability
+   */
   void updateConsignmentLiability(Long consignmentId, ConsignmentLiability consignmentLiability);
 }

@@ -21,6 +21,11 @@ public class ConsignmentLiabilityServiceImpl implements ConsignmentLiabilityServ
   private final ConsignmentService consignmentService;
   private final ObjectMapper objectMapper;
 
+  /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param payload of class ConsignmentLiabilityPayload
+   */
   @Override
   public void updateConsignmentLiability(String payload) {
     ConsignmentLiabilityPayload consignmentLiabilityPayload =
