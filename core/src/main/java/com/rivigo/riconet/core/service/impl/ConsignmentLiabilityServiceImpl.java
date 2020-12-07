@@ -12,6 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * updates ConsignmentLiability of CN
+ *
+ * @author Saurabh @Version 1 @Since 7 Dec 2020
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -28,6 +33,7 @@ public class ConsignmentLiabilityServiceImpl implements ConsignmentLiabilityServ
    */
   @Override
   public void updateConsignmentLiability(String payload) {
+    log.info("Attempting liability update with payload {}", payload);
     ConsignmentLiabilityPayload consignmentLiabilityPayload =
         FinanceUtils.getDtoFromPayload(objectMapper, payload, ConsignmentLiabilityPayload.class);
     String cnote = consignmentLiabilityPayload.getCnote();

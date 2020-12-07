@@ -73,7 +73,7 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
         break;
-      case CONSIGNMENT_LIABILITY:
+      case CONSIGNMENT_LIABILITY_UPDATE:
         consignmentLiabilityService.updateConsignmentLiability(eventPayload.getPayload());
       default:
         log.info("Event does not trigger anything {}", eventType);

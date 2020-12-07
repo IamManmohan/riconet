@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
@@ -535,8 +536,10 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     JsonNode responseJson;
     try {
       MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
-      paramMap.set("consignmentId", consignmentId.toString());
-      paramMap.set("consignmentLiability", consignmentLiability.name());
+      paramMap.set(ConsignmentLiabilityParamConstants.CONSIGNMENT_ID, consignmentId.toString());
+      paramMap.set(
+          ConsignmentLiabilityParamConstants.CONSIGNMENT_LIABILITY, consignmentLiability.name());
+      log.info("Attempting liability update with params {}", paramMap);
       responseJson =
           apiClientService.getEntity(
               null,

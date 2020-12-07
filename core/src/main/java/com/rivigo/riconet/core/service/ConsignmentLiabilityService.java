@@ -1,8 +1,10 @@
 package com.rivigo.riconet.core.service;
 
-import org.springframework.stereotype.Service;
-
-@Service
+/**
+ * updates ConsignmentLiability of CN
+ *
+ * @author Saurabh @Version 1 @Since 7 Dec 2020
+ */
 public interface ConsignmentLiabilityService {
 
   /**
