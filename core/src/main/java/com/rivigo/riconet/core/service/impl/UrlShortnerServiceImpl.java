@@ -3,7 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.rivigo.riconet.core.service.UrlShortnerService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;

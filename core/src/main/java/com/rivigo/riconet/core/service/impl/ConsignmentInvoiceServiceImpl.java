@@ -13,7 +13,7 @@ import com.rivigo.zoom.common.enums.PaymentMode;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.repository.mysql.PaymentDetailV2Repository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;

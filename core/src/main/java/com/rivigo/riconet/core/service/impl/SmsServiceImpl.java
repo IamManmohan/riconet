@@ -12,7 +12,7 @@ import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.zoom.common.enums.ZoomPropertyName;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

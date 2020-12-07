@@ -33,7 +33,7 @@ import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.model.User;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.Location;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

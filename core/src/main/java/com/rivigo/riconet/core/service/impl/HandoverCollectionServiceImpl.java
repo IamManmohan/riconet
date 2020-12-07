@@ -27,7 +27,7 @@ import com.rivigo.zoom.common.model.PaymentDetailV2;
 import com.rivigo.zoom.common.model.depositslip.DepositSlip;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.depositslip.ConsignmentDepositSlipRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

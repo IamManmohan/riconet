@@ -40,7 +40,7 @@ import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.utils.ZoomUtilFunctions;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
