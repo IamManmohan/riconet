@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.WMSService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.wms.client.dto.request.TaskCreateAssignDto;
 import com.rivigo.zoom.wms.client.enums.TaskEntityType;
 import com.rivigo.zoom.wms.client.enums.TaskType;

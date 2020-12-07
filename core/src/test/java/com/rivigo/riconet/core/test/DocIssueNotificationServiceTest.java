@@ -12,7 +12,7 @@ import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.TransportationPartnerMapping;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentScheduleRepository;
 import com.rivigo.zoom.common.repository.mysql.TransportationPartnerMappingRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;

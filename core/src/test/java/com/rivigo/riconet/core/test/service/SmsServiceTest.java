@@ -8,7 +8,7 @@ import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.SmsServiceImpl;
 import com.rivigo.riconet.core.test.Utils.TestConstants;
 import com.rivigo.zoom.common.enums.ZoomPropertyName;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Collections;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;

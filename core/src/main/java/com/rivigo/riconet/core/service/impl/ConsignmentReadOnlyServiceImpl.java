@@ -3,7 +3,7 @@ package com.rivigo.riconet.core.service.impl;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentReadOnlyRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
