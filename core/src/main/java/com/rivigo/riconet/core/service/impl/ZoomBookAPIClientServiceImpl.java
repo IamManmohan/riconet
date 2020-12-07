@@ -11,7 +11,7 @@ import com.rivigo.riconet.core.utils.FinanceUtils;
 import com.rivigo.zoom.common.dto.zoombook.TransactionModelDTO;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
 import com.rivigo.zoom.common.repository.mysql.ZoomBookTransactionRecordRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;

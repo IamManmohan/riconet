@@ -8,7 +8,7 @@ import static com.rivigo.riconet.core.constants.RestUtilConstants.TOKEN_PREFIX;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

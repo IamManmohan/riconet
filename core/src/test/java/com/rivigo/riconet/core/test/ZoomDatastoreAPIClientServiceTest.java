@@ -11,7 +11,7 @@ import com.rivigo.riconet.core.dto.datastore.EwaybillMetadataDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomDatastoreAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
