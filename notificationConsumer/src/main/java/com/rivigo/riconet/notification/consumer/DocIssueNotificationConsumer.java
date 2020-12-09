@@ -5,7 +5,7 @@ import com.rivigo.riconet.core.dto.notification.DocumentIssueNotification;
 import com.rivigo.riconet.core.service.DocumentIssueNotificationService;
 import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.Topic;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

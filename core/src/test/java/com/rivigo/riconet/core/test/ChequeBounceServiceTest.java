@@ -9,7 +9,7 @@ import com.rivigo.riconet.core.service.impl.ChequeBounceServiceImpl;
 import com.rivigo.riconet.core.service.impl.UserMasterServiceImpl;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.zoom.common.model.User;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

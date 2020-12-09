@@ -41,7 +41,7 @@ import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepositor
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository;
 import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
