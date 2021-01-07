@@ -213,6 +213,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     }
     clientDTO.setIndustryType(industryTypeDTO);
     clientDTO.setIsOnlineEnabled(dto.getIsOODEnabled());
+    clientDTO.setIsHolidayDeliveryPickupAllowed(dto.getIsHolidayDeliveryPickupAllowed());
     return clientDTO;
   }
 
