@@ -5,7 +5,7 @@ public enum TransactionManagerEventNames {
   /** CN creation collections event. */
   CN_CREATION_COLLECTIONS,
   /** CN edit collections event. */
-  CN_EDIT_COLLECTIONS,
+  CN_AMOUNT_CHANGE_COLLECTIONS,
   /** CN payment collections event. */
   CN_PAYMENT_COLLECTIONS,
   /** Handover completed event for consignment. */
@@ -33,5 +33,7 @@ public enum TransactionManagerEventNames {
   /** bank transfer approval collections event. */
   BANK_TRANSFER_APPROVAL_COLLECTIONS,
   /** bank transfer rejection collections event. */
-  BANK_TRANSFER_REJECTION_COLLECTIONS
+  BANK_TRANSFER_REJECTION_COLLECTIONS,
+  /** adjustment charges collections event. */
+  CN_ADJUSTMENT_CHARGES_COLLECTIONS
 }
