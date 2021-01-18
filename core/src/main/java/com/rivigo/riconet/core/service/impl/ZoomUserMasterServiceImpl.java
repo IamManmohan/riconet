@@ -4,7 +4,7 @@ import com.rivigo.riconet.core.service.ZoomUserMasterService;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.ZoomUser;
 import com.rivigo.zoom.common.repository.mysql.ZoomUserRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

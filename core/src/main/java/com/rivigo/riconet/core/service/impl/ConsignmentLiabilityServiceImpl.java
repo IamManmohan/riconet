@@ -35,7 +35,8 @@ public class ConsignmentLiabilityServiceImpl implements ConsignmentLiabilityServ
   public void updateConsignmentLiability(String payload) {
     log.info("Attempting liability update with payload {}", payload);
     ConsignmentLiabilityPayload consignmentLiabilityPayload =
-        FinanceUtils.getDtoFromPayload(objectMapper, payload, ConsignmentLiabilityPayload.class);
+        FinanceUtils.getDtoFromPayloadAndFailFast(
+            objectMapper, payload, ConsignmentLiabilityPayload.class);
     String cnote = consignmentLiabilityPayload.getCnote();
     Long consignmentId = consignmentService.getIdByCnote(cnote);
     ConsignmentLiability consignmentLiability =

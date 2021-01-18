@@ -22,6 +22,11 @@ dependencies {
         exclude group: 'io.zipkin.brave'
         exclude group: 'org.aspectj'
     }
+    compile ("com.rivigo.zoom:zoom-backend-client:0.5") {
+        exclude group: 'org.springframework.boot'
+        exclude group: 'org.springframework'
+        exclude group: 'org.springframework.data'
+    }
 }
 spotless {
     java {
@@ -29,3 +34,4 @@ spotless {
     }
 }
 
+processResources.dependsOn('spotlessApply')

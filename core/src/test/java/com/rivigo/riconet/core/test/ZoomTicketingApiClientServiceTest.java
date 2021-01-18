@@ -15,7 +15,7 @@ import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomTicketingAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

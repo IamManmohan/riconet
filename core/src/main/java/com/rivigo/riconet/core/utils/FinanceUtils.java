@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.zoom.exceptions.ZoomException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +60,21 @@ public class FinanceUtils {
   }
 
   /**
+   * function that coverts the dto String fetched from compass to desired DTO.
+   *
+   * @author Nikhil Rawat on 26/05/20.
+   */
+  public static <T> T getDtoFromJsonString(String dtoString, Class<?> target) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      return (T) objectMapper.readValue(dtoString, target);
+    } catch (IOException ex) {
+      log.error("Error occured while processing message {} ", dtoString, ex);
+      return null;
+    }
+  }
+
+  /**
    * Transform payload string to class object
    *
    * @param objectMapper Object Mapper
@@ -66,7 +82,8 @@ public class FinanceUtils {
    * @param clazz Clazz
    * @return class object
    */
-  public static <T> T getDtoFromPayload(ObjectMapper objectMapper, String payload, Class<T> clazz) {
+  public static <T> T getDtoFromPayloadAndFailFast(
+      ObjectMapper objectMapper, String payload, Class<T> clazz) {
     try {
       return objectMapper.readValue(payload, clazz);
     } catch (Exception e) {

@@ -73,6 +73,13 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
         break;
+      case CLIENT_CREDIT_LIMIT_BREACH:
+        /**
+         * This will call out client blocker API and will block dispatch of all DRS of a particular
+         * client.
+         */
+        clientMasterService.updateClientBlocker(eventPayload.getPayload());
+        break;
       case CONSIGNMENT_LIABILITY_UPDATE:
         consignmentLiabilityService.updateConsignmentLiability(eventPayload.getPayload());
       default:

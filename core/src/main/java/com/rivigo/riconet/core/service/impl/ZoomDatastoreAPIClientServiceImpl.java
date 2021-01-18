@@ -6,7 +6,7 @@ import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.datastore.EwaybillMetadataDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomDatastoreAPIClientService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class ZoomDatastoreAPIClientServiceImpl implements ZoomDatastoreAPIClient
       responseJson =
           apiClientService.getEntity(
               ewaybillMetadataDTO, HttpMethod.POST, url, null, datastoreBaseUrl);
-      return apiClientService.parseResponseJsonNodeFromDatastore(
+      return apiClientService.parseNewResponseJsonNode(
           responseJson, objectMapper.constructType(Boolean.class));
     } catch (IOException e) {
       log.error(

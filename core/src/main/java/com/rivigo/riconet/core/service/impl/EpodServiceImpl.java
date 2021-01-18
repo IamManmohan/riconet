@@ -6,7 +6,7 @@ import com.rivigo.riconet.core.dto.EpodPreparedDto;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,6 +2,8 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
@@ -14,6 +16,7 @@ import com.rivigo.riconet.core.dto.EpodApplicableDto;
 import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.dto.OrganizationDTO;
 import com.rivigo.riconet.core.dto.PickupDeleteDtoV2;
+import com.rivigo.riconet.core.dto.athenagps.AthenaGpsEventDto;
 import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
@@ -23,12 +26,14 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
+import com.rivigo.zoom.util.rest.constants.ResponseJavaTypes;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +51,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
 
   @Autowired private ApiClientService apiClientService;
 
+  @Autowired private ObjectMapper objectMapper;
+
   @Override
   public void setPriorityMapping(String cnote, PriorityReasonType reason) {
 
@@ -62,7 +69,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
     }
 
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   @Override
@@ -79,7 +86,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while handling Writeoff request with cnote: {} ", cnote, e);
       throw new ZoomException("Error while handling Writeoff request with cnote: %s", cnote);
     }
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   @Override
@@ -106,7 +113,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException(
           "Error while recalculating cpd of BF consignment with id: " + consignmentId);
     }
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   @Override
@@ -121,8 +128,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while creating Client {} , {}", clientDTO, e);
       throw new ZoomException("Error while creating Client {}" + clientDTO);
     }
-    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
-    return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(ClientDTO.class));
   }
 
   @Override
@@ -137,8 +144,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating Client {} , {}", clientDTO, e);
       throw new ZoomException("Error while updating Client {}" + clientDTO);
     }
-    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
-    return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(ClientDTO.class));
   }
 
   @Override
@@ -152,8 +159,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while deleting Client with Id {} , {}", id, e);
       throw new ZoomException("Error while deleting Client with Id {}" + id);
     }
-    TypeReference<ClientDTO> mapType = new TypeReference<ClientDTO>() {};
-    return (ClientDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(ClientDTO.class));
   }
 
   @Override
@@ -173,12 +180,11 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating Invoice {} for Cnote {} , {}", shortUrl, cnote, e);
       throw new ZoomException("Error while updating Invoice for cnote :" + cnote);
     }
-    TypeReference<ConsignmentUploadedFilesDTO> mapType =
-        new TypeReference<ConsignmentUploadedFilesDTO>() {};
     try {
-      return (ConsignmentUploadedFilesDTO) apiClientService.parseJsonNode(responseJson, mapType);
+      return apiClientService.parseNewResponseJsonNode(
+          responseJson, objectMapper.constructType(ConsignmentUploadedFilesDTO.class));
     } catch (Exception e) {
-      log.error("Error converting json in dto , {}", e);
+      log.error("Error converting json in dto {}", e.getMessage(), e);
       return null;
     }
   }
@@ -194,8 +200,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while creating Organization {} , {}", orgDTO, e);
       throw new ZoomException("Error while creating Organization {}" + orgDTO);
     }
-    TypeReference<OrganizationDTO> mapType = new TypeReference<OrganizationDTO>() {};
-    return (OrganizationDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(OrganizationDTO.class));
   }
 
   @Override
@@ -209,8 +215,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating Organization {} , {}", orgDTO, e);
       throw new ZoomException("Error while updating Organization {}" + orgDTO);
     }
-    TypeReference<OrganizationDTO> mapType = new TypeReference<OrganizationDTO>() {};
-    return (OrganizationDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(OrganizationDTO.class));
   }
 
   @Override
@@ -225,8 +231,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while adding vas details {} ", clientCodDodDTO.toString(), e);
       throw new ZoomException("Error while adding vas details " + clientCodDodDTO.toString());
     }
-    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
-    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(ClientCodDodDTO.class));
   }
 
   @Override
@@ -241,8 +247,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while updating vas details {} ", clientCodDodDTO, e);
       throw new ZoomException("Error while updating Vas Details" + clientCodDodDTO.toString());
     }
-    TypeReference<ClientCodDodDTO> mapType = new TypeReference<ClientCodDodDTO>() {};
-    return (ClientCodDodDTO) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(
+        responseJson, objectMapper.constructType(ClientCodDodDTO.class));
   }
 
   @Override
@@ -265,8 +271,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException(
           "Error while cancelling pickup with pickupdelete dto %s", pickupDeleteDto);
     }
-    TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-    return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
   }
 
   public Boolean handleConsignmentBlocker(
@@ -283,8 +288,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       throw new ZoomException(
           "Error while handling consignmentBlocker %s", consignmentBlockerRequestDTO);
     }
-    TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-    return (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
   }
 
   @Override
@@ -342,7 +346,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   private <T> JsonNode markRecoveryPendingInternal(
       T chequeBounceDTO, String recoveryPendingEndpoint) {
     log.info("Mark Recovery Pending With {} ", chequeBounceDTO);
-    JsonNode responseJson = null;
+    JsonNode responseJson;
     try {
       responseJson =
           apiClientService.getEntity(
@@ -357,8 +361,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           "Exception occurred while marking recovery pending for cn in zoom tech : %s",
           chequeBounceDTO);
     }
-    TypeReference<JsonNode> mapType = new TypeReference<JsonNode>() {};
-    return (JsonNode) apiClientService.parseJsonNode(responseJson, mapType);
+    return apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.JSON_NODE);
   }
 
   @Override
@@ -373,7 +376,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       log.error("Error while handling Knock off request with cnote: {} ", cnote, e);
       throw new ZoomException("Error while handling Knock off request with cnote: %s", cnote);
     }
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   @Override
@@ -387,8 +390,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_PROCESS_VEHICLE_EVENT.replace("{tripId}", tripId.toString()),
               null,
               backendBaseUrl);
-      TypeReference<Boolean> mapType = new TypeReference<Boolean>() {};
-      Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, mapType);
+      Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in processing vehicle event");
       }
@@ -398,10 +401,28 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  @Override
+  public void processAthenaGpsEvent(AthenaGpsEventDto athenaGpsEventDto) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              athenaGpsEventDto,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT,
+              null,
+              backendBaseUrl);
+      apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+    } catch (IOException e) {
+      log.error("Error while processing event with dto {}", athenaGpsEventDto);
+      throw new ZoomException("Error while processing event for gps");
+    }
+  }
+
   /**
    * Zoom Backend API to submit QC data.
    *
-   * @param dto
+   * @param dto qc data submit dto
    */
   @Override
   public void qcConsignmentV2(ConsignmentQcDataSubmitDTO dto) {
@@ -421,7 +442,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   @Override
@@ -442,7 +463,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
 
   /**
@@ -469,7 +490,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
     // Calling parse json node to verify that response status is SUCCESS or throw exception
     // otherwise.
-    apiClientService.parseJsonNode(responseJson, null);
+    apiClientService.parseNewResponseJsonNode(responseJson, null);
   }
   /**
    * function that uploads the e-pod by hitting the zoom-backend api.
@@ -487,8 +508,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_UPLOAD_EPOD,
               null,
               backendBaseUrl);
-      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in uploading epod");
       }
@@ -514,13 +535,128 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_UPDATE_EPOD_FLAG,
               null,
               backendBaseUrl);
-      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in updating epod flag");
       }
     } catch (IOException e) {
       throw new ZoomException("Error while updating epod flag ", e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to start demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   * @param startTime contains startTime of demurrage as string.
+   * @param undeliveredCnRecordId contains undeliveredConsignment record id.
+   */
+  @Override
+  public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add(ConsignmentConstant.CNOTE, cnote);
+      queryParams.add("startTime", startTime);
+      queryParams.add("undeliveredConsignmentRecordId", undeliveredCnRecordId);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for start demurrage request at time {}.", cnote, startTime);
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while starting demurrage for cnote {} at time {}", cnote, startTime, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to end demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  @Override
+  public void endDemurrage(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set(ConsignmentConstant.CNOTE, cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_END_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for end demurrage request.", cnote);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while ending demurrage for cnote {}", cnote, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to cancel ongoing demurrage for given consignment.
+   *
+   * @param cnote contains cnote number of consignment.
+   */
+  @Override
+  public void cancelDemurrage(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set(ConsignmentConstant.CNOTE, cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_CANCEL_DEMURRAGE,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Cnote {} not valid for cancel demurrage request.", cnote);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while cancelling demurrage for cnote {}", cnote, e);
+    }
+  }
+  /**
+   * This function calls the blocking API in the zoom backend with the client code and
+   * enable/disable flag.
+   *
+   * @param zoomClientCreditLimitBreachDto dto which contains client list and reason list of the
+   *     blockers to be added.
+   */
+  @Override
+  public void updateClientBlockerDetails(
+      @NonNull ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto) {
+    try {
+      final JsonNode responseJson =
+          apiClientService.getEntity(
+              zoomClientCreditLimitBreachDto,
+              HttpMethod.POST,
+              UrlConstant.BLOCK_UNBLOCK_CLIENT,
+              null,
+              backendBaseUrl);
+      log.info(
+          "client blocker request received from compass with dto {} and response from backend {}",
+          zoomClientCreditLimitBreachDto,
+          responseJson);
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating client blocker ", e);
     }
   }
 

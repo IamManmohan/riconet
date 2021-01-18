@@ -11,6 +11,7 @@ import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.DemurrageService;
 import com.rivigo.riconet.core.service.EventTriggerService;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.RTOService;
@@ -57,6 +58,8 @@ public class EventTriggerServiceTest {
   @Mock private TicketActionFactory ticketActionFactory;
 
   @Mock private RTOService rtoService;
+
+  @Mock private DemurrageService demurrageService;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -161,5 +164,92 @@ public class EventTriggerServiceTest {
         .sendCnFirstOuDispatchNotification(Matchers.eq(notificationDTO));
     verify(ticketingClientService, times(1))
         .autoCloseTicket(entityId, TicketEntityType.CN.name(), eventName.name());
+  }
+
+  @Test
+  public void cnDeliveryEventTest() {
+    Long entityId = 123456L;
+    EventName eventName = EventName.CN_DELIVERY;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .entityId(entityId)
+            .eventName(eventName.name())
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(appNotificationService, times(1)).sendCnDeliveredNotification(notificationDTO);
+    verify(demurrageService).processEventToEndDemurrage(notificationDTO);
+  }
+
+  @Test
+  public void cnStaleEventTest() {
+    Long entityId = 123456L;
+    EventName eventName = EventName.CN_STALE;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId.toString());
+    metadata.put("STALE_CATEGORY", "1");
+    String staleEventName = eventName.name() + "_1";
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .entityId(entityId)
+            .eventName(eventName.name())
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processEventToCancelDemurrage(notificationDTO);
+    verify(ticketingClientService, times(1))
+        .autoCloseTicket(entityId.toString(), TicketEntityType.CN.name(), staleEventName);
+  }
+
+  @Test
+  public void cnDeletedEventTest() {
+    Long entityId = 123456L;
+    EventName eventName = EventName.CN_DELETED;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("OLD_CNOTE", entityId.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .entityId(entityId)
+            .eventName(eventName.name())
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processEventToCancelDemurrage(notificationDTO);
+    verify(ticketingClientService, times(1))
+        .autoCloseTicket(entityId.toString(), TicketEntityType.CN.name(), eventName.name());
+  }
+
+  @Test
+  public void cnUndeliveryEventTest() {
+    Long entityId = 123456L;
+    EventName eventName = EventName.CN_UNDELIVERY;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .entityId(entityId)
+            .eventName(eventName.name())
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processEventToStartDemurrage(notificationDTO);
+  }
+
+  @Test
+  public void depsRecordCreationEventTest() {
+    Long entityId = 123456L;
+    EventName eventName = EventName.DEPS_RECORD_CREATION;
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("CNOTE", entityId.toString());
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder()
+            .entityId(entityId)
+            .eventName(eventName.name())
+            .metadata(metadata)
+            .build();
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processEventToCancelDemurrage(notificationDTO);
   }
 }

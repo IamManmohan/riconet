@@ -14,7 +14,7 @@ import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.model.FeederVendor;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -142,7 +142,7 @@ public class ZoomBackendAPIClientServiceTest {
           multiValueMapArgumentCaptor.getValue().get("consignmentId").get(0));
 
     verify(apiClientService, times(1))
-        .parseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
+        .parseNewResponseJsonNode(jsonNodeArgumentCaptor.capture(), Mockito.any());
     Assert.assertEquals(jsonNode, jsonNodeArgumentCaptor.getValue());
   }
 
@@ -227,5 +227,40 @@ public class ZoomBackendAPIClientServiceTest {
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while creating vendor with dto");
     zoomBackendAPIClientServiceImpl.addFeederVendor(dto);
+  }
+
+  @Test
+  public void startDemurrageTest() throws IOException {
+    String cnote = "123456";
+    String startTime = "1234567890";
+    String id = "654321";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+  }
+
+  @Test
+  public void endDemurrageTest() throws IOException {
+    String cnote = "123456";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.endDemurrage(cnote);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.endDemurrage(cnote);
+  }
+
+  @Test
+  public void cancelDemurrageTest() throws IOException {
+    String cnote = "123456";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
   }
 }

@@ -70,10 +70,12 @@ public class UrlConstant {
   public static final String ZOOM_BACKEND_PROCESS_VEHICLE_EVENT =
       "/primeSync/processVehicleEvent/{tripId}";
 
+  public static final String ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT = "/athenaGpsEvent";
+
   public static final String ZOOM_BACKEND_QC_CONSIGNMENT_V2 = "/operations/consignments/qc/v2";
 
   public static final String ZOOM_BACKEND_MARK_DELIVERED =
-      "/operations/consignments/cndeliver/{cnote}";
+      "/operations/consignments/markFnCnDelivered/{cnote}";
 
   /** End point for EPOD prepared, after this it would be uploaded in consignment_uploaded_files. */
   public static final String ZOOM_BACKEND_UPLOAD_EPOD = "/epod/uploadPod";
@@ -81,6 +83,17 @@ public class UrlConstant {
   /** End point for epod flag in clients. */
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
 
+  /** Backend API to mark demurrage as started for given consignment. */
+  public final String ZOOM_BACKEND_START_DEMURRAGE = "/vas/demurrage/start";
+
+  /** Backend API to mark demurrage as completed for given consignment. */
+  public final String ZOOM_BACKEND_END_DEMURRAGE = "/vas/demurrage/end";
+
+  /** Backend API to cancel ongoing demurrage for given consignment. */
+  public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
+
+  /** Backend API to add client level blockers based on client credit limit breach event. */
+  public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/addUpdateClientLimitBlocker";
   /** End Point for Zoom Backend Update Consignment Liability */
   public static final String ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY = "/consignmentLiability";
 

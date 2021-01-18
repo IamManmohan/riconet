@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.impl.ApiClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,7 +35,7 @@ public class ApiClientServiceTest {
 
     JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     Boolean response =
-        apiClientService.parseResponseJsonNodeFromDatastore(
+        apiClientService.parseNewResponseJsonNode(
             jsonNode, objectMapper.constructType(Boolean.class));
     Assert.assertTrue(response);
   }
@@ -46,7 +46,6 @@ public class ApiClientServiceTest {
     JsonNode jsonNode = ApiServiceUtils.getDatastoreFailureResponseSampleJsonNode();
     expectedException.expect(ZoomException.class);
     expectedException.expectMessage("Error while cleanup from datastore");
-    apiClientService.parseResponseJsonNodeFromDatastore(
-        jsonNode, objectMapper.constructType(Boolean.class));
+    apiClientService.parseNewResponseJsonNode(jsonNode, objectMapper.constructType(Boolean.class));
   }
 }
