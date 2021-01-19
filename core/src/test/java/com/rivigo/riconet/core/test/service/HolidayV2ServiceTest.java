@@ -2,8 +2,8 @@ package com.rivigo.riconet.core.test.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
-import com.rivigo.riconet.core.service.HolidayV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.riconet.core.service.impl.HolidayV2ServiceImpl;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -19,7 +20,7 @@ public class HolidayV2ServiceTest {
 
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  @InjectMocks private HolidayV2Service holidayV2Service;
+  @InjectMocks private HolidayV2ServiceImpl holidayV2Service;
 
   @Before
   public void initMocks() {
@@ -55,6 +56,6 @@ public class HolidayV2ServiceTest {
         NotificationDTO.builder().entityId(id).metadata(metadata).build();
     holidayV2Service.processHolidayEvent(notificationDTO, isCreate);
     Mockito.verify(zoomBackendAPIClientService, Mockito.times(1))
-        .retriggerCpdCalculationsForHoliday(holidayV2Dto);
+        .retriggerCpdCalculationsForHoliday(Matchers.refEq(holidayV2Dto));
   }
 }

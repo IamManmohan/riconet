@@ -675,10 +675,10 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY,
               null,
               backendBaseUrl);
-      final Boolean isSuccess =
+      Boolean isSuccess =
           apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
-        throw new ZoomException("Error in triggering CPD calculations for Holiday update.");
+        log.info("Error in triggering CPD calculations for Holiday update.");
       }
     } catch (IOException e) {
       throw new ZoomException("Error in triggering CPD calculations for Holiday update.", e);
