@@ -94,4 +94,8 @@ public class UrlConstant {
 
   /** Backend API to add client level blockers based on client credit limit breach event. */
   public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/addUpdateClientLimitBlocker";
+
+  /** Backend API endpoint to trigger CPD calculation for all affected CNs due to holiday update. */
+  public static final String ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY =
+      "/holiday/cpd-calculations";
 }
