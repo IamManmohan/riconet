@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
