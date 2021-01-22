@@ -33,6 +33,7 @@ public class HolidayV2ServiceTest {
     HolidayLocationType locationType = HolidayLocationType.OU;
     String locationName = "DELT1";
     Long holidayStartDateTime = 123456789L;
+    Long oldHolidayStartDateTime = 111111111L;
     Long holidayEndDateTime = 987654321L;
     Boolean isCreate = Boolean.FALSE;
     Map<String, String> metadata = new HashMap<>();
@@ -44,11 +45,14 @@ public class HolidayV2ServiceTest {
     metadata.put(
         ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name(),
         String.valueOf(holidayEndDateTime));
+    metadata.put(
+        ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name(),
+        String.valueOf(oldHolidayStartDateTime));
     HolidayV2Dto holidayV2Dto =
         HolidayV2Dto.builder()
             .locationName(locationName)
             .locationType(locationType)
-            .holidayStartDate(holidayStartDateTime)
+            .holidayStartDate(oldHolidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
             .isCreate(isCreate)
             .build();

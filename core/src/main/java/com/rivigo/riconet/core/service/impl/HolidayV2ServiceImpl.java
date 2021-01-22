@@ -43,9 +43,18 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
     final HolidayLocationType locationType =
         HolidayLocationType.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name()));
-    final Long holidayStartDateTime =
-        Long.valueOf(
+    long holidayStartDateTime =
+        Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
+    if (!isCreate) {
+      long oldHolidayStartDateTime =
+          Long.parseLong(
+              metadata.get(
+                  ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name()));
+      // For Update event, we need to take minimum of new and old holiday start date for CPD
+      // recalculations.
+      holidayStartDateTime = Math.min(oldHolidayStartDateTime, holidayStartDateTime);
+    }
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));

@@ -116,6 +116,8 @@ public enum ZoomCommunicationFieldNames {
     /** holiday start date time. */
     HOLIDAY_START_DATE_TIME,
     /** holiday end date time. */
-    HOLIDAY_END_DATE_TIME
+    HOLIDAY_END_DATE_TIME,
+    /** old holiday start date time. */
+    OLD_HOLIDAY_START_DATE_TIME
   }
 }
