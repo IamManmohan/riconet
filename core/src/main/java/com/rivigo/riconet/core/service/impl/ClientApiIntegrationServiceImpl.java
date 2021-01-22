@@ -225,6 +225,9 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             .dispatchedTo(
                 idToLocationNameMap.getOrDefault(
                     nextSchedule.map(ConsignmentSchedule::getLocationId).orElse(null), ""))
+            .revisedEdd(
+                getRevisedEddFromCnScheduleAndConsignment(
+                    schedules, consignment.getPromisedDeliveryDateTime()))
             .build();
       default:
         log.error("Unrecognized intransit event {}", notificationDTO);
@@ -267,15 +270,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     ConsignmentReadOnly consignmentReadOnly;
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_OUT_FOR_DELIVERY:
-        consignmentReadOnly =
-            consignmentReadOnlyService.findRequiredById(notificationDTO.getEntityId());
-        consignmentSchedules =
-            consignmentScheduleService.getActivePlan(notificationDTO.getEntityId());
-        return DeliveryOFDDto.builder()
-            .revisedEdd(
-                getRevisedEddFromCnScheduleAndConsignment(
-                    consignmentSchedules, consignmentReadOnly.getPromisedDeliveryDateTime()))
-            .build();
+        return DeliveryOFDDto.builder().build();
       case CN_DELIVERY:
         List<ConsignmentUploadedFiles> uploadedDocuments =
             consignmentUploadedFilesRepository.findByConsignmentId(notificationDTO.getEntityId());
