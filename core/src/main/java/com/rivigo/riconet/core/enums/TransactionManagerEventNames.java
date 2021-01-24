@@ -33,7 +33,5 @@ public enum TransactionManagerEventNames {
   /** bank transfer approval collections event. */
   BANK_TRANSFER_APPROVAL_COLLECTIONS,
   /** bank transfer rejection collections event. */
-  BANK_TRANSFER_REJECTION_COLLECTIONS,
-  /** adjustment charges collections event. */
-  CN_ADJUSTMENT_CHARGES_COLLECTIONS
+  BANK_TRANSFER_REJECTION_COLLECTIONS
 }
