@@ -4,7 +4,7 @@ package com.rivigo.riconet.core.enums;
 public enum TransactionManagerEventNames {
   /** CN creation collections event. */
   CN_CREATION_COLLECTIONS,
-  /** CN edit collections event. */
+  /** CN amount change collections event. */
   CN_AMOUNT_CHANGE_COLLECTIONS,
   /** CN payment collections event. */
   CN_PAYMENT_COLLECTIONS,
@@ -33,5 +33,7 @@ public enum TransactionManagerEventNames {
   /** bank transfer approval collections event. */
   BANK_TRANSFER_APPROVAL_COLLECTIONS,
   /** bank transfer rejection collections event. */
-  BANK_TRANSFER_REJECTION_COLLECTIONS
+  BANK_TRANSFER_REJECTION_COLLECTIONS,
+  /** CN amount change and payment type change collections event. */
+  CN_AMOUNT_AND_PAYMENT_TYPE_CHANGE_COLLECTIONS,
 }
