@@ -35,7 +35,7 @@ public class ConsignmentAutoMergeServiceImplTest {
   }
 
   @Test
-  @Ignore  // As of now added @Ignore as release was getting blocked, but this needs to be fixed.
+  @Ignore // As of now added @Ignore as release was getting blocked, but this needs to be fixed.
   public void autoMergeSecondaryConsignment() {
     Consignment parentCn = new Consignment();
     parentCn.setLocationId(Long.valueOf(location));
