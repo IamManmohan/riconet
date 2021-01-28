@@ -213,8 +213,7 @@ public class ClientMasterServiceImpl implements ClientMasterService {
     }
     clientDTO.setIndustryType(industryTypeDTO);
     clientDTO.setIsOnlineEnabled(dto.getIsOODEnabled());
-    // TODO: Uncomment after getter function is added in compass jar
-    // clientDTO.setIsHolidayDeliveryPickupAllowed(dto.getIsHolidayDeliveryPickupAllowed());
+    clientDTO.setIsHolidayDeliveryPickupAllowed(dto.getHolidayDeliveryPickupAllowed());
     return clientDTO;
   }
 

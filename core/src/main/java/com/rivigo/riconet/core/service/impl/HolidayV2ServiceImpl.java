@@ -46,15 +46,6 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
     long holidayStartDateTime =
         Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
-    if (!isCreate) {
-      long oldHolidayStartDateTime =
-          Long.parseLong(
-              metadata.get(
-                  ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name()));
-      // For Update event, we need to take minimum of new and old holiday start date for CPD
-      // recalculations.
-      holidayStartDateTime = Math.min(oldHolidayStartDateTime, holidayStartDateTime);
-    }
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));
@@ -73,6 +64,15 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             .holidayEndDate(holidayEndDateTime)
             .isCreate(isCreate)
             .build();
+    if (!isCreate) {
+      long oldHolidayStartDateTime =
+          Long.parseLong(
+              metadata.get(
+                  ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name()));
+      // For Update event, we need to take minimum of new and old holiday start date for CPD
+      // recalculations. Minimum of two values done in backend.
+      holidayV2Dto.setOldHolidayStartDate(oldHolidayStartDateTime);
+    }
     zoomBackendAPIClientService.retriggerCpdCalculationsForHoliday(holidayV2Dto);
   }
 }
