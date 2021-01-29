@@ -52,8 +52,9 @@ public class HolidayV2ServiceTest {
         HolidayV2Dto.builder()
             .locationName(locationName)
             .locationType(locationType)
-            .holidayStartDate(oldHolidayStartDateTime)
+            .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
+            .oldHolidayStartDate(oldHolidayStartDateTime)
             .isCreate(isCreate)
             .build();
     NotificationDTO notificationDTO =
