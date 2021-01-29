@@ -236,10 +236,10 @@ public class ZoomBackendAPIClientServiceTest {
     String id = "654321";
     JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnUndelivery(cnote, startTime, id);
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnUndelivery(cnote, startTime, id);
   }
 
   @Test

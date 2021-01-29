@@ -234,7 +234,7 @@ public class EventTriggerServiceTest {
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(demurrageService).processEventToStartDemurrage(notificationDTO);
+    verify(demurrageService).processCnUndeliveryEventToStartDemurrage(notificationDTO);
   }
 
   @Test

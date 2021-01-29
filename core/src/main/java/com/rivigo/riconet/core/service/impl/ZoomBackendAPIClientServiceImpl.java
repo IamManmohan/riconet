@@ -550,7 +550,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * @param undeliveredCnRecordId contains undeliveredConsignment record id.
    */
   @Override
-  public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
+  public void startDemurrageOnCnUndelivery(
+      String cnote, String startTime, String undeliveredCnRecordId) {
     JsonNode responseJson;
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -561,7 +562,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               null,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
+              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_UNDELIVERY,
               queryParams,
               backendBaseUrl);
       final Boolean isSuccess =
@@ -572,6 +573,47 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       throw new ZoomException(
           "Error while starting demurrage for cnote {} at time {}", cnote, startTime, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to start demurrage for given consignment on CN dispatch
+   * or delivery hold.
+   *
+   * @param consignmentId consignment id.
+   * @param consignmentAlertId consignment alert id, contains details regarding the
+   *     dispatch/delivery hold.
+   * @param isDispatch flag whether start demurrage on dispatch hold or delivery hold.
+   */
+  @Override
+  public void startDemurrageOnCnDispatchOrDeliveryHold(
+      String consignmentId, String consignmentAlertId, boolean isDispatch) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add(ConsignmentConstant.CONSIGNMENT_ID, consignmentId);
+      queryParams.add(ConsignmentConstant.CONSIGNMENT_ALERT_ID, consignmentAlertId);
+      String apiEndPoint =
+          isDispatch
+              ? UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_HOLD
+              : UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DELIVERY_HOLD;
+      responseJson =
+          apiClientService.getEntity(
+              null, HttpMethod.POST, apiEndPoint, queryParams, backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error(
+            "Consignment id: {} not valid for start demurrage request for alert id: {}.",
+            consignmentId,
+            consignmentAlertId);
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while starting demurrage for Consignment id: {}, consignment alert id: {}",
+          consignmentId,
+          consignmentAlertId,
+          e);
     }
   }
 

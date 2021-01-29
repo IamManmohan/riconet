@@ -42,5 +42,10 @@ public enum EventName {
   CN_DRS_PLANNED,
 
   /** DEPS record creation event. */
-  DEPS_RECORD_CREATION
+  DEPS_RECORD_CREATION,
+
+  /** Consignment's trip dispatch hold event. */
+  CN_DISPATCH_HOLD,
+  /** Consignment's delivery hold event. */
+  CN_DELIVERY_HOLD,
 }

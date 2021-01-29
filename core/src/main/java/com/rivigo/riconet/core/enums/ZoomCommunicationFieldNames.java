@@ -50,6 +50,8 @@ public enum ZoomCommunicationFieldNames {
   ONLINE_PAYMENT_LINK,
   FORWARD_CONSIGNMENT_ID,
 
+  CONSIGNMENT_ALERT_ID,
+
   // flag to check if qc has been performed
   QC_DONE;
 

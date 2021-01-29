@@ -41,9 +41,9 @@ public class DemurrageServiceImplTest {
     metadata.put("ID", undeliveredId);
     NotificationDTO notificationDTO =
         NotificationDTO.builder().entityId(consignmentId).metadata(metadata).build();
-    demurrageService.processEventToStartDemurrage(notificationDTO);
+    demurrageService.processCnUndeliveryEventToStartDemurrage(notificationDTO);
     Mockito.verify(zoomBackendAPIClientService, Mockito.times(1))
-        .startDemurrage(cnote, startTime, undeliveredId);
+        .startDemurrageOnCnUndelivery(cnote, startTime, undeliveredId);
   }
 
   @Test
