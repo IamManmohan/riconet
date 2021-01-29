@@ -170,10 +170,10 @@ public class EventTriggerService {
         demurrageService.processEventToCancelDemurrage(notificationDTO);
         break;
       case HOLIDAY_V2_CREATE:
-        holidayV2Service.processHolidayEvent(notificationDTO, Boolean.TRUE);
+        holidayV2Service.processHolidayEvent(notificationDTO, true);
         break;
       case HOLIDAY_V2_UPDATE:
-        holidayV2Service.processHolidayEvent(notificationDTO, Boolean.FALSE);
+        holidayV2Service.processHolidayEvent(notificationDTO, false);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);

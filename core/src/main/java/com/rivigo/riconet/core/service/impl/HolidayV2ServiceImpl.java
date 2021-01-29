@@ -7,6 +7,7 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,14 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
    * @param isCreate flag whether event being process is Creation event or Updation event.
    */
   @Override
-  public void processHolidayEvent(NotificationDTO notificationDTO, Boolean isCreate) {
+  public void processHolidayEvent(@NonNull NotificationDTO notificationDTO, boolean isCreate) {
     final Map<String, String> metadata = notificationDTO.getMetadata();
     final String locationName =
         metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name());
     final HolidayLocationType locationType =
         HolidayLocationType.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name()));
-    long holidayStartDateTime =
+    final long holidayStartDateTime =
         Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
     final Long holidayEndDateTime =

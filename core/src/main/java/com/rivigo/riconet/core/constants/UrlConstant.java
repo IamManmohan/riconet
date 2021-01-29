@@ -97,5 +97,5 @@ public class UrlConstant {
 
   /** Backend API endpoint to trigger CPD calculation for all affected CNs due to holiday update. */
   public static final String ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY =
-      "/holiday/cpd-calculations";
+      "/holiday/cpd-calculation";
 }

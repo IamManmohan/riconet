@@ -35,7 +35,7 @@ public class HolidayV2ServiceTest {
     Long holidayStartDateTime = 123456789L;
     Long oldHolidayStartDateTime = 111111111L;
     Long holidayEndDateTime = 987654321L;
-    Boolean isCreate = Boolean.FALSE;
+    boolean isCreate = false;
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name(), locationName);
     metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name(), locationType.name());

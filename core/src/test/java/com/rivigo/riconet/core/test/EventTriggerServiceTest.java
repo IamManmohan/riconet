@@ -262,8 +262,7 @@ public class EventTriggerServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_CREATE);
     eventTriggerService.processNotification(notificationDTO);
-    Mockito.verify(holidayV2Service, Mockito.times(1))
-        .processHolidayEvent(notificationDTO, Boolean.TRUE);
+    Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, true);
   }
 
   @Test
@@ -271,7 +270,6 @@ public class EventTriggerServiceTest {
     NotificationDTO notificationDTO =
         NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_UPDATE);
     eventTriggerService.processNotification(notificationDTO);
-    Mockito.verify(holidayV2Service, Mockito.times(1))
-        .processHolidayEvent(notificationDTO, Boolean.FALSE);
+    Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, false);
   }
 }

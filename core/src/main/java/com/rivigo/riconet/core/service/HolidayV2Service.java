@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import lombok.NonNull;
 
 /**
  * {@link HolidayV2Service} is responsible for all tasks related to holiday events.
@@ -17,5 +18,5 @@ public interface HolidayV2Service {
    * @param notificationDTO input holiday event payload.
    * @param isCreate flag whether event being process is Creation event or Updation event.
    */
-  void processHolidayEvent(NotificationDTO notificationDTO, Boolean isCreate);
+  void processHolidayEvent(@NonNull NotificationDTO notificationDTO, boolean isCreate);
 }
