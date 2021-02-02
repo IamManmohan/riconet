@@ -21,6 +21,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
@@ -654,6 +655,33 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           responseJson);
     } catch (IOException e) {
       throw new ZoomException("Error while updating client blocker ", e);
+    }
+  }
+
+  /**
+   * Hits Backend API to retrigger CPD calculation for all affected CNs due to holiday creation or
+   * updation.
+   *
+   * @param holidayV2Dto holiday details.
+   */
+  @Override
+  public void retriggerCpdCalculationsForHoliday(@NonNull HolidayV2Dto holidayV2Dto) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              holidayV2Dto,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY,
+              null,
+              backendBaseUrl);
+      Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.info("Error in triggering CPD calculations for Holiday update.");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error in triggering CPD calculations for Holiday update.", e);
     }
   }
 }

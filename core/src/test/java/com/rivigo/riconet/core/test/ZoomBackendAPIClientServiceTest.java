@@ -10,6 +10,7 @@ import com.rivigo.riconet.core.dto.FeederVendorDTO;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.impl.ZoomBackendAPIClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
+import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
@@ -262,5 +263,16 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     zoomBackendAPIClientServiceImpl.cancelDemurrage(cnote);
+  }
+
+  @Test
+  public void retriggerCpdCalculationsForHolidayTest() throws IOException {
+    HolidayV2Dto holidayV2Dto = new HolidayV2Dto();
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.retriggerCpdCalculationsForHoliday(holidayV2Dto);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.retriggerCpdCalculationsForHoliday(holidayV2Dto);
   }
 }

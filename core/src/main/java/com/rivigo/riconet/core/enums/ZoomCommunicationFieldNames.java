@@ -106,4 +106,18 @@ public enum ZoomCommunicationFieldNames {
     UNDELIVERED_AT,
     DELIVERY_REATTEMPT_CHARGEABLE
   }
+
+  /** HolidayV2 field names used in HolidayV2 create and update event. */
+  public enum HolidayV2 {
+    /** location type of the holiday. */
+    LOCATION_TYPE,
+    /** location name of the holiday. */
+    LOCATION_NAME,
+    /** holiday start date time. */
+    HOLIDAY_START_DATE_TIME,
+    /** holiday end date time. */
+    HOLIDAY_END_DATE_TIME,
+    /** old holiday start date time. */
+    OLD_HOLIDAY_START_DATE_TIME
+  }
 }
