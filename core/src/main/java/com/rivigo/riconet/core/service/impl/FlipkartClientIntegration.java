@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.FlipkartUtilConstants;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Collections;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

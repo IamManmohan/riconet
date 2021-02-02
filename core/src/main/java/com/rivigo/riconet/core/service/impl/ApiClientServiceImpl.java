@@ -13,7 +13,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.backend.client.utils.HeaderUtils;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.dto.Response;
 import com.rivigo.zoom.util.rest.enums.ResponseStatus;
 import java.io.IOException;

@@ -21,7 +21,7 @@ import com.rivigo.zoom.common.enums.EntityType;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.UploadedFileRecord;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;

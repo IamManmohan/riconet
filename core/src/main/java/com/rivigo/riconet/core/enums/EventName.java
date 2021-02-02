@@ -42,5 +42,10 @@ public enum EventName {
   CN_DRS_PLANNED,
 
   /** DEPS record creation event. */
-  DEPS_RECORD_CREATION
+  DEPS_RECORD_CREATION,
+
+  /** HolidayV2 creation event. */
+  HOLIDAY_V2_CREATE,
+  /** HolidayV2 update or deletion event. */
+  HOLIDAY_V2_UPDATE,
 }

@@ -1,7 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

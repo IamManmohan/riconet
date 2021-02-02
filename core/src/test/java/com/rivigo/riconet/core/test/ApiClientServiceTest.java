@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.impl.ApiClientServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;

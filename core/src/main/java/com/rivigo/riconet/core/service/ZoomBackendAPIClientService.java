@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
 import com.rivigo.riconet.core.dto.ChequeBounceDTO;
@@ -14,6 +15,7 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
+import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
@@ -127,6 +129,23 @@ public interface ZoomBackendAPIClientService {
    * @param cnote contains cnote number of consignment.
    */
   void cancelDemurrage(String cnote);
+
+  /**
+   * This function calls the blocking API in the zoom backend with the client code and
+   * enable/disable flag.
+   *
+   * @param zoomClientCreditLimitBreachDto dto which contains client list and reason list of the
+   *     blockers to be added.
+   */
+  void updateClientBlockerDetails(ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto);
+
+  /**
+   * Hits Backend API to retrigger CPD calculation for all affected CNs due to holiday creation or
+   * updation.
+   *
+   * @param holidayV2Dto holiday details.
+   */
+  void retriggerCpdCalculationsForHoliday(HolidayV2Dto holidayV2Dto);
 
   /**
    * Function used to make backend API call to knockoff bank transfer payment for given UTR number.

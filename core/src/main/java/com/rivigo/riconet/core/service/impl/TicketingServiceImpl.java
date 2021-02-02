@@ -15,7 +15,7 @@ import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.utils.TicketingEmailTemplateHelper;
 import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.enums.ZoomPropertyName;
-import com.rivigo.zoom.exceptions.ZoomException;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
