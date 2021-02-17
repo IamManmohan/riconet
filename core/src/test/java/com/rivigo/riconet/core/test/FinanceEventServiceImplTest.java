@@ -3,7 +3,10 @@ package com.rivigo.riconet.core.test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.compass.vendorcontractapi.dto.zoom.VendorContractZoomEventDTO;
 import com.rivigo.finance.zoom.dto.EventPayload;
+import com.rivigo.finance.zoom.dto.UniqueTransactionReferencePostingDTO;
+import com.rivigo.finance.zoom.enums.UniqueTransactionReferencePostingStatus;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.impl.FinanceEventServiceImpl;
@@ -26,6 +29,8 @@ public class FinanceEventServiceImplTest {
   @Mock FeederVendorService feederVendorService;
 
   @Mock ZoomPropertyService zoomPropertyService;
+
+  @Mock BankTransferService bankTransferService;
 
   @Before
   public void setUp() {
@@ -66,5 +71,21 @@ public class FinanceEventServiceImplTest {
         .thenReturn(jsonNode);
     financeEventServiceImpl.processFinanceEvents(eventPayload);
     Assert.assertNotNull(jsonNode);
+  }
+
+  @Test
+  public void processUniqueTransactionReferencePostingEventTest() throws IOException {
+    UniqueTransactionReferencePostingDTO uniqueTransactionReferencePostingDTO =
+        new UniqueTransactionReferencePostingDTO();
+    uniqueTransactionReferencePostingDTO.setUniqueTransactionReferenceNumber("1234567123456789");
+    uniqueTransactionReferencePostingDTO.setStatus(
+        UniqueTransactionReferencePostingStatus.COMPLETE);
+    EventPayload eventPayload = new EventPayload();
+    eventPayload.setEventType(ZoomEventType.UNIQUE_TRANSACTION_REFERENCE_POSTING);
+    eventPayload.setPayload(
+        "{\"uniqueTransactionReferenceNumber\":\"1234567123456789\",\"status\":\"COMPLETE\"}");
+    financeEventServiceImpl.processFinanceEvents(eventPayload);
+    Mockito.verify(bankTransferService)
+        .handleUniqueTransactionReferencePostingEvent(eventPayload.getPayload());
   }
 }
