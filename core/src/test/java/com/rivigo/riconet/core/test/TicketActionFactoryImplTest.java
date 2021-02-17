@@ -92,7 +92,7 @@ public class TicketActionFactoryImplTest {
         ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE);
 
     Mockito.verify(zoomBackendAPIClientService)
-        .handleKnockOffRequest(Mockito.anyString(), Mockito.any());
+        .handleKnockOffRequestForCnote(Mockito.anyString(), Mockito.any());
 
     Mockito.verify(zoomBackendAPIClientService, Mockito.never()).markRecoveryPending(Mockito.any());
   }
@@ -115,7 +115,7 @@ public class TicketActionFactoryImplTest {
     ticketActionFactory.consume(1L, "1", ZoomTicketingConstant.BANK_TRANSFER_ACTION_NAME, "reject");
 
     Mockito.verify(zoomBackendAPIClientService, Mockito.never())
-        .handleKnockOffRequest(Mockito.anyString(), Mockito.any());
+        .handleKnockOffRequestForCnote(Mockito.anyString(), Mockito.any());
 
     Mockito.verify(zoomBackendAPIClientService).markRecoveryPending(Mockito.any());
   }
