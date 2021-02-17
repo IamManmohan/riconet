@@ -97,12 +97,12 @@ subprojects {
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:3.1.14')
-        compile('com.rivigo.collections:collections-api:1.1.11.6264-SNAPSHOT'){
+        compile('com.rivigo.collections:collections-api:1.1.13'){
             exclude module: 'spring-web'
             exclude module: 'spring-data-commons'
         }
 
-        compile("com.rivigo:rivigo-finance-external-api:0.0.25.6264-SNAPSHOT") {
+        compile("com.rivigo:rivigo-finance-external-api:1.0.1") {
             force = true
             exclude module: 'cms-external-api'
         }
