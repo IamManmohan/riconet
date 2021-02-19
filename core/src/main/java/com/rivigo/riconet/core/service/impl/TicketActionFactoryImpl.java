@@ -197,7 +197,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
     try {
       if (ZoomTicketingConstant.TICKET_ACTION_VALUE_APPROVE.equals(actionValue)) {
         // knock off
-        zoomBackendAPIClientService.handleKnockOffRequest(
+        zoomBackendAPIClientService.handleKnockOffRequestForCnote(
             cnote,
             new BankTransferRequestDTO(
                 paymentDetailV2.getTransactionReferenceNo(),

@@ -102,4 +102,16 @@ public class UrlConstant {
 
   /** Backend API to add client level blockers based on client credit limit breach event. */
   public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/addUpdateClientLimitBlocker";
+
+  /** Backend API endpoint to trigger CPD calculation for all affected CNs due to holiday update. */
+  public static final String ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY =
+      "/holiday/cpd-calculation";
+
+  /** Backend API to knockoff given UTR number for payment type Bank Transfer. */
+  public final String ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/complete";
+
+  /** Backend API to revert knockoff given UTR number for payment type Bank Transfer. */
+  public final String ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/revert";
 }

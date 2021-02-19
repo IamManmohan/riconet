@@ -46,6 +46,12 @@ public class EventTriggerService {
    */
   @Autowired private DemurrageService demurrageService;
 
+  /**
+   * {@link HolidayV2Service} is used to trigger CPD calculation for all affected CNs due to create
+   * or update of holiday.
+   */
+  @Autowired private HolidayV2Service holidayV2Service;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
@@ -162,6 +168,12 @@ public class EventTriggerService {
         break;
       case DEPS_RECORD_CREATION:
         demurrageService.processEventToCancelDemurrage(notificationDTO);
+        break;
+      case HOLIDAY_V2_CREATE:
+        holidayV2Service.processHolidayEvent(notificationDTO, true);
+        break;
+      case HOLIDAY_V2_UPDATE:
+        holidayV2Service.processHolidayEvent(notificationDTO, false);
         break;
       case CN_DELIVERY_HOLD:
       case CN_DISPATCH_HOLD:

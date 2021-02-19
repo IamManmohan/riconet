@@ -13,6 +13,7 @@ import com.rivigo.riconet.core.service.AppNotificationService;
 import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.DemurrageService;
 import com.rivigo.riconet.core.service.EventTriggerService;
+import com.rivigo.riconet.core.service.HolidayV2Service;
 import com.rivigo.riconet.core.service.PickupService;
 import com.rivigo.riconet.core.service.RTOService;
 import com.rivigo.riconet.core.service.TicketActionFactory;
@@ -31,6 +32,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestTemplate;
 
@@ -60,6 +62,8 @@ public class EventTriggerServiceTest {
   @Mock private RTOService rtoService;
 
   @Mock private DemurrageService demurrageService;
+
+  @Mock private HolidayV2Service holidayV2Service;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
@@ -251,5 +255,21 @@ public class EventTriggerServiceTest {
             .build();
     eventTriggerService.processNotification(notificationDTO);
     verify(demurrageService).processEventToCancelDemurrage(notificationDTO);
+  }
+
+  @Test
+  public void holidayCreateEventTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_CREATE);
+    eventTriggerService.processNotification(notificationDTO);
+    Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, true);
+  }
+
+  @Test
+  public void holidayUpdateEventTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_UPDATE);
+    eventTriggerService.processNotification(notificationDTO);
+    Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, false);
   }
 }
