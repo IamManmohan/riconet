@@ -129,7 +129,7 @@ public class ZoomPropertyServiceImpl implements ZoomPropertyService {
         return Stream.of(
                 property
                     .getVariableValue()
-                    .split(ZoomTicketingConstant.ZOOM_PROPERTIES_PRIORITY_SEPORATOR))
+                    .split(ZoomTicketingConstant.ZOOM_PROPERTIES_LIST_SEPARATOR))
             .collect(Collectors.toList());
       } catch (Exception ex) {
         log.error("Exception while getting list(long) for " + propertyName.name(), ex);
