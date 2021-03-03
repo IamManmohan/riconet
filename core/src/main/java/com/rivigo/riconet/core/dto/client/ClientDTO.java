@@ -54,4 +54,5 @@ public class ClientDTO {
   private Set<String> clientNotificationList;
   private Boolean isOnlineEnabled;
   private Boolean isDacc;
+  private Boolean isHolidayDeliveryPickupAllowed;
 }
