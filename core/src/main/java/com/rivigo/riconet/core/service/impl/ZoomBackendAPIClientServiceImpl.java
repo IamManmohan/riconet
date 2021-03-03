@@ -1,6 +1,5 @@
 package com.rivigo.riconet.core.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
@@ -701,8 +700,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY,
               paramMap,
               backendBaseUrl);
-      final TypeReference<Boolean> booleanType = new TypeReference<Boolean>() {};
-      final Boolean isSuccess = (Boolean) apiClientService.parseJsonNode(responseJson, booleanType);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
       if (!Boolean.TRUE.equals(isSuccess)) {
         throw new ZoomException("Error in updating consignment liability");
       }
