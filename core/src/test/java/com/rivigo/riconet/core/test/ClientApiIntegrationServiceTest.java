@@ -6,22 +6,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.CnActionEventName;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.impl.ClientApiIntegrationServiceImpl;
 import com.rivigo.riconet.core.service.impl.FlipkartClientIntegration;
 import com.rivigo.riconet.core.service.impl.RestClientUtilityServiceImpl;
 import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
+import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
 import com.rivigo.zoom.common.repository.mysql.UndeliveredConsignmentsRepository;
 import com.rivigo.zoom.common.repository.neo4j.LocationRepositoryV2;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -50,6 +55,8 @@ public class ClientApiIntegrationServiceTest {
   @Mock private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
   @Mock private ClientConsignmentService clientConsignmentService;
   @Mock private FlipkartClientIntegration flipkartClientIntegration;
+  @Mock private ConsignmentService consignmentService;
+  @Mock private AdministrativeEntityService administrativeEntityService;
   @InjectMocks private ClientApiIntegrationServiceImpl clientApiIntegrationService;
 
   @Before
@@ -130,6 +137,12 @@ public class ClientApiIntegrationServiceTest {
         .thenReturn(Optional.of(ApiServiceUtils.getClientResponseDTO()));
     Mockito.when(flipkartClientIntegration.getFlipkartAccessToken())
         .thenReturn(ApiServiceUtils.getFlipkartLoginResponseDTO().getAccessToken());
+    Mockito.when(consignmentService.getLastScanByCnIdIn(Mockito.anyList(), Mockito.anyList()))
+        .thenReturn(Collections.emptyMap());
+    AdministrativeEntity administrativeEntity = new AdministrativeEntity();
+    administrativeEntity.setId(RandomUtils.nextLong());
+    Mockito.when(administrativeEntityService.findParentCluster(Mockito.any()))
+        .thenReturn(administrativeEntity);
   }
 
   private void addPickupDoneEvent() {
@@ -156,7 +169,7 @@ public class ClientApiIntegrationServiceTest {
     for (String client : clientIds) {
       NotificationDTO notificationDTO =
           ApiServiceUtils.getDummyCnNotificationDtoForEvent(
-              CnActionEventName.CN_LOADED, CNOTES.get(CNOTE_INDEX));
+              CnActionEventName.CN_TRIP_DISPATCHED, CNOTES.get(CNOTE_INDEX));
 
       clientApiIntegrationService.getClientRequestDtosByType(notificationDTO, client);
     }
