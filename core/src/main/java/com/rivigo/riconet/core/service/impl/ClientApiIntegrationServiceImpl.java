@@ -237,6 +237,13 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                     schedules, consignment.getPromisedDeliveryDateTime()))
             .build();
       case CN_TRIP_DISPATCHED:
+        Long departureTime =
+            Optional.ofNullable(
+                    notificationDTO
+                        .getMetadata()
+                        .get(ZoomCommunicationFieldNames.ConsignmentSchedule.DEPARTURE_TIME.name()))
+                .map(Long::valueOf)
+                .orElse(notificationDTO.getTsMs());
         return IntransitDispatchedDto.builder()
             .dispatchedFrom(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
             .dispatchedTo(
@@ -245,6 +252,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             .revisedEdd(
                 getRevisedEddFromCnScheduleAndConsignment(
                     schedules, consignment.getPromisedDeliveryDateTime()))
+            .date(TimeUtilsZoom.getDate(new DateTime(departureTime)))
+            .time(TimeUtilsZoom.getTime(new DateTime(departureTime)))
             .build();
       default:
         log.error("Unrecognized intransit event {}", notificationDTO);
@@ -343,8 +352,10 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         log.error("Unrecognized event {}", notificationDTO);
         throw new ZoomException("Unrecognized event {}" + notificationDTO);
     }
-    fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
-    fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    if (!CnActionEventName.CN_TRIP_DISPATCHED.name().equals(notificationDTO.getEventName())) {
+      fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
+      fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    }
     if (addBarcodes) {
       List<String> barCodes =
           clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
