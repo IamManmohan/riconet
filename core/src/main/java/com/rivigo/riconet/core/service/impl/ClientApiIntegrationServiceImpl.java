@@ -21,21 +21,26 @@ import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.enums.HiltiJobType;
 import com.rivigo.riconet.core.enums.HiltiStatusCode;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.service.AdministrativeEntityService;
 import com.rivigo.riconet.core.service.ClientApiIntegrationService;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.ConsignmentScheduleService;
+import com.rivigo.riconet.core.service.ConsignmentService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.riconet.core.utils.TimeUtilsZoom;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
+import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.enums.LocationTag;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
+import com.rivigo.zoom.common.model.ConsignmentHistory;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
+import com.rivigo.zoom.common.model.neo4j.AdministrativeEntity;
 import com.rivigo.zoom.common.model.neo4j.Location;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentUploadedFilesRepository;
 import com.rivigo.zoom.common.repository.mysql.PickupRepository;
@@ -88,6 +93,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
 
   @Autowired private PickupRepository pickupRepository;
 
+  @Autowired private ConsignmentService consignmentService;
+
   @Autowired private FlipkartClientIntegration flipkartClientIntegration;
 
   @Autowired private LocationRepositoryV2 locationRepositoryV2;
@@ -101,6 +108,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
   @Autowired private UndeliveredConsignmentsRepository undeliveredConsignmentsRepository;
 
   @Autowired private ClientConsignmentService clientConsignmentService;
+
+  @Autowired private AdministrativeEntityService administrativeEntityService;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -149,13 +158,21 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     final Map<Long, List<ConsignmentSchedule>> consignmentScheduleListForAllCNs =
         consignmentScheduleService.getActivePlansMapByIds(consignmentIds);
 
+    Map<Long, ConsignmentHistory> lastScanByCnIdIn =
+        consignmentService.getLastScanByCnIdIn(
+            consignmentIds, Collections.singletonList(ConsignmentStatus.INTRANSIT_TO_OU.name()));
+
     return cnList
         .stream()
         .map(
             v -> {
               PickupDoneDto pickupDoneDto =
                   PickupDoneDto.builder()
-                      .pickupTime(TimeUtilsZoom.getTime(pickup.getPickupDate()))
+                      .pickupTime(
+                          TimeUtilsZoom.getTime(
+                              Optional.ofNullable(lastScanByCnIdIn.get(v.getId()))
+                                  .map(ConsignmentHistory::getCreatedAt)
+                                  .orElse(v.getCreatedAt())))
                       .expectedDeliveryDate(TimeUtilsZoom.getDate(v.getPromisedDeliveryDateTime()))
                       .build();
               if (addBarcodes) {
@@ -207,19 +224,26 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         locations.stream().collect(Collectors.toMap(Location::getId, Location::getName));
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_RECEIVED_AT_OU:
+        AdministrativeEntity currentCluster =
+            administrativeEntityService.findParentCluster(consignment.getLocationId());
+        AdministrativeEntity deliveryCluster =
+            administrativeEntityService.findParentCluster(consignment.getToLocationId());
+        boolean atDestination = currentCluster.getId().equals(deliveryCluster.getId());
         return IntransitArrivedDto.builder()
             .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
-            .atDestination("no")
+            .atDestination(atDestination ? "yes" : "no")
             .revisedEdd(
                 getRevisedEddFromCnScheduleAndConsignment(
                     schedules, consignment.getPromisedDeliveryDateTime()))
             .build();
-      case CN_DELIVERY_LOADED:
-        return IntransitArrivedDto.builder()
-            .arrivedAt(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
-            .atDestination("yes")
-            .build();
-      case CN_LOADED:
+      case CN_TRIP_DISPATCHED:
+        Long departureTime =
+            Optional.ofNullable(
+                    notificationDTO
+                        .getMetadata()
+                        .get(ZoomCommunicationFieldNames.ConsignmentSchedule.DEPARTURE_TIME.name()))
+                .map(Long::valueOf)
+                .orElse(notificationDTO.getTsMs());
         return IntransitDispatchedDto.builder()
             .dispatchedFrom(idToLocationNameMap.getOrDefault(consignment.getLocationId(), ""))
             .dispatchedTo(
@@ -228,6 +252,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
             .revisedEdd(
                 getRevisedEddFromCnScheduleAndConsignment(
                     schedules, consignment.getPromisedDeliveryDateTime()))
+            .date(TimeUtilsZoom.getDate(new DateTime(departureTime)))
+            .time(TimeUtilsZoom.getTime(new DateTime(departureTime)))
             .build();
       default:
         log.error("Unrecognized intransit event {}", notificationDTO);
@@ -314,8 +340,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
     BaseHiltiFieldData fieldData;
     switch (CnActionEventName.valueOf(notificationDTO.getEventName())) {
       case CN_RECEIVED_AT_OU:
-      case CN_DELIVERY_LOADED:
-      case CN_LOADED:
+      case CN_TRIP_DISPATCHED:
         fieldData = getIntransitFieldData(notificationDTO);
         break;
       case CN_OUT_FOR_DELIVERY:
@@ -327,8 +352,10 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         log.error("Unrecognized event {}", notificationDTO);
         throw new ZoomException("Unrecognized event {}" + notificationDTO);
     }
-    fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
-    fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    if (!CnActionEventName.CN_TRIP_DISPATCHED.name().equals(notificationDTO.getEventName())) {
+      fieldData.setTime(TimeUtilsZoom.getTime(new DateTime(notificationDTO.getTsMs())));
+      fieldData.setDate(TimeUtilsZoom.getDate(new DateTime(notificationDTO.getTsMs())));
+    }
     if (addBarcodes) {
       List<String> barCodes =
           clientConsignmentService.getBarcodeListFromConsignmentId(notificationDTO.getEntityId());
@@ -348,11 +375,10 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
       case PICKUP_COMPLETION:
         return getPickupRequestDtos(notificationDTO, addBarcodes);
       case CN_RECEIVED_AT_OU:
-      case CN_DELIVERY_LOADED:
         jobType = HiltiJobType.INTRANSIT;
         statusCode = HiltiStatusCode.ARRIVED;
         break;
-      case CN_LOADED:
+      case CN_TRIP_DISPATCHED:
         jobType = HiltiJobType.INTRANSIT;
         statusCode = HiltiStatusCode.DISPATCHED;
         break;
