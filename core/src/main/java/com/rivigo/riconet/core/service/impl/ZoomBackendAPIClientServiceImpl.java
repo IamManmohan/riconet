@@ -23,7 +23,6 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
-import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.constants.ResponseJavaTypes;
 import java.io.IOException;
@@ -51,25 +50,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Autowired private ApiClientService apiClientService;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Override
-  public void setPriorityMapping(String cnote, PriorityReasonType reason) {
-
-    String url = UrlConstant.PRIORITY_URL;
-    JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("cnote", Collections.singletonList(cnote));
-    valuesMap.put("reason", Collections.singletonList(reason.toString()));
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-    } catch (IOException e) {
-      log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
-      throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
-    }
-
-    apiClientService.parseNewResponseJsonNode(responseJson, null);
-  }
 
   @Override
   public void handleWriteOffApproveRejectRequest(
