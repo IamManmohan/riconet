@@ -122,4 +122,8 @@ public enum ZoomCommunicationFieldNames {
     /** old holiday start date time. */
     OLD_HOLIDAY_START_DATE_TIME
   }
+
+  public enum ConsignmentSchedule {
+    DEPARTURE_TIME;
+  }
 }

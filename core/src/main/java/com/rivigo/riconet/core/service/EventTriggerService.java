@@ -121,7 +121,6 @@ public class EventTriggerService {
         bankTransferService.createTicket(notificationDTO.getMetadata());
         break;
       case TICKET_CREATION:
-        ticketingService.setPriorityMapping(notificationDTO);
         //        ticketingService.sendTicketingEventsEmail(notificationDTO);
         break;
       case RTO_TICKET_ASSIGNEE_CHANGE:
