@@ -18,7 +18,6 @@ import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
-import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 
 public interface ZoomBackendAPIClientService {
@@ -44,8 +43,6 @@ public interface ZoomBackendAPIClientService {
       String cnote, WriteOffRequestAction writeOffRequestAction);
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
-
-  void setPriorityMapping(String cnote, PriorityReasonType reason);
 
   ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO);
 

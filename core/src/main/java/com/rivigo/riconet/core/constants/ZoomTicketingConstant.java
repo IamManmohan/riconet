@@ -43,10 +43,7 @@ public class ZoomTicketingConstant {
   public static final String ACTION_CLOSURE_MESSAGE =
       "Ticket got auto-closed after action is taken";
 
-  public static final String PRIORITY_AUTO_CLOSURE_MESSAGE =
-      "The Ticket got auto closed after changing the consignment priority";
-
-  public static final String ZOOM_PROPERTIES_PRIORITY_SEPORATOR = ",";
+  public static final String ZOOM_PROPERTIES_LIST_SEPARATOR = ",";
 
   public static final String UNDERSCORE = "_";
 
