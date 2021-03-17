@@ -6,6 +6,7 @@ import com.rivigo.finance.zoom.enums.ZoomEventType;
 import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
+import com.rivigo.riconet.core.service.ConsignmentLiabilityService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
@@ -30,6 +31,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
   @Autowired private HandoverCollectionService handoverCollectionService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private ConsignmentLiabilityService consignmentLiabilityService;
 
   /**
    * BankTransferService is used to handle incoming UniqueTransactionReferencePosting event from
@@ -87,6 +90,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
          */
         clientMasterService.updateClientBlocker(eventPayload.getPayload());
         break;
+      case CONSIGNMENT_LIABILITY_UPDATE:
+        consignmentLiabilityService.updateConsignmentLiability(eventPayload.getPayload());
       default:
         log.info("Event does not trigger anything {}", eventType);
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
@@ -21,6 +22,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
@@ -652,6 +654,39 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           responseJson);
     } catch (IOException e) {
       throw new ZoomException("Error while updating client blocker ", e);
+    }
+  }
+
+  /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param consignmentId cn id
+   * @param consignmentLiability Consignment Liability
+   */
+  @Override
+  public void updateConsignmentLiability(
+      Long consignmentId, ConsignmentLiability consignmentLiability) {
+    JsonNode responseJson;
+    try {
+      MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+      paramMap.set(ConsignmentLiabilityParamConstants.CONSIGNMENT_ID, consignmentId.toString());
+      paramMap.set(
+          ConsignmentLiabilityParamConstants.CONSIGNMENT_LIABILITY, consignmentLiability.name());
+      log.info("Attempting liability update with params {}", paramMap);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY,
+              paramMap,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in updating consignment liability");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating consignment liability ", e);
     }
   }
 
