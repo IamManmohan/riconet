@@ -5,7 +5,6 @@ import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.DemurrageService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,20 +66,11 @@ public class DemurrageServiceImpl implements DemurrageService {
     final String consignmentId = metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name());
     final String consignmentAlertId =
         metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ALERT_ID.name());
-    boolean isDispatch;
-    if (EventName.CN_DELIVERY_HOLD.name().equals(notificationDTO.getEventName())) {
-      isDispatch = false;
-    } else if (EventName.CN_DISPATCH_HOLD.name().equals(notificationDTO.getEventName())) {
-      isDispatch = true;
-    } else {
-      throw new ZoomException(
-          "Invalid event name: {} for start demurrage request.", notificationDTO.getEventName());
-    }
     log.debug(
         "Start demurrage request for consignment id: {} on dispatch/delivery hold received.",
         consignmentId);
     zoomBackendAPIClientService.startDemurrageOnCnDispatchOrDeliveryHold(
-        consignmentId, consignmentAlertId, isDispatch);
+        consignmentId, consignmentAlertId);
   }
 
   /**

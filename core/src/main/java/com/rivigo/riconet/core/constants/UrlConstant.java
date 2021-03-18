@@ -84,13 +84,9 @@ public class UrlConstant {
   /** Backend API endpoint to start demurrage for a consignment on CN undelivery. */
   public final String ZOOM_BACKEND_START_DEMURRAGE_UNDELIVERY = "/vas/demurrage/undelivery/start";
 
-  /** Backend API endpoint to start demurrage for a consignment on CN dispatch hold. */
-  public final String ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_HOLD =
-      "/vas/demurrage/dispatch-hold/start";
-
-  /** Backend API endpoint to start demurrage for a consignment on CN delivery hold. */
-  public final String ZOOM_BACKEND_START_DEMURRAGE_DELIVERY_HOLD =
-      "/vas/demurrage/delivery-hold/start";
+  /** Backend API endpoint to start demurrage for a consignment on CN dispatch or delivery hold. */
+  public final String ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_OR_DELIVERY_HOLD =
+      "/vas/demurrage/hold/start";
 
   /** Backend API endpoint to complete demurrage for a consignment. */
   public final String ZOOM_BACKEND_END_DEMURRAGE = "/vas/demurrage/end";

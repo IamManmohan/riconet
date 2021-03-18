@@ -121,10 +121,8 @@ public interface ZoomBackendAPIClientService {
    * @param consignmentId consignment id.
    * @param consignmentAlertId consignment alert id, contains details regarding the
    *     dispatch/delivery hold.
-   * @param isDispatch flag whether start demurrage on dispatch hold or delivery hold.
    */
-  void startDemurrageOnCnDispatchOrDeliveryHold(
-      String consignmentId, String consignmentAlertId, boolean isDispatch);
+  void startDemurrageOnCnDispatchOrDeliveryHold(String consignmentId, String consignmentAlertId);
 
   /**
    * Function used to make backend API call to end demurrage for given consignment.

@@ -581,20 +581,16 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * @param consignmentId consignment id.
    * @param consignmentAlertId consignment alert id, contains details regarding the
    *     dispatch/delivery hold.
-   * @param isDispatch flag whether start demurrage on dispatch hold or delivery hold.
    */
   @Override
   public void startDemurrageOnCnDispatchOrDeliveryHold(
-      String consignmentId, String consignmentAlertId, boolean isDispatch) {
+      String consignmentId, String consignmentAlertId) {
     JsonNode responseJson;
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
       queryParams.add(ConsignmentConstant.CONSIGNMENT_ID, consignmentId);
       queryParams.add(ConsignmentConstant.CONSIGNMENT_ALERT_ID, consignmentAlertId);
-      String apiEndPoint =
-          isDispatch
-              ? UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_HOLD
-              : UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DELIVERY_HOLD;
+      String apiEndPoint = UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_OR_DELIVERY_HOLD;
       responseJson =
           apiClientService.getEntity(
               null, HttpMethod.POST, apiEndPoint, queryParams, backendBaseUrl);
