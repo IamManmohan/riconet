@@ -272,4 +272,20 @@ public class EventTriggerServiceTest {
     eventTriggerService.processNotification(notificationDTO);
     Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, false);
   }
+
+  @Test
+  public void cnDeliveryHoldEventTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.CN_DELIVERY_HOLD);
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
+  }
+
+  @Test
+  public void cnDispatchHoldEventTest() {
+    NotificationDTO notificationDTO =
+        NotificationDTOModel.getNotificationDTO(EventName.CN_DISPATCH_HOLD);
+    eventTriggerService.processNotification(notificationDTO);
+    verify(demurrageService).processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
+  }
 }
