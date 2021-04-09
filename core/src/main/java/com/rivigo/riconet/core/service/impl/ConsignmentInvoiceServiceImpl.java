@@ -64,7 +64,8 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
           "New CN "
               + invoiceDocumentPreparedDTO.getCnote()
               + " successfully created, click here to access GST invoice: "
-              + shortUrl;
+              + shortUrl
+              + " Team Rivigo";
 
       PaymentDetailV2 paymentDetailV2 =
           paymentDetailV2Repository.findByConsignmentIdAndIsActive(consignment.getId(), true);
