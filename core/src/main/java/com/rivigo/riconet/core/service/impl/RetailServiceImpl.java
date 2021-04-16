@@ -131,7 +131,7 @@ public class RetailServiceImpl implements RetailService {
           // BigDecimal.ROUND_HALF_EVEN))
           //              .append(" ");
         });
-    sb.append("Do not deliver the shipment without collecting amount.");
+    sb.append("Do not deliver the shipment without collecting amount. Team Rivigo");
     smsService.sendSms(retailNotificationDTOList.get(0).getDrsUserMobile(), sb.toString());
     retailNotifications
         .get(0)
