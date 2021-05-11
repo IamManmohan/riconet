@@ -136,19 +136,24 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     HandoverCollectionExcludeEventPayload handoverExcludePayload =
         getDtoFromPayload(payload, HandoverCollectionExcludeEventPayload.class);
 
+    // deposit slip for which cheque bounce took place.
+    Long depositSlipId = handoverExcludePayload.getDepositSlipId();
     DepositSlip depositSlip =
         depositSlipService
-            .findByDepositSlipId(handoverExcludePayload.getDepositSlipId())
+            .findByDepositSlipId(depositSlipId)
             .orElseThrow(
                 () ->
                     new ZoomException(
                         "DepositSlip not found - %s", handoverExcludePayload.getDepositSlipId()));
+    // existing number of instruments in deposit slip.
+    Integer noOfInstruments = depositSlip.getNumberOfInstruments();
 
     // get all CNs from depositSlip
     final Map<Long, PaymentDetailV2> cnIdToPaymentDetailV2Map = new HashMap<>();
 
     List<Long> consignmentIds =
-        consignmentDepositSlipRepository.findConsignmentIdByDepositSlipId(depositSlip.getId());
+        consignmentDepositSlipRepository.findConsignmentIdByDepositSlipIdAndIsActive(
+            depositSlip.getId(), Boolean.TRUE);
 
     String chequeNumber = handoverExcludePayload.getChequeNumber();
     String bankName = handoverExcludePayload.getBankName();
@@ -185,6 +190,8 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
                   .bankName(bankName)
                   .amount(paymentDetailV2.getTotalAmount())
                   .bankAccountReference(paymentDetailV2.getBankAccountReference())
+                  .depositSlipId(depositSlipId)
+                  .noOfInstrumentsInDepositSlip(noOfInstruments - 1)
                   .build();
           chequeBounceDTOListForRecoveryPendingAPI.add(oneDto);
         });
