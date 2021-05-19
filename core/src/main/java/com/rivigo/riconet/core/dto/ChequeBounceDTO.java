@@ -30,9 +30,9 @@ public class ChequeBounceDTO {
 
   @NonNull private BigDecimal amount;
 
-  // deposit slip id for the cheque bounce.
+  /** deposit slip id for the cheque bounce. */
   private Long depositSlipId;
 
-  // no of instruments in deposit slip after the cheque bounce.
-  private Integer noOfInstrumentsInDepositSlip;
+  /** no of cheques in deposit slip after the cheque bounce. */
+  private Integer noOfChequesInDepositSlip;
 }
