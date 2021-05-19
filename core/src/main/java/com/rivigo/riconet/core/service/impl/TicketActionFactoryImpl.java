@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketActionDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
@@ -13,6 +12,7 @@ import com.rivigo.riconet.core.service.TicketActionFactory;
 import com.rivigo.riconet.core.service.TicketingService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.common.enums.PaymentType;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.PaymentDetailV2;
@@ -205,7 +205,7 @@ public class TicketActionFactoryImpl implements TicketActionFactory {
       } else {
         // Mark recovery
         zoomBackendAPIClientService.markRecoveryPending(
-            ChequeBounceDTO.builder()
+            ChequeBounceRequestDTO.builder()
                 .amount(paymentDetailV2.getTotalAmount())
                 .bankName(paymentDetailV2.getBankName())
                 .bankAccountReference(paymentDetailV2.getBankAccountReference())

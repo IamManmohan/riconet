@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
@@ -22,6 +21,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
@@ -317,18 +317,18 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * consignment. <br>
    * MarkRecoveryPending flow is triggered for given consignment.
    *
-   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   * @param chequeBounceRequestDTO Bank transfer payment details that were rejected.
    */
   @Override
-  public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
+  public JsonNode markRecoveryPending(ChequeBounceRequestDTO chequeBounceRequestDTO) {
     return markRecoveryPendingInternal(
-        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING);
+        chequeBounceRequestDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING);
   }
 
   @Override
-  public JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO) {
+  public JsonNode markRecoveryPendingBulk(List<ChequeBounceRequestDTO> chequeBounceRequestDTO) {
     return markRecoveryPendingInternal(
-        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
+        chequeBounceRequestDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
   }
 
   private <T> JsonNode markRecoveryPendingInternal(

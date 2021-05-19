@@ -7,7 +7,6 @@ import com.rivigo.collections.api.dto.HandoverCollectionExcludeEventPayload;
 import com.rivigo.collections.api.enums.PaymentType.ZoomPaymentType;
 import com.rivigo.finance.utils.TimeUUID;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.service.ConsignmentReadOnlyService;
 import com.rivigo.riconet.core.service.DepositSlipService;
 import com.rivigo.riconet.core.service.HandoverCollectionService;
@@ -16,6 +15,7 @@ import com.rivigo.riconet.core.service.PaymentDetailV2Service;
 import com.rivigo.riconet.core.service.TransactionManagerService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomBookAPIClientService;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.common.dto.zoombook.ZoomBookTransactionRequestDTO;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookFunctionType;
 import com.rivigo.zoom.common.enums.zoombook.ZoomBookTenantType;
@@ -179,12 +179,13 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     zoomBookAPIClientService.processZoomBookTransaction(transactionRequestDTOList);
 
     // Mark Recovery Pending API
-    List<ChequeBounceDTO> chequeBounceDTOListForRecoveryPendingAPI = new ArrayList<>();
+    List<ChequeBounceRequestDTO> chequeBounceRequestDTOListForRecoveryPendingAPI =
+        new ArrayList<>();
     cnIdToConsignmentMap.forEach(
         (key, consignmentReadOnly) -> {
           PaymentDetailV2 paymentDetailV2 = cnIdToPaymentDetailV2Map.get(key);
-          ChequeBounceDTO oneDto =
-              ChequeBounceDTO.builder()
+          ChequeBounceRequestDTO oneDto =
+              ChequeBounceRequestDTO.builder()
                   .cnote(consignmentReadOnly.getCnote())
                   .chequeNumber(chequeNumber)
                   .bankName(bankName)
@@ -196,12 +197,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
                    */
                   .noOfChequesInDepositSlip(noOfInstruments - 1)
                   .build();
-          chequeBounceDTOListForRecoveryPendingAPI.add(oneDto);
+          chequeBounceRequestDTOListForRecoveryPendingAPI.add(oneDto);
         });
     log.info(
         "Making zoom backend markRecoveryPendingV2 API calls for payload: {}",
-        chequeBounceDTOListForRecoveryPendingAPI);
-    markRecoveryPending(chequeBounceDTOListForRecoveryPendingAPI);
+        chequeBounceRequestDTOListForRecoveryPendingAPI);
+    markRecoveryPending(chequeBounceRequestDTOListForRecoveryPendingAPI);
 
     try {
       transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
@@ -306,11 +307,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     return String.valueOf(TimeUUID.createUUID(System.currentTimeMillis()));
   }
 
-  private void markRecoveryPending(List<ChequeBounceDTO> chequeBounceDTOList) {
-    JsonNode jsonNode = zoomBackendAPIClientService.markRecoveryPendingBulk(chequeBounceDTOList);
+  private void markRecoveryPending(List<ChequeBounceRequestDTO> chequeBounceRequestDTOList) {
+    JsonNode jsonNode =
+        zoomBackendAPIClientService.markRecoveryPendingBulk(chequeBounceRequestDTOList);
     log.info(
         "API call for chequeBounceEvent done, for payload: {}, response: {}",
-        chequeBounceDTOList,
+        chequeBounceRequestDTOList,
         jsonNode);
     // Does this make a difference what happens to the request?
   }
