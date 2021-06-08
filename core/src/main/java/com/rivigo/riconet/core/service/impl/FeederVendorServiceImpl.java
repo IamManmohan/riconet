@@ -16,10 +16,12 @@ import com.rivigo.zoom.common.repository.mysql.BusinessPartnerRepository;
 import com.rivigo.zoom.common.repository.mysql.FeederVendorRepository;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -50,6 +52,7 @@ public class FeederVendorServiceImpl implements FeederVendorService {
         case BP:
         case RP:
           return createBP(vendorContractZoomEventDTO);
+        case NLH:
         case RLH_FEEDER:
           return createVendor(vendorContractZoomEventDTO);
         default:
@@ -68,16 +71,25 @@ public class FeederVendorServiceImpl implements FeederVendorService {
     dto.setVendorType(FeederVendor.VendorType.VENDOR);
     dto.setVendorStatus(OperationalStatus.ACTIVE);
     dto.setLegalName(vendorContractZoomEventDTO.getLegalEntityName());
-    Optional<FeederVendor> feederVendor =
+    dto.setExpenseTypeList(Collections.singleton(vendorContractZoomEventDTO.getExpenseType()));
+    Optional<FeederVendor> feederVendorOptional =
         Optional.ofNullable(
             feederVendorRepository.findByVendorCode(vendorContractZoomEventDTO.getVendorCode()));
-    if (feederVendor.isPresent()) {
-      dto.setId(feederVendor.get().getId());
-      log.info(
-          "vendor details are already present with vendor code : {} ,id : {} ",
-          feederVendor.get().getVendorCode(),
-          feederVendor.get().getId());
-      return null;
+    if (feederVendorOptional.isPresent()) {
+      FeederVendor feederVendor = feederVendorOptional.get();
+      dto.setId(feederVendor.getId());
+      if (!CollectionUtils.isEmpty(feederVendor.getExpenseTypeList())
+          && feederVendor
+              .getExpenseTypeList()
+              .contains(vendorContractZoomEventDTO.getExpenseType())) {
+        // Update not allowed if feeder vendor entry already exists for given expense type.
+        log.info(
+            "vendor details are already present with vendor code : {} ,id : {}, expense type: {}",
+            feederVendor.getVendorCode(),
+            feederVendor.getId(),
+            vendorContractZoomEventDTO.getExpenseType());
+        return null;
+      }
     }
     return zoomBackendAPIClientService.addFeederVendor(dto);
   }
