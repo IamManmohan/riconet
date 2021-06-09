@@ -94,7 +94,6 @@ subprojects {
             exclude module: 'aws-java-sdk'
             exclude module: 'scala-library'
             exclude module: 'spring-boot-starter-data-jpa'
-            exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
             exclude module: 'cms-client'
             exclude module: 'cms-api'
         }
