@@ -95,6 +95,8 @@ subprojects {
             exclude module: 'scala-library'
             exclude module: 'spring-boot-starter-data-jpa'
             exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+            exclude module: 'cms-client'
+            exclude module: 'cms-api'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:3.1.14')
