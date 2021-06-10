@@ -94,15 +94,18 @@ subprojects {
             exclude module: 'aws-java-sdk'
             exclude module: 'scala-library'
             exclude module: 'spring-boot-starter-data-jpa'
+            exclude module: 'cms-client'
+            exclude module: 'cms-api'
         }
 
         compile('com.rivigo.security:rivigo-security-resource-server-commons:3.1.14')
-        compile('com.rivigo.collections:collections-api:1.1.3'){
+        compile('com.rivigo.collections:collections-api:1.1.13'){
             exclude module: 'spring-web'
             exclude module: 'spring-data-commons'
+            exclude group: 'org.bouncycastle'
         }
 
-        compile("com.rivigo:rivigo-finance-external-api:1.0.0") {
+        compile("com.rivigo:rivigo-finance-external-api:1.0.2.7160-SNAPSHOT") {
             exclude module: 'cms-external-api'
         }
 

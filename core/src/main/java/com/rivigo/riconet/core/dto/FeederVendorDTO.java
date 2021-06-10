@@ -1,7 +1,9 @@
 package com.rivigo.riconet.core.dto;
 
+import com.rivigo.vms.enums.ExpenseType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
 import com.rivigo.zoom.common.model.FeederVendor.VendorType;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,4 +33,7 @@ public class FeederVendorDTO {
   private OperationalStatus vendorStatus;
 
   private String clusterCode;
+
+  // Expense type can RLH_FEEDER or NLH for vendor.
+  private Set<ExpenseType> expenseTypeList;
 }

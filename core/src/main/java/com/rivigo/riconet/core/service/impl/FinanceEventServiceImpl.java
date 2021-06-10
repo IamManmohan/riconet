@@ -3,8 +3,10 @@ package com.rivigo.riconet.core.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.finance.zoom.dto.EventPayload;
 import com.rivigo.finance.zoom.enums.ZoomEventType;
+import com.rivigo.riconet.core.service.BankTransferService;
 import com.rivigo.riconet.core.service.ClientMasterService;
 import com.rivigo.riconet.core.service.ConsignmentInvoiceService;
+import com.rivigo.riconet.core.service.ConsignmentLiabilityService;
 import com.rivigo.riconet.core.service.EpodService;
 import com.rivigo.riconet.core.service.FeederVendorService;
 import com.rivigo.riconet.core.service.FinanceEventService;
@@ -29,6 +31,14 @@ public class FinanceEventServiceImpl implements FinanceEventService {
   @Autowired private HandoverCollectionService handoverCollectionService;
 
   @Autowired private ZoomPropertyService zoomPropertyService;
+
+  @Autowired private ConsignmentLiabilityService consignmentLiabilityService;
+
+  /**
+   * BankTransferService is used to handle incoming UniqueTransactionReferencePosting event from
+   * compass and forward the knockoff/revert-knockoff request to backend.
+   */
+  @Autowired private BankTransferService bankTransferService;
 
   /**
    * This service is used for uploading epod link.
@@ -70,6 +80,9 @@ public class FinanceEventServiceImpl implements FinanceEventService {
         handoverCollectionService.handleHandoverCollectionExcludeEvent(
             eventPayload.getPayload(), eventType);
         break;
+      case UNIQUE_TRANSACTION_REFERENCE_POSTING:
+        bankTransferService.handleUniqueTransactionReferencePostingEvent(eventPayload.getPayload());
+        break;
       case CLIENT_CREDIT_LIMIT_BREACH:
         /**
          * This will call out client blocker API and will block dispatch of all DRS of a particular
@@ -77,6 +90,8 @@ public class FinanceEventServiceImpl implements FinanceEventService {
          */
         clientMasterService.updateClientBlocker(eventPayload.getPayload());
         break;
+      case CONSIGNMENT_LIABILITY_UPDATE:
+        consignmentLiabilityService.updateConsignmentLiability(eventPayload.getPayload());
       default:
         log.info("Event does not trigger anything {}", eventType);
     }

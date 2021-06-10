@@ -109,16 +109,15 @@ public class ZoomPropertyServiceTest {
   public void getStringValues1Test() {
 
     ZoomProperty zoomProperty2 = new ZoomProperty();
-    zoomProperty2.setVariableValue("Delayed Delivery,Priority Shipment Special Request");
-    List<String> priorityTicket = new ArrayList<>();
-    priorityTicket.add("Delayed Delivery");
-    priorityTicket.add("Priority Shipment Special Request");
+    zoomProperty2.setVariableValue("Value 1,Value 2");
+    List<String> propList = new ArrayList<>();
+    propList.add("Value 1");
+    propList.add("Value 2");
     Mockito.when(
             zoomPropertiesRepository.findByVariableNameAndIsActive(
-                ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1))
+                ZoomPropertyName.TESTING.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty2));
-    Assert.assertEquals(
-        priorityTicket, zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE));
+    Assert.assertEquals(propList, zoomPropertyService.getStringValues(ZoomPropertyName.TESTING));
   }
 
   @Test
@@ -127,10 +126,9 @@ public class ZoomPropertyServiceTest {
     zoomProperty.setVariableValue(null);
     Mockito.when(
             zoomPropertiesRepository.findByVariableNameAndIsActive(
-                ZoomPropertyName.PRIORITY_TICKET_TYPE.name(), 1))
+                ZoomPropertyName.TESTING.name(), 1))
         .thenReturn(Collections.singletonList(zoomProperty));
     Assert.assertEquals(
-        Collections.emptyList(),
-        zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE));
+        Collections.emptyList(), zoomPropertyService.getStringValues(ZoomPropertyName.TESTING));
   }
 }

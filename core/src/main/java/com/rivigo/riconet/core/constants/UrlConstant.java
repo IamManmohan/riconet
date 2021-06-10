@@ -41,8 +41,6 @@ public class UrlConstant {
 
   public static final String ZOOM_TICKETING_TICKET_DETAIL = "/ticket/detail";
 
-  public static final String PRIORITY_URL = "/operations/consignments/priority";
-
   public static final String ZOOM_BACKEND_VAS_DETAILS_SERVICE = "/master/vasDetails";
 
   public static final String ZOOM_BACKEND_WRITE_OFF_REQUEST_ONBOARDING =
@@ -95,7 +93,18 @@ public class UrlConstant {
   /** Backend API to add client level blockers based on client credit limit breach event. */
   public static final String BLOCK_UNBLOCK_CLIENT = "/master/client/addUpdateClientLimitBlocker";
 
+  /** End Point for Zoom Backend Update Consignment Liability */
+  public static final String ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY = "/consignmentLiability";
+
   /** Backend API endpoint to trigger CPD calculation for all affected CNs due to holiday update. */
   public static final String ZOOM_BACKEND_TRIGGER_CPD_CALCULATIONS_HOLIDAY =
       "/holiday/cpd-calculation";
+
+  /** Backend API to knockoff given UTR number for payment type Bank Transfer. */
+  public final String ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/complete";
+
+  /** Backend API to revert knockoff given UTR number for payment type Bank Transfer. */
+  public final String ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER =
+      "/payment/bank-transfer/utr/knockOff/revert";
 }

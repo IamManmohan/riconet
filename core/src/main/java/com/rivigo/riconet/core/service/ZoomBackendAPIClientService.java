@@ -15,9 +15,9 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
+import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
-import com.rivigo.zoom.common.enums.PriorityReasonType;
 import java.util.List;
 
 public interface ZoomBackendAPIClientService {
@@ -44,8 +44,6 @@ public interface ZoomBackendAPIClientService {
 
   Boolean handleConsignmentBlocker(ConsignmentBlockerRequestDTO consignmentBlockerRequestDTO);
 
-  void setPriorityMapping(String cnote, PriorityReasonType reason);
-
   ClientCodDodDTO addVasDetails(ClientCodDodDTO clientCodDodDTO);
 
   ClientCodDodDTO updateVasDetails(ClientCodDodDTO clientCodDodDTO);
@@ -56,11 +54,26 @@ public interface ZoomBackendAPIClientService {
 
   JsonNode addFeederVendor(FeederVendorDTO feederVendorDTO);
 
+  /**
+   * This function is used to maked backend API call to reject bank transfer payment for given
+   * consignment. <br>
+   * MarkRecoveryPending flow is triggered for given consignment.
+   *
+   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   */
   JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
 
   JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO);
 
-  void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
+  /**
+   * This function is used to make Backend API call to knockoff bank transfer payment for given
+   * cnote. <br>
+   * This function ensures backward compatibility.
+   *
+   * @param cnote Cnote that needs to be knocked off.
+   * @param bankTransferRequestDTO Bank transfer payment details to be knocked off.
+   */
+  void handleKnockOffRequestForCnote(String cnote, BankTransferRequestDTO bankTransferRequestDTO);
 
   void processVehicleEvent(PrimeEventDto primeEventDto, Long tripId);
 
@@ -125,10 +138,33 @@ public interface ZoomBackendAPIClientService {
   void updateClientBlockerDetails(ZoomClientCreditLimitBreachDTO zoomClientCreditLimitBreachDto);
 
   /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param consignmentId cn id
+   * @param consignmentLiability Consignment Liability
+   */
+  void updateConsignmentLiability(Long consignmentId, ConsignmentLiability consignmentLiability);
+
+  /**
    * Hits Backend API to retrigger CPD calculation for all affected CNs due to holiday creation or
    * updation.
    *
    * @param holidayV2Dto holiday details.
    */
   void retriggerCpdCalculationsForHoliday(HolidayV2Dto holidayV2Dto);
+
+  /**
+   * Function used to make backend API call to knockoff bank transfer payment for given UTR number.
+   *
+   * @param utrNo UTR number to be knocked off.
+   */
+  void knockOffUtrBankTransfer(String utrNo);
+
+  /**
+   * Function used to make backend API call to revert knockoff bank transfer payment for given UTR
+   * number.
+   *
+   * @param utrNo UTR number to be revert knocked off.
+   */
+  void revertKnockOffUtrBankTransfer(String utrNo);
 }

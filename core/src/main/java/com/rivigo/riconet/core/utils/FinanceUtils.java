@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -70,6 +71,25 @@ public class FinanceUtils {
     } catch (IOException ex) {
       log.error("Error occured while processing message {} ", dtoString, ex);
       return null;
+    }
+  }
+
+  /**
+   * Transform payload string to class object
+   *
+   * @param objectMapper Object Mapper
+   * @param payload Payload
+   * @param clazz Clazz
+   * @return class object
+   */
+  public static <T> T getDtoFromPayloadAndFailFast(
+      ObjectMapper objectMapper, String payload, Class<T> clazz) {
+    try {
+      return objectMapper.readValue(payload, clazz);
+    } catch (Exception e) {
+      log.error("Failed to parse {} - {}", clazz.toString(), e.getLocalizedMessage());
+      throw new ZoomException(
+          "Failed to create %s DTO from payload - %s", clazz.toString(), payload);
     }
   }
 }

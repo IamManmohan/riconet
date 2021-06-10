@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
@@ -21,9 +22,9 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
-import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.constants.ResponseJavaTypes;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,25 +52,6 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   @Autowired private ApiClientService apiClientService;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Override
-  public void setPriorityMapping(String cnote, PriorityReasonType reason) {
-
-    String url = UrlConstant.PRIORITY_URL;
-    JsonNode responseJson;
-    MultiValueMap<String, String> valuesMap = new LinkedMultiValueMap<>();
-    valuesMap.put("cnote", Collections.singletonList(cnote));
-    valuesMap.put("reason", Collections.singletonList(reason.toString()));
-    try {
-      responseJson =
-          apiClientService.getEntity(null, HttpMethod.PUT, url, valuesMap, backendBaseUrl);
-    } catch (IOException e) {
-      log.error("Error while updating priority mapping needed with cnote: {}", cnote, e);
-      throw new ZoomException("Error while updating priority mapping needed  with cnote: " + cnote);
-    }
-
-    apiClientService.parseNewResponseJsonNode(responseJson, null);
-  }
 
   @Override
   public void handleWriteOffApproveRejectRequest(
@@ -329,6 +312,13 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     }
   }
 
+  /**
+   * This function is used to maked backend API call to reject bank transfer payment for given
+   * consignment. <br>
+   * MarkRecoveryPending flow is triggered for given consignment.
+   *
+   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   */
   @Override
   public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
     return markRecoveryPendingInternal(
@@ -362,8 +352,17 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     return apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.JSON_NODE);
   }
 
+  /**
+   * This function is used to make Backend API call to knockoff bank transfer payment for given
+   * cnote. <br>
+   * This function ensures backward compatibility.
+   *
+   * @param cnote Cnote that needs to be knocked off.
+   * @param bankTransferRequestDTO Bank transfer payment details to be knocked off.
+   */
   @Override
-  public void handleKnockOffRequest(String cnote, BankTransferRequestDTO bankTransferRequestDTO) {
+  public void handleKnockOffRequestForCnote(
+      String cnote, @Valid BankTransferRequestDTO bankTransferRequestDTO) {
     JsonNode responseJson;
     String url = UrlConstant.ZOOM_BACKEND_KNOCK_OFF_REQUEST.replace("{cnote}", cnote);
     try {
@@ -659,6 +658,39 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   }
 
   /**
+   * Hits Zoom Backend API to Update Consignment Liability
+   *
+   * @param consignmentId cn id
+   * @param consignmentLiability Consignment Liability
+   */
+  @Override
+  public void updateConsignmentLiability(
+      Long consignmentId, ConsignmentLiability consignmentLiability) {
+    JsonNode responseJson;
+    try {
+      MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+      paramMap.set(ConsignmentLiabilityParamConstants.CONSIGNMENT_ID, consignmentId.toString());
+      paramMap.set(
+          ConsignmentLiabilityParamConstants.CONSIGNMENT_LIABILITY, consignmentLiability.name());
+      log.info("Attempting liability update with params {}", paramMap);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_UPDATE_CONSIGNMENT_LIABILITY,
+              paramMap,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        throw new ZoomException("Error in updating consignment liability");
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while updating consignment liability ", e);
+    }
+  }
+
+  /**
    * Hits Backend API to retrigger CPD calculation for all affected CNs due to holiday creation or
    * updation.
    *
@@ -682,6 +714,63 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
     } catch (IOException e) {
       throw new ZoomException("Error in triggering CPD calculations for Holiday update.", e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to knockoff bank transfer payment for given UTR number.
+   *
+   * @param utrNo UTR number to be knocked off.
+   */
+  @Override
+  public void knockOffUtrBankTransfer(String utrNo) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("utrNo", utrNo);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_KNOCKOFF_COMPLETE_UTR_BANK_TRANSFER,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Knockoff request for UTR: {} failed.", utrNo);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while knocking off bank transfer for UTR {}", utrNo, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to revert knockoff bank transfer payment for given UTR
+   * number.
+   *
+   * @param utrNo UTR number to be revert knocked off.
+   */
+  @Override
+  public void revertKnockOffUtrBankTransfer(String utrNo) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("utrNo", utrNo);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Revert Knockoff request for UTR: {} failed.", utrNo);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while Reverting Knockoff bank transfer for UTR {}", utrNo, e);
     }
   }
 }

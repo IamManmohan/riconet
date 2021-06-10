@@ -13,7 +13,6 @@ import com.rivigo.riconet.core.test.Utils.ApiServiceUtils;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import com.rivigo.zoom.common.enums.OperationalStatus;
-import com.rivigo.zoom.common.enums.PriorityReasonType;
 import com.rivigo.zoom.common.model.FeederVendor;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.io.IOException;
@@ -52,15 +51,6 @@ public class ZoomBackendAPIClientServiceTest {
   }
 
   private Long consignmentId = 1234L;
-
-  @Test
-  public void setPriorityMappingTest() throws IOException {
-    String cnote = "1234567890";
-    PriorityReasonType reasonType = PriorityReasonType.TICKET;
-    JsonNode jsonNode = ApiServiceUtils.getSampleJsonNode();
-    mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.setPriorityMapping(cnote, reasonType);
-  }
 
   @Test
   public void recalculateCpdOfBfTest() throws IOException {
@@ -274,5 +264,27 @@ public class ZoomBackendAPIClientServiceTest {
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
     zoomBackendAPIClientServiceImpl.retriggerCpdCalculationsForHoliday(holidayV2Dto);
+  }
+
+  @Test
+  public void knockOffUtrBankTransferTest() throws IOException {
+    String utrNo = "1234567123456789";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.knockOffUtrBankTransfer(utrNo);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.knockOffUtrBankTransfer(utrNo);
+  }
+
+  @Test
+  public void revertKnockOffUtrBankTransferTest() throws IOException {
+    String utrNo = "1234567123456789";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.revertKnockOffUtrBankTransfer(utrNo);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.revertKnockOffUtrBankTransfer(utrNo);
   }
 }

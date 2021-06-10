@@ -4,10 +4,8 @@ import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.zoomticketing.TicketDTO;
 import com.rivigo.riconet.core.enums.EventName;
-import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketStatus;
 import com.rivigo.riconet.core.service.EmailSenderService;
-import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
 import com.rivigo.riconet.core.service.ZoomTicketingAPIClientService;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
@@ -17,10 +15,7 @@ import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
 import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import com.rivigo.zoom.common.model.ZoomProperty;
 import com.rivigo.zoom.common.repository.mysql.ZoomPropertiesRepository;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,19 +45,13 @@ public class TicketingServiceTest {
    * */
 
   @Mock private ZoomPropertyService zoomPropertyService;
-  @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
   @Mock private ZoomTicketingAPIClientService zoomTicketingAPIClientService;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     EmailSenderService emailSenderService = new EmailSenderServiceImpl(this.zoomPropertyService);
-    ticketingService =
-        new TicketingServiceImpl(
-            emailSenderService,
-            zoomBackendAPIClientService,
-            this.zoomPropertyService,
-            zoomTicketingAPIClientService);
+    ticketingService = new TicketingServiceImpl(emailSenderService, zoomTicketingAPIClientService);
     //    RestTemplate restTemplate = new RestTemplate();
     ZoomPropertyService zoomPropertyService = new ZoomPropertyServiceImpl();
     ReflectionTestUtils.setField(
@@ -165,45 +154,5 @@ public class TicketingServiceTest {
             .id(2l)
             .build();
     ticketingService.closeTicket(ticket3, "test");
-  }
-
-  @Test
-  public void setPriorityMappingTest() {
-    NotificationDTO notificationDTO = new NotificationDTO();
-    notificationDTO.setEventName(EventName.TICKET_ACTION.name());
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    notificationDTO = NotificationDTOModel.getNotificationDTO(EventName.TICKET_CREATION);
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    notificationDTO
-        .getMetadata()
-        .put(TicketingFieldName.TICKET_TYPE.toString(), "Delayed Delivery");
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    Mockito.when(zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
-        .thenReturn(Arrays.asList(""));
-    Mockito.when(
-            zoomPropertyService.getStringValues(ZoomPropertyName.AUTOCLOSABLE_PRIORITY_TICKET_TYPE))
-        .thenReturn(Collections.singletonList("Priority Shipment Special Request"));
-    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_TYPE.toString(), "CN");
-    notificationDTO
-        .getMetadata()
-        .put(TicketingFieldName.TICKET_TYPE.toString(), "Priority Shipment Special Request");
-    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_ID.toString(), "1234567890");
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    List<String> priorityTicket = new ArrayList<>();
-    priorityTicket.add("Delayed Delivery");
-    priorityTicket.add("Priority Shipment Special Request");
-    Mockito.when(zoomPropertyService.getStringValues(ZoomPropertyName.PRIORITY_TICKET_TYPE))
-        .thenReturn(priorityTicket);
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    notificationDTO.getMetadata().put(TicketingFieldName.ENTITY_ID.toString(), "null");
-    ticketingService.setPriorityMapping(notificationDTO);
-
-    notificationDTO.setEntityId(null);
-    ticketingService.setPriorityMapping(notificationDTO);
   }
 }
