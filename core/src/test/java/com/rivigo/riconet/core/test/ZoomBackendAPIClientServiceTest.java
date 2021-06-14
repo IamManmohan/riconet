@@ -221,16 +221,30 @@ public class ZoomBackendAPIClientServiceTest {
   }
 
   @Test
-  public void startDemurrageTest() throws IOException {
+  public void startDemurrageOnCnUndeliveryTest() throws IOException {
     String cnote = "123456";
     String startTime = "1234567890";
     String id = "654321";
     JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
     mockApiClientServiceGetEntity(jsonNode);
-    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnUndelivery(cnote, startTime, id);
     mockApiClientServiceGetEntityException();
     expectedException.expect(ZoomException.class);
-    zoomBackendAPIClientServiceImpl.startDemurrage(cnote, startTime, id);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnUndelivery(cnote, startTime, id);
+  }
+
+  @Test
+  public void startDemurrageOnCnDispatchOrDeliveryHoldTest() throws IOException {
+    String consignmentId = "123456";
+    String consignmentAlertId = "654321";
+    JsonNode jsonNode = ApiServiceUtils.getDatastoreSuccessResponseSampleJsonNode();
+    mockApiClientServiceGetEntity(jsonNode);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnDispatchOrDeliveryHold(
+        consignmentId, consignmentAlertId);
+    mockApiClientServiceGetEntityException();
+    expectedException.expect(ZoomException.class);
+    zoomBackendAPIClientServiceImpl.startDemurrageOnCnDispatchOrDeliveryHold(
+        consignmentId, consignmentAlertId);
   }
 
   @Test
