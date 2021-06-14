@@ -30,4 +30,9 @@ public class ConsignmentConstant {
 
   /** Constant interger to hold is_active of active consignment. */
   public static final int IS_ACTIVE_CONSIGNMENT = 1;
+
+  /** Constant string to store consignmentId API param name. */
+  public static final String CONSIGNMENT_ID = "consignmentId";
+  /** Constant string to store consignmentAlertId param name. */
+  public static final String CONSIGNMENT_ALERT_ID = "consignmentAlertId";
 }

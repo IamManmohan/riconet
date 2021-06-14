@@ -81,13 +81,17 @@ public class UrlConstant {
   /** End point for epod flag in clients. */
   public static final String ZOOM_BACKEND_UPDATE_EPOD_FLAG = "/epod/updateEpodFlag";
 
-  /** Backend API to mark demurrage as started for given consignment. */
-  public final String ZOOM_BACKEND_START_DEMURRAGE = "/vas/demurrage/start";
+  /** Backend API endpoint to start demurrage for a consignment on CN undelivery. */
+  public final String ZOOM_BACKEND_START_DEMURRAGE_UNDELIVERY = "/vas/demurrage/undelivery/start";
 
-  /** Backend API to mark demurrage as completed for given consignment. */
+  /** Backend API endpoint to start demurrage for a consignment on CN dispatch or delivery hold. */
+  public final String ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_OR_DELIVERY_HOLD =
+      "/vas/demurrage/hold/start";
+
+  /** Backend API endpoint to complete demurrage for a consignment. */
   public final String ZOOM_BACKEND_END_DEMURRAGE = "/vas/demurrage/end";
 
-  /** Backend API to cancel ongoing demurrage for given consignment. */
+  /** Backend API endpoint to cancel ongoing demurrage for a consignment. */
   public final String ZOOM_BACKEND_CANCEL_DEMURRAGE = "/vas/demurrage/cancel";
 
   /** Backend API to add client level blockers based on client credit limit breach event. */

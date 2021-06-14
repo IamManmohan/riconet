@@ -41,8 +41,8 @@ public class EventTriggerService {
   @Autowired private ObjectMapper objectMapper;
 
   /**
-   * DemurrageService is used to trigger demurrage Start and End events at time of CN undelivery and
-   * delivery respectively.
+   * DemurrageService is used to trigger demurrage start and end flow on consuming appropriate
+   * events.
    */
   @Autowired private DemurrageService demurrageService;
 
@@ -163,7 +163,7 @@ public class EventTriggerService {
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
       case CN_UNDELIVERY:
-        demurrageService.processEventToStartDemurrage(notificationDTO);
+        demurrageService.processCnUndeliveryEventToStartDemurrage(notificationDTO);
         break;
       case DEPS_RECORD_CREATION:
         demurrageService.processEventToCancelDemurrage(notificationDTO);
@@ -173,6 +173,10 @@ public class EventTriggerService {
         break;
       case HOLIDAY_V2_UPDATE:
         holidayV2Service.processHolidayEvent(notificationDTO, false);
+        break;
+      case CN_DELIVERY_HOLD:
+      case CN_DISPATCH_HOLD:
+        demurrageService.processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
