@@ -48,4 +48,9 @@ public enum EventName {
   HOLIDAY_V2_CREATE,
   /** HolidayV2 update or deletion event. */
   HOLIDAY_V2_UPDATE,
+
+  /** Consignment's trip dispatch hold event. */
+  CN_DISPATCH_HOLD,
+  /** Consignment's delivery hold event. */
+  CN_DELIVERY_HOLD,
 }

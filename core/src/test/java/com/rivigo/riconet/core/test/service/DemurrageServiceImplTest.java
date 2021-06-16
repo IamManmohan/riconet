@@ -1,10 +1,9 @@
 package com.rivigo.riconet.core.test.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
-import com.rivigo.riconet.core.service.impl.ConsignmentReadOnlyServiceImpl;
 import com.rivigo.riconet.core.service.impl.DemurrageServiceImpl;
-import com.rivigo.zoom.common.repository.mysql.vas.DemurrageRepository;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -18,10 +17,6 @@ public class DemurrageServiceImplTest {
 
   @Mock private ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  @Mock private ConsignmentReadOnlyServiceImpl consignmentReadOnlyService;
-
-  @Mock private DemurrageRepository demurrageRepository;
-
   @InjectMocks private DemurrageServiceImpl demurrageService;
 
   @Before
@@ -30,20 +25,35 @@ public class DemurrageServiceImplTest {
   }
 
   @Test
-  public void processEventToStartDemurrageTest() {
+  public void processCnUndeliveryEventToStartDemurrageTest() {
     Long consignmentId = 123456L;
     String cnote = "12345654321";
     String startTime = "123456789";
     String undeliveredId = "654321";
     Map<String, String> metadata = new HashMap<>();
-    metadata.put("CNOTE", cnote);
-    metadata.put("UNDELIVERED_AT", startTime);
-    metadata.put("ID", undeliveredId);
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), cnote);
+    metadata.put(ZoomCommunicationFieldNames.Undelivery.UNDELIVERED_AT.name(), startTime);
+    metadata.put(ZoomCommunicationFieldNames.ID.name(), undeliveredId);
     NotificationDTO notificationDTO =
         NotificationDTO.builder().entityId(consignmentId).metadata(metadata).build();
-    demurrageService.processEventToStartDemurrage(notificationDTO);
+    demurrageService.processCnUndeliveryEventToStartDemurrage(notificationDTO);
     Mockito.verify(zoomBackendAPIClientService, Mockito.times(1))
-        .startDemurrage(cnote, startTime, undeliveredId);
+        .startDemurrageOnCnUndelivery(cnote, startTime, undeliveredId);
+  }
+
+  @Test
+  public void processCnDispatchDeliveryHoldEventToStartDemurrageTest() {
+    String consignmentId = "123456";
+    Long id = 123456L;
+    String consignmentAlertId = "654321";
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name(), consignmentId);
+    metadata.put(ZoomCommunicationFieldNames.CONSIGNMENT_ALERT_ID.name(), consignmentAlertId);
+    NotificationDTO notificationDTO =
+        NotificationDTO.builder().entityId(id).metadata(metadata).build();
+    demurrageService.processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
+    Mockito.verify(zoomBackendAPIClientService, Mockito.times(1))
+        .startDemurrageOnCnDispatchOrDeliveryHold(consignmentId, consignmentAlertId);
   }
 
   @Test
@@ -52,9 +62,9 @@ public class DemurrageServiceImplTest {
     String cnote = "12345654321";
     String deliveryTime = "123456789";
     Map<String, String> metadata = new HashMap<>();
-    metadata.put("CNOTE", cnote);
-    metadata.put("DELIVERY_DATE_TIME", deliveryTime);
-    metadata.put("CONSIGNMENT_ID", consignmentId.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), cnote);
+    metadata.put(ZoomCommunicationFieldNames.Consignment.DELIVERY_DATE_TIME.name(), deliveryTime);
+    metadata.put(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name(), consignmentId.toString());
     NotificationDTO notificationDTO =
         NotificationDTO.builder().entityId(consignmentId).metadata(metadata).build();
     demurrageService.processEventToEndDemurrage(notificationDTO);
@@ -66,8 +76,8 @@ public class DemurrageServiceImplTest {
     Long consignmentId = 123456L;
     String cnote = "12345654321";
     Map<String, String> metadata = new HashMap<>();
-    metadata.put("CNOTE", cnote);
-    metadata.put("CONSIGNMENT_ID", consignmentId.toString());
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), cnote);
+    metadata.put(ZoomCommunicationFieldNames.CONSIGNMENT_ID.name(), consignmentId.toString());
     NotificationDTO notificationDTO =
         NotificationDTO.builder().entityId(consignmentId).metadata(metadata).build();
     demurrageService.processEventToCancelDemurrage(notificationDTO);
