@@ -38,9 +38,16 @@ public class ConsignmentBlockUnblockConsumerTest {
 
   private static final Long REASON_ID = 1L;
 
+  private static final String CNOTE = "1234567890";
+  private static final String CHEQUE_NUMBER = "123456";
+  private static final String BANK_NAME = "ICICI";
+
   @Test
   public void processMessageCod() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), CNOTE);
+    metadata.put(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name(), CHEQUE_NUMBER);
+    metadata.put(ZoomCommunicationFieldNames.DRAWEE_BANK.name(), BANK_NAME);
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.TO_PAY.name());
     metadata.put(ZoomCommunicationFieldNames.AMOUNT.name(), "10");
     NotificationDTO dto =
@@ -55,6 +62,9 @@ public class ConsignmentBlockUnblockConsumerTest {
   @Test
   public void processMessagePaid() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), CNOTE);
+    metadata.put(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name(), CHEQUE_NUMBER);
+    metadata.put(ZoomCommunicationFieldNames.DRAWEE_BANK.name(), BANK_NAME);
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.PAID.name());
     metadata.put(ZoomCommunicationFieldNames.Reason.REASON.name(), REASON_ID.toString());
     metadata.put(ZoomCommunicationFieldNames.AMOUNT.name(), "10");
@@ -71,6 +81,9 @@ public class ConsignmentBlockUnblockConsumerTest {
   @Test
   public void processMessageTOPAY() throws JsonProcessingException {
     Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.CNOTE.name(), CNOTE);
+    metadata.put(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name(), CHEQUE_NUMBER);
+    metadata.put(ZoomCommunicationFieldNames.DRAWEE_BANK.name(), BANK_NAME);
     metadata.put(ZoomCommunicationFieldNames.PAYMENT_MODE.name(), PaymentMode.TO_PAY.name());
     metadata.put(ZoomCommunicationFieldNames.Reason.REASON.name(), REASON_ID.toString());
     metadata.put(ZoomCommunicationFieldNames.AMOUNT.name(), "10");

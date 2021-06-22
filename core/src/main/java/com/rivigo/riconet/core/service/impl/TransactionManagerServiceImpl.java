@@ -288,8 +288,8 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
   public void syncPostUnpost(
       HandoverCollectionEventPayload handoverCollectionEventPayload, ZoomEventType zoomEventType) {
     final List<Long> consignmentIds =
-        consignmentDepositSlipRepository.findConsignmentIdByDepositSlipId(
-            handoverCollectionEventPayload.getDepositSlipId());
+        consignmentDepositSlipRepository.findConsignmentIdByDepositSlipIdAndIsActive(
+            handoverCollectionEventPayload.getDepositSlipId(), Boolean.TRUE);
     final Map<Long, ConsignmentReadOnly> consignmentMap =
         consignmentReadOnlyService.getConsignmentMap(consignmentIds);
     final List<PaymentDetailV2> paymentDetails =

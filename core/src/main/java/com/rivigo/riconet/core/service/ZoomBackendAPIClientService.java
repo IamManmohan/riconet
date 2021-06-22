@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.rivigo.finance.zoom.dto.ZoomClientCreditLimitBreachDTO;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
@@ -15,6 +14,7 @@ import com.rivigo.riconet.core.dto.client.ClientCodDodDTO;
 import com.rivigo.riconet.core.dto.client.ClientDTO;
 import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
@@ -59,11 +59,11 @@ public interface ZoomBackendAPIClientService {
    * consignment. <br>
    * MarkRecoveryPending flow is triggered for given consignment.
    *
-   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   * @param chequeBounceRequestDTO Bank transfer payment details that were rejected.
    */
-  JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO);
+  JsonNode markRecoveryPending(ChequeBounceRequestDTO chequeBounceRequestDTO);
 
-  JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO);
+  JsonNode markRecoveryPendingBulk(List<ChequeBounceRequestDTO> chequeBounceRequestDTO);
 
   /**
    * This function is used to make Backend API call to knockoff bank transfer payment for given
