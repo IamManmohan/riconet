@@ -11,7 +11,6 @@ import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.constants.ZoomTicketingConstant;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
-import com.rivigo.zoom.backend.client.utils.HeaderUtils;
 import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.dto.Response;
@@ -130,9 +129,6 @@ public class ApiClientServiceImpl implements ApiClientService {
       // The value of Business must be any zoom business type, irrespective of cn business type
       // Identifying business is un-necessary overhead
       headers.add("Business", ServiceType.ZOOM_CORPORATE.name());
-    }
-    if (uri.contains(backendBaseUrl)) {
-      headers.add(HeaderUtils.NEW_RESPONSE_HEADER_KEY, "true");
     }
     return headers;
   }
