@@ -22,7 +22,7 @@ dependencies {
         exclude group: 'io.zipkin.brave'
         exclude group: 'org.aspectj'
     }
-    compile ("com.rivigo.zoom:zoom-backend-client:1.1.8576-SNAPSHOT") {
+    compile ("com.rivigo.zoom:zoom-backend-client:1.6") {
         exclude group: 'org.springframework.boot'
         exclude group: 'org.springframework'
         exclude group: 'org.springframework.data'
