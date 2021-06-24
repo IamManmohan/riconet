@@ -8,7 +8,6 @@ import com.rivigo.riconet.core.constants.ConsignmentLiabilityParamConstants;
 import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.BankTransferRequestDTO;
 import com.rivigo.riconet.core.dto.BusinessPartnerDTO;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.core.dto.ConsignmentUploadedFilesDTO;
 import com.rivigo.riconet.core.dto.EpodApplicableDto;
@@ -22,6 +21,7 @@ import com.rivigo.riconet.core.dto.primesync.PrimeEventDto;
 import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
@@ -317,18 +317,18 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * consignment. <br>
    * MarkRecoveryPending flow is triggered for given consignment.
    *
-   * @param chequeBounceDTO Bank transfer payment details that were rejected.
+   * @param chequeBounceRequestDTO Bank transfer payment details that were rejected.
    */
   @Override
-  public JsonNode markRecoveryPending(ChequeBounceDTO chequeBounceDTO) {
+  public JsonNode markRecoveryPending(ChequeBounceRequestDTO chequeBounceRequestDTO) {
     return markRecoveryPendingInternal(
-        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING);
+        chequeBounceRequestDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING);
   }
 
   @Override
-  public JsonNode markRecoveryPendingBulk(List<ChequeBounceDTO> chequeBounceDTO) {
+  public JsonNode markRecoveryPendingBulk(List<ChequeBounceRequestDTO> chequeBounceRequestDTO) {
     return markRecoveryPendingInternal(
-        chequeBounceDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
+        chequeBounceRequestDTO, UrlConstant.ZOOM_BACKEND_MARK_HANDOVER_AS_RECOVERY_PENDING_BULK);
   }
 
   private <T> JsonNode markRecoveryPendingInternal(
@@ -550,7 +550,8 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    * @param undeliveredCnRecordId contains undeliveredConsignment record id.
    */
   @Override
-  public void startDemurrage(String cnote, String startTime, String undeliveredCnRecordId) {
+  public void startDemurrageOnCnUndelivery(
+      String cnote, String startTime, String undeliveredCnRecordId) {
     JsonNode responseJson;
     try {
       final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -561,7 +562,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               null,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE,
+              UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_UNDELIVERY,
               queryParams,
               backendBaseUrl);
       final Boolean isSuccess =
@@ -572,6 +573,43 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
     } catch (IOException e) {
       throw new ZoomException(
           "Error while starting demurrage for cnote {} at time {}", cnote, startTime, e);
+    }
+  }
+
+  /**
+   * Function used to make backend API call to start demurrage for given consignment on CN dispatch
+   * or delivery hold.
+   *
+   * @param consignmentId consignment id.
+   * @param consignmentAlertId consignment alert id, contains details regarding the
+   *     dispatch/delivery hold.
+   */
+  @Override
+  public void startDemurrageOnCnDispatchOrDeliveryHold(
+      String consignmentId, String consignmentAlertId) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.add(ConsignmentConstant.CONSIGNMENT_ID, consignmentId);
+      queryParams.add(ConsignmentConstant.CONSIGNMENT_ALERT_ID, consignmentAlertId);
+      String apiEndPoint = UrlConstant.ZOOM_BACKEND_START_DEMURRAGE_DISPATCH_OR_DELIVERY_HOLD;
+      responseJson =
+          apiClientService.getEntity(
+              null, HttpMethod.POST, apiEndPoint, queryParams, backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error(
+            "Consignment id: {} not valid for start demurrage request for alert id: {}.",
+            consignmentId,
+            consignmentAlertId);
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while starting demurrage for Consignment id: {}, consignment alert id: {}",
+          consignmentId,
+          consignmentAlertId,
+          e);
     }
   }
 

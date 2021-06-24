@@ -1,7 +1,6 @@
 package com.rivigo.riconet.event.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rivigo.riconet.core.dto.ChequeBounceDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -9,6 +8,7 @@ import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.event.dto.ConsignmentBlockerRequestDTO;
 import com.rivigo.riconet.event.service.ConsignmentBlockUnblockService;
+import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -85,13 +85,13 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
   private JsonNode markRecoveryPending(NotificationDTO notificationDTO) {
 
     Map<String, String> metadata = notificationDTO.getMetadata();
-    ChequeBounceDTO chequeBounceDTO =
-        ChequeBounceDTO.builder()
+    ChequeBounceRequestDTO chequeBounceRequestDTO =
+        ChequeBounceRequestDTO.builder()
             .cnote(metadata.get(ZoomCommunicationFieldNames.CNOTE.name()))
             .chequeNumber(metadata.get(ZoomCommunicationFieldNames.INSTRUMENT_NUMBER.name()))
             .bankName(metadata.get(ZoomCommunicationFieldNames.DRAWEE_BANK.name()))
             .amount(new BigDecimal(metadata.get(ZoomCommunicationFieldNames.AMOUNT.name())))
             .build();
-    return zoomBackendAPIClientService.markRecoveryPending(chequeBounceDTO);
+    return zoomBackendAPIClientService.markRecoveryPending(chequeBounceRequestDTO);
   }
 }
