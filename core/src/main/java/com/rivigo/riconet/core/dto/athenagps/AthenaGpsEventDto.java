@@ -4,13 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
 /**
  * AthenaGpsEventDto contains data coming from Athena for both Node Events & Gps Events. It has
  * union of properties of both the events, will bifurcate them accordingly by EVENT_TYPE property
  */
+@Getter
+@Setter
+@ToString
 public class AthenaGpsEventDto {
   private String sourceId; // Vehicle No
   private String eventType; // NODE or GPS
