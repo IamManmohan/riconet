@@ -209,12 +209,13 @@ public class EventMain {
         secondaryCnAutoMergeConsumer);
     load(materializer, system, bootstrapServers, primeEventsGroup, primeEventsConsumer);
     load(materializer, system, bootstrapServers, athenaGpsEventsGroup, athenaGpsEventsConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-        transactionManagerConsumerGroup,
-        transactionManagerEventConsumer);
+    /* Pausing transaction manager consumer as the service is being stopped for now. */
+    //    load(
+    //        materializer,
+    //        system,
+    //        bootstrapServers,
+    //        transactionManagerConsumerGroup,
+    //        transactionManagerEventConsumer);
   }
 
   private void load(
