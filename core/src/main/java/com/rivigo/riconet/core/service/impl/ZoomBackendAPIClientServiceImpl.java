@@ -406,7 +406,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           apiClientService.getEntity(
               athenaGpsEventDto,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_PROCESS_ATHENA_GPS_EVENT,
+              UrlConstant.ZOOM_BACKEND_PROCESS_ATHENA_EVENT,
               null,
               backendBaseUrl);
       apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
