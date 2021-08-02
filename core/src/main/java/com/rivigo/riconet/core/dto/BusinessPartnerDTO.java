@@ -2,7 +2,6 @@ package com.rivigo.riconet.core.dto;
 
 import com.rivigo.zoom.common.enums.AvailabilityStatus;
 import com.rivigo.zoom.common.enums.TacticalCreditStatus;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,6 +21,4 @@ public class BusinessPartnerDTO {
   private Double tacticalCreditMinimumBalance;
   private Integer negativeTacticalCreditAllowedOverdueDays;
   private String type;
-  private List<LocalityDTO> localityDTOList;
-  private List<String> pincodeList;
 }

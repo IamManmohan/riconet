@@ -103,11 +103,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
     zoomBookAPIClientService.processZoomBookTransaction(
         Collections.singletonList(transactionRequestDTO));
 
-    try {
-      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
-    } catch (Exception e) {
-      log.error("Could not hit transaction manager as: {}", e.getMessage());
-    }
+    /* Transaction manager service is being stopped for now. */
+    //    try {
+    //      transactionManagerService.syncPostUnpost(handoverCollectionEventPayload, eventType);
+    //    } catch (Exception e) {
+    //      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    //    }
   }
 
   private ZoomBookTransactionType getTransactionType(ZoomEventType eventType) {
@@ -204,11 +205,12 @@ public class HandoverCollectionServiceImpl implements HandoverCollectionService 
         chequeBounceRequestDTOListForRecoveryPendingAPI);
     markRecoveryPending(chequeBounceRequestDTOListForRecoveryPendingAPI);
 
-    try {
-      transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
-    } catch (Exception e) {
-      log.error("Could not hit transaction manager as: {}", e.getMessage());
-    }
+    /* Transaction manager service is being stopped for now. */
+    //    try {
+    //      transactionManagerService.syncExclusion(cnIdToConsignmentMap, cnIdToPaymentDetailV2Map);
+    //    } catch (Exception e) {
+    //      log.error("Could not hit transaction manager as: {}", e.getMessage());
+    //    }
   }
 
   private Location getLocation(String code) {
