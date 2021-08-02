@@ -125,8 +125,7 @@ public class TransactionManagerServiceImpl implements TransactionManagerService 
    *
    * @param collectionRequestDto request dto to be sent to transaction manager.
    */
-  @Override
-  public void hitTransactionManagerAndLogResponse(
+  private void hitTransactionManagerAndLogResponse(
       @NonNull CollectionRequestDto collectionRequestDto) {
 
     log.debug("Hitting transaction manager with collectionRequestDto: {}", collectionRequestDto);
