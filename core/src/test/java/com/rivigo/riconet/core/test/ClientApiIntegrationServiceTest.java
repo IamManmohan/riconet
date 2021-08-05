@@ -140,7 +140,7 @@ public class ClientApiIntegrationServiceTest {
     Mockito.when(consignmentService.getLastScanByCnIdIn(Mockito.anyList(), Mockito.anyList()))
         .thenReturn(Collections.emptyMap());
     AdministrativeEntity administrativeEntity = new AdministrativeEntity();
-    administrativeEntity.setId(RandomUtils.nextLong());
+    administrativeEntity.setId(RandomUtils.nextLong(0, 123456));
     Mockito.when(administrativeEntityService.findParentCluster(Mockito.any()))
         .thenReturn(administrativeEntity);
   }
