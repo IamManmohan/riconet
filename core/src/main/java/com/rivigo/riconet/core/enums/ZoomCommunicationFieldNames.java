@@ -32,6 +32,7 @@ public enum ZoomCommunicationFieldNames {
   ACTION_NAME,
   ACTION_VALUE,
   FIRST_RIVIGO_OU,
+  CONSIGNMENT_ID_LIST,
 
   STALE_CATEGORY,
   TYPE_ID,
@@ -106,7 +107,8 @@ public enum ZoomCommunicationFieldNames {
   // Field names for CN_UNDELIVERY event.
   public enum Undelivery {
     UNDELIVERED_AT,
-    DELIVERY_REATTEMPT_CHARGEABLE
+    DELIVERY_REATTEMPT_CHARGEABLE,
+    DRS_ID
   }
 
   /** HolidayV2 field names used in HolidayV2 create and update event. */

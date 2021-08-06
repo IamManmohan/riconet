@@ -22,6 +22,7 @@ import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
+import com.rivigo.zoom.backend.client.dto.request.ZoomConsignmentUndeliveryDto;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
@@ -809,6 +810,34 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
     } catch (IOException e) {
       throw new ZoomException("Error while Reverting Knockoff bank transfer for UTR {}", utrNo, e);
+    }
+  }
+
+  /**
+   * Method used to make backend API call to mark multiple consignments as undelivered.
+   *
+   * @param cnUndeliveryDtoList consignment undelivery details.
+   */
+  @Override
+  public void undeliverMultipleConsignments(
+      List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              cnUndeliveryDtoList,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_MARK_MULTIPLE_CNS_UNDELIVERED,
+              null,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Mark CNs undelivered request failed.");
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while marking consignment undelivered on vehicle placement failure.", e);
     }
   }
 }
