@@ -16,7 +16,7 @@ dependencies {
         exclude group: 'org.hibernate', module: 'hibernate-c3p0'
         exclude group: 'org.slf4j', module: 'jcl-over-slf4j'
     }
-    compile('com.rivigo.transaction.manager:tm-client:1.1') {
+    compile('com.rivigo.transaction.manager:tm-client:1.2') {
         exclude group: 'org.springframework.boot'
         exclude group: 'org.springframework'
         exclude group: 'io.zipkin.brave'
