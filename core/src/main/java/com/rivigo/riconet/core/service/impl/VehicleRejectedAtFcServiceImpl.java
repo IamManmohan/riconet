@@ -52,6 +52,10 @@ public class VehicleRejectedAtFcServiceImpl implements VehicleRejectedAtFcServic
             .collect(Collectors.toList());
     log.debug(
         "Vehicle Placement failure for DRS id {} received for cn Ids: {}", drsId, consignmentIds);
+    consignmentIds.forEach(
+        cnId -> {
+          log.info("Consignment id: {}", cnId);
+        });
     final List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList = new ArrayList<>();
     consignmentIds.forEach(
         cnId -> {
