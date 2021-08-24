@@ -19,6 +19,7 @@ import com.rivigo.zoom.backend.client.dto.request.ZoomConsignmentUndeliveryDto;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
+import java.util.Collection;
 import java.util.List;
 
 public interface ZoomBackendAPIClientService {
@@ -185,5 +186,5 @@ public interface ZoomBackendAPIClientService {
    *
    * @param cnUndeliveryDtoList consignment undelivery details.
    */
-  void undeliverMultipleConsignments(List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList);
+  void undeliverMultipleConsignments(Collection<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList);
 }

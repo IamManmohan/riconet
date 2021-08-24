@@ -29,6 +29,7 @@ import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.constants.ResponseJavaTypes;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -820,7 +821,7 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
    */
   @Override
   public void undeliverMultipleConsignments(
-      List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList) {
+      Collection<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList) {
     JsonNode responseJson;
     try {
       responseJson =
