@@ -180,7 +180,7 @@ public class EventTriggerService {
       case CN_DISPATCH_HOLD:
         demurrageService.processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
         break;
-      case VEHICLE_REJECTED_AT_FC:
+      case CN_VEHICLE_REJECTED_AT_FC:
         vehicleRejectedAtFcService.processVehicleRejectionEventToUndeliverCns(notificationDTO);
         break;
       default:

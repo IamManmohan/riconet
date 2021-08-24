@@ -7,10 +7,11 @@ import com.rivigo.riconet.core.service.VehicleRejectedAtFcService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.backend.client.dto.request.UndeliveredConsignmentsDTO;
 import com.rivigo.zoom.backend.client.dto.request.ZoomConsignmentUndeliveryDto;
-import java.util.ArrayList;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,45 +31,52 @@ public class VehicleRejectedAtFcServiceImpl implements VehicleRejectedAtFcServic
 
   private final ZoomBackendAPIClientService zoomBackendAPIClientService;
 
-  /** All consignments will be marked undelivered for the following reason. */
-  private static final String VEHICLE_REJECTED_AT_FC_UNDELIVERY_REASON = "Vehicle Rejected at FC";
-
   /**
-   * Method used to process received {@link EventName#VEHICLE_REJECTED_AT_FC} to mark all attached
-   * consignments as undelivered with a particular reason.
+   * Method used to process received {@link EventName#CN_VEHICLE_REJECTED_AT_FC} to mark all
+   * attached consignments as undelivered with a particular reason.
    *
    * @param notificationDTO event payload populated with all the required details.
    */
   @Override
   public void processVehicleRejectionEventToUndeliverCns(NotificationDTO notificationDTO) {
     final Map<String, String> metadata = notificationDTO.getMetadata();
-    final String drsIdAsString = metadata.get(ZoomCommunicationFieldNames.Undelivery.DRS_ID.name());
+    final Long drsId =
+        Optional.ofNullable(metadata.get(ZoomCommunicationFieldNames.Undelivery.DRS_ID.name()))
+            .map(Long::parseLong)
+            .orElseThrow(() -> new ZoomException("DRS id is not present."));
     final String consignmentIdListAsString =
         metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID_LIST.name());
-    final Long drsId = Long.parseLong(drsIdAsString);
     final List<Long> consignmentIds =
         Arrays.stream(consignmentIdListAsString.replaceAll("[\\[\\]]", "").split(","))
             .map(Long::parseLong)
             .collect(Collectors.toList());
+    final String vehicleRejectionReason =
+        metadata.get(ZoomCommunicationFieldNames.Reason.REASON.name());
+    final String vehicleRejectionSubReason =
+        metadata.getOrDefault(ZoomCommunicationFieldNames.Reason.SUB_REASON.name(), null);
     log.debug(
         "Vehicle Placement failure for DRS id {} received for cn Ids: {}", drsId, consignmentIds);
-    consignmentIds.forEach(
-        cnId -> {
-          log.info("Consignment id: {}", cnId);
-        });
-    final List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList = new ArrayList<>();
-    consignmentIds.forEach(
-        cnId -> {
-          ZoomConsignmentUndeliveryDto zoomConsignmentUndeliveryDto =
-              new ZoomConsignmentUndeliveryDto();
-          zoomConsignmentUndeliveryDto.setId(cnId);
-          zoomConsignmentUndeliveryDto.setDrsId(drsId);
-          UndeliveredConsignmentsDTO undeliveredConsignmentsDTO = new UndeliveredConsignmentsDTO();
-          undeliveredConsignmentsDTO.setReason(VEHICLE_REJECTED_AT_FC_UNDELIVERY_REASON);
-          undeliveredConsignmentsDTO.setSubReason(null);
-          zoomConsignmentUndeliveryDto.setUndeliveredConsignmentsDto(undeliveredConsignmentsDTO);
-          cnUndeliveryDtoList.add(zoomConsignmentUndeliveryDto);
-        });
+    final List<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList =
+        consignmentIds
+            .stream()
+            .map(
+                cnId ->
+                    getConsignmentUndeliveryDto(
+                        drsId, cnId, vehicleRejectionReason, vehicleRejectionSubReason))
+            .collect(Collectors.toList());
     zoomBackendAPIClientService.undeliverMultipleConsignments(cnUndeliveryDtoList);
+  }
+
+  private ZoomConsignmentUndeliveryDto getConsignmentUndeliveryDto(
+      Long drsId, Long consignmentId, String undeliveryReason, String undeliverySubReason) {
+    final ZoomConsignmentUndeliveryDto consignmentUndeliveryDto =
+        new ZoomConsignmentUndeliveryDto();
+    consignmentUndeliveryDto.setId(consignmentId);
+    consignmentUndeliveryDto.setDrsId(drsId);
+    final UndeliveredConsignmentsDTO undeliveredConsignmentsDTO = new UndeliveredConsignmentsDTO();
+    undeliveredConsignmentsDTO.setReason(undeliveryReason);
+    undeliveredConsignmentsDTO.setSubReason(undeliverySubReason);
+    consignmentUndeliveryDto.setUndeliveredConsignmentsDto(undeliveredConsignmentsDTO);
+    return consignmentUndeliveryDto;
   }
 }
