@@ -37,6 +37,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -831,9 +832,10 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
               UrlConstant.ZOOM_BACKEND_MARK_MULTIPLE_CNS_UNDELIVERED,
               null,
               backendBaseUrl);
-      final Boolean isSuccess =
-          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
-      if (!Boolean.TRUE.equals(isSuccess)) {
+      final String responseString =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.STRING);
+      log.info("Backend response received: {}", responseString);
+      if (StringUtils.isBlank(responseString)) {
         log.error("Mark CNs undelivered request failed.");
       }
     } catch (IOException e) {
