@@ -48,6 +48,7 @@ public class VehicleRejectedAtFcServiceImpl implements VehicleRejectedAtFcServic
         metadata.get(ZoomCommunicationFieldNames.CONSIGNMENT_ID_LIST.name());
     final List<Long> consignmentIds =
         Arrays.stream(consignmentIdListAsString.replaceAll("[\\[\\]]", "").split(","))
+            .map(String::trim)
             .map(Long::parseLong)
             .collect(Collectors.toList());
     final String vehicleRejectionReason =
