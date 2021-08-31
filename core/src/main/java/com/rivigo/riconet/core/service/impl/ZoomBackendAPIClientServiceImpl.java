@@ -22,12 +22,14 @@ import com.rivigo.riconet.core.enums.WriteOffRequestAction;
 import com.rivigo.riconet.core.service.ApiClientService;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
+import com.rivigo.zoom.backend.client.dto.request.ZoomConsignmentUndeliveryDto;
 import com.rivigo.zoom.billing.enums.ConsignmentLiability;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.dto.errorcorrection.ConsignmentQcDataSubmitDTO;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
 import com.rivigo.zoom.util.rest.constants.ResponseJavaTypes;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -809,6 +812,35 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
     } catch (IOException e) {
       throw new ZoomException("Error while Reverting Knockoff bank transfer for UTR {}", utrNo, e);
+    }
+  }
+
+  /**
+   * Method used to make backend API call to mark multiple consignments as undelivered.
+   *
+   * @param cnUndeliveryDtoList consignment undelivery details.
+   */
+  @Override
+  public void undeliverMultipleConsignments(
+      Collection<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              cnUndeliveryDtoList,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_MARK_MULTIPLE_CNS_UNDELIVERED,
+              null,
+              backendBaseUrl);
+      final String responseString =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.STRING);
+      log.info("Backend response received: {}", responseString);
+      if (StringUtils.isBlank(responseString)) {
+        log.error("Mark CNs undelivered request failed.");
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while marking consignment undelivered on vehicle placement failure.", e);
     }
   }
 }

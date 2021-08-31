@@ -53,4 +53,7 @@ public enum EventName {
   CN_DISPATCH_HOLD,
   /** Consignment's delivery hold event. */
   CN_DELIVERY_HOLD,
+
+  /** Consignment Vehicle rejected at FC event. */
+  CN_VEHICLE_REJECTED_AT_FC,
 }
