@@ -111,4 +111,8 @@ public class UrlConstant {
   /** Backend API to revert knockoff given UTR number for payment type Bank Transfer. */
   public final String ZOOM_BACKEND_REVERT_KNOCKOFF_UTR_BANK_TRANSFER =
       "/payment/bank-transfer/utr/knockOff/revert";
+
+  /** Backend API to mark multiple consignments as undelivered. */
+  public final String ZOOM_BACKEND_MARK_MULTIPLE_CNS_UNDELIVERED =
+      "/operations/consignments/markUndelivered/multiple";
 }

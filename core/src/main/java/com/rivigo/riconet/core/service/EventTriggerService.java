@@ -52,6 +52,8 @@ public class EventTriggerService {
    */
   @Autowired private HolidayV2Service holidayV2Service;
 
+  @Autowired private VehicleRejectedAtFcService vehicleRejectedAtFcService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
@@ -177,6 +179,9 @@ public class EventTriggerService {
       case CN_DELIVERY_HOLD:
       case CN_DISPATCH_HOLD:
         demurrageService.processCnDispatchDeliveryHoldEventToStartDemurrage(notificationDTO);
+        break;
+      case CN_VEHICLE_REJECTED_AT_FC:
+        vehicleRejectedAtFcService.processVehicleRejectionEventToUndeliverCns(notificationDTO);
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
