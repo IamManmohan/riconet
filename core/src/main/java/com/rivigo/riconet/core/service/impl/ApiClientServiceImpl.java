@@ -177,10 +177,11 @@ public class ApiClientServiceImpl implements ApiClientService {
           httpMethod,
           objectMapper.writeValueAsString(entity),
           urlWithParams);
-      ResponseEntity<JsonNode> response =
-          riconetRestTemplate.exchange(urlWithParams, httpMethod, entity, JsonNode.class);
+
+      ResponseEntity<String> response =
+          riconetRestTemplate.exchange(urlWithParams, httpMethod, entity, String.class);
       log.info("response: {}", response);
-      return response.getBody();
+      return null;
     } catch (HttpStatusCodeException e) {
       if (e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
         log.info("Existing token expired. New token is being generated ");
