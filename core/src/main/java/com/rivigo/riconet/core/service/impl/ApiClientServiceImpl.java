@@ -177,6 +177,7 @@ public class ApiClientServiceImpl implements ApiClientService {
           httpMethod,
           objectMapper.writeValueAsString(entity),
           urlWithParams);
+
       ResponseEntity<JsonNode> response =
           riconetRestTemplate.exchange(urlWithParams, httpMethod, entity, JsonNode.class);
       log.info("response: {}", response);
