@@ -54,15 +54,12 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));
-    final Long sectionalTatId =
-        Long.valueOf(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name());
     log.info(
-        "Received Holiday event with type: {} for location: {} {}, disrupted section id:{} "
+        "Received Holiday event with type: {} for location: {} {}, "
             + "with dateTime from {} to {}, isCreate: {}",
         holidayType,
         locationType,
         locationName,
-        sectionalTatId,
         holidayStartDateTime,
         holidayEndDateTime,
         isCreate);
@@ -73,7 +70,6 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             .locationType(locationType)
             .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
-            .sectionalTatId(sectionalTatId)
             .isCreate(isCreate)
             .build();
     if (!isCreate) {
