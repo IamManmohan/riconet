@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # From gist at https://gist.github.com/chadmaughan/5889802
-# setting alias : allow gradle and gradlew both 
+# setting alias : allow gradle and gradlew both
 
 function gradle_or_gradlew() {
         if [ -f ./gradlew ] ; then
-                echo "NC" "Executing gradlew instead of gradle...";
+                echo "Black" "Executing gradlew instead of gradle...";
                 ./gradlew "$@";
         else
                 gradle "$@";
@@ -44,4 +44,3 @@ git diff-index --quiet HEAD -- || {
     exit 1
 }
 echo "Green" "No uncommitted changes found. Pushing the code..."
-
