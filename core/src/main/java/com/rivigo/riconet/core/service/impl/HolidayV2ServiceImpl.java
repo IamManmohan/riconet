@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.service.HolidayV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
+import com.rivigo.zoom.common.enums.HolidayType;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,9 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
   @Override
   public void processHolidayEvent(@NonNull NotificationDTO notificationDTO, boolean isCreate) {
     final Map<String, String> metadata = notificationDTO.getMetadata();
+    final HolidayType holidayType =
+        HolidayType.valueOf(
+            metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name()));
     final String locationName =
         metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name());
     final HolidayLocationType locationType =
@@ -50,19 +54,26 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));
+    final Long sectionalTatId =
+        Long.valueOf(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name());
     log.info(
-        "Received Holiday event for location: {} {} with dateTime from {} to {}, isCreate: {}",
+        "Received Holiday event with type: {} for location: {} {}, disrupted section id:{} "
+            + "with dateTime from {} to {}, isCreate: {}",
+        holidayType,
         locationType,
         locationName,
+        sectionalTatId,
         holidayStartDateTime,
         holidayEndDateTime,
         isCreate);
     HolidayV2Dto holidayV2Dto =
         HolidayV2Dto.builder()
+            .holidayType(holidayType)
             .locationName(locationName)
             .locationType(locationType)
             .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
+            .sectionalTatId(sectionalTatId)
             .isCreate(isCreate)
             .build();
     if (!isCreate) {
@@ -74,6 +85,8 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
       // recalculations. Minimum of two values done in backend.
       holidayV2Dto.setOldHolidayStartDate(oldHolidayStartDateTime);
     }
-    zoomBackendAPIClientService.retriggerCpdCalculationsForHoliday(holidayV2Dto);
+    if (HolidayType.ALL_HOLIDAYS_WITH_CPD_IMPACT.contains(holidayType)) {
+      zoomBackendAPIClientService.retriggerCpdCalculationsForHoliday(holidayV2Dto);
+    }
   }
 }

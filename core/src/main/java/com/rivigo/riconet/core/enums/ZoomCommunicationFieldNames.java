@@ -113,6 +113,8 @@ public enum ZoomCommunicationFieldNames {
 
   /** HolidayV2 field names used in HolidayV2 create and update event. */
   public enum HolidayV2 {
+    /** type of the holiday. */
+    HOLIDAY_TYPE,
     /** location type of the holiday. */
     LOCATION_TYPE,
     /** location name of the holiday. */
@@ -122,7 +124,9 @@ public enum ZoomCommunicationFieldNames {
     /** holiday end date time. */
     HOLIDAY_END_DATE_TIME,
     /** old holiday start date time. */
-    OLD_HOLIDAY_START_DATE_TIME
+    OLD_HOLIDAY_START_DATE_TIME,
+    /** sectional tat of the disrupted section. */
+    SECTIONAL_TAT_ID
   }
 
   public enum ConsignmentSchedule {
