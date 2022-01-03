@@ -41,22 +41,23 @@ else
   echo "Green" "Autopep8 run successful!";
 fi
 
+# Uncommitted changes check
+echo "Yellow" "\n2. Checking uncommitted changes..."
+if [[ "$(git status --porcelain)" ]]; then
+  echo "Red" "Uncommitted files count: $(git status --porcelain | wc -l)";
+  echo "Red" "There are uncommitted changes. Please commit your changes first!";
+  exit 1;
+else
+  echo "Green" "No uncommitted changes found!";
+fi
+
 # Running tests
-echo "Yellow" "\n2. Running tests..."
+echo "Yellow" "\n3. Running tests..."
 python coverage.py
 if [ "$?" -ne "0" ]; then
   echo "Red" "Tests failed!";
   exit 1;
 else
-  echo "Green" "Tests run successful!";
+  echo "Green" "Tests run successful. Pushing the code...";
 fi
 
-# Uncommitted changes check
-echo "Yellow" "\n3. Checking uncommitted changes..."
-if [[ "$(git status --porcelain)" ]]; then
-  echo "Red" "Uncommitted files count: $(git status --porcelain | wc -l)";
-  echo "Red" "There are uncommitted changes. Please commit your changes first.";
-  exit 1;
-else
-  echo "Green" "No uncommitted changes found. Pushing the code...";
-fi
