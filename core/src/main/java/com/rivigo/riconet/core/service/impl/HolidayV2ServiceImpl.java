@@ -45,24 +45,33 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name()));
     final String locationName =
         metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name());
-    final HolidayLocationType locationType =
-        HolidayLocationType.valueOf(
-            metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name()));
+    String holidayLocationTypeNullableString =
+        metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name());
+    HolidayLocationType xLocationType = null;
+    if (HolidayType.ALL_DAY_BASED_HOLIDAYS.contains(holidayType)) {
+      xLocationType = HolidayLocationType.valueOf(holidayLocationTypeNullableString);
+    }
+    final HolidayLocationType locationType = xLocationType;
     final long holidayStartDateTime =
         Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));
-    final Long sectionTatId =
-        Long.valueOf(metadata.get(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name()));
+    String sectionalTatIdNullableString =
+        metadata.get(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name());
+    Long lSectionTatId = null;
+    if (sectionalTatIdNullableString != null) {
+      lSectionTatId = Long.valueOf(sectionalTatIdNullableString);
+    }
+    final Long sectionalTatId = lSectionTatId;
     log.info(
         "Received Holiday event with type: {} for location: {} {},sectional tat id:{} "
             + "with dateTime from {} to {}, isCreate: {}",
         holidayType,
         locationType,
         locationName,
-        sectionTatId,
+        sectionalTatId,
         holidayStartDateTime,
         holidayEndDateTime,
         isCreate);
@@ -73,7 +82,7 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             .locationType(locationType)
             .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
-            .sectionalTatId(sectionTatId)
+            .sectionalTatId(sectionalTatId)
             .isCreate(isCreate)
             .build();
     if (!isCreate) {
