@@ -1,7 +1,6 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
-import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.HolidayV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -9,8 +8,6 @@ import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
 import com.rivigo.zoom.common.enums.HolidayType;
 import java.util.Map;
-import java.util.Optional;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,8 +45,9 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name()));
     final String locationName =
         metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name());
-    final HolidayLocationType holidayLocationType= HolidayLocationType.valueOf(
-            metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name()));
+    final HolidayLocationType holidayLocationType =
+        HolidayLocationType.valueOf(
+            metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name()));
     final long holidayStartDateTime =
         Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
@@ -83,8 +81,6 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
       // recalculations. Minimum of two values done in backend.
       holidayV2Dto.setOldHolidayStartDate(oldHolidayStartDateTime);
     }
-    if (HolidayType.ALL_HOLIDAYS_WITH_CPD_IMPACT.contains(holidayType)) {
-      zoomBackendAPIClientService.retriggerCpdCalculationsForHoliday(holidayV2Dto);
-    }
+    zoomBackendAPIClientService.retriggerCpdCalculationsForHoliday(holidayV2Dto);
   }
 }
