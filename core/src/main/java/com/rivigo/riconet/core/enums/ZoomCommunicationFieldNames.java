@@ -124,9 +124,7 @@ public enum ZoomCommunicationFieldNames {
     /** holiday end date time. */
     HOLIDAY_END_DATE_TIME,
     /** old holiday start date time. */
-    OLD_HOLIDAY_START_DATE_TIME,
-    /** sectional tat of the disrupted section. */
-    SECTIONAL_TAT_ID
+    OLD_HOLIDAY_START_DATE_TIME
   }
 
   public enum ConsignmentSchedule {

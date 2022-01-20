@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service.impl;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.enums.TicketingFieldName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.HolidayV2Service;
 import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
@@ -8,6 +9,8 @@ import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
 import com.rivigo.zoom.common.enums.HolidayType;
 import java.util.Map;
+import java.util.Optional;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,33 +48,20 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name()));
     final String locationName =
         metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name());
-    String holidayLocationTypeNullableString =
-        metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name());
-    HolidayLocationType xLocationType = null;
-    if (HolidayType.ALL_DAY_BASED_HOLIDAYS.contains(holidayType)) {
-      xLocationType = HolidayLocationType.valueOf(holidayLocationTypeNullableString);
-    }
-    final HolidayLocationType locationType = xLocationType;
+    final HolidayLocationType holidayLocationType= HolidayLocationType.valueOf(
+            metadata.get(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name()));
     final long holidayStartDateTime =
         Long.parseLong(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name()));
     final Long holidayEndDateTime =
         Long.valueOf(
             metadata.get(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name()));
-    String sectionalTatIdNullableString =
-        metadata.get(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name());
-    Long lSectionTatId = null;
-    if (sectionalTatIdNullableString != null) {
-      lSectionTatId = Long.valueOf(sectionalTatIdNullableString);
-    }
-    final Long sectionalTatId = lSectionTatId;
     log.info(
-        "Received Holiday event with type: {} for location: {} {},sectional tat id:{} "
+        "Received Holiday event with type: {} for location: {} {}, "
             + "with dateTime from {} to {}, isCreate: {}",
         holidayType,
-        locationType,
+        holidayLocationType,
         locationName,
-        sectionalTatId,
         holidayStartDateTime,
         holidayEndDateTime,
         isCreate);
@@ -79,10 +69,9 @@ public class HolidayV2ServiceImpl implements HolidayV2Service {
         HolidayV2Dto.builder()
             .holidayType(holidayType)
             .locationName(locationName)
-            .locationType(locationType)
+            .locationType(holidayLocationType)
             .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
-            .sectionalTatId(sectionalTatId)
             .isCreate(isCreate)
             .build();
     if (!isCreate) {

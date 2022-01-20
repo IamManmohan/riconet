@@ -37,8 +37,6 @@ public class HolidayV2ServiceTest {
     Long holidayStartDateTime = 123456789L;
     Long oldHolidayStartDateTime = 111111111L;
     Long holidayEndDateTime = 987654321L;
-    Long sectionalTatId = null;
-    String ss = null;
     boolean isCreate = false;
     Map<String, String> metadata = new HashMap<>();
     metadata.put(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name(), holidayType.name());
@@ -53,7 +51,6 @@ public class HolidayV2ServiceTest {
     metadata.put(
         ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name(),
         String.valueOf(oldHolidayStartDateTime));
-    metadata.put(ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name(), null);
     HolidayV2Dto holidayV2Dto =
         HolidayV2Dto.builder()
             .holidayType(holidayType)
@@ -62,56 +59,12 @@ public class HolidayV2ServiceTest {
             .holidayStartDate(holidayStartDateTime)
             .holidayEndDate(holidayEndDateTime)
             .oldHolidayStartDate(oldHolidayStartDateTime)
-            .sectionalTatId(sectionalTatId)
             .isCreate(isCreate)
             .build();
     NotificationDTO notificationDTO =
         NotificationDTO.builder().entityId(id).metadata(metadata).build();
     holidayV2Service.processHolidayEvent(notificationDTO, isCreate);
     Mockito.verify(zoomBackendAPIClientService, Mockito.times(1))
-        .retriggerCpdCalculationsForHoliday(Matchers.refEq(holidayV2Dto));
-  }
-
-  @Test
-  public void processHolidayEventWithServiceInTransitDisruptionTest() {
-    Long id = 123456L;
-    HolidayType holidayType = HolidayType.IN_TRANSIT_SERVICE_DISRUPTION;
-    Long holidayStartDateTime = 123456789L;
-    Long oldHolidayStartDateTime = 111111111L;
-    Long holidayEndDateTime = 987654321L;
-    Long sectionalTatId = 23L;
-    boolean isCreate = false;
-    Map<String, String> metadata = new HashMap<>();
-    metadata.put(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name(), holidayType.name());
-    metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name(), null);
-    metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name(), null);
-    metadata.put(
-        ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_START_DATE_TIME.name(),
-        String.valueOf(holidayStartDateTime));
-    metadata.put(
-        ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_END_DATE_TIME.name(),
-        String.valueOf(holidayEndDateTime));
-    metadata.put(
-        ZoomCommunicationFieldNames.HolidayV2.OLD_HOLIDAY_START_DATE_TIME.name(),
-        String.valueOf(oldHolidayStartDateTime));
-    metadata.put(
-        ZoomCommunicationFieldNames.HolidayV2.SECTIONAL_TAT_ID.name(),
-        String.valueOf(sectionalTatId));
-    HolidayV2Dto holidayV2Dto =
-        HolidayV2Dto.builder()
-            .holidayType(holidayType)
-            .locationName(null)
-            .locationType(null)
-            .holidayStartDate(holidayStartDateTime)
-            .holidayEndDate(holidayEndDateTime)
-            .oldHolidayStartDate(oldHolidayStartDateTime)
-            .sectionalTatId(sectionalTatId)
-            .isCreate(isCreate)
-            .build();
-    NotificationDTO notificationDTO =
-        NotificationDTO.builder().entityId(id).metadata(metadata).build();
-    holidayV2Service.processHolidayEvent(notificationDTO, isCreate);
-    Mockito.verify(zoomBackendAPIClientService, Mockito.times(0))
         .retriggerCpdCalculationsForHoliday(Matchers.refEq(holidayV2Dto));
   }
 }
