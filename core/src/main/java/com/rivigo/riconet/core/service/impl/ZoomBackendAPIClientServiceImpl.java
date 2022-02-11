@@ -843,4 +843,27 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
           "Error while marking consignment undelivered on vehicle placement failure.", e);
     }
   }
+
+  @Override
+  public void triggerInsurancePolicyGeneration(String cnote) {
+    JsonNode responseJson;
+    try {
+      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+      queryParams.set("cnote", cnote);
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.ZOOM_BACKEND_GENERATE_INSURANCE_POLICY,
+              queryParams,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Insurance policy generation request for cnote: {} failed.", cnote);
+      }
+    } catch (IOException e) {
+      throw new ZoomException("Error while generating insurance policy for cnote {}", cnote, e);
+    }
+  }
 }

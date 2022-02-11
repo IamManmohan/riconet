@@ -115,4 +115,7 @@ public class UrlConstant {
   /** Backend API to mark multiple consignments as undelivered. */
   public final String ZOOM_BACKEND_MARK_MULTIPLE_CNS_UNDELIVERED =
       "/operations/consignments/markUndelivered/multiple";
+
+  /** Backend API to trigger insurance policy generation for consignment. */
+  public final String ZOOM_BACKEND_GENERATE_INSURANCE_POLICY = "/insurance/generate/policy";
 }

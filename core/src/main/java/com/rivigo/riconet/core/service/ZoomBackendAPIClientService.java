@@ -187,4 +187,11 @@ public interface ZoomBackendAPIClientService {
    * @param cnUndeliveryDtoList consignment undelivery details.
    */
   void undeliverMultipleConsignments(Collection<ZoomConsignmentUndeliveryDto> cnUndeliveryDtoList);
+
+  /**
+   * Used to make backend API call to generate insurance policy for consignment.
+   *
+   * @param cnote cnote of consignment.
+   */
+  void triggerInsurancePolicyGeneration(String cnote);
 }

@@ -183,6 +183,10 @@ public class EventTriggerService {
       case CN_VEHICLE_REJECTED_AT_FC:
         vehicleRejectedAtFcService.processVehicleRejectionEventToUndeliverCns(notificationDTO);
         break;
+      case CN_COMPLETION:
+        zoomBackendAPIClientService.triggerInsurancePolicyGeneration(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
+        break;
       default:
         log.info("Event does not trigger anything {}", eventName);
     }
@@ -241,9 +245,9 @@ public class EventTriggerService {
       log.error("Marking Zoom Doc CN as delivered failed", e);
     }
     try {
-      consignmentService.triggerBfCpdCalcualtion(unloadingData);
+      consignmentService.triggerBfFlows(unloadingData);
     } catch (Exception e) {
-      log.error("BF CPD calculation failed", e);
+      log.error("BF flows failed", e);
     }
   }
 }
