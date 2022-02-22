@@ -170,10 +170,10 @@ public class EventTriggerService {
       case DEPS_RECORD_CREATION:
         demurrageService.processEventToCancelDemurrage(notificationDTO);
         break;
-      case HOLIDAY_V2_CREATE:
+      case CPD_IMPACTING_HOLIDAY_V2_CREATE:
         holidayV2Service.processHolidayEvent(notificationDTO, true);
         break;
-      case HOLIDAY_V2_UPDATE:
+      case CPD_IMPACTING_HOLIDAY_V2_UPDATE:
         holidayV2Service.processHolidayEvent(notificationDTO, false);
         break;
       case CN_DELIVERY_HOLD:
