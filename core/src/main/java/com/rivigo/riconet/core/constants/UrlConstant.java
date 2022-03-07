@@ -117,5 +117,6 @@ public class UrlConstant {
       "/operations/consignments/markUndelivered/multiple";
 
   /** Backend API to trigger insurance policy generation for consignment. */
-  public final String ZOOM_BACKEND_GENERATE_INSURANCE_POLICY = "/insurance/generate/policy";
+  public final String ZOOM_BACKEND_GENERATE_INSURANCE_POLICY =
+      "/insurance/policy/cnote/{cnote}/generate";
 }

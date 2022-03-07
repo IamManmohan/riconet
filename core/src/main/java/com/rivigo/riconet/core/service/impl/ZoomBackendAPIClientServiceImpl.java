@@ -848,14 +848,12 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
   public void triggerInsurancePolicyGeneration(String cnote) {
     JsonNode responseJson;
     try {
-      final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-      queryParams.set("cnote", cnote);
       responseJson =
           apiClientService.getEntity(
               null,
               HttpMethod.POST,
-              UrlConstant.ZOOM_BACKEND_GENERATE_INSURANCE_POLICY,
-              queryParams,
+              UrlConstant.ZOOM_BACKEND_GENERATE_INSURANCE_POLICY.replace("{cnote}", cnote),
+              null,
               backendBaseUrl);
       final Boolean isSuccess =
           apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
