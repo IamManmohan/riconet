@@ -85,7 +85,7 @@ public class EventTriggerServiceTest {
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(consignmentService, times(1)).triggerBfCpdCalcualtion(any());
+    verify(consignmentService, times(1)).triggerBfFlows(any());
     verify(rtoService, times(1)).reassignRTOTicketIfExists(any());
   }
 
