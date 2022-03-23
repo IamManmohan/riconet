@@ -1,5 +1,5 @@
 #!/bin/sh
-mvn com.coveo:fmt-maven-plugin:check || {
+mvn com.coveo:fmt-maven-plugin:2.5.1:check || {
   echo "Please format your code by running mvn clean install"
   exit 1
 }
