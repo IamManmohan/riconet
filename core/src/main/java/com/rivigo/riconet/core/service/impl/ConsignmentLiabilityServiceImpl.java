@@ -41,6 +41,11 @@ public class ConsignmentLiabilityServiceImpl implements ConsignmentLiabilityServ
     Long consignmentId = consignmentService.getIdByCnote(cnote);
     ConsignmentLiability consignmentLiability =
         consignmentLiabilityPayload.getConsignmentLiability();
-    zoomBackendAPIClientService.updateConsignmentLiability(consignmentId, consignmentLiability);
+    try {
+      zoomBackendAPIClientService.updateConsignmentLiability(consignmentId, consignmentLiability);
+    } catch (Exception e) {
+      log.error("Failed to update consignment liability.", e);
+    }
+    zoomBackendAPIClientService.triggerInsurancePolicyGeneration(cnote);
   }
 }

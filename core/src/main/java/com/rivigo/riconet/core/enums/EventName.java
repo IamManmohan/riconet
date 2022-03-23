@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.enums;
 public enum EventName {
   CN_RECEIVED_AT_OU,
   CN_LOADED,
+  CN_COMPLETION,
 
   PICKUP_CANCELLATION,
   PICKUP_COMPLETION,
