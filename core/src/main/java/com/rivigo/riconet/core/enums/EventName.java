@@ -3,6 +3,7 @@ package com.rivigo.riconet.core.enums;
 public enum EventName {
   CN_RECEIVED_AT_OU,
   CN_LOADED,
+  CN_COMPLETION,
 
   PICKUP_CANCELLATION,
   PICKUP_COMPLETION,
@@ -45,9 +46,9 @@ public enum EventName {
   DEPS_RECORD_CREATION,
 
   /** HolidayV2 creation event. */
-  HOLIDAY_V2_CREATE,
+  CPD_IMPACTING_HOLIDAY_V2_CREATE,
   /** HolidayV2 update or deletion event. */
-  HOLIDAY_V2_UPDATE,
+  CPD_IMPACTING_HOLIDAY_V2_UPDATE,
 
   /** Consignment's trip dispatch hold event. */
   CN_DISPATCH_HOLD,

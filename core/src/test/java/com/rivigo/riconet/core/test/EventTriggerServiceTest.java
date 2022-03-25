@@ -85,7 +85,7 @@ public class EventTriggerServiceTest {
             .metadata(metadata)
             .build();
     eventTriggerService.processNotification(notificationDTO);
-    verify(consignmentService, times(1)).triggerBfCpdCalcualtion(any());
+    verify(consignmentService, times(1)).triggerBfFlows(any());
     verify(rtoService, times(1)).reassignRTOTicketIfExists(any());
   }
 
@@ -260,7 +260,7 @@ public class EventTriggerServiceTest {
   @Test
   public void holidayCreateEventTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_CREATE);
+        NotificationDTOModel.getNotificationDTO(EventName.CPD_IMPACTING_HOLIDAY_V2_CREATE);
     eventTriggerService.processNotification(notificationDTO);
     Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, true);
   }
@@ -268,7 +268,7 @@ public class EventTriggerServiceTest {
   @Test
   public void holidayUpdateEventTest() {
     NotificationDTO notificationDTO =
-        NotificationDTOModel.getNotificationDTO(EventName.HOLIDAY_V2_UPDATE);
+        NotificationDTOModel.getNotificationDTO(EventName.CPD_IMPACTING_HOLIDAY_V2_UPDATE);
     eventTriggerService.processNotification(notificationDTO);
     Mockito.verify(holidayV2Service, Mockito.times(1)).processHolidayEvent(notificationDTO, false);
   }

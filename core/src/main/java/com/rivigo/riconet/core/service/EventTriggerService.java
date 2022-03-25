@@ -170,10 +170,10 @@ public class EventTriggerService {
       case DEPS_RECORD_CREATION:
         demurrageService.processEventToCancelDemurrage(notificationDTO);
         break;
-      case HOLIDAY_V2_CREATE:
+      case CPD_IMPACTING_HOLIDAY_V2_CREATE:
         holidayV2Service.processHolidayEvent(notificationDTO, true);
         break;
-      case HOLIDAY_V2_UPDATE:
+      case CPD_IMPACTING_HOLIDAY_V2_UPDATE:
         holidayV2Service.processHolidayEvent(notificationDTO, false);
         break;
       case CN_DELIVERY_HOLD:
@@ -182,6 +182,10 @@ public class EventTriggerService {
         break;
       case CN_VEHICLE_REJECTED_AT_FC:
         vehicleRejectedAtFcService.processVehicleRejectionEventToUndeliverCns(notificationDTO);
+        break;
+      case CN_COMPLETION:
+        zoomBackendAPIClientService.triggerInsurancePolicyGeneration(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name()));
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
@@ -241,9 +245,9 @@ public class EventTriggerService {
       log.error("Marking Zoom Doc CN as delivered failed", e);
     }
     try {
-      consignmentService.triggerBfCpdCalcualtion(unloadingData);
+      consignmentService.triggerBfFlows(unloadingData);
     } catch (Exception e) {
-      log.error("BF CPD calculation failed", e);
+      log.error("BF flows failed", e);
     }
   }
 }

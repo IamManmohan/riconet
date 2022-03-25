@@ -113,6 +113,8 @@ public enum ZoomCommunicationFieldNames {
 
   /** HolidayV2 field names used in HolidayV2 create and update event. */
   public enum HolidayV2 {
+    /** type of the holiday. */
+    HOLIDAY_TYPE,
     /** location type of the holiday. */
     LOCATION_TYPE,
     /** location name of the holiday. */

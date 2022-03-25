@@ -37,7 +37,7 @@ public interface ConsignmentService {
 
   Map<Long, String> getIdToCnoteMap(List<String> cnoteList);
 
-  void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO);
+  void triggerBfFlows(ConsignmentBasicDTO unloadingEventDTO);
 
   Boolean isPrimaryConsignment(String cNote);
 

@@ -6,6 +6,7 @@ import com.rivigo.riconet.core.service.ZoomBackendAPIClientService;
 import com.rivigo.riconet.core.service.impl.HolidayV2ServiceImpl;
 import com.rivigo.zoom.common.dto.HolidayV2Dto;
 import com.rivigo.zoom.common.enums.HolidayLocationType;
+import com.rivigo.zoom.common.enums.HolidayType;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -30,6 +31,7 @@ public class HolidayV2ServiceTest {
   @Test
   public void processHolidayEventTest() {
     Long id = 123456L;
+    HolidayType holidayType = HolidayType.DELIVERY_HOLIDAY_NO_EXEMPTIONS_ALLOWED;
     HolidayLocationType locationType = HolidayLocationType.OU;
     String locationName = "DELT1";
     Long holidayStartDateTime = 123456789L;
@@ -37,6 +39,7 @@ public class HolidayV2ServiceTest {
     Long holidayEndDateTime = 987654321L;
     boolean isCreate = false;
     Map<String, String> metadata = new HashMap<>();
+    metadata.put(ZoomCommunicationFieldNames.HolidayV2.HOLIDAY_TYPE.name(), holidayType.name());
     metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_NAME.name(), locationName);
     metadata.put(ZoomCommunicationFieldNames.HolidayV2.LOCATION_TYPE.name(), locationType.name());
     metadata.put(
@@ -50,6 +53,7 @@ public class HolidayV2ServiceTest {
         String.valueOf(oldHolidayStartDateTime));
     HolidayV2Dto holidayV2Dto =
         HolidayV2Dto.builder()
+            .holidayType(holidayType)
             .locationName(locationName)
             .locationType(locationType)
             .holidayStartDate(holidayStartDateTime)

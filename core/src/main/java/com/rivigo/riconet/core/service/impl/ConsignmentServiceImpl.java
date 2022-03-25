@@ -110,7 +110,7 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   }
 
   @Override
-  public void triggerBfCpdCalcualtion(ConsignmentBasicDTO unloadingEventDTO) {
+  public void triggerBfFlows(ConsignmentBasicDTO unloadingEventDTO) {
     BigInteger organizationId =
         consignmentRepo.getOrganizationId(unloadingEventDTO.getConsignmentId());
     if (organizationId == null) {
@@ -121,6 +121,18 @@ public class ConsignmentServiceImpl implements ConsignmentService {
     if (organization == null || organization.getType() != OrganizationType.BF) {
       return;
     }
+    try {
+      zoomBackendAPIClientService.triggerInsurancePolicyGeneration(unloadingEventDTO.getCnote());
+    } catch (Exception e) {
+      log.error(
+          "Failed to generate insurance policy for consignment: {}",
+          unloadingEventDTO.getCnote(),
+          e);
+    }
+    triggerBfCpdCalculation(unloadingEventDTO);
+  }
+
+  private void triggerBfCpdCalculation(ConsignmentBasicDTO unloadingEventDTO) {
     Boolean rivigoOuLeft =
         consignmentScheduleService
             .getActivePlan(unloadingEventDTO.getConsignmentId())
