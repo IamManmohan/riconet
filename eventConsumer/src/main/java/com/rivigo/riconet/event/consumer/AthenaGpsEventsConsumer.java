@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AthenaGpsEventsConsumer extends ConsumerModel {
 
+  private static final Long NUM_RETRIES = 0L;
+
   private ObjectMapper objectMapper;
 
   @Autowired private AthenaGpsEventService athenaGpsEventService;
@@ -24,6 +26,11 @@ public class AthenaGpsEventsConsumer extends ConsumerModel {
   public AthenaGpsEventsConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  }
+
+  @Override
+  public Long getNumRetries() {
+    return NUM_RETRIES;
   }
 
   @Override
