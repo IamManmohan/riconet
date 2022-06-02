@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinanceEventsConsumer extends ConsumerModel {
 
+  private static final Long NUM_RETRIES = 0L;
   private ObjectMapper objectMapper;
 
   @Autowired private FinanceEventService financeEventService;
@@ -25,6 +26,11 @@ public class FinanceEventsConsumer extends ConsumerModel {
   public FinanceEventsConsumer() {
     objectMapper = new ObjectMapper();
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  }
+
+  @Override
+  public Long getNumRetries() {
+    return NUM_RETRIES;
   }
 
   @Override
