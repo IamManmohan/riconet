@@ -54,8 +54,6 @@ public class EventTriggerService {
 
   @Autowired private VehicleRejectedAtFcService vehicleRejectedAtFcService;
 
-  @Autowired private PickupService pickupService;
-
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
