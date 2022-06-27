@@ -54,6 +54,8 @@ public class EventTriggerService {
 
   @Autowired private VehicleRejectedAtFcService vehicleRejectedAtFcService;
 
+  @Autowired private PickupService pickupService;
+
   public void processNotification(NotificationDTO notificationDTO) {
     EventName eventName = EventName.valueOf(notificationDTO.getEventName());
     String entityId;
@@ -92,6 +94,9 @@ public class EventTriggerService {
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.OLD_CNOTE.name());
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
+        break;
+      case PICKUP_CREATION:
+        zoomBackendAPIClientService.mergeDuplicatePickups(notificationDTO.getEntityId());
         break;
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
