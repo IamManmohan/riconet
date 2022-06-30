@@ -93,9 +93,6 @@ public class EventTriggerService {
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());
         break;
-      case PICKUP_CREATION:
-        zoomBackendAPIClientService.mergeDuplicatePickups(notificationDTO.getEntityId());
-        break;
       case PICKUP_COMPLETION:
       case PICKUP_CANCELLATION:
         ticketingClientService.autoCloseTicket(
