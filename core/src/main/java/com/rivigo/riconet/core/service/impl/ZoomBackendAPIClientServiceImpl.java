@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -862,6 +863,28 @@ public class ZoomBackendAPIClientServiceImpl implements ZoomBackendAPIClientServ
       }
     } catch (IOException e) {
       throw new ZoomException("Error while generating insurance policy for cnote {}", cnote, e);
+    }
+  }
+
+  @Override
+  public void mergeDuplicatePickups(@NotNull Long pickupId) {
+    JsonNode responseJson;
+    try {
+      responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.PUT,
+              UrlConstant.MERGE_DUPLICATE_PICKUPS.replace("{pickupId}", pickupId.toString()),
+              null,
+              backendBaseUrl);
+      final Boolean isSuccess =
+          apiClientService.parseNewResponseJsonNode(responseJson, ResponseJavaTypes.BOOLEAN);
+      if (!Boolean.TRUE.equals(isSuccess)) {
+        log.error("Duplicate Pickup merge request for pickup id: {} failed.", pickupId);
+      }
+    } catch (IOException e) {
+      throw new ZoomException(
+          "Error while merging duplicate pickups for pickup id: {}", pickupId, e);
     }
   }
 }
