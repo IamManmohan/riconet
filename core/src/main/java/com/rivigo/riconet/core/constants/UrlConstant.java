@@ -119,4 +119,7 @@ public class UrlConstant {
   /** Backend API to trigger insurance policy generation for consignment. */
   public final String ZOOM_BACKEND_GENERATE_INSURANCE_POLICY =
       "/insurance/policy/cnote/{cnote}/generate";
+
+  /** Backend API to trigger duplicate pickup merging. */
+  public final String MERGE_DUPLICATE_PICKUPS = "/operations/pickup/merge/duplicates/{pickupId}";
 }
