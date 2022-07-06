@@ -194,4 +194,11 @@ public interface ZoomBackendAPIClientService {
    * @param cnote cnote of consignment.
    */
   void triggerInsurancePolicyGeneration(String cnote);
+
+  /**
+   * Merge duplicate pickups for given pickup id.
+   *
+   * @param pickupId pickup id.
+   */
+  void mergeDuplicatePickups(Long pickupId);
 }
