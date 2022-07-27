@@ -99,7 +99,7 @@ subprojects {
             exclude group: 'com.rivigo', module: 'zoom-billing-api'
         }
 
-        compile('com.rivigo.security:rivigo-security-resource-server-commons:3.1.14')
+        compile('com.rivigo.security:rivigo-security-resource-server-commons:3.2.2')
         compile('com.rivigo.collections:collections-api:1.1.13'){
             exclude module: 'spring-web'
             exclude module: 'spring-data-commons'
