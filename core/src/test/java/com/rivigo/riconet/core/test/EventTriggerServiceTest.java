@@ -5,6 +5,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.rivigo.riconet.core.constants.RedisTokenConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.EventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -22,6 +23,7 @@ import com.rivigo.riconet.core.service.impl.DatastoreServiceImpl;
 import com.rivigo.riconet.core.service.impl.EmailSenderServiceImpl;
 import com.rivigo.riconet.core.service.impl.TicketingServiceImpl;
 import com.rivigo.riconet.core.test.Utils.NotificationDTOModel;
+import com.rivigo.zoom.common.repository.redis.AccessTokenSsfRedisRepository;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +65,8 @@ public class EventTriggerServiceTest {
 
   @Mock private DemurrageService demurrageService;
 
+  @Mock private AccessTokenSsfRedisRepository accessTokenSsfRedisRepository;
+
   @Mock private HolidayV2Service holidayV2Service;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
@@ -70,6 +74,8 @@ public class EventTriggerServiceTest {
   @Before
   public void initMocks() {
     MockitoAnnotations.initMocks(this);
+    Mockito.when(accessTokenSsfRedisRepository.get(RedisTokenConstant.RICONET_MASTER_LOGIN_TOKEN))
+        .thenReturn("XYZ");
   }
 
   @Test
