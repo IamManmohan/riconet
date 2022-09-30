@@ -53,7 +53,12 @@ public class ConsignmentInvoiceServiceImpl implements ConsignmentInvoiceService 
     if (RIVIGO_ORGANIZATION_ID != consignment.getOrganizationId()) {
       return;
     }
-    String shortUrl = urlShortnerService.shortenUrl(invoiceDocumentPreparedDTO.getEncodedUrl());
+    String shortUrl = invoiceDocumentPreparedDTO.getEncodedUrl();
+    try {
+      shortUrl = urlShortnerService.shortenUrl(shortUrl);
+    } catch (Exception e) {
+      log.info("Exception occurred while shortening the link from google ", e);
+    }
     zoomBackendAPIClientService.addInvoice(
         invoiceDocumentPreparedDTO.getEncodedUrl(),
         shortUrl,
