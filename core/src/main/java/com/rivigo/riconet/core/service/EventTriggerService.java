@@ -59,8 +59,12 @@ public class EventTriggerService {
     String entityId;
     switch (eventName) {
       case CN_DELIVERY:
+        entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         appNotificationService.sendCnDeliveredNotification(notificationDTO);
         demurrageService.processEventToEndDemurrage(notificationDTO);
+        ticketingClientService.autoCloseTicket(
+            entityId, TicketEntityType.CN.name(), eventName.name());
+        break;
       case CN_TRIP_DISPATCHED:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(
