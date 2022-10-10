@@ -2,28 +2,30 @@ package com.rivigo.riconet.core.test;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rivigo.riconet.core.service.impl.UrlShortnerServiceImpl;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
+import com.rivigo.riconet.core.service.UrlShortnerService;
+import java.util.LinkedHashMap;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /** Created by sunny on 30/9/22. */
-public class URLShortnerServiceTest {
+@EnableRetry
+public class URLShortenerServiceTest extends TesterBase {
 
   private static final String shortenerUrl = "http://firebase-root-url.dummy.com";
   private static final String shortenerKey = "abcde";
@@ -31,7 +33,7 @@ public class URLShortnerServiceTest {
 
   private static final String shortenerEnabled = "true";
 
-  @InjectMocks private UrlShortnerServiceImpl urlShortnerService;
+  @Autowired private UrlShortnerService urlShortnerService;
 
   @Mock private RestTemplate restTemplate;
 
@@ -44,26 +46,31 @@ public class URLShortnerServiceTest {
     ReflectionTestUtils.setField(urlShortnerService, "shortenerEnabled", shortenerEnabled);
     ReflectionTestUtils.setField(urlShortnerService, "objectMapper", new ObjectMapper());
     ReflectionTestUtils.setField(urlShortnerService, "restTemplate", restTemplate);
-
-    List<NameValuePair> params = new ArrayList<>();
-    params.add(new BasicNameValuePair("key", shortenerKey));
-    String paramString = URLEncodedUtils.format(params, "utf-8");
   }
 
-  @Test(expected = HttpClientErrorException.class)
+  @Test
   public void shortenerRetryTest() throws Exception {
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    map.put("shortLink", "ShortURL");
     doThrow(HttpClientErrorException.class)
         .doThrow(HttpClientErrorException.class)
         .doThrow(HttpClientErrorException.class)
         .doThrow(HttpClientErrorException.class)
-        .doThrow(HttpClientErrorException.class)
-        .doThrow(HttpClientErrorException.class)
+        .doReturn(ResponseEntity.ok().body(map))
         .when(restTemplate)
         .exchange(
             Mockito.startsWith(shortenerUrl),
             Mockito.eq(HttpMethod.POST),
             Mockito.isA(HttpEntity.class),
             (Class<Object>) any());
-    urlShortnerService.shortenUrl("https://rivigo.com/?file=hsjhadjuadbwkjdbwuabduak.pdf");
+    String shortenedUrl =
+        urlShortnerService.shortenUrl("https://rivigo.com/?file=hsjhadjuadbwkjdbwuabduak.pdf");
+    verify(restTemplate, times(5))
+        .exchange(
+            Mockito.startsWith(shortenerUrl),
+            Mockito.eq(HttpMethod.POST),
+            Mockito.isA(HttpEntity.class),
+            (Class<Object>) any());
+    Assert.assertEquals(shortenedUrl, "ShortURL");
   }
 }

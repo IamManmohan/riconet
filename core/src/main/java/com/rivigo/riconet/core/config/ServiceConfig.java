@@ -24,6 +24,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
@@ -47,6 +48,7 @@ import org.springframework.web.client.RestTemplate;
   }
 )
 @Slf4j
+@EnableRetry
 public class ServiceConfig {
 
   private static final int CORE_POOL_SIZE = 10;
