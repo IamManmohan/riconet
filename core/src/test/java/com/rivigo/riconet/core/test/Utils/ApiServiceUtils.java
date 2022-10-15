@@ -2,6 +2,7 @@ package com.rivigo.riconet.core.test.Utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rivigo.riconet.core.dto.ConsignmentBasicDTO;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.client.ClientIntegrationResponseDTO;
 import com.rivigo.riconet.core.dto.client.FlipkartLoginResponseDTO;
@@ -9,14 +10,17 @@ import com.rivigo.riconet.core.dto.hilti.HiltiResponseDto;
 import com.rivigo.riconet.core.enums.CnActionEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.zoom.common.enums.ConsignmentLocationStatus;
+import com.rivigo.zoom.common.enums.ConsignmentStatus;
 import com.rivigo.zoom.common.enums.FileTypes;
 import com.rivigo.zoom.common.enums.LocationTypeV2;
+import com.rivigo.zoom.common.enums.OrganizationType;
 import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.BoxHistory;
 import com.rivigo.zoom.common.model.Consignment;
 import com.rivigo.zoom.common.model.ConsignmentReadOnly;
 import com.rivigo.zoom.common.model.ConsignmentSchedule;
 import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
+import com.rivigo.zoom.common.model.Organization;
 import com.rivigo.zoom.common.model.Pickup;
 import com.rivigo.zoom.common.model.UndeliveredConsignment;
 import com.rivigo.zoom.common.model.neo4j.Location;
@@ -280,5 +284,28 @@ public class ApiServiceUtils {
     responseDto.setSuccessDescription("ok");
     responseDto.setSuccessCode("OK");
     return responseDto;
+  }
+
+  public static ConsignmentBasicDTO getDummyConsignmentBasicDTO() {
+    return ConsignmentBasicDTO.builder()
+        .cnote("1000000001")
+        .consignmentId(CONSIGNMENT_ID)
+        .locationId(CURRENT_LOCATION_ID)
+        .status(ConsignmentStatus.RECEIVED_AT_OU)
+        .toLocationId(END_LOCATION_ID)
+        .fromId(START_LOCATION_ID)
+        .build();
+  }
+
+  public static Organization getDummyOrganization() {
+    Organization organization = new Organization();
+    organization.setType(OrganizationType.BF);
+    return organization;
+  }
+
+  public static Consignment getDummyConsignment() {
+    Consignment consignment = new Consignment();
+    consignment.setPickupId(PICKUP_ID);
+    return consignment;
   }
 }

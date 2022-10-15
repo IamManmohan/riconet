@@ -239,6 +239,7 @@ public class EventTriggerService {
   }
 
   private void processCNReceivedAtOuAndHandleException(NotificationDTO notificationDTO) {
+    log.info("NotificationDto for {} event: {}", notificationDTO.getEventName(), notificationDTO);
     ConsignmentBasicDTO unloadingData = getBasicConsignmentDTO(notificationDTO);
     // consignmentService.triggerAssetCnUnload(notificationDTO, unloadingData);
     log.info(

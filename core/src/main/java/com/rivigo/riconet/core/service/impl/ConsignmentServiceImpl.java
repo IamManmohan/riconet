@@ -25,7 +25,6 @@ import com.rivigo.zoom.common.repository.mysql.ConsignmentHistoryRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentRepository;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +52,8 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   @Autowired private PincodeService pincodeService;
 
   @Autowired private LocationService locationService;
+
+  @Autowired private ConsignmentService consignmentService;
 
   @Override
   public Map<Long, ConsignmentHistory> getLastScanByCnIdIn(
@@ -133,21 +134,39 @@ public class ConsignmentServiceImpl implements ConsignmentService {
   }
 
   private void triggerBfCpdCalculation(ConsignmentBasicDTO unloadingEventDTO) {
-    Boolean rivigoOuLeft =
-        consignmentScheduleService
-            .getActivePlan(unloadingEventDTO.getConsignmentId())
-            .stream()
-            .anyMatch(this::isLeftRivigoLocation);
-    if (rivigoOuLeft) {
+    List<ConsignmentSchedule> consignmentScheduleList =
+        consignmentScheduleService.getActivePlan(unloadingEventDTO.getConsignmentId());
+
+    final Boolean rivigoOuLeft =
+        consignmentScheduleList.stream().anyMatch(this::isLeftRivigoLocation);
+    if (Boolean.TRUE.equals(rivigoOuLeft)) {
       return;
     }
-    zoomBackendAPIClientService.recalculateCpdOfBf(unloadingEventDTO.getConsignmentId());
+
+    final Boolean isCnReachedAtRivigoLocation =
+        consignmentScheduleList.stream().anyMatch(this::isFirstRivigoLocation);
+
+    final Consignment cn =
+        consignmentService.getConsignmentById(unloadingEventDTO.getConsignmentId());
+    log.info("cNote received in Riconet: {}", cn.getCnote());
+
+    if (cn.getPickupId() != null) {
+      zoomBackendAPIClientService.recalculateCpdOfBf(unloadingEventDTO.getConsignmentId());
+    } else if (Boolean.TRUE.equals(isCnReachedAtRivigoLocation)) {
+      // with no pickUp, allow bfFlow only when this is first rivigo OU
+      zoomBackendAPIClientService.recalculateCpdOfBf(unloadingEventDTO.getConsignmentId());
+    }
+  }
+
+  private Boolean isFirstRivigoLocation(ConsignmentSchedule schedule) {
+    final List<LocationTag> nonRivigoLocationTag = LocationTag.NON_RIVIGO_LOCATION_TAGS;
+    return LocationTypeV2.LOCATION.equals(schedule.getLocationType())
+        && ConsignmentLocationStatus.REACHED.equals(schedule.getPlanStatus())
+        && !nonRivigoLocationTag.contains(schedule.getLocationTag());
   }
 
   private Boolean isLeftRivigoLocation(ConsignmentSchedule schedule) {
-    List<LocationTag> nonRivigoLocationTag =
-        Arrays.asList(
-            LocationTag.BF, LocationTag.DF, LocationTag.FROM_PINCODE, LocationTag.TO_PINCODE);
+    final List<LocationTag> nonRivigoLocationTag = LocationTag.NON_RIVIGO_LOCATION_TAGS;
     return LocationTypeV2.LOCATION.equals(schedule.getLocationType())
         && ConsignmentLocationStatus.LEFT.equals(schedule.getPlanStatus())
         && !nonRivigoLocationTag.contains(schedule.getLocationTag());
