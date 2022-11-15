@@ -19,6 +19,9 @@ public enum EventName {
   CN_STALE,
   CN_UNDELIVERY,
 
+  /** Event made for closing pace-ticket of issue type Change Delivery Address */
+  CN_DELIVERY_ADDRESS_CHANGE,
+
   COLLECTION_CHEQUE_BOUNCE,
   BANK_TRANSFER_INITIATED,
 

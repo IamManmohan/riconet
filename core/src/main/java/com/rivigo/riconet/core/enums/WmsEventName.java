@@ -15,5 +15,8 @@ public enum WmsEventName {
   CN_REMOVED_FROM_UNLOADING,
 
   // catch task closure for RTO CN processing
-  TASK_CLOSED
+  TASK_CLOSED,
+
+  /** Event made for closing RTO pace tickets upon creation of RTO_REVERSE task */
+  RTO_REVERSE_TASK_OPEN
 }
