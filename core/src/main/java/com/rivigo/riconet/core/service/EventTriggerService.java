@@ -77,6 +77,7 @@ public class EventTriggerService {
                 b -> appNotificationService.sendCnFirstOuDispatchNotification(notificationDTO));
         break;
       case CN_PAYMENT_HANDOVER_COMPLETED:
+      case CN_DELIVERY_ADDRESS_CHANGE:
         entityId = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
         ticketingClientService.autoCloseTicket(
             entityId, TicketEntityType.CN.name(), eventName.name());

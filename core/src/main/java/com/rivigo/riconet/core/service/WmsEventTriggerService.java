@@ -2,6 +2,8 @@ package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.WmsEventName;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
+import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ public class WmsEventTriggerService {
   @Autowired private AppNotificationService appNotificationService;
 
   @Autowired private RTOService rtoService;
+
+  @Autowired private TicketingClientService ticketingClientService;
 
   public void processNotification(NotificationDTO notificationDTO) {
     WmsEventName eventName = WmsEventName.valueOf(notificationDTO.getEventName());
@@ -35,6 +39,14 @@ public class WmsEventTriggerService {
         break;
       case TASK_CLOSED:
         rtoService.processTaskClosedEvent(notificationDTO);
+        break;
+      case RTO_REVERSE_TASK_OPEN:
+        String entityId =
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+        if (entityId != null) {
+          ticketingClientService.autoCloseTicket(
+              entityId, TicketEntityType.CN.name(), eventName.name());
+        }
         break;
       default:
         log.info("Event does not trigger anything {}", eventName);
