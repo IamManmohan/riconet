@@ -122,4 +122,7 @@ public class UrlConstant {
 
   /** Backend API to trigger duplicate pickup merging. */
   public final String MERGE_DUPLICATE_PICKUPS = "/operations/pickup/merge/duplicates/{pickupId}";
+
+  public static final String AUTO_CLOSE_WITH_METADATA_URL_ENDPOINT =
+      "/ticket/autoCloseWithMetaData";
 }

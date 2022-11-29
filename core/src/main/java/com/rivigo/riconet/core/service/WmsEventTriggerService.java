@@ -4,6 +4,8 @@ import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.WmsEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.enums.zoomticketing.TicketEntityType;
+import java.util.Collections;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +45,14 @@ public class WmsEventTriggerService {
       case RTO_REVERSE_TASK_OPEN:
         String entityId =
             notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
-        if (entityId != null) {
-          ticketingClientService.autoCloseTicket(
-              entityId, TicketEntityType.CN.name(), eventName.name());
+        String reverseCnote =
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.REVERSE_CNOTE.toString());
+        if (entityId != null && reverseCnote != null) {
+          Map<String, String> metadata =
+              Collections.singletonMap(
+                  ZoomCommunicationFieldNames.REVERSE_CNOTE.toString(), reverseCnote);
+          ticketingClientService.autoCloseTicketWithMetaData(
+              entityId, TicketEntityType.CN.name(), eventName.name(), metadata);
         }
         break;
       default:

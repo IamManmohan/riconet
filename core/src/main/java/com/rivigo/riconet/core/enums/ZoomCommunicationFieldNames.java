@@ -54,7 +54,9 @@ public enum ZoomCommunicationFieldNames {
   CONSIGNMENT_ALERT_ID,
 
   // flag to check if qc has been performed
-  QC_DONE;
+  QC_DONE,
+
+  REVERSE_CNOTE;
 
   public enum Consignment {
     DELIVERY_DATE_TIME
