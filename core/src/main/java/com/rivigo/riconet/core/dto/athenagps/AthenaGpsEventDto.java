@@ -28,4 +28,5 @@ public class AthenaGpsEventDto {
   private Double longitude;
   private Long gpsTimestamp;
   private String gpsEventType; // GPS_LAT_LONG_UPDATE
+  private String locationDescription;
 }
