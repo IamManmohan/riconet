@@ -73,6 +73,7 @@ public class TicketingEmailTemplateHelper {
     List<String> emailList = new ArrayList<>();
 
     getEmailList(metadata, TicketingFieldName.CREATOR_EMAIL).ifPresent(emailList::addAll);
+    getEmailList(metadata, TicketingFieldName.REQUESTOR_EMAIL).ifPresent(emailList::addAll);
     getEmailList(metadata, TicketingFieldName.ASSIGNEE_EMAIL_LIST).ifPresent(emailList::addAll);
     getEmailList(metadata, TicketingFieldName.CC_USER_EMAIL_LIST).ifPresent(emailList::addAll);
     getEmailList(metadata, TicketingFieldName.OWNER_EMAIL_LIST).ifPresent(emailList::addAll);
