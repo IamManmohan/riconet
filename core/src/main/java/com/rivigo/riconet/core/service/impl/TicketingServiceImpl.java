@@ -105,10 +105,7 @@ public class TicketingServiceImpl implements TicketingService {
   private boolean emailUpdateRequired(EventName eventName, Map<String, String> metadata) {
     switch (eventName) {
       case TICKET_CREATION:
-      case TICKET_STATUS_CHANGE:
       case TICKET_ESCALATION_CHANGE:
-      case TICKET_SEVERITY_CHANGE:
-      case TICKET_COMMENT_CREATION:
       case TICKET_CC_NEW_PERSON_ADDITION:
         return false;
       case TICKET_ASSIGNEE_CHANGE:
@@ -118,6 +115,16 @@ public class TicketingServiceImpl implements TicketingService {
                 s ->
                     ZoomTicketingConstant.groupTypeIdsForAssigneeChangeEmail.contains(
                         Long.valueOf(s)))
+            .isPresent();
+      case TICKET_SEVERITY_CHANGE:
+      case TICKET_COMMENT_CREATION:
+      case TICKET_STATUS_CHANGE:
+        return TicketingEmailTemplateHelper.getValueFromMap(
+                metadata, TicketingFieldName.GROUP_TYPE_ID)
+            .filter(
+                s ->
+                    ZoomTicketingConstant.groupTypeIdsForTicketCommentOrSeverityOrStatusChangeEmail
+                        .contains(Long.valueOf(s)))
             .isPresent();
       default:
         log.info(" Email update not required for event : {}", eventName);

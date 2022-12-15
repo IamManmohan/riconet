@@ -67,6 +67,11 @@ public class ZoomTicketingConstant {
 
   public static final Long GREEN_GROUP_TYPE_ID = 159L;
 
+  public static final Long HQTR_TECH_SUPPORT_GROUP_TYPE_ID = 223L;
+
   public static final List<Long> groupTypeIdsForAssigneeChangeEmail =
       ImmutableList.of(PRIME_CORPORATE_GROUP_TYPE_ID, GREEN_GROUP_TYPE_ID);
+
+  public static final List<Long> groupTypeIdsForTicketCommentOrSeverityOrStatusChangeEmail =
+      ImmutableList.of(HQTR_TECH_SUPPORT_GROUP_TYPE_ID);
 }
