@@ -46,9 +46,6 @@ public class EventTopicNameConfig {
   @Value("${EXPRESS_APP_PICKUP_SINK_ERROR}")
   private String expressAppPickupSinkError;
 
-  @Value("${BF_PICKUP_CHARGES_ACTION_ERROR}")
-  private String bfPickupChargesActionError;
-
   @Value("${CN_ACTION_ERROR}")
   private String cnActionError;
 
@@ -108,10 +105,6 @@ public class EventTopicNameConfig {
 
   public String expressAppPickupSinkError() {
     return expressAppPickupSinkError;
-  }
-
-  public String bfPickupChargesActionError() {
-    return bfPickupChargesActionError;
   }
 
   public String cnActionError() {

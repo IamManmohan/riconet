@@ -13,7 +13,6 @@ import com.rivigo.riconet.core.config.ZoomRiconetConfig;
 import com.rivigo.riconet.core.consumer.HealthCheckConsumer;
 import com.rivigo.riconet.core.consumerabstract.ConsumerModel;
 import com.rivigo.riconet.event.consumer.AthenaGpsEventsConsumer;
-import com.rivigo.riconet.event.consumer.BfPickupChargesActionConsumer;
 import com.rivigo.riconet.event.consumer.CnActionConsumer;
 import com.rivigo.riconet.event.consumer.ConsignmentBlockUnblockConsumer;
 import com.rivigo.riconet.event.consumer.ExpressAppPickupConsumer;
@@ -44,9 +43,6 @@ public class EventMain {
   private final ZoomEventTriggerConsumer zoomEventTriggerConsumer;
 
   private final ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer;
-
-  private final BfPickupChargesActionConsumer bfPickupChargesActionConsumer;
-
   private final FinanceEventsConsumer financeEventsConsumer;
 
   private final CnActionConsumer cnActionConsumer;
@@ -105,9 +101,6 @@ public class EventMain {
   @Value("${financeEventsConsumer.group.id}")
   private String financeEventsGroup;
 
-  @Value("${bfPickupCharges.group.id}")
-  private String bfPickupChargesGroup;
-
   @Value("${wmsEventConsumer.group.id}")
   private String wmsEventGroup;
 
@@ -130,7 +123,6 @@ public class EventMain {
       HealthCheckConsumer healthCheckConsumer,
       ZoomEventTriggerConsumer zoomEventTriggerConsumer,
       ConsignmentBlockUnblockConsumer consignmentBlockUnblockConsumer,
-      BfPickupChargesActionConsumer bfPickupChargesActionConsumer,
       FinanceEventsConsumer financeEventsConsumer,
       CnActionConsumer cnActionConsumer,
       WmsEventConsumer wmsEventConsumer,
@@ -143,7 +135,6 @@ public class EventMain {
     this.healthCheckConsumer = healthCheckConsumer;
     this.zoomEventTriggerConsumer = zoomEventTriggerConsumer;
     this.consignmentBlockUnblockConsumer = consignmentBlockUnblockConsumer;
-    this.bfPickupChargesActionConsumer = bfPickupChargesActionConsumer;
     this.financeEventsConsumer = financeEventsConsumer;
     this.cnActionConsumer = cnActionConsumer;
     this.wmsEventConsumer = wmsEventConsumer;
@@ -187,12 +178,6 @@ public class EventMain {
         consignmentBlockerGroup,
         consignmentBlockUnblockConsumer);
     load(materializer, system, bootstrapServers, financeEventsGroup, financeEventsConsumer);
-    load(
-        materializer,
-        system,
-        bootstrapServers,
-        bfPickupChargesGroup,
-        bfPickupChargesActionConsumer);
     load(materializer, system, bootstrapServers, wmsEventGroup, wmsEventConsumer);
     load(
         materializer,
