@@ -1,5 +1,7 @@
 package com.rivigo.riconet.core.constants;
 
+import java.math.BigInteger;
+
 public class ClientConstants {
 
   private ClientConstants() {
@@ -16,4 +18,10 @@ public class ClientConstants {
   public static final String ZOOM_DOCS_CONSIGNMENT_CLIENT_CODE = "ZDOCS";
 
   public static final String CORPORATE_CLIENT_RETURN_CN_MOVEMENT_TYPE = "RETURN";
+
+  public static final String SERVICE_POC_STRING = "SERVICE_POC";
+
+  public static final BigInteger POC_LEVEL_FOR_EMAIL = BigInteger.valueOf(1);
+
+  public static final String CONSIGNER_VALUE = "CONSIGNER";
 }
