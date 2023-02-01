@@ -5,7 +5,7 @@ import static com.rivigo.riconet.core.test.Utils.TestConstants.eventName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
-import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
+import com.rivigo.riconet.core.dto.ZoomCommunicationsDTO;
 import com.rivigo.riconet.core.service.SmsService;
 import com.rivigo.riconet.core.service.ZoomCommunicationsService;
 import com.rivigo.riconet.core.service.ZoomPropertyService;
@@ -40,7 +40,7 @@ public class ZoomCommunicationServiceTest {
     String message = "send sms";
     String sendSmsResponse = "sms sent sucessfully";
     NotificationDTO notificationDto = TestUtils.getDummyNotificationDto(eventName, null);
-    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO =
+    ZoomCommunicationsDTO zoomCommunicationsDTO =
         TestUtils.getDummyZoomCommunicationSmsDto(
             phoneNumber, message, null, notificationDto.toString());
     Integer dndStartTime = 1000 * 20 * 60 * 60;
@@ -56,7 +56,7 @@ public class ZoomCommunicationServiceTest {
         .thenReturn(Collections.singletonList(eventName));
     Mockito.when(smsService.sendSms(phoneNumber, message)).thenReturn(sendSmsResponse);
 
-    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
+    zoomCommunicationsService.processNotification(zoomCommunicationsDTO);
     Assert.assertNull(notificationDto.getIsTemplateV2());
   }
 
@@ -66,7 +66,7 @@ public class ZoomCommunicationServiceTest {
     String templateName = "crm call did not connect";
     TemplateV2DTO templateV2DTO = TestUtils.getDummyTemplateV2Dto(templateName);
     NotificationDTO notificationDto = TestUtils.getDummyNotificationDto(eventName, true);
-    ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO =
+    ZoomCommunicationsDTO zoomCommunicationsDTO =
         TestUtils.getDummyZoomCommunicationSmsDto(
             phoneNumber, null, templateV2DTO.toString(), notificationDto.toString());
     Integer dndStartTime = 1000 * 20 * 60 * 60;
@@ -84,7 +84,7 @@ public class ZoomCommunicationServiceTest {
         .thenReturn(Collections.singletonList(eventName));
     Mockito.when(smsService.sendSmsV2(phoneNumber, templateV2DTO)).thenReturn(true);
 
-    zoomCommunicationsService.processNotificationMessage(zoomCommunicationsSMSDTO);
+    zoomCommunicationsService.processNotification(zoomCommunicationsDTO);
     assert notificationDto.getIsTemplateV2();
   }
 }

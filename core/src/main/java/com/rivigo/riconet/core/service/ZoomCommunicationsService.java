@@ -3,10 +3,14 @@ package com.rivigo.riconet.core.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
-import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
+import com.rivigo.riconet.core.dto.ZoomCommunicationsDTO;
+import com.rivigo.riconet.core.enums.Clients;
+import com.rivigo.riconet.core.utils.ConsignmentUtils;
 import com.rivigo.zoom.common.enums.ZoomPropertyName;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -25,7 +29,7 @@ public class ZoomCommunicationsService {
 
   @Autowired private ObjectMapper objectMapper;
 
-  public void processNotificationMessage(ZoomCommunicationsSMSDTO zoomCommunicationsSMSDTO) {
+  public void processNotification(ZoomCommunicationsDTO zoomCommunicationsDTO) {
 
     // This is usually in evening
     Integer dndStartTime =
@@ -37,12 +41,12 @@ public class ZoomCommunicationsService {
             ZoomPropertyName.ZOOM_COMMUNICATION_DND_END_TIME, 1000 * 8 * 60 * 60);
 
     log.info("Processing zoomCommunicationsSMSDTO");
-    if (null == zoomCommunicationsSMSDTO) {
+    if (null == zoomCommunicationsDTO) {
       log.debug("zoomCommunicationsSMSDTO is null");
       return;
     }
 
-    if (StringUtils.isEmpty(zoomCommunicationsSMSDTO.getPhoneNumber())) {
+    if (StringUtils.isEmpty(zoomCommunicationsDTO.getPhoneNumber())) {
       log.debug("zoomCommunicationsSmsDTO with empty or null phonenumbers");
       return;
     }
@@ -55,11 +59,15 @@ public class ZoomCommunicationsService {
 
     TemplateV2DTO templateV2 = null;
     Boolean isTemplateV2 = false;
+    Boolean isCorporate = false;
     try {
       NotificationDTO notificationDTO =
-          objectMapper.readValue(
-              zoomCommunicationsSMSDTO.getNotificationDTO(), NotificationDTO.class);
-      String templateString = zoomCommunicationsSMSDTO.getTemplateV2();
+          objectMapper.readValue(zoomCommunicationsDTO.getNotificationDTO(), NotificationDTO.class);
+      isCorporate =
+          Optional.ofNullable(notificationDTO.getConditions())
+              .orElse(new ArrayList<>())
+              .contains(Clients.CORPORATE.toString());
+      String templateString = zoomCommunicationsDTO.getTemplateV2();
       templateV2 =
           StringUtils.isBlank(templateString)
               ? null
@@ -73,35 +81,41 @@ public class ZoomCommunicationsService {
     } catch (IOException ex) {
       log.error(
           "Error occured while processing NotificationDTO for {} ",
-          zoomCommunicationsSMSDTO.getEventUID(),
+          zoomCommunicationsDTO.getEventUID(),
           ex);
     }
 
-    log.info(
-        "Sending sms, message {}, templateV2 {}, on Phone number {}",
-        zoomCommunicationsSMSDTO.getMessage(),
-        zoomCommunicationsSMSDTO.getTemplateV2(),
-        zoomCommunicationsSMSDTO.getPhoneNumber());
+    if (ConsignmentUtils.SHOULD_SEND_EMAIL.negate().test(isCorporate, zoomCommunicationsDTO)) {
+      log.info(
+          "Sending sms, message {}, templateV2 {}, on Phone number {}",
+          zoomCommunicationsDTO.getMessage(),
+          zoomCommunicationsDTO.getTemplateV2(),
+          zoomCommunicationsDTO.getPhoneNumber());
 
-    log.debug(
-        "DND start time {} and end time {}, isDndExempted: {}",
-        dndStartTime,
-        dndEndTime,
-        isDndExempted);
-    int millisOfDay =
-        DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
-    if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
-      log.info("Value of IsTemplateV2 flag is {}", isTemplateV2);
-      if (Boolean.TRUE.equals(isTemplateV2)) {
-        smsService.sendSmsV2(zoomCommunicationsSMSDTO.getPhoneNumber(), templateV2);
+      log.debug(
+          "DND start time {} and end time {}, isDndExempted: {}",
+          dndStartTime,
+          dndEndTime,
+          isDndExempted);
+      int millisOfDay =
+          DateTime.now().withZone(DateTimeZone.forOffsetHoursMinutes(5, 30)).getMillisOfDay();
+      if (isDndExempted || (millisOfDay >= dndEndTime && millisOfDay < dndStartTime)) {
+        log.info("Value of IsTemplateV2 flag is {}", isTemplateV2);
+        if (Boolean.TRUE.equals(isTemplateV2)) {
+          smsService.sendSmsV2(zoomCommunicationsDTO.getPhoneNumber(), templateV2);
+        } else {
+          String returnValue =
+              smsService.sendSms(
+                  zoomCommunicationsDTO.getPhoneNumber(), zoomCommunicationsDTO.getMessage());
+          log.info("send sms response is {}", returnValue);
+        }
       } else {
-        String returnValue =
-            smsService.sendSms(
-                zoomCommunicationsSMSDTO.getPhoneNumber(), zoomCommunicationsSMSDTO.getMessage());
-        log.info("send sms response is {}", returnValue);
+        log.info("Can not send sms as the current time is dnd time");
       }
     } else {
-      log.info("Can not send sms as the current time is dnd time");
+      log.info(
+          "Not Sending SMS as the event is for Corporate Client Consignor, eventUID {}",
+          zoomCommunicationsDTO.getEventUID());
     }
   }
 }

@@ -2,12 +2,12 @@ package com.rivigo.riconet.core.test.Utils;
 
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
-import com.rivigo.riconet.core.dto.ZoomCommunicationsSMSDTO;
+import com.rivigo.riconet.core.dto.ZoomCommunicationsDTO;
 
 public class TestUtils {
-  public static ZoomCommunicationsSMSDTO getDummyZoomCommunicationSmsDto(
+  public static ZoomCommunicationsDTO getDummyZoomCommunicationSmsDto(
       String phoneNumber, String message, String templateV2, String notificationDto) {
-    ZoomCommunicationsSMSDTO dto = new ZoomCommunicationsSMSDTO();
+    ZoomCommunicationsDTO dto = new ZoomCommunicationsDTO();
     dto.setPhoneNumber(phoneNumber);
     dto.setMessage(message);
     dto.setTemplateV2(templateV2);

@@ -15,4 +15,6 @@ public class EmailConstant {
   public static final String SERVICE_EMAIL_ID = "service@rivigo.com";
 
   public static final String CE_TEAM_EMAIL_ID = "CETeam@rivigo.com";
+
+  public static final String CN_UPDATE_EMAIL_SUBJECT_TEMPLATE = "MESPL | Consignment Update | %s";
 }

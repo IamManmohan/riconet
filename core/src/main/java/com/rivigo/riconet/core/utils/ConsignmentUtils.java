@@ -1,6 +1,10 @@
 package com.rivigo.riconet.core.utils;
 
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.dto.ZoomCommunicationsDTO;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
 public class ConsignmentUtils {
 
@@ -12,4 +16,11 @@ public class ConsignmentUtils {
     }
     return retVal;
   }
+
+  public static BiPredicate<Boolean, ZoomCommunicationsDTO> SHOULD_SEND_EMAIL =
+      (u, v) ->
+          Boolean.TRUE.equals(u)
+              && Optional.ofNullable(v.getUserType())
+                  .orElse("")
+                  .equals(ClientConstants.CONSIGNER_VALUE);
 }
