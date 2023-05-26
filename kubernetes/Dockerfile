@@ -48,7 +48,8 @@ ENV COMMON_JAVA_OPTS="$EXTRA_ARGS -Xms$XMX_XMS_VALUE -Xmx$XMX_XMS_VALUE \
     -Dzoom.mysql.url=$BACKEND_READ_JDBC_URL \
     -Dzoom.mysql.username=$BACKEND_READ_JDBC_USERNAME \
     -Dzoom.mysql.password=$BACKEND_READ_JDBC_PASSWORD \
-    -Dtopic.prefix.out=$OUT_TOPIC_PREFIX"
+    -Dtopic.prefix.out=$OUT_TOPIC_PREFIX \
+    -Djsse.enableSNIExtension=false"
 
 
 #https://stackoverflow.com/questions/35184558/multiple-app-nodes-how-to-expose-jmx-in-kubernetes?rq=1

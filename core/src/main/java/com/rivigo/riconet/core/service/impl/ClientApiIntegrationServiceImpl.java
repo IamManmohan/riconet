@@ -70,6 +70,7 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -307,6 +308,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                     Collectors.toMap(
                         ConsignmentUploadedFiles::getFileTypes,
                         ConsignmentUploadedFiles::getS3URL));
+
         return DeliveryDeliveredDto.builder()
             .podDelivered(fileTypeToUrlMap.getOrDefault(FileTypes.POD, ""))
             .codImage(fileTypeToUrlMap.getOrDefault(FileTypes.COD_DOD, ""))
@@ -451,6 +453,27 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         }
         log.info("List of flipkart dtos: {}", clientIntegrationRequestDTOList.toString());
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);
+        break;
+      case ClientConstants.LOGI_FREIGHT_CLIENT_ID:
+        // validate and mark the consignments delivered in shipX
+        String cnote = consignmentService.getCnoteByIdAndIsActive(notificationDTO.getEntityId());
+        boolean isPrimaryCn = consignmentService.isPrimaryConsignment(cnote);
+        if (CnActionEventName.CN_DELIVERY.name().equals(notificationDTO.getEventName())
+            && isPrimaryCn) {
+          log.info("NotificationDTO for LOGIFREIGHT:{}", notificationDTO);
+          List<ConsignmentUploadedFiles> uploadedFiles =
+              consignmentUploadedFilesRepository.findByFileTypesAndConsignmentId(
+                  FileTypes.POD, notificationDTO.getEntityId());
+          ConsignmentUploadedFiles consignmentUploadedFiles =
+              CollectionUtils.isEmpty(uploadedFiles) ? null : uploadedFiles.get(0);
+          clientConsignmentService.validateAirConsignmentsAndMarkDelivery(
+              notificationDTO, consignmentUploadedFiles);
+        } else {
+          log.debug(
+              "ignoring the {} for consignment_id: {}.",
+              notificationDTO.getEntityName(),
+              notificationDTO.getEntityId());
+        }
         break;
       default:
         log.info("No event defined for this client {}", notificationDTO);

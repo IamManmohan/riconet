@@ -8,6 +8,8 @@ public class ClientConstants {
     throw new IllegalStateException("Utility class");
   }
 
+  // TODO: get this corrected
+  public static final String LOGI_FREIGHT_CLIENT_ID = "9721";
   public static final String HILTI_CLIENT_ID = "619";
   public static final String HILTI_CLIENT_ID_DEP = "2187";
   public static final String HILTI_CLIENT_ID_CD = "2870";

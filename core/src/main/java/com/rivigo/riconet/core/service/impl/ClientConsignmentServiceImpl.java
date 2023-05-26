@@ -1,17 +1,23 @@
 package com.rivigo.riconet.core.service.impl;
 
-import static com.rivigo.riconet.core.constants.ConsignmentConstant.METADATA;
-
+import com.rivigo.riconet.core.constants.ConsignmentConstant;
+import com.rivigo.riconet.core.dto.NotificationDTO;
+import com.rivigo.riconet.core.dto.logifreight.RecordDeliveryRequestDto;
 import com.rivigo.riconet.core.service.BoxService;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentService;
+import com.rivigo.riconet.core.service.LogiFreightRestService;
 import com.rivigo.zoom.common.enums.BoxStatus;
 import com.rivigo.zoom.common.enums.CustomFieldsMetadataIdentifier;
 import com.rivigo.zoom.common.model.Box;
 import com.rivigo.zoom.common.model.BoxHistory;
+import com.rivigo.zoom.common.model.Consignment;
+import com.rivigo.zoom.common.model.ConsignmentUploadedFiles;
 import com.rivigo.zoom.common.model.consignmentcustomfields.ConsignmentCustomFieldValue;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldMetadataRepository;
 import com.rivigo.zoom.common.repository.mysql.ConsignmentCustomFieldValueRepository;
+import com.rivigo.zoom.util.commons.exception.ZoomException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +25,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -35,6 +43,8 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
 
   private final ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
 
+  private final LogiFreightRestService logiFreightRestService;
+
   public Map<String, Map<String, String>> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
 
@@ -42,7 +52,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
     Long cnCustomFieldMetadataId =
         consignmentCustomFieldMetadataRepository
             .findByCustomFieldsMetadataIdentifierAndFieldName(
-                CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, METADATA)
+                CustomFieldsMetadataIdentifier.CN_CREATE_UPDATE_API, ConsignmentConstant.METADATA)
             .getId();
     Map<Long, ConsignmentCustomFieldValue> cnCustomFieldValue =
         consignmentCustomFieldValueRepository
@@ -76,6 +86,70 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   public List<String> getBarcodeListFromConsignmentId(Long cnId) {
     List<Box> boxList = boxService.getByConsignmentIdIncludingInactive(cnId);
     return getFormattedBarcodes(boxList).stream().map(Box::getBarCode).collect(Collectors.toList());
+  }
+
+  private RecordDeliveryRequestDto populateRecordDeliveryRequestDto(
+      NotificationDTO notificationDTO, ConsignmentUploadedFiles consignmentUploadedFiles) {
+    Long cnId = notificationDTO.getEntityId();
+    Long cnCustomFieldMetadataId =
+        consignmentCustomFieldMetadataRepository
+            .findByCustomFieldsMetadataIdentifierAndFieldName(
+                CustomFieldsMetadataIdentifier.CLIENT_INTEGRATION_IDENTIFIER,
+                ConsignmentConstant.REFERENCE_NUMBER)
+            .getId();
+    List<ConsignmentCustomFieldValue> consignmentCustomFieldValues =
+        consignmentCustomFieldValueRepository.findByConsignmentIdInAndMetadataIdAndIsActiveTrue(
+            Collections.singletonList(cnId), cnCustomFieldMetadataId);
+    if (CollectionUtils.isEmpty(consignmentCustomFieldValues)
+        || StringUtils.isEmpty(consignmentCustomFieldValues.get(0).getValue())) {
+      throw new ZoomException("Unable to find LR number for consignmentId: {}", cnId);
+    }
+    Consignment consignment = consignmentService.getConsignmentById(cnId);
+    RecordDeliveryRequestDto requestDto = new RecordDeliveryRequestDto();
+    RecordDeliveryRequestDto.LrDeliveryRequestDto lrDeliveryRequestDto =
+        new RecordDeliveryRequestDto.LrDeliveryRequestDto();
+    lrDeliveryRequestDto.setNumber(consignmentCustomFieldValues.get(0).getValue());
+    lrDeliveryRequestDto.setDelivered_packages(String.valueOf(consignment.getTotalBoxes()));
+    requestDto.setLr(lrDeliveryRequestDto);
+    return requestDto;
+  }
+
+  @Override
+  public void validateAirConsignmentsAndMarkDelivery(
+      NotificationDTO notificationDTO, ConsignmentUploadedFiles consignmentUploadedFiles) {
+    Long cnId = notificationDTO.getEntityId();
+    log.info("Checking if consignment with id : {}, is MLL air consignment", cnId);
+    // check if LogiFreight air cn or not
+    Long cnCustomFieldMetadataId =
+        consignmentCustomFieldMetadataRepository
+            .findByCustomFieldsMetadataIdentifierAndFieldName(
+                CustomFieldsMetadataIdentifier.CLIENT_INTEGRATION_IDENTIFIER,
+                ConsignmentConstant.IS_LOGI_FREIGHT_AIR_CN)
+            .getId();
+    List<ConsignmentCustomFieldValue> consignmentCustomFieldValues =
+        consignmentCustomFieldValueRepository.findByConsignmentIdInAndMetadataIdAndIsActiveTrue(
+            Collections.singletonList(cnId), cnCustomFieldMetadataId);
+    if (CollectionUtils.isEmpty(consignmentCustomFieldValues)
+        && !Boolean.parseBoolean(consignmentCustomFieldValues.get(0).getValue())) {
+      log.info("CN: {}, is not a Air CN", cnId);
+      return;
+    }
+    // hit Logi Freight apis, ad mark the CNs delivered in their system.
+    log.info("Hitting LOGIFREIGHT Client for CN id : {}", cnId);
+    RecordDeliveryRequestDto recordDeliveryRequestDto =
+        populateRecordDeliveryRequestDto(notificationDTO, consignmentUploadedFiles);
+
+    /*
+     *
+     * <li>Step 1: releasing LR hold
+     * <li>Step 2: Marking delivery in logifreight
+     * <li>Step 3: Attaching PODs to logifreight
+     */
+    logiFreightRestService.releaseLrHold(recordDeliveryRequestDto.getLr().getNumber());
+    logiFreightRestService.recordConsignmentDelivery(recordDeliveryRequestDto);
+    logiFreightRestService.uploadPod(
+        recordDeliveryRequestDto.getLr().getNumber(),
+        consignmentUploadedFiles != null ? consignmentUploadedFiles.getS3URL() : "");
   }
 
   private List<Box> getFormattedBarcodes(List<Box> boxList) {
