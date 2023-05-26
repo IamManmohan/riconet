@@ -9,6 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rivigo.riconet.core.service.RestClientUtilityService;
 import com.rivigo.zoom.util.commons.exception.ZoomException;
+import com.rivigo.zoom.util.rest.enums.RetryRestRequest;
+import com.rivigo.zoom.util.rest.util.RestUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -114,6 +116,30 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
 
   @Override
   public <T> Optional<T> executeRest(
+      String baseUrl,
+      RetryRestRequest retryRestRequest,
+      Map<String, String> pathVariableValueMap,
+      MultiValueMap<String, String> paramMap,
+      Object body,
+      HttpHeaders customHeaders,
+      Class<T> expectedClass,
+      Long timeOut,
+      Integer retryAttempts) {
+    String url =
+        RestUtils.getUrl(baseUrl, retryRestRequest.getEndpoint(), pathVariableValueMap, paramMap);
+    return executeRest(
+        url,
+        retryRestRequest.getHttpMethod(),
+        body != null ? new HttpEntity(body, customHeaders) : new HttpEntity<>(customHeaders),
+        expectedClass,
+        timeOut != null ? timeOut : DEFAULT_TIMEOUT_MILLIS,
+        retryRestRequest.isRetryEndpoint()
+            ? retryAttempts != null ? retryAttempts : DEFAULT_RETRY_ATTEMPTS
+            : 0);
+  }
+
+  @Override
+  public <T> Optional<T> executeRest(
       String url,
       HttpMethod httpMethod,
       HttpEntity entity,
@@ -132,7 +158,12 @@ public class RestClientUtilityServiceImpl implements RestClientUtilityService {
         response =
             Optional.ofNullable(
                 executeRestWithTimeout(url, httpMethod, entity, expectedClass, timeoutMillis));
-        break;
+
+        // Check if the response is present
+        if (response.isPresent()) {
+          log.info("Received API response, avoiding retries for this.");
+          break;
+        }
       } catch (TimeoutException | ExecutionException | InterruptedException e) {
         log.error("API call failed, retryCount : {}", retryCount, e);
         if (e.getCause() instanceof ZoomException) {

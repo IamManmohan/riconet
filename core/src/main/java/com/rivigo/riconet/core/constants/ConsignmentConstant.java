@@ -21,6 +21,8 @@ public class ConsignmentConstant {
   public static final String SHORT_URL = "shortUrl";
   public static final String URL = "url";
   public static final String METADATA = "metadata";
+  public static final String REFERENCE_NUMBER = "reference_number";
+  public static final String IS_LOGI_FREIGHT_AIR_CN = "client_integration_is_logifreight_air_cn";
 
   /** Constant String to hold Normal CnoteType constant. */
   public static final String NORMAL_CNOTE_TYPE = "NORMAL";
