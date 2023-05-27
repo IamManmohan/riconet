@@ -65,6 +65,8 @@ public class LogiFreightRestServiceImpl implements LogiFreightRestService {
     headers.set(
         LogiFreightConstants.LOGIFREIGHT_API_KEY_HEADER_NAME,
         getUserLoginToken(email, password, cacheKey));
+    headers.set(
+        LogiFreightConstants.USERAGENT_HEADER, LogiFreightConstants.USERAGENT_HEADER_BROWSER_VALUE);
     return headers;
   }
 
