@@ -11,7 +11,7 @@ public class LogiFreightConstants {
   public static final String USER_LOGIN_URL = "/integration/users/login.json";
   public static final String GET_CONSIGNMENT_DETAIL_URL = "/integration/consignments/list.json";
 
-  public static final Long USER_LOGIN_KEY_CACHE_DURATION_IN_MILLIS = 1000 * 60 * 60 * 12L;
+  public static final Long USER_LOGIN_KEY_CACHE_DURATION_IN_SECONDS = 60 * 60 * 24L; // 24hrs
 
   public static final String LOGIFREIGHT_API_KEY_HEADER_NAME = "X-SHIPX-API-KEY";
   public static final String USERAGENT_HEADER = "user-agent";

@@ -59,14 +59,19 @@ public class LogiFreightRestServiceImpl implements LogiFreightRestService {
 
   private final CacheService cacheService;
 
+  private HttpHeaders getLogiFreightHeaders() {
+    HttpHeaders headers = restClientUtilityService.getHeaders();
+    headers.set(
+        LogiFreightConstants.USERAGENT_HEADER, LogiFreightConstants.USERAGENT_HEADER_BROWSER_VALUE);
+    return headers;
+  }
+
   private HttpHeaders getLogiFreightHeadersWithToken(
       String email, String password, String cacheKey) {
-    HttpHeaders headers = restClientUtilityService.getHeaders();
+    HttpHeaders headers = getLogiFreightHeaders();
     headers.set(
         LogiFreightConstants.LOGIFREIGHT_API_KEY_HEADER_NAME,
         getUserLoginToken(email, password, cacheKey));
-    headers.set(
-        LogiFreightConstants.USERAGENT_HEADER, LogiFreightConstants.USERAGENT_HEADER_BROWSER_VALUE);
     return headers;
   }
 
@@ -101,7 +106,7 @@ public class LogiFreightRestServiceImpl implements LogiFreightRestService {
                   null,
                   null,
                   userLoginRequestDto,
-                  restClientUtilityService.getHeaders(),
+                  getLogiFreightHeaders(),
                   UserLoginResponseDto.class,
                   timeoutMillis,
                   LogiFreightRestServiceRequest.GET_USER_LOGIN_DETAILS.isRetryEndpoint()
@@ -115,7 +120,7 @@ public class LogiFreightRestServiceImpl implements LogiFreightRestService {
 
       String apiKey = userLoginResponseDto.getUser().getApiKey();
       cacheService.setValueWithTtl(
-          cacheKay, apiKey, LogiFreightConstants.USER_LOGIN_KEY_CACHE_DURATION_IN_MILLIS);
+          cacheKay, apiKey, LogiFreightConstants.USER_LOGIN_KEY_CACHE_DURATION_IN_SECONDS);
       return apiKey;
     } catch (Exception e) {
       log.error(e.getMessage(), e);
