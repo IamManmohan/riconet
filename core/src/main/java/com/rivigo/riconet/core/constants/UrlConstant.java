@@ -125,4 +125,7 @@ public class UrlConstant {
 
   public static final String AUTO_CLOSE_WITH_METADATA_URL_ENDPOINT =
       "/ticket/autoCloseWithMetaData";
+
+  public static final String BLOCK_UNBLOCK_CN_FOR_PARTIAL_DELIVERY =
+      "/consignmentBlocker/partialDelivery";
 }

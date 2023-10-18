@@ -1,6 +1,7 @@
 package com.rivigo.riconet.event.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rivigo.riconet.core.constants.UrlConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.enums.CnBlockUnblockEventName;
 import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
@@ -12,6 +13,7 @@ import com.rivigo.zoom.backend.client.dto.request.ChequeBounceRequestDTO;
 import com.rivigo.zoom.common.enums.ConsignmentBlockerRequestType;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Component
 @Slf4j
@@ -42,11 +46,32 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
       case CN_SHORTAGE_RESOLUTION:
         unblockCn(notificationDTO);
         break;
+      case BLOCK_UNBLOCK_PARTIAL_DELIVERY:
+        blockUnblockCNsForPartialDelivery(notificationDTO);
       default:
         log.info(
             "Skipping event {} processing from {}",
             notificationDTO.getEventName(),
             this.getClass().getName());
+    }
+  }
+
+  private void blockUnblockCNsForPartialDelivery(NotificationDTO notificationDTO) {
+    String cnote = notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CNOTE.name());
+    try {
+      MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+      params.put("cnote", Collections.singletonList(cnote));
+      log.info("hitting zoom-backend blockUnblockPartialDelivery API for CN: {}", cnote);
+      JsonNode responseJson =
+          apiClientService.getEntity(
+              null,
+              HttpMethod.POST,
+              UrlConstant.BLOCK_UNBLOCK_CN_FOR_PARTIAL_DELIVERY,
+              params,
+              zoomBackendBaseUrl);
+      log.debug("response {}", responseJson);
+    } catch (Exception ex) {
+      log.error("Exception occurred during partial delivery blocking/unblocking", ex);
     }
   }
 
