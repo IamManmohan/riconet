@@ -48,6 +48,7 @@ public class ConsignmentBlockUnblockServiceImpl implements ConsignmentBlockUnblo
         break;
       case BLOCK_UNBLOCK_PARTIAL_DELIVERY:
         blockUnblockCNsForPartialDelivery(notificationDTO);
+        break;
       default:
         log.info(
             "Skipping event {} processing from {}",
