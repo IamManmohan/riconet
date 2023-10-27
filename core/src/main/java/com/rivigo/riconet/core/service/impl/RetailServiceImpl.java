@@ -328,6 +328,7 @@ public class RetailServiceImpl implements RetailService {
             : "-";
     retailNotification.setEddString(dateStr);
     Map<String, String> valuesMap = objectMapper.convertValue(retailNotification, Map.class);
+    valuesMap = smsService.sanitizeStringValuesForStringLimit(valuesMap);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
     String sms = sub.replace(template);
     valuesMap.put("paymentType", "-");

@@ -373,6 +373,8 @@ public class PickupServiceImpl implements PickupService {
         new BigDecimal(pickupNotification.getWeight()).stripTrailingZeros().toPlainString());
     valuesMap.put("consignorMobile", pickupNotification.getConsignorMobile());
     valuesMap.put("contactPerson", pickupNotification.getContactPerson());
+
+    valuesMap = smsService.sanitizeStringValuesForStringLimit(valuesMap);
     StrSubstitutor sub = new StrSubstitutor(valuesMap);
     return sub.replace(template);
   }
