@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -204,20 +203,21 @@ public class SmsServiceImpl implements SmsService {
     return message.replaceAll(NON_ASCII, "");
   }
 
-  public Map<String, String> sanitizeStringValuesForStringLimit(Map<String,String> valuesMap) {
+  public Map<String, String> sanitizeStringValuesForStringLimit(Map<String, String> valuesMap) {
 
     // adding logic to limit the length of any string element which can exceed the prescribed length
     // of 30 chars.
-    valuesMap.entrySet()
-            .stream()
-            .filter(e -> e.getValue().getClass().equals(String.class))
-            .filter(e -> e.getValue().toString().length() > 30)
-            .forEach(
-                    e -> {
-                      String s = e.getValue().toString().substring(0, 27);
-                      s = s.concat("...");
-                      e.setValue(s);
-                    });
+    valuesMap
+        .entrySet()
+        .stream()
+        .filter(e -> e.getValue().getClass().equals(String.class))
+        .filter(e -> e.getValue().toString().length() > 30)
+        .forEach(
+            e -> {
+              String s = e.getValue().toString().substring(0, 27);
+              s = s.concat("...");
+              e.setValue(s);
+            });
     return valuesMap;
   }
 }

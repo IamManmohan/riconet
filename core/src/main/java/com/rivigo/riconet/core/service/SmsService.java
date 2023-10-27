@@ -1,6 +1,7 @@
 package com.rivigo.riconet.core.service;
 
 import com.rivigo.riconet.core.dto.TemplateV2DTO;
+import java.util.Map;
 
 import java.util.Map;
 
@@ -10,5 +11,5 @@ public interface SmsService {
 
   Boolean sendSmsV2(String mobileNo, TemplateV2DTO template);
 
-  Map<String, String> sanitizeStringValuesForStringLimit(Map<String,String> valuesMap);
+  Map<String, String> sanitizeStringValuesForStringLimit(Map<String, String> valuesMap);
 }
