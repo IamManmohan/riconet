@@ -1,8 +1,10 @@
 package com.rivigo.riconet.core.service.impl;
 
+import com.rivigo.riconet.core.constants.ClientConstants;
 import com.rivigo.riconet.core.constants.ConsignmentConstant;
 import com.rivigo.riconet.core.dto.NotificationDTO;
 import com.rivigo.riconet.core.dto.logifreight.RecordDeliveryRequestDto;
+import com.rivigo.riconet.core.enums.ZoomCommunicationFieldNames;
 import com.rivigo.riconet.core.service.BoxService;
 import com.rivigo.riconet.core.service.ClientConsignmentService;
 import com.rivigo.riconet.core.service.ConsignmentService;
@@ -44,7 +46,6 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   private final ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
 
   private final LogiFreightRestService logiFreightRestService;
-
   public Map<String, Map<String, String>> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
 
@@ -115,7 +116,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   }
 
   @Override
-  public void validateAirConsignmentsAndMarkDelivery(
+  public void validateLFConsignmentsAndMarkDelivery(
       NotificationDTO notificationDTO, ConsignmentUploadedFiles consignmentUploadedFiles) {
     Long cnId = notificationDTO.getEntityId();
     log.info("Checking if consignment with id : {}, is MLL air consignment", cnId);
@@ -129,9 +130,11 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
     List<ConsignmentCustomFieldValue> consignmentCustomFieldValues =
         consignmentCustomFieldValueRepository.findByConsignmentIdInAndMetadataIdAndIsActiveTrue(
             Collections.singletonList(cnId), cnCustomFieldMetadataId);
-    if (CollectionUtils.isEmpty(consignmentCustomFieldValues)
-        && !Boolean.parseBoolean(consignmentCustomFieldValues.get(0).getValue())) {
-      log.info("CN: {}, is not a Air CN", cnId);
+    if ((CollectionUtils.isEmpty(consignmentCustomFieldValues)
+            || !Boolean.parseBoolean(consignmentCustomFieldValues.get(0).getValue()))
+        && !ClientConstants.PFIZER_CLIENT_IDS.contains(
+            notificationDTO.getMetadata().get(ZoomCommunicationFieldNames.CLIENT_ID.name()))) {
+      log.info("CN: {}, is not a Air CN and Not logifreight CN", cnId);
       return;
     }
     // hit Logi Freight apis, ad mark the CNs delivered in their system.

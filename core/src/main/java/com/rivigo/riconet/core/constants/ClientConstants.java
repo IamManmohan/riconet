@@ -1,6 +1,8 @@
 package com.rivigo.riconet.core.constants;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClientConstants {
 
@@ -10,6 +12,8 @@ public class ClientConstants {
 
   // TODO: get this corrected
   public static final String LOGI_FREIGHT_CLIENT_ID = "9721";
+  public static final String PFIZER_CLIENT_ID = "10019";
+  public static final String PFIZER_CLIENT_ID_IND = "10020";
   public static final String HILTI_CLIENT_ID = "619";
   public static final String HILTI_CLIENT_ID_DEP = "2187";
   public static final String HILTI_CLIENT_ID_CD = "2870";
@@ -26,4 +30,7 @@ public class ClientConstants {
   public static final BigInteger POC_LEVEL_FOR_EMAIL = BigInteger.valueOf(1);
 
   public static final String CONSIGNER_VALUE = "CONSIGNER";
+
+  public static final List<String> PFIZER_CLIENT_IDS =
+      Arrays.asList(PFIZER_CLIENT_ID, PFIZER_CLIENT_ID_IND);
 }
