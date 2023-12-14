@@ -455,6 +455,8 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
         addEventsToQueue(clientIntegrationRequestDTOList, clientEventBuffer);
         break;
       case ClientConstants.LOGI_FREIGHT_CLIENT_ID:
+      case ClientConstants.PFIZER_CLIENT_ID:
+      case ClientConstants.PFIZER_CLIENT_ID_IND:
         // validate and mark the consignments delivered in shipX
         String cnote = consignmentService.getCnoteByIdAndIsActive(notificationDTO.getEntityId());
         boolean isPrimaryCn = consignmentService.isPrimaryConsignment(cnote);
@@ -466,7 +468,7 @@ public class ClientApiIntegrationServiceImpl implements ClientApiIntegrationServ
                   FileTypes.POD, notificationDTO.getEntityId());
           ConsignmentUploadedFiles consignmentUploadedFiles =
               CollectionUtils.isEmpty(uploadedFiles) ? null : uploadedFiles.get(0);
-          clientConsignmentService.validateAirConsignmentsAndMarkDelivery(
+          clientConsignmentService.validateLFConsignmentsAndMarkDelivery(
               notificationDTO, consignmentUploadedFiles);
         } else {
           log.debug(

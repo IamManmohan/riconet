@@ -13,6 +13,6 @@ public interface ClientConsignmentService {
 
   List<String> getBarcodeListFromConsignmentId(Long cnId);
 
-  void validateAirConsignmentsAndMarkDelivery(
+  void validateLFConsignmentsAndMarkDelivery(
       NotificationDTO notificationDTO, ConsignmentUploadedFiles consignmentUploadedFiles);
 }
