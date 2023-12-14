@@ -46,6 +46,7 @@ public class ClientConsignmentServiceImpl implements ClientConsignmentService {
   private final ConsignmentCustomFieldValueRepository consignmentCustomFieldValueRepository;
 
   private final LogiFreightRestService logiFreightRestService;
+
   public Map<String, Map<String, String>> getCnoteToConsignmentMetadataMapFromCnoteList(
       List<String> cnoteList) {
 
